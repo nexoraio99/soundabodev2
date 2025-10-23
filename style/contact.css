@@ -100,6 +100,36 @@ body {
     transform: translateX(0);
     z-index: 2000; /* above everything when open */
   }
+/* ============================================================================
+   WHATSAPP FLOATING BUTTON
+   ============================================================================ */
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 25px;
+    right: 25px;
+    background-color: #25D366;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1);
+    background-color: #20ba5a;
+}
+
+.whatsapp-icon {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) invert(1);
+}
   
   /* --- Contact Section --- */
   .contact-section {
