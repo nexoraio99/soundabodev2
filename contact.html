@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Soundabode</title>
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-KVRWZ2DP');
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="frontend/styles/contact.css"> 
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
+</head>
+<body>
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KVRWZ2DP"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="assets/sa-logo edited.png" alt="Soundabode Logo" class="logo-img">
+        </a>        
+        <div class="nav-menu">
+            <div class="nav-links">
+                <a href="#" data-text="ABOUT"><span>ABOUT</span></a>
+                <a href="#" data-text="COURSES"><span>COURSES</span></a>
+                <a href="#" data-text="CONTACT"><span>CONTACT</span></a>
+            </div>
+        </div>
+        <button class="hamburger-menu">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </button>
+    </nav>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact-section">
+        <h2 class="section-title">CONTACT US</h2> 
+        <div class="contact-grid">
+            <div class="contact-info">
+                <div class="info-item">
+                    <label>Send an email</label>
+                    <a href="mailto:soundabodeacademy@gmail.com">soundabodeacademy@gmail.com</a>
+                </div>
+                <div class="info-item">
+                    <label>PHONE</label>
+                    <p>+91 997 501 6189</p>
+                </div>
+                <div class="info-item">
+                    <label>Location</label>
+                    <p>VISION 9, 2nd FLOOR<br>PIMPLE SAUDAGAR, PUNE<br>411017</p>
+                </div>
+            </div>
+
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Jane Smith" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="jane@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="course">Course of Interest</label>
+                    <select id="course" name="course" required>
+                        <option value="" disabled selected>Select a course</option>
+                        <option value="dj-training">DJ Training</option>
+                        <option value="audio-engineering">Audio Engineering</option>
+                        <option value="music-production">Music Production</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Send a message" required></textarea>
+                </div>
+
+                <div class="recaptcha-container">
+                    <div class="g-recaptcha" data-sitekey="6Ld5K-4rAAAAAGtEeNga3S7R8Yzd5ZJEMizF-XMd"></div>
+                </div>
+
+                <button type="submit">Submit</button>
+                <div id="form-status" style="text-align: center; margin-top: 10px; min-height: 20px;"></div>
+            </form>
+        </div>
+    </section>
+
+    <!-- MAP SECTION -->
+    <section class="map">
+        <div class="container">
+            <div class="map-frame">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3781.7558844206836!2d73.80020231409167!3d18.595459887336456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2c8a5a5a5a5a5%3A0x5a5a5a5a5a5a5a5a!2sVISION%209%2C%202nd%20Floor%2C%20Pimple%20Saudagar%2C%20Pune!5e0!3m2!1sen!2sin!4v1234567890" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 20px; color:#fff;">
+            <a class="nav-link" href="https://www.google.com/maps/place/Soundabode+Music+Production+%26+DJ+Academy/@18.5940925,73.7907623,15z/data=!3m1!4b1!4m6!3m5!1s0x3bc2b91c1d1836bb:0xc2aa72cb288dbe97!8m2!3d18.5940925!4d73.7907623!16s%2Fg%2F11s9n7lpzv" target="_blank" rel="noopener"style="color:#fff; text-decoration:none;"">Open in Google Maps</a>
+        </p>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-columns">
+                <div class="footer-column">
+                    <h4>ABOUT</h4>
+                    <ul>
+                        <li><a href="#">ABOUT</a></li>
+                        <li><a href="#">COURSES</a></li>
+                        <li><a href="#">CONTACT</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>LOCATION</h4>
+                    <p>VISION 9, 2ND FLOOR<br>KUNAL ICON RD<br>PIMPLE SAUDAGAR, PUNE<br>MAHARASHTRA 411017</p>
+                </div>
+                <div class="footer-column">
+                    <h4>SOCIALS</h4>
+                    <ul>
+                        <li><a href="#">INSTAGRAM</a></li>
+                        <li><a href="#">TWITTER</a></li>
+                        <li><a href="#">FACEBOOK</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>2025 © SOUNDABODE</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="frontend/script/contact.js"></script>
+</body>
+</html>
