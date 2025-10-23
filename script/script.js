@@ -145,28 +145,92 @@ function updateImageZoom() {
 }
 
 // ============================================================================
-// CAROUSEL ANIMATION - INFINITE SEAMLESS LOOP
+// CAROUSEL ANIMATION - INFINITE SEAMLESS LOOP (FIXED)
 // ============================================================================
 let carouselAnimationId = null;
 let carouselScrollPos = 0;
-let carouselItemWidth = 0;
-let totalCarouselWidth = 0;
+let carouselOneSetWidth = 0;
+let carouselTotalWidth = 0;
 
 function initCarouselClones() {
     if (!carouselTrack) return;
 
+    // Clear any existing clones first
+    carouselTrack.innerHTML = carouselTrack.innerHTML;
+
     // Get original items
     const originalItems = Array.from(carouselTrack.querySelectorAll('.carousel-item'));
     
-    if (originalItems.length === 0) return;
+    if (originalItems.length === 0) {
+        console.warn('No carousel items found');
+        return;
+    }
 
-    // Calculate single carousel width
-    carouselItemWidth = originalItems[0].offsetWidth + 40; // item width + gap
-    totalCarouselWidth = carouselItemWidth * originalItems.length;
+    // Wait for images to load, then calculate properly
+    const waitForImages = new Promise((resolve) => {
+        let loadedCount = 0;
+        const images = carouselTrack.querySelectorAll('img');
+        
+        if (images.length === 0) {
+            resolve();
+            return;
+        }
 
-    // Clone items to create infinite effect (clone original 4 times)
-    const originalHTML = carouselTrack.innerHTML;
-    carouselTrack.innerHTML = originalHTML + originalHTML + originalHTML + originalHTML;
+        images.forEach(img => {
+            if (img.complete) {
+                loadedCount++;
+            } else {
+                img.addEventListener('load', () => {
+                    loadedCount++;
+                    if (loadedCount === images.length) resolve();
+                });
+                img.addEventListener('error', () => {
+                    loadedCount++;
+                    if (loadedCount === images.length) resolve();
+                });
+            }
+        });
+
+        if (loadedCount === images.length) resolve();
+    });
+
+    waitForImages.then(() => {
+        // Get computed styles for gap
+        const styles = window.getComputedStyle(carouselTrack);
+        const gapStr = styles.gap || '40px';
+        const gap = parseInt(gapStr) || 40;
+
+        // Calculate width of one complete set
+        let totalWidth = 0;
+        const items = carouselTrack.querySelectorAll('.carousel-item');
+        
+        items.forEach((item, index) => {
+            totalWidth += item.offsetWidth;
+            if (index < items.length - 1) {
+                totalWidth += gap; // Add gap between items
+            }
+        });
+
+        carouselOneSetWidth = totalWidth;
+        
+        // Clone items to create infinite effect
+        const originalHTML = carouselTrack.innerHTML;
+        carouselTrack.innerHTML = originalHTML + originalHTML + originalHTML;
+        
+        carouselTotalWidth = carouselOneSetWidth * 3;
+        
+        console.log('Carousel initialized:', {
+            itemCount: items.length,
+            oneSetWidth: carouselOneSetWidth,
+            totalWidth: carouselTotalWidth,
+            gap: gap
+        });
+
+        // Start animation if already in view
+        if (state.carouselInView && !state.isCarouselAnimating) {
+            startCarouselAnimation();
+        }
+    });
 }
 
 function checkCarouselInView() {
@@ -180,7 +244,7 @@ function checkCarouselInView() {
 
     if (inView && !state.carouselInView) {
         state.carouselInView = true;
-        if (!state.isCarouselAnimating) {
+        if (!state.isCarouselAnimating && carouselOneSetWidth > 0) {
             startCarouselAnimation();
         }
     } else if (!inView && state.carouselInView) {
@@ -190,19 +254,21 @@ function checkCarouselInView() {
 }
 
 function startCarouselAnimation() {
-    if (state.isCarouselAnimating) return;
+    if (state.isCarouselAnimating || carouselOneSetWidth === 0) return;
     state.isCarouselAnimating = true;
 
     function animateCarousel() {
-        carouselScrollPos += 0.6;
+        carouselScrollPos += 0.6; // Speed of carousel
 
-        // Seamless loop: reset when we've scrolled through one full set
-        if (carouselScrollPos >= totalCarouselWidth) {
+        // Seamless loop: reset when we've scrolled through one complete set
+        if (carouselScrollPos >= carouselOneSetWidth) {
             carouselScrollPos = 0;
         }
 
-        carouselTrack.style.transform = `translateX(-${carouselScrollPos}px)`;
-        carouselTrack.style.transition = 'none';
+        if (carouselTrack) {
+            carouselTrack.style.transform = `translateX(-${carouselScrollPos}px)`;
+            carouselTrack.style.transition = 'none';
+        }
         
         if (state.isCarouselAnimating) {
             carouselAnimationId = requestAnimationFrame(animateCarousel);
@@ -220,14 +286,27 @@ function stopCarouselAnimation() {
     state.isCarouselAnimating = false;
 }
 
+// Pause on hover
 if (carouselTrack) {
     carouselTrack.addEventListener('mouseenter', stopCarouselAnimation);
     carouselTrack.addEventListener('mouseleave', () => {
-        if (state.carouselInView) {
+        if (state.carouselInView && carouselOneSetWidth > 0) {
             startCarouselAnimation();
         }
     });
 }
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    // Reinitialize carousel on resize
+    carouselScrollPos = 0;
+    stopCarouselAnimation();
+    
+    // Wait a bit for layout to settle
+    setTimeout(() => {
+        initCarouselClones();
+    }, 300);
+});
 
 // ============================================================================
 // TESTIMONIAL CAROUSEL
