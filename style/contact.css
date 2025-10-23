@@ -824,7 +824,17 @@ body {
         font-size: clamp(0.5rem, 0.9vw, 0.6rem);
     }
 }
+.whatsapp-float {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+    }
 
+    .whatsapp-icon {
+        width: 25px;
+        height: 25px;
+    }
 @media (max-width: 360px) {
     .navbar {
         padding: 6px clamp(8px, 1.5vw, 12px);
