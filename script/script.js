@@ -196,90 +196,61 @@ let carouselAnimationId = null;
 let carouselScrollPos = 0;
 let carouselOneSetWidth = 0;
 let carouselSpeed = isMobile ? 0.3 : 0.6; // Slower on mobile
-
-// Cache carousel width
-let carouselWidthCache = {
-    oneSetWidth: 0,
-    gap: 0,
-    initialized: false
-};
+let carouselInitialized = false;
 
 function initCarouselClones() {
-    if (!carouselTrack || carouselWidthCache.initialized) return;
+    if (!carouselTrack || carouselInitialized) return;
 
-    // Get original items
-    const originalItems = Array.from(carouselTrack.querySelectorAll('.carousel-item'));
+    // Get original items before any modifications
+    const carouselItems = carouselTrack.querySelectorAll('.carousel-item');
     
-    if (originalItems.length === 0) {
+    if (carouselItems.length === 0) {
         console.warn('No carousel items found');
         return;
     }
 
-    // Wait for images to load
-    const waitForImages = new Promise((resolve) => {
-        let loadedCount = 0;
-        const images = carouselTrack.querySelectorAll('img');
-        
-        if (images.length === 0) {
-            resolve();
-            return;
-        }
+    // Wait a bit for images to load
+    setTimeout(() => {
+        try {
+            // Get computed styles for gap
+            const styles = window.getComputedStyle(carouselTrack);
+            const gapStr = styles.gap || '40px';
+            const gap = parseInt(gapStr) || 40;
 
-        images.forEach(img => {
-            if (img.complete) {
-                loadedCount++;
-            } else {
-                img.addEventListener('load', () => {
-                    loadedCount++;
-                    if (loadedCount === images.length) resolve();
-                }, { once: true });
-                img.addEventListener('error', () => {
-                    loadedCount++;
-                    if (loadedCount === images.length) resolve();
-                }, { once: true });
+            // Calculate width of one complete set
+            let totalWidth = 0;
+            const items = carouselTrack.querySelectorAll('.carousel-item');
+            
+            items.forEach((item, index) => {
+                totalWidth += item.offsetWidth;
+                if (index < items.length - 1) {
+                    totalWidth += gap;
+                }
+            });
+
+            carouselOneSetWidth = totalWidth;
+
+            if (carouselOneSetWidth > 0) {
+                // Clone items
+                const originalHTML = carouselTrack.innerHTML;
+                carouselTrack.innerHTML = originalHTML + originalHTML + originalHTML;
+                carouselInitialized = true;
+
+                console.log('Carousel initialized:', {
+                    itemCount: items.length,
+                    oneSetWidth: carouselOneSetWidth,
+                    gap: gap,
+                    speed: carouselSpeed
+                });
+
+                if (state.carouselInView && !state.isCarouselAnimating) {
+                    startCarouselAnimation();
+                }
             }
-        });
-
-        if (loadedCount === images.length) resolve();
-    });
-
-    waitForImages.then(() => {
-        // Get computed styles for gap
-        const styles = window.getComputedStyle(carouselTrack);
-        const gapStr = styles.gap || '40px';
-        const gap = parseInt(gapStr) || 40;
-
-        // Calculate width of one complete set
-        let totalWidth = 0;
-        const items = carouselTrack.querySelectorAll('.carousel-item');
-        
-        items.forEach((item, index) => {
-            totalWidth += item.offsetWidth;
-            if (index < items.length - 1) {
-                totalWidth += gap;
-            }
-        });
-
-        // Cache values
-        carouselWidthCache.oneSetWidth = totalWidth;
-        carouselWidthCache.gap = gap;
-        carouselWidthCache.initialized = true;
-        carouselOneSetWidth = totalWidth;
-
-        // Clone items
-        const originalHTML = carouselTrack.innerHTML;
-        carouselTrack.innerHTML = originalHTML + originalHTML + originalHTML;
-
-        console.log('Carousel initialized:', {
-            itemCount: items.length,
-            oneSetWidth: carouselWidthCache.oneSetWidth,
-            gap: gap
-        });
-
-        if (state.carouselInView && !state.isCarouselAnimating) {
-            startCarouselAnimation();
+        } catch (e) {
+            console.error('Carousel init error:', e);
         }
-    });
+    }, 500);
 }
 
 function checkCarouselInView() {
@@ -293,7 +264,7 @@ function checkCarouselInView() {
 
     if (inView && !state.carouselInView) {
         state.carouselInView = true;
-        if (!state.isCarouselAnimating && carouselWidthCache.initialized) {
+        if (!state.isCarouselAnimating && carouselInitialized && carouselOneSetWidth > 0) {
             startCarouselAnimation();
         }
     } else if (!inView && state.carouselInView) {
@@ -303,13 +274,14 @@ function checkCarouselInView() {
 }
 
 function startCarouselAnimation() {
-    if (state.isCarouselAnimating || carouselWidthCache.oneSetWidth === 0) return;
+    if (state.isCarouselAnimating || carouselOneSetWidth === 0 || !carouselInitialized) return;
     state.isCarouselAnimating = true;
 
     function animateCarousel() {
         carouselScrollPos += carouselSpeed;
 
-        if (carouselScrollPos >= carouselWidthCache.oneSetWidth) {
+        // Seamless loop: reset when we've scrolled through one complete set
+        if (carouselScrollPos >= carouselOneSetWidth) {
             carouselScrollPos = 0;
         }
 
@@ -337,7 +309,7 @@ function stopCarouselAnimation() {
 if (carouselTrack) {
     carouselTrack.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
     carouselTrack.addEventListener('mouseleave', () => {
-        if (state.carouselInView && carouselWidthCache.initialized) {
+        if (state.carouselInView && carouselInitialized && carouselOneSetWidth > 0) {
             startCarouselAnimation();
         }
     }, { passive: true });
@@ -583,7 +555,6 @@ window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', () => {
     INTRO_ANIMATION_RANGE = window.innerHeight * 0.8;
     state.aboutSectionCached = false; // Reset cache on resize
-    carouselWidthCache.initialized = false; // Reset carousel cache
 }, { passive: true });
 
 // ============================================================================
