@@ -212,7 +212,9 @@ body {
         transform: translateX(0);
     }
 }
-
+.aurora-text, .carousel-item, .image-block, .logo-track {
+    will-change: transform;
+}
 /* ============================================================================
    MAIN CONTENT
    ============================================================================ */
