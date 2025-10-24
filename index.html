@@ -41,22 +41,32 @@
         <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KVRWZ2DP" height="0" width="0" style="display:none;visibility:hidden"></iframe>
     </noscript>
 
-    <!-- ============================================================================
-         POPUP FORM
-         ============================================================================ -->
-    <div id="popup-form" class="popup-overlay">
-        <div class="popup-content">
-            <button class="close-btn" id="closePopup">&times;</button>
-            <h2>Get in Touch</h2>
-            <form id="leadForm">
-                <input type="text" name="name" placeholder="Your Name" required>
-                <input type="email" name="email" placeholder="Your Email" required>
-                <input type="tel" name="phone" placeholder="Your Phone" required>
-                <textarea name="message" placeholder="Your Message" rows="3"></textarea>
-                <button type="submit">Submit</button>
-            </form>
-        </div>
+    <!-- POPUP FORM -->
+<div id="popup-form" class="popup-overlay">
+    <div class="popup-content">
+        <button class="close-btn" id="closePopup">&times;</button>
+        <h2>Get in Touch</h2>
+        
+        <!-- FormSubmit Integration -->
+        <form action="https://formsubmit.co/your@email.com" method="POST">
+            
+            <!-- FormSubmit Configuration (Hidden Fields) -->
+            <input type="hidden" name="_subject" value="New Inquiry from SoundAbode Website">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_autoresponse" value="Thank you for contacting SoundAbode! We'll get back to you within 24 hours.">
+            
+            <!-- Form Fields -->
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <input type="tel" name="phone" placeholder="Your Phone" required>
+            <textarea name="message" placeholder="Your Message" rows="3"></textarea>
+            
+            <button type="submit">Submit</button>
+        </form>
     </div>
+</div>
+
 
     <!-- ============================================================================
          NAVBAR
