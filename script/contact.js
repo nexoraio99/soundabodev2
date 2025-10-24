@@ -28,7 +28,7 @@ document.addEventListener('click', (e) => {
 });
 
 // ============================================================================
-// FORM HANDLING - Contact Form Submission
+// FORM HANDLING - Contact Form Submission with Client-Side Validation
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('contactForm');
@@ -36,9 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!form) return;
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
+    form.addEventListener('submit', (e) => {
         // Clear previous status
         formStatus.textContent = '';
         formStatus.style.color = '#00c2ff';
@@ -48,18 +46,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = form.email.value.trim();
         const phone = form.phone.value.trim();
         const course = form.course.value;
-        const message = form.message.value.trim() || '';
+        const message = form.message.value.trim();
 
         // Validate reCAPTCHA
         const recaptchaResponse = grecaptcha.getResponse();
         if (!recaptchaResponse) {
+            e.preventDefault();
             formStatus.textContent = '❌ Please complete the reCAPTCHA verification';
             formStatus.style.color = '#ff6b6b';
             return;
         }
 
         // Basic validation
-        if (!name || !email || !phone || !course) {
+        if (!name || !email || !phone || !course || !message) {
+            e.preventDefault();
             formStatus.textContent = '❌ Please fill in all required fields';
             formStatus.style.color = '#ff6b6b';
             return;
@@ -68,83 +68,27 @@ document.addEventListener('DOMContentLoaded', () => {
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
+            e.preventDefault();
             formStatus.textContent = '❌ Please enter a valid email address';
             formStatus.style.color = '#ff6b6b';
             return;
         }
 
-        // Phone validation (basic - at least 10 digits)
-        const phoneDigits = phone.replace(/\D/g, '');
-        if (phoneDigits.length < 10) {
+        // Phone validation (basic - adjust pattern as needed)
+        const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+        if (!phoneRegex.test(phone) || phone.replace(/\D/g, '').length < 10) {
+            e.preventDefault();
             formStatus.textContent = '❌ Please enter a valid phone number';
             formStatus.style.color = '#ff6b6b';
             return;
         }
 
-        try {
-            // Show loading state
-            formStatus.textContent = '⏳ Submitting...';
-            formStatus.style.color = '#00c2ff';
-            
-            const submitButton = form.querySelector('button[type="submit"]');
-            const originalText = submitButton.textContent;
-            submitButton.textContent = 'Submitting...';
-            submitButton.disabled = true;
+        // Show loading state
+        formStatus.textContent = '⏳ Submitting...';
+        formStatus.style.color = '#00c2ff';
 
-            // Prepare form data for submission
-            const formData = {
-                name,
-                email,
-                phone,
-                course,
-                message,
-                recaptcha_token: recaptchaResponse,
-                submitted_at: new Date().toISOString()
-            };
-
-            // OPTION 1: Submit to your n8n webhook
-            // Replace 'YOUR_N8N_WEBHOOK_URL' with your actual webhook URL
-            const webhookURL = 'YOUR_N8N_WEBHOOK_URL';
-            
-            const response = await fetch(webhookURL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            });
-
-            if (!response.ok) {
-                throw new Error('Submission failed');
-            }
-
-            // Success message
-            formStatus.textContent = '✅ Message submitted successfully! We\'ll get back to you soon.';
-            formStatus.style.color = '#33ff8c';
-
-            // Reset form
-            form.reset();
-            grecaptcha.reset();
-            
-            // Re-enable submit button
-            submitButton.textContent = originalText;
-            submitButton.disabled = false;
-
-            // Auto-clear success message after 5 seconds
-            setTimeout(() => {
-                formStatus.textContent = '';
-            }, 5000);
-
-        } catch (err) {
-            console.error('Form submission error:', err);
-            formStatus.textContent = '❌ There was an error submitting your message. Please try again.';
-            formStatus.style.color = '#ff6b6b';
-            
-            // Re-enable submit button on error
-            const submitButton = form.querySelector('button[type="submit"]');
-            submitButton.textContent = 'Submit';
-            submitButton.disabled = false;
-        }
+        // Form will submit normally via POST to FormSubmit.co
+        // FormSubmit will handle the email sending and redirect
     });
 
     // Real-time form validation
@@ -170,8 +114,9 @@ function validateField(field) {
             field.style.borderColor = '#333';
         }
     } else if (field.type === 'tel') {
-        const phoneDigits = value.replace(/\D/g, '');
-        if (value && phoneDigits.length < 10) {
+        const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+        const digitsOnly = value.replace(/\D/g, '');
+        if (value && (!phoneRegex.test(value) || digitsOnly.length < 10)) {
             field.style.borderColor = '#ff6b6b';
         } else {
             field.style.borderColor = '#333';
@@ -184,13 +129,57 @@ function validateField(field) {
 }
 
 // ============================================================================
+// PHONE NUMBER FORMATTING
+// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const phoneInput = document.getElementById('phone');
+    if (!phoneInput) return;
+
+    phoneInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/[^\d\+]/g, '');
+        
+        // Allow international format starting with +
+        if (value.startsWith('+')) {
+            // Keep the + and format rest
+            const digits = value.slice(1).replace(/\D/g, '');
+            if (digits.length > 12) {
+                e.target.value = '+' + digits.slice(0, 12);
+            } else {
+                e.target.value = '+' + digits;
+            }
+        } else {
+            // Indian format: +91 XXX XXX XXXX
+            const digits = value.replace(/\D/g, '');
+            if (digits.length > 10) {
+                e.target.value = digits.slice(0, 10);
+            } else {
+                e.target.value = digits;
+            }
+        }
+    });
+
+    // Format on blur
+    phoneInput.addEventListener('blur', (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length === 10) {
+            // Format as: XXX XXX XXXX
+            e.target.value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6);
+        } else if (value.length > 10) {
+            // International format
+            e.target.value = '+' + value;
+        }
+    });
+});
+
+// ============================================================================
 // ACCESSIBILITY - Keyboard navigation for form
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('contactForm');
     if (!form) return;
 
-    const formElements = form.querySelectorAll('input, textarea, select, button');
+    const formElements = form.querySelectorAll('input:not([name="_honey"]), textarea, select, button');
 
     formElements.forEach((element, index) => {
         element.addEventListener('keydown', (e) => {
@@ -228,6 +217,40 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // ============================================================================
+// PREVENT MULTIPLE FORM SUBMISSIONS
+// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+
+    let isSubmitting = false;
+
+    form.addEventListener('submit', (e) => {
+        if (isSubmitting) {
+            e.preventDefault();
+            return;
+        }
+
+        // Only set submitting if validation passes
+        const formStatus = document.getElementById('form-status');
+        if (!formStatus.textContent.includes('❌')) {
+            isSubmitting = true;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+
+            // Reset after form actually submits or 5 seconds
+            setTimeout(() => {
+                isSubmitting = false;
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }, 5000);
+        }
+    });
+});
+
+// ============================================================================
 // INTERSECTION OBSERVER FOR ANIMATIONS
 // ============================================================================
 const observerOptions = {
@@ -256,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // FORM FIELD FOCUS EFFECTS
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    const inputs = document.querySelectorAll('.contact-form input, .contact-form textarea, .contact-form select');
+    const inputs = document.querySelectorAll('.contact-form input:not([name="_honey"]), .contact-form textarea, .contact-form select');
 
     inputs.forEach(input => {
         input.addEventListener('focus', () => {
@@ -265,29 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         input.addEventListener('blur', () => {
             input.style.boxShadow = 'none';
-        });
-    });
-});
-
-// ============================================================================
-// PHONE NUMBER FORMATTING
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const phoneInputs = document.querySelectorAll('input[type="tel"]');
-    phoneInputs.forEach(input => {
-        input.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 10) value = value.slice(0, 10);
-            
-            if (value.length > 0) {
-                if (value.length <= 3) {
-                    e.target.value = value;
-                } else if (value.length <= 6) {
-                    e.target.value = value.slice(0, 3) + '-' + value.slice(3);
-                } else {
-                    e.target.value = value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6);
-                }
-            }
         });
     });
 });
