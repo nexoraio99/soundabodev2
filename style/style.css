@@ -152,15 +152,15 @@ line-height: 1.6;
 }
 
 .overlay-left {
-left: 50%;
+left: 10%;
 transform: translateX(-50%);
-text-align: left;
+text-align: center;
 }
 
 .overlay-right {
-right: 50%;
+right: 10%;
 transform: translateX(0);
-text-align: left;
+text-align: center;
 }
 
 .left-font,
