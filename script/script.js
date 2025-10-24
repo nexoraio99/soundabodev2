@@ -1,8 +1,14 @@
 // ============================================================================
-// SOUNDABODE SCROLL ANIMATION - COMPLETE RESTRUCTURED LOGIC
+// SOUNDABODE SCROLL ANIMATION - OPTIMIZED FOR MOBILE PERFORMANCE
 // ============================================================================
 
 let INTRO_ANIMATION_RANGE = window.innerHeight * 0.8;
+
+// ============================================================================
+// DETECT DEVICE & PERFORMANCE
+// ============================================================================
+const isMobile = window.innerWidth < 768;
+const isLowEndDevice = navigator.deviceMemory && navigator.deviceMemory < 4;
 
 // ============================================================================
 // DOM ELEMENTS
@@ -28,55 +34,82 @@ let state = {
     spacerStart: 0,
     spacerEnd: 0,
     carouselInView: false,
-    isCarouselAnimating: false
+    isCarouselAnimating: false,
+    aboutSectionCached: false,
+    aboutTop: 0,
+    aboutBottom: 0
 };
 
 // ============================================================================
-// MAIN SCROLL ANIMATION FUNCTION
+// MASTER ANIMATION LOOP - Consolidated RAF for better performance
 // ============================================================================
-function animateOnScroll() {
+let masterAnimationId = null;
+let ticking = false;
+let lastScrollY = 0;
+
+function masterAnimationLoop() {
     state.scrollY = window.scrollY;
-    const viewportHeight = window.innerHeight;
-    const spacerHeight = spacer ? spacer.offsetHeight : 0;
     
-    state.spacerStart = viewportHeight;
-    state.spacerEnd = state.spacerStart + spacerHeight;
+    // Only update if scroll changed significantly (throttle)
+    if (Math.abs(state.scrollY - lastScrollY) > 5 || !ticking) {
+        lastScrollY = state.scrollY;
+        
+        const viewportHeight = window.innerHeight;
+        const spacerHeight = spacer ? spacer.offsetHeight : 0;
+        
+        state.spacerStart = viewportHeight;
+        state.spacerEnd = state.spacerStart + spacerHeight;
 
-    // Calculate intro animation progress (0 to 1)
-    state.phase1Progress = Math.min(1, state.scrollY / INTRO_ANIMATION_RANGE);
+        // Calculate intro animation progress (0 to 1)
+        state.phase1Progress = Math.min(1, state.scrollY / INTRO_ANIMATION_RANGE);
 
-    updateIntroOverlay();
-    updateMainContent();
-    updateImageZoom();
-    checkCarouselInView();
+        updateIntroOverlay();
+        updateMainContent();
+        
+        // Only animate image zoom if not low-end device
+        if (!isLowEndDevice) {
+            updateImageZoom();
+        }
+        
+        checkCarouselInView();
+    }
+
+    if (ticking) {
+        masterAnimationId = requestAnimationFrame(masterAnimationLoop);
+    }
+}
+
+// Optimized scroll listener with throttling
+function onScroll() {
+    if (!ticking) {
+        ticking = true;
+        masterAnimationLoop();
+    }
 }
 
 // ============================================================================
-// INTRO OVERLAY - Panel sliding animation
+// INTRO OVERLAY - Panel sliding animation (Optimized)
 // ============================================================================
 function updateIntroOverlay() {
     if (!panelLeft || !panelRight || !introOverlay) return;
 
     const translateX = state.phase1Progress * 100;
+    
+    // Batch transform updates
     panelLeft.style.transform = `translateX(${-translateX}%)`;
     panelRight.style.transform = `translateX(${translateX}%)`;
-    panelLeft.style.transition = 'transform 0.05s linear';
-    panelRight.style.transition = 'transform 0.05s linear';
 
     if (overlayLeft) {
         overlayLeft.style.transform = `translateX(${-state.phase1Progress * 10}px)`;
-        overlayLeft.style.transition = 'transform 0.05s linear';
     }
     if (overlayRight) {
         overlayRight.style.transform = `translateX(${state.phase1Progress * 10}px)`;
-        overlayRight.style.transition = 'transform 0.05s linear';
     }
 
     const fadeStartPoint = 0.75;
     const fadeOutOpacity = Math.max(0, 1 - (state.phase1Progress - fadeStartPoint) / (1 - fadeStartPoint));
     
     introOverlay.style.opacity = fadeOutOpacity.toString();
-    introOverlay.style.transition = 'opacity 0.05s linear';
 
     if (fadeOutOpacity < 0.05) {
         introOverlay.style.pointerEvents = 'none';
@@ -95,68 +128,84 @@ function updateMainContent() {
 
     // Main content fades in as panels move away
     const opacity = state.phase1Progress;
-    const scale = 1 + (state.phase1Progress * 0.05); // Subtle grow effect
+    const scale = 1 + (state.phase1Progress * 0.05);
 
-    mainContent.style.transition = 'none';
     mainContent.style.transform = `scale(${scale})`;
     mainContent.style.opacity = opacity;
 
-    // Intro overlay opacity reduces as panels move
-    if (introOverlay) {
-        introOverlay.style.opacity = (1 - state.phase1Progress).toString();
+    if (state.phase1Progress > 0.1) {
+        mainContent.style.pointerEvents = 'auto';
     }
 
     if (navbar) {
         navbar.style.opacity = '1';
         navbar.style.pointerEvents = 'auto';
     }
-
-    if (state.phase1Progress > 0.1) {
-        mainContent.style.pointerEvents = 'auto';
-    }
 }
 
 // ============================================================================
-// IMAGE ZOOM EFFECT - About section
+// IMAGE ZOOM EFFECT - About section (Optimized)
 // ============================================================================
 function updateImageZoom() {
     if (!aboutSection || imageBlocks.length === 0) return;
 
-    const aboutTop = aboutSection.offsetTop;
-    const aboutBottom = aboutTop + aboutSection.offsetHeight;
+    // Cache section boundaries on first run
+    if (!state.aboutSectionCached) {
+        state.aboutTop = aboutSection.offsetTop;
+        state.aboutBottom = state.aboutTop + aboutSection.offsetHeight;
+        state.aboutSectionCached = true;
+    }
 
-    if (state.scrollY >= aboutTop && state.scrollY <= aboutBottom) {
-        const scrollProgress = (state.scrollY - aboutTop) / (aboutBottom - aboutTop);
+    const viewportHeight = window.innerHeight;
+    
+    // Early exit if section not in viewport
+    if (state.scrollY < state.aboutTop - viewportHeight || 
+        state.scrollY > state.aboutBottom + viewportHeight) {
+        imageBlocks.forEach(block => {
+            block.style.transform = 'scale(1)';
+        });
+        return;
+    }
 
+    // Only calculate if in view range
+    if (state.scrollY >= state.aboutTop && state.scrollY <= state.aboutBottom) {
+        const scrollProgress = (state.scrollY - state.aboutTop) / (state.aboutBottom - state.aboutTop);
+
+        // Pre-calculate transforms to avoid reflow thrashing
+        const transforms = [];
         imageBlocks.forEach((block, index) => {
             const delay = index * 0.08;
             const adjustedProgress = Math.max(0, Math.min(1, scrollProgress - delay));
             const blockScale = 1 + (adjustedProgress * 0.12);
-
-            block.style.transform = `scale(${blockScale})`;
-            block.style.transition = 'transform 0.1s ease-out';
+            transforms.push(`scale(${blockScale})`);
         });
-    } else {
-        imageBlocks.forEach(block => {
-            block.style.transform = 'scale(1)';
-            block.style.transition = 'transform 0.1s ease-out';
+
+        // Apply all transforms in one batch
+        requestAnimationFrame(() => {
+            imageBlocks.forEach((block, i) => {
+                block.style.transform = transforms[i];
+            });
         });
     }
 }
 
 // ============================================================================
-// CAROUSEL ANIMATION - INFINITE SEAMLESS LOOP (FIXED)
+// CAROUSEL ANIMATION - INFINITE SEAMLESS LOOP (OPTIMIZED)
 // ============================================================================
 let carouselAnimationId = null;
 let carouselScrollPos = 0;
 let carouselOneSetWidth = 0;
-let carouselTotalWidth = 0;
+let carouselSpeed = isMobile ? 0.3 : 0.6; // Slower on mobile
+
+// Cache carousel width
+let carouselWidthCache = {
+    oneSetWidth: 0,
+    gap: 0,
+    initialized: false
+};
 
 function initCarouselClones() {
-    if (!carouselTrack) return;
-
-    // Clear any existing clones first
-    carouselTrack.innerHTML = carouselTrack.innerHTML;
+    if (!carouselTrack || carouselWidthCache.initialized) return;
 
     // Get original items
     const originalItems = Array.from(carouselTrack.querySelectorAll('.carousel-item'));
@@ -166,7 +215,7 @@ function initCarouselClones() {
         return;
     }
 
-    // Wait for images to load, then calculate properly
+    // Wait for images to load
     const waitForImages = new Promise((resolve) => {
         let loadedCount = 0;
         const images = carouselTrack.querySelectorAll('img');
@@ -183,11 +232,11 @@ function initCarouselClones() {
                 img.addEventListener('load', () => {
                     loadedCount++;
                     if (loadedCount === images.length) resolve();
-                });
+                }, { once: true });
                 img.addEventListener('error', () => {
                     loadedCount++;
                     if (loadedCount === images.length) resolve();
-                });
+                }, { once: true });
             }
         });
 
@@ -207,26 +256,26 @@ function initCarouselClones() {
         items.forEach((item, index) => {
             totalWidth += item.offsetWidth;
             if (index < items.length - 1) {
-                totalWidth += gap; // Add gap between items
+                totalWidth += gap;
             }
         });
 
+        // Cache values
+        carouselWidthCache.oneSetWidth = totalWidth;
+        carouselWidthCache.gap = gap;
+        carouselWidthCache.initialized = true;
         carouselOneSetWidth = totalWidth;
-        
-        // Clone items to create infinite effect
+
+        // Clone items
         const originalHTML = carouselTrack.innerHTML;
         carouselTrack.innerHTML = originalHTML + originalHTML + originalHTML;
-        
-        carouselTotalWidth = carouselOneSetWidth * 3;
-        
+
         console.log('Carousel initialized:', {
             itemCount: items.length,
-            oneSetWidth: carouselOneSetWidth,
-            totalWidth: carouselTotalWidth,
+            oneSetWidth: carouselWidthCache.oneSetWidth,
             gap: gap
         });
 
-        // Start animation if already in view
         if (state.carouselInView && !state.isCarouselAnimating) {
             startCarouselAnimation();
         }
@@ -244,7 +293,7 @@ function checkCarouselInView() {
 
     if (inView && !state.carouselInView) {
         state.carouselInView = true;
-        if (!state.isCarouselAnimating && carouselOneSetWidth > 0) {
+        if (!state.isCarouselAnimating && carouselWidthCache.initialized) {
             startCarouselAnimation();
         }
     } else if (!inView && state.carouselInView) {
@@ -254,20 +303,18 @@ function checkCarouselInView() {
 }
 
 function startCarouselAnimation() {
-    if (state.isCarouselAnimating || carouselOneSetWidth === 0) return;
+    if (state.isCarouselAnimating || carouselWidthCache.oneSetWidth === 0) return;
     state.isCarouselAnimating = true;
 
     function animateCarousel() {
-        carouselScrollPos += 0.6; // Speed of carousel
+        carouselScrollPos += carouselSpeed;
 
-        // Seamless loop: reset when we've scrolled through one complete set
-        if (carouselScrollPos >= carouselOneSetWidth) {
+        if (carouselScrollPos >= carouselWidthCache.oneSetWidth) {
             carouselScrollPos = 0;
         }
 
         if (carouselTrack) {
             carouselTrack.style.transform = `translateX(-${carouselScrollPos}px)`;
-            carouselTrack.style.transition = 'none';
         }
         
         if (state.isCarouselAnimating) {
@@ -288,25 +335,13 @@ function stopCarouselAnimation() {
 
 // Pause on hover
 if (carouselTrack) {
-    carouselTrack.addEventListener('mouseenter', stopCarouselAnimation);
+    carouselTrack.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
     carouselTrack.addEventListener('mouseleave', () => {
-        if (state.carouselInView && carouselOneSetWidth > 0) {
+        if (state.carouselInView && carouselWidthCache.initialized) {
             startCarouselAnimation();
         }
-    });
+    }, { passive: true });
 }
-
-// Handle window resize
-window.addEventListener('resize', () => {
-    // Reinitialize carousel on resize
-    carouselScrollPos = 0;
-    stopCarouselAnimation();
-    
-    // Wait a bit for layout to settle
-    setTimeout(() => {
-        initCarouselClones();
-    }, 300);
-});
 
 // ============================================================================
 // TESTIMONIAL CAROUSEL
@@ -351,17 +386,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================================================
-// POPUP FORM
+// POPUP FORM - Use variable instead of sessionStorage
 // ============================================================================
 const popup = document.getElementById('popup-form');
 const closeBtn = document.getElementById('closePopup');
+let popupShown = false;
 
 if (popup && closeBtn) {
     window.addEventListener('load', () => {
-        if (!sessionStorage.getItem('formShown')) {
+        if (!popupShown) {
             setTimeout(() => {
                 popup.classList.add('active');
-                sessionStorage.setItem('formShown', 'true');
+                popupShown = true;
             }, 2000);
         }
     });
@@ -378,7 +414,7 @@ if (popup && closeBtn) {
 }
 
 // ============================================================================
-// INFINITE LOGO SCROLL - TRUE SEAMLESS LOOP
+// INFINITE LOGO SCROLL - OPTIMIZED
 // ============================================================================
 const logoTrack = document.querySelector('.logo-track');
 const logoSet = document.querySelector('.logo-set');
@@ -387,13 +423,18 @@ if (logoTrack && logoSet) {
     const originalHTML = logoSet.outerHTML;
     logoTrack.innerHTML = originalHTML + originalHTML + originalHTML + originalHTML + originalHTML;
 
-    let logoScrollSpeed = 0.1;
+    let logoScrollSpeed = isMobile ? 0.03 : 0.1;
     let logoCurrentPosition = 0;
     let logoIsPaused = false;
+    let logoSetWidth = 0;
+    let logoAnimationId = null;
 
     function getLogoSetWidth() {
-        const sets = logoTrack.querySelectorAll('.logo-set');
-        return sets[0] ? sets[0].offsetWidth : 0;
+        if (logoSetWidth === 0) {
+            const sets = logoTrack.querySelectorAll('.logo-set');
+            logoSetWidth = sets[0] ? sets[0].offsetWidth : 0;
+        }
+        return logoSetWidth;
     }
 
     function animateLogo() {
@@ -406,43 +447,43 @@ if (logoTrack && logoSet) {
             }
 
             logoTrack.style.transform = `translateX(${logoCurrentPosition}px)`;
-            logoTrack.style.transition = 'none';
         }
 
-        requestAnimationFrame(animateLogo);
+        logoAnimationId = requestAnimationFrame(animateLogo);
     }
 
     const banner = document.querySelector('.client-logo-banner');
     if (banner) {
         banner.addEventListener('mouseenter', () => {
             logoIsPaused = true;
-        });
+        }, { passive: true });
 
         banner.addEventListener('mouseleave', () => {
             logoIsPaused = false;
-        });
+        }, { passive: true });
     }
 
     function updateLogoSpeed() {
         const screenWidth = window.innerWidth;
         if (screenWidth < 660) {
-            logoScrollSpeed = 0.05;
+            logoScrollSpeed = 0.03;
         } else if (screenWidth < 768) {
-            logoScrollSpeed = 0.08;
+            logoScrollSpeed = 0.05;
         } else if (screenWidth < 1440) {
-            logoScrollSpeed = 0.4;
+            logoScrollSpeed = 0.25;
         } else {
-            logoScrollSpeed = 0.6;
+            logoScrollSpeed = 0.4;
         }
+        logoSetWidth = 0; // Reset cache on resize
     }
 
     updateLogoSpeed();
-    window.addEventListener('resize', updateLogoSpeed);
+    window.addEventListener('resize', updateLogoSpeed, { passive: true });
     animateLogo();
 }
 
 // ============================================================================
-// REVEAL ON SCROLL - Intersection Observer for better performance
+// REVEAL ON SCROLL - Intersection Observer
 // ============================================================================
 function setupRevealObserver() {
     const observerOptions = {
@@ -476,7 +517,7 @@ function setupRevealObserver() {
 }
 
 // ============================================================================
-// AURORA TEXT ANIMATION - Ensure visibility
+// AURORA TEXT ANIMATION
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
     const el = document.querySelector('.aurora-text');
@@ -494,7 +535,6 @@ document.addEventListener('DOMContentLoaded', () => {
         el.style.setProperty('background-clip', 'text', 'important');
         el.style.setProperty('-webkit-text-fill-color', 'transparent', 'important');
         el.style.setProperty('color', 'transparent', 'important');
-        el.classList.add('debug-force-front');
     }
 });
 
@@ -536,15 +576,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================================================
-// EVENT LISTENERS
+// EVENT LISTENERS - OPTIMIZED
 // ============================================================================
-window.addEventListener('scroll', () => {
-    requestAnimationFrame(animateOnScroll);
-}, { passive: true });
+window.addEventListener('scroll', onScroll, { passive: true });
 
 window.addEventListener('resize', () => {
     INTRO_ANIMATION_RANGE = window.innerHeight * 0.8;
-});
+    state.aboutSectionCached = false; // Reset cache on resize
+    carouselWidthCache.initialized = false; // Reset carousel cache
+}, { passive: true });
 
 // ============================================================================
 // INITIALIZE
@@ -555,5 +595,6 @@ window.addEventListener('DOMContentLoaded', () => {
     setupRevealObserver();
 });
 
+// Initial setup
 animateOnScroll();
 setupRevealObserver();
