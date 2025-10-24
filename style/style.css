@@ -152,13 +152,13 @@ line-height: 1.6;
 }
 
 .overlay-left {
-left: 10%;
+left: 50%;
 transform: translateX(-50%);
 text-align: left;
 }
 
 .overlay-right {
-right: 10%;
+right: 50%;
 transform: translateX(0);
 text-align: left;
 }
