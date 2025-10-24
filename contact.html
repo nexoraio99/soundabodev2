@@ -66,23 +66,36 @@
                 </div>
             </div>
 
-            <form class="contact-form" id="contactForm">
+            <!-- FormSubmit.co Form - Replace YOUR_EMAIL with your actual email -->
+            <form action="https://formsubmit.co/YOUR_EMAIL@example.com" method="POST" class="contact-form" id="contactForm">
+                <!-- FormSubmit.co Configuration -->
+                <input type="hidden" name="_subject" value="New Contact Form Submission - Soundabode">
+                <input type="hidden" name="_captcha" value="true">
+                <input type="hidden" name="_template" value="table">
+                <input type="text" name="_honey" style="display:none">
+                
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name" placeholder="Jane Smith" required>
                 </div>
+                
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" placeholder="jane@example.com" required>
                 </div>
                 
                 <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+91 999 999 9999" required>
+                </div>
+                
+                <div class="form-group">
                     <label for="course">Course of Interest</label>
                     <select id="course" name="course" required>
                         <option value="" disabled selected>Select a course</option>
-                        <option value="dj-training">DJ Training</option>
-                        <option value="audio-engineering">Audio Engineering</option>
-                        <option value="music-production">Music Production</option>
+                        <option value="DJ Training">DJ Training</option>
+                        <option value="Audio Engineering">Audio Engineering</option>
+                        <option value="Music Production">Music Production</option>
                     </select>
                 </div>
 
@@ -146,7 +159,6 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script/contact.js"></script>
 </body>
 </html>
