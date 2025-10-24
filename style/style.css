@@ -1150,10 +1150,10 @@
     transform: translateY(0);
     }
     
-    /* ============================================================================
-    POPUP OVERLAY
-    ============================================================================ */
-    .popup-overlay {
+   /* ============================================================================
+   POPUP OVERLAY - FormSubmit Integration
+   ============================================================================ */
+.popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -1168,14 +1168,14 @@
     pointer-events: none;
     transition: opacity 0.4s ease;
     z-index: 1000;
-    }
-    
-    .popup-overlay.active {
+}
+
+.popup-overlay.active {
     opacity: 1;
     pointer-events: auto;
-    }
-    
-    .popup-content {
+}
+
+.popup-content {
     background: #fff;
     padding: clamp(1.5rem, 3vw, 2rem);
     border-radius: 1rem;
@@ -1183,20 +1183,27 @@
     max-width: 400px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     animation: popIn 0.5s ease;
-    }
-    
-    @keyframes popIn {
+    position: relative;
+}
+
+@keyframes popIn {
     from {
-    transform: scale(0.8);
-    opacity: 0;
+        transform: scale(0.8);
+        opacity: 0;
     }
     to {
-    transform: scale(1);
-    opacity: 1;
+        transform: scale(1);
+        opacity: 1;
     }
-    }
-    
-    .close-btn {
+}
+
+.popup-content h2 {
+    margin-bottom: 1rem;
+    color: #1a1a1a;
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+}
+
+.close-btn {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -1204,38 +1211,80 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    }
-    
-    #leadForm {
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+
+/* Form Styles */
+.popup-content form {
     display: flex;
     flex-direction: column;
     gap: clamp(0.6rem, 1.5vw, 0.8rem);
-    }
-    
-    #leadForm input,
-    #leadForm textarea {
+}
+
+.popup-content form input,
+.popup-content form textarea,
+.popup-content form select {
+    width: 100%;
     padding: clamp(0.6rem, 1.5vw, 0.7rem) clamp(0.8rem, 2vw, 1rem);
     border: 1px solid #ddd;
     border-radius: 0.5rem;
     outline: none;
     font-size: clamp(0.8rem, 1.5vw, 1rem);
-    }
-    
-    #leadForm button {
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.popup-content form input:focus,
+.popup-content form textarea:focus,
+.popup-content form select:focus {
+    border-color: #00c2ff;
+}
+
+.popup-content form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.popup-content form button {
     background: #00c2ff;
     border: none;
     color: #fff;
     padding: clamp(0.7rem, 1.5vw, 0.8rem);
     border-radius: 0.5rem;
     cursor: pointer;
-    transition: 0.3s;
+    transition: background 0.3s ease, transform 0.2s ease;
     font-size: clamp(0.8rem, 1.5vw, 1rem);
-    }
-    
-    #leadForm button:hover {
+    font-weight: 500;
+}
+
+.popup-content form button:hover {
     background: #0098cc;
+    transform: translateY(-2px);
+}
+
+.popup-content form button:active {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+    .popup-content {
+        width: 95%;
+        padding: 1.5rem 1rem;
     }
     
+    .close-btn {
+        top: 0.5rem;
+        right: 0.5rem;
+        font-size: 1.2rem;
+    }
+}
+
     /* ============================================================================
     WHATSAPP FLOATING BUTTON
     ============================================================================ */
