@@ -1,3 +1,4 @@
+
 // ============================================================================
 // SOUNDABODE SCROLL ANIMATION - OPTIMIZED FOR MOBILE PERFORMANCE
 // ============================================================================
@@ -67,9 +68,9 @@ function masterAnimationLoop() {
         updateMainContent();
         
         // Only animate image zoom if not low-end device
-        if (!isLowEndDevice) {
-            updateImageZoom();
-        }
+       // if (!isLowEndDevice) {
+         //   updateImageZoom();
+        //}
         
         checkCarouselInView();
     }
@@ -162,7 +163,7 @@ function updateImageZoom() {
     if (state.scrollY < state.aboutTop - viewportHeight || 
         state.scrollY > state.aboutBottom + viewportHeight) {
         imageBlocks.forEach(block => {
-            block.style.transform = 'scale(1)';
+            block.style.transform = 'scale(0)';
         });
         return;
     }
