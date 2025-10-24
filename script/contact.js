@@ -28,14 +28,6 @@ document.addEventListener('click', (e) => {
 });
 
 // ============================================================================
-// SUPABASE INITIALIZATION
-// ============================================================================
-const SUPABASE_URL = "https://pcuuecfvcvbrmcnryaaq.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjdXVlY2Z2Y3Zicm1jbnJ5YWFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3ODk5MDIsImV4cCI6MjA3NjM2NTkwMn0.7eL1xwZSSumiAtyuN8iMQ_VYQzOpiUxdZzBiCDqUJqI";
-const { createClient } = window.supabase;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// ============================================================================
 // FORM HANDLING - Contact Form Submission
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -54,8 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get form data
         const name = form.name.value.trim();
         const email = form.email.value.trim();
+        const phone = form.phone.value.trim();
         const course = form.course.value;
-        const message = form.message.value.trim() || null;
+        const message = form.message.value.trim() || '';
 
         // Validate reCAPTCHA
         const recaptchaResponse = grecaptcha.getResponse();
@@ -66,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Basic validation
-        if (!name || !email || !course) {
+        if (!name || !email || !phone || !course) {
             formStatus.textContent = '❌ Please fill in all required fields';
             formStatus.style.color = '#ff6b6b';
             return;
@@ -80,26 +73,50 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Phone validation (basic - at least 10 digits)
+        const phoneDigits = phone.replace(/\D/g, '');
+        if (phoneDigits.length < 10) {
+            formStatus.textContent = '❌ Please enter a valid phone number';
+            formStatus.style.color = '#ff6b6b';
+            return;
+        }
+
         try {
             // Show loading state
             formStatus.textContent = '⏳ Submitting...';
             formStatus.style.color = '#00c2ff';
+            
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
 
-            // Insert data into Supabase
-            const { data, error } = await supabase
-                .from('contact_form')
-                .insert([
-                    {
-                        name,
-                        email,
-                        course,
-                        message,
-                        recaptcha_token: recaptchaResponse,
-                        submitted_at: new Date().toISOString()
-                    }
-                ]);
+            // Prepare form data for submission
+            const formData = {
+                name,
+                email,
+                phone,
+                course,
+                message,
+                recaptcha_token: recaptchaResponse,
+                submitted_at: new Date().toISOString()
+            };
 
-            if (error) throw error;
+            // OPTION 1: Submit to your n8n webhook
+            // Replace 'YOUR_N8N_WEBHOOK_URL' with your actual webhook URL
+            const webhookURL = 'YOUR_N8N_WEBHOOK_URL';
+            
+            const response = await fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Submission failed');
+            }
 
             // Success message
             formStatus.textContent = '✅ Message submitted successfully! We\'ll get back to you soon.';
@@ -108,6 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset form
             form.reset();
             grecaptcha.reset();
+            
+            // Re-enable submit button
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
 
             // Auto-clear success message after 5 seconds
             setTimeout(() => {
@@ -118,6 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Form submission error:', err);
             formStatus.textContent = '❌ There was an error submitting your message. Please try again.';
             formStatus.style.color = '#ff6b6b';
+            
+            // Re-enable submit button on error
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Submit';
+            submitButton.disabled = false;
         }
     });
 
@@ -139,6 +165,13 @@ function validateField(field) {
     if (field.type === 'email') {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (value && !emailRegex.test(value)) {
+            field.style.borderColor = '#ff6b6b';
+        } else {
+            field.style.borderColor = '#333';
+        }
+    } else if (field.type === 'tel') {
+        const phoneDigits = value.replace(/\D/g, '');
+        if (value && phoneDigits.length < 10) {
             field.style.borderColor = '#ff6b6b';
         } else {
             field.style.borderColor = '#333';
@@ -195,36 +228,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // ============================================================================
-// PREVENT MULTIPLE FORM SUBMISSIONS
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('contactForm');
-    if (!form) return;
-
-    let isSubmitting = false;
-
-    form.addEventListener('submit', async (e) => {
-        if (isSubmitting) {
-            e.preventDefault();
-            return;
-        }
-
-        isSubmitting = true;
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalText = submitButton.textContent;
-        submitButton.textContent = 'Submitting...';
-        submitButton.disabled = true;
-
-        // Reset after 3 seconds
-        setTimeout(() => {
-            isSubmitting = false;
-            submitButton.textContent = originalText;
-            submitButton.disabled = false;
-        }, 3000);
-    });
-});
-
-// ============================================================================
 // INTERSECTION OBSERVER FOR ANIMATIONS
 // ============================================================================
 const observerOptions = {
@@ -269,21 +272,23 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================================
 // PHONE NUMBER FORMATTING
 // ============================================================================
-const phoneInputs = document.querySelectorAll('input[type="tel"]');
-phoneInputs.forEach(input => {
-    input.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length > 10) value = value.slice(0, 10);
-        
-        if (value.length > 0) {
-            if (value.length <= 3) {
-                e.target.value = value;
-            } else if (value.length <= 6) {
-                e.target.value = value.slice(0, 3) + '-' + value.slice(3);
-            } else {
-                e.target.value = value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6);
+document.addEventListener('DOMContentLoaded', () => {
+    const phoneInputs = document.querySelectorAll('input[type="tel"]');
+    phoneInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) value = value.slice(0, 10);
+            
+            if (value.length > 0) {
+                if (value.length <= 3) {
+                    e.target.value = value;
+                } else if (value.length <= 6) {
+                    e.target.value = value.slice(0, 3) + '-' + value.slice(3);
+                } else {
+                    e.target.value = value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6);
+                }
             }
-        }
+        });
     });
 });
 
@@ -298,7 +303,7 @@ window.addEventListener('load', () => {
 });
 
 // ============================================================================
-// FADE-IN ANIMATION KEYFRAMES (Add to CSS or define here)
+// FADE-IN ANIMATION KEYFRAMES
 // ============================================================================
 const style = document.createElement('style');
 style.textContent = `
