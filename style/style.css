@@ -1538,7 +1538,18 @@ gap: clamp(20px, 3vw, 25px);
     font-size: clamp(0.9rem, 2vw, 1.2rem);
     margin-bottom: clamp(8px, 1vw, 12px);
 }
+@media (max-width: 480px) {
+  .overlay-left {
+    top: 5%;
+    left: 3%;
+    width: 95%;
+    padding: 0.5rem;
+  }
 
+  .overlay-left p {
+    font-size: 14px;
+  }
+}
 .main-content {
     padding: clamp(10px, 2vw, 15px);
 }
