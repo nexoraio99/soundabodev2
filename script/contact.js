@@ -48,15 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const course = form.course.value;
         const message = form.message.value.trim();
 
-        // Validate reCAPTCHA
-        const recaptchaResponse = grecaptcha.getResponse();
-        if (!recaptchaResponse) {
-            e.preventDefault();
-            formStatus.textContent = '❌ Please complete the reCAPTCHA verification';
-            formStatus.style.color = '#ff6b6b';
-            return;
-        }
-
         // Basic validation
         if (!name || !email || !phone || !course || !message) {
             e.preventDefault();
