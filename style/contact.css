@@ -252,22 +252,7 @@ body {
     cursor: pointer;
 }
 
-/* --- Recaptcha & Button Container --- */
-.recaptcha-button-wrapper {
-    display: flex;
-    align-items: center;
-    gap: clamp(15px, 3vw, 20px);
-    flex-wrap: wrap;
-    width: 100%;
-    margin-top: clamp(10px, 2vw, 20px);
-}
 
-.recaptcha-container {
-    transform: scale(clamp(0.75, 1vw, 0.9));
-    transform-origin: left center;
-    display: inline-block;
-    width: auto;
-}
 
 .contact-form button {
     background-color: #fff;
