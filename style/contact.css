@@ -1,457 +1,939 @@
-// ============================================================================
-// CUSTOM CURSOR ANIMATION - Futuristic Effect
-// ============================================================================
-const cursor = document.querySelector('.cursor');
-const cursorFollower = document.querySelector('.cursor-follower');
-
-if (cursor && cursorFollower) {
-    document.addEventListener('mousemove', (e) => {
-        cursor.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`;
-        
-        setTimeout(() => {
-            cursorFollower.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
-        }, 100);
-    });
-
-    // Cursor hover effect on interactive elements
-    document.querySelectorAll('button, input, textarea, select, a, .enquiry-btn').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            cursor.style.transform += ' scale(1.5)';
-            cursor.style.borderColor = '#0088ff';
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            cursor.style.borderColor = '#00ff88';
-        });
-    });
+/* ============================================================================
+   GLOBAL STYLES & VARIABLES
+   ============================================================================ */
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-// ============================================================================
-// HAMBURGER MENU - Mobile Navigation
-// ============================================================================
-const hamburger = document.querySelector('.hamburger-menu');
-const navMenu = document.querySelector('.nav-menu');
-const navLinks = document.querySelectorAll('.nav-menu a');
-
-if (hamburger && navMenu) {
-    // Toggle menu on hamburger click
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('is-active');
-        navMenu.classList.toggle('is-active');
-    });
-
-    // Close menu when a link is clicked
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('is-active');
-            navMenu.classList.remove('is-active');
-        });
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.navbar') && navMenu.classList.contains('is-active')) {
-            hamburger.classList.remove('is-active');
-            navMenu.classList.remove('is-active');
-        }
-    });
+:root {
+    --primary-color: #00ff88;
+    --secondary-color: #0088ff;
+    --bg-dark: #0a0a0a;
+    --bg-darker: #050505;
+    --text-light: #ffffff;
+    --text-gray: #8a8a8a;
+    --border-color: #1a1a1a;
 }
 
-// ============================================================================
-// ENQUIRY TYPE TOGGLE - General vs Courses
-// ============================================================================
-const generalBtn = document.getElementById('generalBtn');
-const coursesBtn = document.getElementById('coursesBtn');
-const coursesDropdown = document.getElementById('coursesDropdown');
-const courseSelect = document.getElementById('course');
-
-if (generalBtn && coursesBtn && coursesDropdown && courseSelect) {
-    generalBtn.addEventListener('click', () => {
-        generalBtn.classList.add('active');
-        coursesBtn.classList.remove('active');
-        coursesDropdown.style.display = 'none';
-        courseSelect.disabled = true;
-        courseSelect.removeAttribute('required');
-    });
-
-    coursesBtn.addEventListener('click', () => {
-        coursesBtn.classList.add('active');
-        generalBtn.classList.remove('active');
-        coursesDropdown.style.display = 'block';
-        courseSelect.disabled = false;
-        courseSelect.setAttribute('required', 'required');
-    });
+body {
+    font-family: 'Roboto Mono', monospace;
+    background-color: #000;
+    color: #fff;
+    overflow-x: hidden;
 }
 
-// ============================================================================
-// SUBMIT BUTTON PARTICLE EFFECT
-// ============================================================================
-const submitBtn = document.querySelector('.submit-btn');
-if (submitBtn) {
-    submitBtn.addEventListener('mousemove', (e) => {
-        const rect = e.target.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        e.target.style.setProperty('--x', `${x}%`);
-        e.target.style.setProperty('--y', `${y}%`);
-    });
+/* ============================================================================
+   CUSTOM CURSOR - Desktop Only
+   ============================================================================ */
+.cursor,
+.cursor-follower {
+    display: none;
 }
 
-// ============================================================================
-// FIELD VALIDATION HELPER
-// ============================================================================
-function validateField(field) {
-    const value = field.value.trim();
+@media (min-width: 1025px) {
+    .cursor {
+        display: block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--primary-color);
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+        mix-blend-mode: difference;
+    }
 
-    if (field.type === 'email') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (value && !emailRegex.test(value)) {
-            field.style.borderColor = '#ff6b6b';
-            return false;
-        } else {
-            field.style.borderColor = '#1a1a1a';
-            return true;
-        }
-    } else if (field.type === 'tel' || field.id === 'phone') {
-        const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-        const digitsOnly = value.replace(/\D/g, '');
-        if (value && (!phoneRegex.test(value) || digitsOnly.length < 10)) {
-            field.style.borderColor = '#ff6b6b';
-            return false;
-        } else {
-            field.style.borderColor = '#1a1a1a';
-            return true;
-        }
-    } else if (field.required && !value) {
-        field.style.borderColor = '#ff6b6b';
-        return false;
-    } else {
-        field.style.borderColor = '#1a1a1a';
-        return true;
+    .cursor-follower {
+        display: block;
+        width: 40px;
+        height: 40px;
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9998;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        mix-blend-mode: difference;
+    }
+    
+    body {
+        cursor: none;
     }
 }
 
-// ============================================================================
-// PHONE NUMBER FORMATTING
-// ============================================================================
-function setupPhoneFormatting() {
-    const phoneInput = document.getElementById('phone');
-    if (!phoneInput) return;
-
-    phoneInput.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/[^\d\+]/g, '');
-        
-        // Allow international format starting with +
-        if (value.startsWith('+')) {
-            const digits = value.slice(1).replace(/\D/g, '');
-            if (digits.length > 12) {
-                e.target.value = '+' + digits.slice(0, 12);
-            } else {
-                e.target.value = '+' + digits;
-            }
-        } else {
-            // Indian format: XXX XXX XXXX
-            const digits = value.replace(/\D/g, '');
-            if (digits.length > 10) {
-                e.target.value = digits.slice(0, 10);
-            } else {
-                e.target.value = digits;
-            }
-        }
-    });
-
-    // Format on blur
-    phoneInput.addEventListener('blur', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        
-        if (value.length === 10) {
-            e.target.value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6);
-        } else if (value.length > 10) {
-            e.target.value = '+' + value;
-        }
-        validateField(phoneInput);
-    });
-}
-
-// ============================================================================
-// SUCCESS MESSAGE DISPLAY
-// ============================================================================
-function showSuccessMessage() {
-    const successMessage = document.getElementById('successMessage');
-    if (successMessage) {
-        successMessage.classList.add('show');
-        
-        setTimeout(() => {
-            successMessage.classList.remove('show');
-        }, 3000);
+@media (max-width: 1024px) {
+    body, button, input, textarea, select, a {
+        cursor: auto !important;
     }
 }
 
-// ============================================================================
-// FORM SUBMISSION WITH reCAPTCHA v3
-// ============================================================================
-function setupFormSubmission() {
-    const form = document.getElementById('contactForm');
-    if (!form) return;
-
-    let isSubmitting = false;
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        // Prevent multiple submissions
-        if (isSubmitting) return;
-
-        // Get form data
-        const name = document.getElementById('name');
-        const email = document.getElementById('email');
-        const phone = document.getElementById('phone');
-        const message = document.getElementById('message');
-        const course = document.getElementById('course');
-
-        // Validate all fields
-        let isValid = true;
-        if (name) isValid = validateField(name) && isValid;
-        if (email) isValid = validateField(email) && isValid;
-        if (phone) isValid = validateField(phone) && isValid;
-        if (course && !course.disabled) isValid = validateField(course) && isValid;
-
-        if (!isValid) {
-            alert('Please fill in all required fields correctly.');
-            return;
-        }
-
-        // Set submitting state
-        isSubmitting = true;
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalText = submitButton.querySelector('.btn-text').textContent;
-        submitButton.querySelector('.btn-text').textContent = 'Submitting...';
-        submitButton.disabled = true;
-
-        // Execute reCAPTCHA v3
-        if (typeof grecaptcha !== 'undefined') {
-            grecaptcha.ready(() => {
-                grecaptcha.execute('YOUR_SITE_KEY', { action: 'contact_form' }).then((token) => {
-                    // Set the token in hidden input
-                    const tokenInput = document.getElementById('recaptcha-token');
-                    if (tokenInput) tokenInput.value = token;
-
-                    // Prepare form data
-                    const formData = {
-                        name: name.value,
-                        phone: phone.value,
-                        email: email.value,
-                        message: message ? message.value : '',
-                        enquiryType: generalBtn && generalBtn.classList.contains('active') ? 'general' : 'courses',
-                        course: coursesBtn && coursesBtn.classList.contains('active') ? course.value : null,
-                        recaptchaToken: token
-                    };
-
-                    console.log('Form Data:', formData);
-
-                    // HERE: Send data to your backend
-                    // Example with fetch:
-                    /*
-                    fetch('your-backend-endpoint.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(formData)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.success) {
-                            showSuccessMessage();
-                            form.reset();
-                            if (generalBtn) generalBtn.click();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('There was an error submitting the form. Please try again.');
-                    })
-                    .finally(() => {
-                        isSubmitting = false;
-                        submitButton.querySelector('.btn-text').textContent = originalText;
-                        submitButton.disabled = false;
-                    });
-                    */
-
-                    // For demo purposes, show success message
-                    setTimeout(() => {
-                        showSuccessMessage();
-                        form.reset();
-                        if (generalBtn) generalBtn.click();
-                        
-                        isSubmitting = false;
-                        submitButton.querySelector('.btn-text').textContent = originalText;
-                        submitButton.disabled = false;
-                    }, 1500);
-                });
-            });
-        } else {
-            // If reCAPTCHA not loaded, submit anyway
-            console.warn('reCAPTCHA not loaded');
-            setTimeout(() => {
-                showSuccessMessage();
-                form.reset();
-                if (generalBtn) generalBtn.click();
-                
-                isSubmitting = false;
-                submitButton.querySelector('.btn-text').textContent = originalText;
-                submitButton.disabled = false;
-            }, 1500);
-        }
-    });
+/* ============================================================================
+   NAVBAR
+   ============================================================================ */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: clamp(12px, 3vw, 20px) clamp(15px, 5vw, 50px);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    background-color: rgba(10, 10, 10, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    height: clamp(48px, 12vw, 70px);
 }
 
-// ============================================================================
-// INPUT FIELD ANIMATIONS AND VALIDATION
-// ============================================================================
-function setupInputAnimations() {
-    const inputs = document.querySelectorAll('.input-group input, .input-group textarea, .input-group select');
-    
-    inputs.forEach(input => {
-        // Focus animations
-        input.addEventListener('focus', function() {
-            this.parentElement.style.transform = 'translateX(5px)';
-            this.style.boxShadow = '0 0 0 3px rgba(0, 194, 255, 0.1)';
-        });
-        
-        // Blur animations and validation
-        input.addEventListener('blur', function() {
-            this.parentElement.style.transform = 'translateX(0)';
-            this.style.boxShadow = 'none';
-            validateField(this);
-        });
-    });
+.navbar a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 200;
+    font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+    position: relative;
+    display: inline-block;
+    padding: 5px 0;
+    overflow: hidden;
 }
 
-// ============================================================================
-// SMOOTH SCROLL FOR ANCHOR LINKS
-// ============================================================================
-function setupSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (href !== '#') {
-                e.preventDefault();
-                const target = document.querySelector(href);
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            }
-        });
-    });
+.nav-links {
+    display: flex;
+    gap: clamp(20px, 5vw, 40px);
 }
 
-// ============================================================================
-// INTERSECTION OBSERVER FOR ANIMATIONS
-// ============================================================================
-function setupScrollAnimations() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.animation = 'fadeIn 0.6s ease-out forwards';
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    const contactSection = document.querySelector('.contact-section');
-    const mapSection = document.querySelector('.map');
-    const formSection = document.querySelector('.form-section');
-
-    if (contactSection) observer.observe(contactSection);
-    if (mapSection) observer.observe(mapSection);
-    if (formSection) observer.observe(formSection);
+.logo-img {
+    height: clamp(24px, 5vw, 40px);
+    width: auto;
+    object-fit: contain;
 }
 
-// ============================================================================
-// KEYBOARD ACCESSIBILITY
-// ============================================================================
-function setupKeyboardNavigation() {
-    const form = document.getElementById('contactForm');
-    if (!form) return;
-
-    const formElements = form.querySelectorAll('input:not([type="hidden"]), textarea, select, button');
-
-    formElements.forEach((element, index) => {
-        element.addEventListener('keydown', (e) => {
-            // Shift + Tab to go to previous field
-            if (e.key === 'Tab' && e.shiftKey && index === 0) {
-                e.preventDefault();
-                formElements[formElements.length - 1].focus();
-            }
-            // Tab to go to next field
-            else if (e.key === 'Tab' && !e.shiftKey && index === formElements.length - 1) {
-                e.preventDefault();
-                formElements[0].focus();
-            }
-        });
-    });
+.navbar a::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-// ============================================================================
-// NAVBAR PAGE LOAD ANIMATION
-// ============================================================================
-function setupNavbarAnimation() {
-    const navbar = document.querySelector('.navbar');
-    if (navbar) {
-        navbar.style.animation = 'fadeIn 0.8s ease-out';
+.navbar a:hover::before {
+    transform: translateY(-100%);
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.hamburger-menu .bar {
+    display: block;
+    width: 25px;
+    height: 2px;
+    background-color: #fff;
+    margin: 5px 0;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.nav-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+    z-index: 900;
+}
+
+.nav-menu.is-active {
+    transform: translateX(0);
+    z-index: 2000;
+}
+
+/* WhatsApp Float */
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 25px;
+    right: 25px;
+    background-color: #25D366;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1);
+    background-color: #20ba5a;
+}
+
+.whatsapp-icon {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) invert(1);
+}
+
+/* ============================================================================
+   CONTACT SECTION
+   ============================================================================ */
+.contact-section {
+    color: #fff;
+    padding: clamp(80px, 15vw, 150px) clamp(15px, 5vw, 50px) clamp(60px, 10vw, 100px);
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.section-title {
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-weight: 500;
+    letter-spacing: clamp(1px, 1.5vw, 2px);
+    display: block;
+    text-align: center;
+    margin: 0 auto clamp(40px, 8vw, 80px);
+    position: relative;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: clamp(40px, 8vw, 80px);
+    align-items: start;
+    width: 100%;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(18px, 3vw, 25px);
+    width: 100%;
+}
+
+.info-item label {
+    display: block;
+    color: #888;
+    font-size: clamp(0.65rem, 1.3vw, 0.8rem);
+    margin-bottom: clamp(6px, 1vw, 10px);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-item p,
+.info-item a {
+    font-size: clamp(0.85rem, 2vw, 1.1rem);
+    font-weight: 500;
+    color: #fff;
+    text-decoration: none;
+    line-height: 1.6;
+    margin: 0;
+    word-break: break-word;
+}
+
+.info-item a:hover {
+    color: #00c2ff;
+    transition: color 0.3s ease;
+}
+
+/* ============================================================================
+   FORM WITH IMAGE BACKGROUND - OVERLAY LAYOUT
+   ============================================================================ */
+.form-image-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 600px; /* ← ADJUST MINIMUM HEIGHT HERE */
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* Background Image Layer */
+.form-background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.form-background-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.3);
+    animation: zoomIn 20s infinite alternate;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 136, 255, 0.15));
+    pointer-events: none;
+    animation: overlayPulse 4s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes overlayPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+/* Form Overlay Layer */
+.form-section {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(2rem, 5vw, 3rem);
+    min-height: 600px; /* ← ADJUST MINIMUM HEIGHT HERE */
+}
+
+/* ============================================================================
+   ⭐ FORM CONTAINER SIZE CONTROLS ⭐
+   Adjust these values to make the form bigger or smaller
+   ============================================================================ */
+.form-container {
+    width: 100%;
+    max-width: 500px;        /* ← CHANGE THIS to make form wider/narrower */
+    padding: clamp(1.5rem, 4vw, 2.5rem);  /* ← CHANGE THIS for internal spacing */
+    background: rgba(10, 10, 10, 0.85);   /* Semi-transparent dark background */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: fadeIn 1s ease-out 0.3s both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-// ============================================================================
-// ADD FADE-IN ANIMATION KEYFRAMES
-// ============================================================================
-function addAnimationStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    `;
-    document.head.appendChild(style);
+/* ============================================================================
+   FORM TITLE WITH GLITCH EFFECT
+   ============================================================================ */
+.form-title {
+    font-size: clamp(1.5rem, 4vw, 2rem);  /* ← CHANGE THIS for title size */
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    color: var(--text-light);
 }
 
-// ============================================================================
-// INITIALIZE ALL FUNCTIONS ON DOM READY
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    // Add animations
-    addAnimationStyles();
-    
-    // Setup all features
-    setupPhoneFormatting();
-    setupFormSubmission();
-    setupInputAnimations();
-    setupSmoothScroll();
-    setupScrollAnimations();
-    setupKeyboardNavigation();
-    
-    console.log('✅ All features initialized successfully');
-});
+.highlight {
+    color: var(--primary-color);
+    position: relative;
+}
 
-// ============================================================================
-// INITIALIZE ON WINDOW LOAD
-// ============================================================================
-window.addEventListener('load', () => {
-    setupNavbarAnimation();
-});
+.highlight::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    animation: lineExpand 2s ease-in-out infinite;
+}
+
+@keyframes lineExpand {
+    0%, 100% { transform: scaleX(0.5); }
+    50% { transform: scaleX(1); }
+}
+
+/* Glitch Effect on Form Title */
+.glitch {
+    position: relative;
+    color: var(--text-light);
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    left: 2px;
+    text-shadow: -2px 0 var(--primary-color);
+    animation: glitch-1 2s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    left: -2px;
+    text-shadow: 2px 0 var(--secondary-color);
+    animation: glitch-2 3s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-1 {
+    0% { clip-path: inset(40% 0 61% 0); }
+    20% { clip-path: inset(92% 0 1% 0); }
+    40% { clip-path: inset(43% 0 1% 0); }
+    60% { clip-path: inset(25% 0 58% 0); }
+    80% { clip-path: inset(54% 0 7% 0); }
+    100% { clip-path: inset(58% 0 43% 0); }
+}
+
+@keyframes glitch-2 {
+    0% { clip-path: inset(65% 0 15% 0); }
+    20% { clip-path: inset(12% 0 63% 0); }
+    40% { clip-path: inset(78% 0 5% 0); }
+    60% { clip-path: inset(32% 0 51% 0); }
+    80% { clip-path: inset(85% 0 8% 0); }
+    100% { clip-path: inset(45% 0 40% 0); }
+}
+
+/* ============================================================================
+   ENQUIRY BUTTONS
+   ============================================================================ */
+.enquiry-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.enquiry-btn {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.enquiry-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--text-light);
+}
+
+.enquiry-btn.active {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 136, 255, 0.1));
+    border-color: var(--primary-color);
+    color: var(--text-light);
+}
+
+.btn-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0, 255, 136, 0.3), transparent);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.5s ease;
+}
+
+.enquiry-btn.active .btn-glow {
+    transform: translate(-50%, -50%) scale(1.5);
+}
+
+/* ============================================================================
+   INPUT GROUPS
+   ============================================================================ */
+.input-group {
+    position: relative;
+    margin-bottom: 1.8rem;
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select {
+    width: 100%;
+    padding: 0.9rem 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-light);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.input-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8a8a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    padding-right: 2rem;
+}
+
+.input-group label {
+    position: absolute;
+    top: 0.9rem;
+    left: 0;
+    color: var(--text-gray);
+    font-size: 0.95rem;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus ~ label,
+.input-group input:valid ~ label,
+.input-group textarea:focus ~ label,
+.input-group textarea:valid ~ label,
+.input-group select:focus ~ label,
+.input-group select:valid ~ label {
+    top: -1.3rem;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+}
+
+.input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transition: width 0.5s ease;
+}
+
+.input-group input:focus ~ .input-border,
+.input-group textarea:focus ~ .input-border,
+.input-group select:focus ~ .input-border {
+    width: 100%;
+}
+
+/* ============================================================================
+   SUBMIT BUTTON
+   ============================================================================ */
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    color: var(--bg-darker);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    transition: transform 0.3s ease;
+}
+
+.submit-btn:hover .btn-icon {
+    transform: translateX(5px);
+}
+
+.btn-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.3), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.submit-btn:hover .btn-particles {
+    opacity: 1;
+}
+
+/* ============================================================================
+   SUCCESS MESSAGE
+   ============================================================================ */
+.success-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: var(--bg-dark);
+    border: 2px solid var(--primary-color);
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    width: 90%;
+    max-width: 300px;
+}
+
+.success-message.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+.success-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--primary-color);
+    color: var(--bg-darker);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 1rem;
+    animation: successPulse 1s ease-out;
+}
+
+@keyframes successPulse {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-message p {
+    font-size: 0.95rem;
+}
+
+/* ============================================================================
+   MAP SECTION
+   ============================================================================ */
+/* ============================================================================
+   MAP SECTION - Positioned Left of Form
+   ============================================================================ */
+   .map {
+    padding: 0;
+    width: 100%;
+    position: relative;
+    z-index: 5;
+    background: transparent;
+    box-sizing: border-box;
+    /* Remove extra padding since it's now inside contact-section */
+}
+
+.map-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.map-frame {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 194, 255, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Square aspect ratio for better left sidebar */
+    margin-bottom: 1rem;
+}
+
+.map-frame iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: grayscale(100%) contrast(110%) brightness(90%);
+    border: none;
+}
+
+.map p {
+    text-align: center;
+    margin-top: clamp(10px, 1.5vw, 15px);
+    font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+}
+
+.map .nav-link {
+    color: #00c2ff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+}
+
+.map .nav-link:hover {
+    color: #fff;
+}
+
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+.site-footer {
+    background-color: #000;
+    font-family: 'Roboto Mono', monospace;
+    color: #fff;
+    padding: clamp(20px, 4vw, 30px) clamp(15px, 5vw, 50px);
+    border-top: 1px solid #2222222e;
+    position: relative;
+    z-index: 10;
+    box-sizing: border-box;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: clamp(15px, 3vw, 30px);
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.footer-columns {
+    display: flex;
+    gap: clamp(40px, 8vw, 100px);
+    flex-wrap: wrap;
+}
+
+.footer-column h4 {
+    color: #888;
+    font-size: clamp(0.65rem, 1.3vw, 0.8rem);
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin-top: 0;
+    margin-bottom: clamp(8px, 1vw, 12px);
+    text-transform: uppercase;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column li {
+    margin-bottom: clamp(8px, 1vw, 11px);
+}
+
+.footer-column a,
+.footer-column p {
+    color: #fff;
+    text-decoration: none;
+    font-size: clamp(0.6rem, 1.2vw, 0.7rem);
+    line-height: 1.6;
+    margin: 0;
+    transition: opacity 0.3s;
+}
+
+.footer-column a:hover {
+    opacity: 0.7;
+}
+
+.footer-copyright p {
+    margin: 0;
+    color: #888;
+    font-size: clamp(0.55rem, 1.1vw, 0.6rem);
+}
+
+/* ============================================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================================ */
+
+/* Tablet - 768px to 1024px */
+@media (max-width: 1024px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: clamp(30px, 5vw, 60px);
+    }
+
+    .form-image-wrapper {
+        min-height: 550px; /* ← ADJUST FOR TABLET */
+    }
+
+    .form-section {
+        min-height: 550px;
+    }
+
+    .form-container {
+        max-width: 100%;  /* ← ADJUST FOR TABLET */
+    }
+
+    .enquiry-buttons {
+        flex-direction: row;
+        gap: 1rem;
+    }
+}
+
+/* Mobile - 768px and below */
+@media (max-width: 768px) {
+    .hamburger-menu {
+        display: block;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .nav-menu a {
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+    }
+
+    .hamburger-menu.is-active .bar:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-menu.is-active .bar:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger-menu.is-active .bar:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .form-image-wrapper {
+        min-height: 500px; /* ← ADJUST FOR MOBILE */
+    }
+
+    .form-section {
+        min-height: 500px;
+        padding: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .form-container {
+        max-width: 100%;  /* ← ADJUST FOR MOBILE */
+        padding: clamp(1.2rem, 3vw, 1.8rem);
+    }
+
+    .form-title {
+        font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+    }
+
+    .enquiry-buttons {
+        flex-direction: column;
+    }
+}
+
+/* Small Mobile - 480px and below */
+@media (max-width: 480px) {
+    .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .whatsapp-icon {
+        width: 25px;
+        height: 25px;
+    }
+
+    .form-image-wrapper {
+        min-height: 450px; /* ← ADJUST FOR SMALL MOBILE */
+    }
+
+    .form-section {
+        min-height: 450px;
+        padding: 1rem;
+    }
+
+    .form-container {
+        padding: 1rem;
+    }
+}
+
+/* Extra Small Mobile - 360px and below */
+@media (max-width: 360px) {
+    .form-image-wrapper {
+        min-height: 420px; /* ← ADJUST FOR EXTRA SMALL MOBILE */
+    }
+
+    .form-section {
+        min-height: 420px;
+    }
+}
+
+/* ============================================================================
+   ACCESSIBILITY & PREFERENCES
+   ============================================================================ */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #00ff00;
+        --secondary-color: #00ffff;
+        --border-color: #333333;
+    }
+
+    .enquiry-btn.active {
+        background: rgba(0, 255, 136, 0.3);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .cursor,
+    .cursor-follower {
+        display: none !important;
+    }
+}
+
