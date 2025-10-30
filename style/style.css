@@ -17,6 +17,8 @@
     --blur: 1rem;
     --fs: clamp(2.5rem, 7vw, 6rem);
     --ls: clamp(-2px, -0.2vw, -3.5px);
+    --panel-content-max: 720px;
+    --section-content-max: 1200px;
     }
     
     body {
@@ -151,16 +153,34 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
+    align-items:flex-start;
     color: #fff;
-    font-size: clamp(12px, 2vw, 16px);
+    font-size: clamp(12px, 1.6vw, 16px);
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
     z-index: 10;
     font-weight: 200;
-    padding: 2rem 4rem;
+    padding: clamp(16px, 3vw, 24px) clamp(20px, 5vw, 64px);
     box-sizing: border-box;
     line-height: 1.6;
-    text-align: left;
+    text-align:left;
+}
+
+/* Constrain and align text blocks inside panels for symmetry */
+.overlay-left h2,
+.overlay-left p,
+.overlay-right h2,
+.overlay-right p {
+    width: min(92%, var(--panel-content-max));
+}
+
+.overlay-left h2,
+.overlay-right h2 {
+    margin-bottom: clamp(10px, 2vw, 16px);
+}
+
+.overlay-left p + p,
+.overlay-right p + p {
+    margin-top: clamp(6px, 1.2vw, 10px);
 }
 
 /* Fonts */
@@ -236,7 +256,7 @@
     .overlay-left p,
     .overlay-right p {
         text-align: center !important;
-        font-size: clamp(14px, 2.5vw, 18px);
+        font-size: clamp(14px, 2.2vw, 18px);
         max-width: 90%;
     }
 }
@@ -527,7 +547,7 @@
     align-items: flex-start;
     justify-content: center;
     width: 95%;
-    max-width: 1200px;
+    max-width: var(--section-content-max);
     margin-top: clamp(15px, 3vw, 30px);
     flex-wrap: wrap;
     gap: clamp(12px, 2vw, 20px);
@@ -691,11 +711,31 @@
     
     .content-section p {
     color: rgba(240, 239, 239, 0.782);
-    font-size: clamp(10px, 2vw, 16px);
-    max-width: 1200px;
+    font-size: clamp(12px, 1.8vw, 16px);
+    max-width: var(--section-content-max);
     line-height: 1.6;
     text-align: left;
     }
+
+/* Section headings and lists alignment for new blocks */
+.content-section h2.section-title {
+    width: min(92%, var(--section-content-max));
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.content-section > ul,
+.content-section > div > ul {
+    width: min(92%, 900px);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: clamp(16px, 3vw, 24px);
+}
+
+.content-section li {
+    margin: clamp(6px, 1.2vw, 10px) 0;
+    line-height: 1.6;
+}
     
     /* ============================================================================
     ABOUT SECTION
@@ -1143,6 +1183,7 @@
     opacity: 0;
     transform: translateY(50px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    color:#fff;
     }
     
     .reveal-up.active {
@@ -1150,8 +1191,8 @@
     transform: translateY(0);
     }
     
-   /* ============================================================================
-   POPUP OVERLAY - FormSubmit Integration
+  /* ============================================================================
+   POPUP OVERLAY - Updated for JavaScript Integration
    ============================================================================ */
 .popup-overlay {
     position: fixed;
@@ -1159,129 +1200,166 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
     z-index: 1000;
 }
 
 .popup-overlay.active {
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
 }
 
 .popup-content {
-    background: #fff;
-    padding: clamp(1.5rem, 3vw, 2rem);
-    border-radius: 1rem;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: clamp(2rem, 4vw, 2.5rem);
+    border-radius: 1.2rem;
     width: 90%;
-    max-width: 400px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    animation: popIn 0.5s ease;
+    max-width: 450px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.popup-overlay.active .popup-content {
+    transform: scale(1);
 }
 
 @keyframes popIn {
     from {
-        transform: scale(0.8);
+        transform: scale(0.7) translateY(-20px);
         opacity: 0;
     }
     to {
-        transform: scale(1);
+        transform: scale(1) translateY(0);
         opacity: 1;
     }
 }
 
 .popup-content h2 {
-    margin-bottom: 1rem;
-    color: #1a1a1a;
-    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    margin-bottom: 0.5rem;
+    color: #fff;
+    font-size: clamp(1.3rem, 3vw, 1.6rem);
+    font-weight: 600;
+    text-align: center;
 }
 
 .close-btn {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: none;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #666;
-    transition: color 0.3s ease;
+    color: #fff;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .close-btn:hover {
-    color: #000;
+    background: rgba(255, 0, 0, 0.8);
+    transform: rotate(90deg);
 }
 
 /* Form Styles */
 .popup-content form {
     display: flex;
     flex-direction: column;
-    gap: clamp(0.6rem, 1.5vw, 0.8rem);
+    gap: clamp(0.8rem, 2vw, 1rem);
 }
 
-.popup-content form input,
-.popup-content form textarea,
-.popup-content form select {
+.popup-content form input {
     width: 100%;
-    padding: clamp(0.6rem, 1.5vw, 0.7rem) clamp(0.8rem, 2vw, 1rem);
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
+    padding: clamp(0.75rem, 2vw, 0.9rem) clamp(1rem, 2.5vw, 1.2rem);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.6rem;
     outline: none;
-    font-size: clamp(0.8rem, 1.5vw, 1rem);
+    font-size: clamp(0.85rem, 2vw, 1rem);
     font-family: inherit;
-    transition: border-color 0.3s ease;
+    color: #fff;
+    transition: all 0.3s ease;
 }
 
-.popup-content form input:focus,
-.popup-content form textarea:focus,
-.popup-content form select:focus {
-    border-color: #00c2ff;
+.popup-content form input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
 }
 
-.popup-content form textarea {
-    resize: vertical;
-    min-height: 80px;
+.popup-content form input:focus {
+    border-color: #00ff88;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
 }
 
 .popup-content form button {
-    background: #00c2ff;
+    background: linear-gradient(135deg, #00ff88 0%, #00cc70 100%);
     border: none;
-    color: #fff;
-    padding: clamp(0.7rem, 1.5vw, 0.8rem);
-    border-radius: 0.5rem;
+    color: #000;
+    padding: clamp(0.8rem, 2vw, 1rem);
+    border-radius: 0.6rem;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-    font-size: clamp(0.8rem, 1.5vw, 1rem);
-    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: clamp(0.9rem, 2vw, 1.05rem);
+    font-weight: 600;
+    margin-top: 0.5rem;
 }
 
 .popup-content form button:hover {
-    background: #0098cc;
     transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
 }
 
 .popup-content form button:active {
     transform: translateY(0);
 }
 
+.popup-content form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.popup-status {
+    min-height: 20px;
+    font-weight: 500;
+}
+
 /* Mobile Responsive */
 @media (max-width: 480px) {
     .popup-content {
         width: 95%;
-        padding: 1.5rem 1rem;
+        padding: 1.5rem 1.2rem;
     }
     
     .close-btn {
-        top: 0.5rem;
-        right: 0.5rem;
+        top: 0.7rem;
+        right: 0.7rem;
+        width: 32px;
+        height: 32px;
+        font-size: 1.3rem;
+    }
+    
+    .popup-content h2 {
         font-size: 1.2rem;
+        margin-bottom: 0.3rem;
     }
 }
 
@@ -1645,10 +1723,12 @@
     .section-title {
         font-size: clamp(1.3rem, 4vw, 2.2rem);
         margin-bottom: clamp(25px, 4vw, 45px);
+        color:#fff;
     }
     
     .quote {
         font-size: clamp(0.85rem, 2vw, 1rem);
+        color:#fff;
     }
     
     .site-footer {
