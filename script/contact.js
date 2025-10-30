@@ -3,7 +3,6 @@
 // ============================================================================
 const CONFIG = {
     BACKEND_URL: 'https://soundabode-test.onrender.com/api/contact-form',
-    RECAPTCHA_SITE_KEY: 'YOUR_SITE_KEY', // Replace with your actual site key
     MESSAGES: {
         SENDING: 'Sending...',
         SUCCESS: '✅ Message sent successfully! We\'ll get back to you soon.',
@@ -20,432 +19,94 @@ const CONFIG = {
 };
 
 // ============================================================================
-// DOM ELEMENTS CACHE
+// CUSTOM CURSOR ANIMATION - Futuristic Effect
 // ============================================================================
-const elements = {
-    // Form elements
-    contactForm: null,
-    submitBtn: null,
-    statusMsg: null,
-    
-    // Input fields
-    nameInput: null,
-    emailInput: null,
-    phoneInput: null,
-    messageInput: null,
-    courseSelect: null,
-    
-    // Enquiry type buttons
-    generalBtn: null,
-    coursesBtn: null,
-    coursesDropdown: null,
-    
-    // Other elements
-    successMessage: null,
-    hamburger: null,
-    navMenu: null,
-    cursor: null,
-    cursorFollower: null
-};
+const cursor = document.querySelector('.cursor');
+const cursorFollower = document.querySelector('.cursor-follower');
 
-// ============================================================================
-// INITIALIZE DOM ELEMENTS
-// ============================================================================
-function initializeElements() {
-    // Form elements
-    elements.contactForm = document.getElementById('contactForm');
-    elements.submitBtn = elements.contactForm?.querySelector('button[type="submit"]');
-    elements.statusMsg = document.getElementById('form-status');
-    
-    // Input fields
-    elements.nameInput = document.getElementById('name');
-    elements.emailInput = document.getElementById('email');
-    elements.phoneInput = document.getElementById('phone');
-    elements.messageInput = document.getElementById('message');
-    elements.courseSelect = document.getElementById('course');
-    
-    // Enquiry type buttons
-    elements.generalBtn = document.getElementById('generalBtn');
-    elements.coursesBtn = document.getElementById('coursesBtn');
-    elements.coursesDropdown = document.getElementById('coursesDropdown');
-    
-    // Other elements
-    elements.successMessage = document.getElementById('successMessage');
-    elements.hamburger = document.querySelector('.hamburger-menu');
-    elements.navMenu = document.querySelector('.nav-menu');
-    elements.cursor = document.querySelector('.cursor');
-    elements.cursorFollower = document.querySelector('.cursor-follower');
-}
-
-// ============================================================================
-// VALIDATION FUNCTIONS
-// ============================================================================
-function validateEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-function validatePhone(phone) {
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-    const digitsOnly = phone.replace(/\D/g, '');
-    return phoneRegex.test(phone) && digitsOnly.length >= 10;
-}
-
-function validateField(field) {
-    if (!field) return false;
-    
-    const value = field.value.trim();
-    let isValid = true;
-
-    if (field.type === 'email') {
-        isValid = value && validateEmail(value);
-    } else if (field.type === 'tel' || field.id === 'phone') {
-        isValid = value && validatePhone(value);
-    } else if (field.required && !value) {
-        isValid = false;
-    }
-
-    // Visual feedback
-    field.style.borderColor = isValid ? CONFIG.COLORS.DEFAULT : CONFIG.COLORS.ERROR;
-    
-    return isValid;
-}
-
-function validateAllFields() {
-    let isValid = true;
-    
-    if (elements.nameInput) isValid = validateField(elements.nameInput) && isValid;
-    if (elements.emailInput) isValid = validateField(elements.emailInput) && isValid;
-    if (elements.phoneInput) isValid = validateField(elements.phoneInput) && isValid;
-    
-    // Validate course only if courses enquiry is active
-    if (elements.coursesBtn?.classList.contains('active') && elements.courseSelect) {
-        isValid = validateField(elements.courseSelect) && isValid;
-    }
-    
-    return isValid;
-}
-
-// ============================================================================
-// UI UPDATE FUNCTIONS
-// ============================================================================
-function showStatus(message, isError = false) {
-    if (!elements.statusMsg) {
-        // Create status message element if it doesn't exist
-        elements.statusMsg = document.createElement('div');
-        elements.statusMsg.id = 'form-status';
-        elements.statusMsg.style.cssText = 'margin-top: 15px; text-align: center; font-size: 0.9rem; font-weight: 500;';
-        elements.contactForm?.appendChild(elements.statusMsg);
-    }
-    
-    elements.statusMsg.textContent = message;
-    elements.statusMsg.style.color = isError ? CONFIG.COLORS.ERROR : CONFIG.COLORS.SUCCESS;
-    elements.statusMsg.style.display = 'block';
-}
-
-function setButtonState(isDisabled, text) {
-    if (!elements.submitBtn) return;
-    
-    const btnText = elements.submitBtn.querySelector('.btn-text');
-    if (btnText) {
-        btnText.textContent = text;
-    } else {
-        elements.submitBtn.textContent = text;
-    }
-    
-    elements.submitBtn.disabled = isDisabled;
-}
-
-function showSuccessMessage() {
-    if (elements.successMessage) {
-        elements.successMessage.classList.add('show');
-        
-        setTimeout(() => {
-            elements.successMessage.classList.remove('show');
-        }, 3000);
-    }
-}
-
-function resetForm() {
-    if (elements.contactForm) {
-        elements.contactForm.reset();
-    }
-    
-    // Reset to general enquiry
-    if (elements.generalBtn) {
-        elements.generalBtn.click();
-    }
-    
-    // Reset reCAPTCHA if loaded
-    if (typeof grecaptcha !== 'undefined') {
-        try {
-            grecaptcha.reset();
-        } catch (e) {
-            console.log('reCAPTCHA reset not needed');
-        }
-    }
-    
-    // Hide status message after delay
-    setTimeout(() => {
-        if (elements.statusMsg) {
-            elements.statusMsg.style.display = 'none';
-        }
-    }, 5000);
-}
-
-// ============================================================================
-// PHONE NUMBER FORMATTING
-// ============================================================================
-function setupPhoneFormatting() {
-    if (!elements.phoneInput) return;
-
-    elements.phoneInput.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/[^\d\+]/g, '');
-        
-        // Allow international format starting with +
-        if (value.startsWith('+')) {
-            const digits = value.slice(1).replace(/\D/g, '');
-            if (digits.length > 12) {
-                e.target.value = '+' + digits.slice(0, 12);
-            } else {
-                e.target.value = '+' + digits;
-            }
-        } else {
-            // Indian format: limit to 10 digits
-            const digits = value.replace(/\D/g, '');
-            e.target.value = digits.slice(0, 10);
-        }
-    });
-
-    // Format on blur
-    elements.phoneInput.addEventListener('blur', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        
-        if (value.length === 10) {
-            e.target.value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6);
-        }
-        validateField(elements.phoneInput);
-    });
-}
-
-// ============================================================================
-// ENQUIRY TYPE TOGGLE
-// ============================================================================
-function setupEnquiryToggle() {
-    if (!elements.generalBtn || !elements.coursesBtn) return;
-
-    elements.generalBtn.addEventListener('click', () => {
-        elements.generalBtn.classList.add('active');
-        elements.coursesBtn.classList.remove('active');
-        
-        if (elements.coursesDropdown) {
-            elements.coursesDropdown.style.display = 'none';
-        }
-        
-        if (elements.courseSelect) {
-            elements.courseSelect.disabled = true;
-            elements.courseSelect.removeAttribute('required');
-            elements.courseSelect.value = '';
-        }
-    });
-
-    elements.coursesBtn.addEventListener('click', () => {
-        elements.coursesBtn.classList.add('active');
-        elements.generalBtn.classList.remove('active');
-        
-        if (elements.coursesDropdown) {
-            elements.coursesDropdown.style.display = 'block';
-        }
-        
-        if (elements.courseSelect) {
-            elements.courseSelect.disabled = false;
-            elements.courseSelect.setAttribute('required', 'required');
-        }
-    });
-}
-
-// ============================================================================
-// API COMMUNICATION
-// ============================================================================
-async function submitFormData(formData) {
-    const response = await fetch(CONFIG.BACKEND_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-    });
-
-    const result = await response.json();
-    console.log('📥 Server response:', result);
-
-    if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Submission failed');
-    }
-
-    return result;
-}
-
-// ============================================================================
-// FORM SUBMISSION HANDLER
-// ============================================================================
-let isSubmitting = false;
-
-async function handleFormSubmit(e) {
-    e.preventDefault();
-
-    // Prevent multiple submissions
-    if (isSubmitting) return;
-
-    // Validate all fields
-    if (!validateAllFields()) {
-        showStatus(CONFIG.MESSAGES.VALIDATION_ERROR, true);
-        return;
-    }
-
-    // Get form data
-    const enquiryType = elements.coursesBtn?.classList.contains('active') ? 'courses' : 'general';
-    
-    const formData = {
-        name: elements.nameInput?.value.trim() || '',
-        email: elements.emailInput?.value.trim() || '',
-        phone: elements.phoneInput?.value.trim() || '',
-        message: elements.messageInput?.value.trim() || '',
-        enquiryType: enquiryType,
-        course: enquiryType === 'courses' ? elements.courseSelect?.value || null : null
-    };
-
-    console.log('📤 Submitting contact form:', formData);
-
-    // Check reCAPTCHA if available
-    if (typeof grecaptcha !== 'undefined') {
-        try {
-            const recaptchaResponse = grecaptcha.getResponse();
-            if (!recaptchaResponse) {
-                showStatus(CONFIG.MESSAGES.RECAPTCHA_ERROR, true);
-                return;
-            }
-            formData.recaptcha = recaptchaResponse;
-        } catch (e) {
-            console.warn('reCAPTCHA not properly loaded:', e);
-        }
-    }
-
-    // Set submitting state
-    isSubmitting = true;
-    setButtonState(true, CONFIG.MESSAGES.SENDING);
-
-    try {
-        // Submit form
-        await submitFormData(formData);
-        
-        // Success
-        showStatus(CONFIG.MESSAGES.SUCCESS, false);
-        showSuccessMessage();
-        resetForm();
-        
-    } catch (error) {
-        // Error handling
-        console.error('❌ Form submission error:', error);
-        showStatus(CONFIG.MESSAGES.ERROR, true);
-        
-    } finally {
-        // Reset button state
-        isSubmitting = false;
-        setButtonState(false, CONFIG.MESSAGES.DEFAULT_BUTTON);
-    }
-}
-
-// ============================================================================
-// INPUT ANIMATIONS & VALIDATION
-// ============================================================================
-function setupInputAnimations() {
-    const inputs = document.querySelectorAll('.input-group input, .input-group textarea, .input-group select');
-    
-    inputs.forEach(input => {
-        // Focus animations
-        input.addEventListener('focus', function() {
-            if (this.parentElement) {
-                this.parentElement.style.transform = 'translateX(5px)';
-            }
-            this.style.boxShadow = '0 0 0 3px rgba(0, 194, 255, 0.1)';
-        });
-        
-        // Blur animations and validation
-        input.addEventListener('blur', function() {
-            if (this.parentElement) {
-                this.parentElement.style.transform = 'translateX(0)';
-            }
-            this.style.boxShadow = 'none';
-            validateField(this);
-        });
-    });
-}
-
-// ============================================================================
-// HAMBURGER MENU
-// ============================================================================
-function setupHamburgerMenu() {
-    if (!elements.hamburger || !elements.navMenu) return;
-
-    // Toggle menu on hamburger click
-    elements.hamburger.addEventListener('click', () => {
-        elements.hamburger.classList.toggle('is-active');
-        elements.navMenu.classList.toggle('is-active');
-    });
-
-    // Close menu when a link is clicked
-    const navLinks = elements.navMenu.querySelectorAll('a');
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            elements.hamburger.classList.remove('is-active');
-            elements.navMenu.classList.remove('is-active');
-        });
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.navbar') && elements.navMenu.classList.contains('is-active')) {
-            elements.hamburger.classList.remove('is-active');
-            elements.navMenu.classList.remove('is-active');
-        }
-    });
-}
-
-// ============================================================================
-// CUSTOM CURSOR
-// ============================================================================
-function setupCustomCursor() {
-    if (!elements.cursor || !elements.cursorFollower) return;
-
+if (cursor && cursorFollower) {
     document.addEventListener('mousemove', (e) => {
-        elements.cursor.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`;
+        cursor.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`;
         
         setTimeout(() => {
-            elements.cursorFollower.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
+            cursorFollower.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
         }, 100);
     });
 
     // Cursor hover effect on interactive elements
     document.querySelectorAll('button, input, textarea, select, a, .enquiry-btn').forEach(el => {
         el.addEventListener('mouseenter', () => {
-            elements.cursor.style.transform += ' scale(1.5)';
-            elements.cursor.style.borderColor = '#0088ff';
+            cursor.style.transform += ' scale(1.5)';
+            cursor.style.borderColor = '#0088ff';
         });
         
         el.addEventListener('mouseleave', () => {
-            elements.cursor.style.borderColor = '#00ff88';
+            cursor.style.borderColor = '#00ff88';
         });
+    });
+}
+
+// ============================================================================
+// HAMBURGER MENU - Mobile Navigation
+// ============================================================================
+const hamburger = document.querySelector('.hamburger-menu');
+const navMenu = document.querySelector('.nav-menu');
+const navLinks = document.querySelectorAll('.nav-menu a');
+
+if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('is-active');
+        navMenu.classList.toggle('is-active');
+    });
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('is-active');
+            navMenu.classList.remove('is-active');
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.navbar') && navMenu.classList.contains('is-active')) {
+            hamburger.classList.remove('is-active');
+            navMenu.classList.remove('is-active');
+        }
+    });
+}
+
+// ============================================================================
+// ENQUIRY TYPE TOGGLE - General vs Courses
+// ============================================================================
+const generalBtn = document.getElementById('generalBtn');
+const coursesBtn = document.getElementById('coursesBtn');
+const coursesDropdown = document.getElementById('coursesDropdown');
+const courseSelect = document.getElementById('course');
+
+if (generalBtn && coursesBtn && coursesDropdown && courseSelect) {
+    generalBtn.addEventListener('click', () => {
+        generalBtn.classList.add('active');
+        coursesBtn.classList.remove('active');
+        coursesDropdown.style.display = 'none';
+        courseSelect.disabled = true;
+        courseSelect.removeAttribute('required');
+        courseSelect.value = '';
+    });
+
+    coursesBtn.addEventListener('click', () => {
+        coursesBtn.classList.add('active');
+        generalBtn.classList.remove('active');
+        coursesDropdown.style.display = 'block';
+        courseSelect.disabled = false;
+        courseSelect.setAttribute('required', 'required');
     });
 }
 
 // ============================================================================
 // SUBMIT BUTTON PARTICLE EFFECT
 // ============================================================================
-function setupSubmitButtonEffect() {
-    if (!elements.submitBtn) return;
-    
-    elements.submitBtn.addEventListener('mousemove', (e) => {
+const submitBtn = document.querySelector('.submit-btn');
+if (submitBtn) {
+    submitBtn.addEventListener('mousemove', (e) => {
         const rect = e.target.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
@@ -455,7 +116,239 @@ function setupSubmitButtonEffect() {
 }
 
 // ============================================================================
-// SMOOTH SCROLL
+// FIELD VALIDATION HELPER
+// ============================================================================
+function validateField(field) {
+    const value = field.value.trim();
+
+    if (field.type === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (value && !emailRegex.test(value)) {
+            field.style.borderColor = '#ff6b6b';
+            return false;
+        } else {
+            field.style.borderColor = '#1a1a1a';
+            return true;
+        }
+    } else if (field.type === 'tel' || field.id === 'phone') {
+        const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+        const digitsOnly = value.replace(/\D/g, '');
+        if (value && (!phoneRegex.test(value) || digitsOnly.length < 10)) {
+            field.style.borderColor = '#ff6b6b';
+            return false;
+        } else {
+            field.style.borderColor = '#1a1a1a';
+            return true;
+        }
+    } else if (field.required && !value) {
+        field.style.borderColor = '#ff6b6b';
+        return false;
+    } else {
+        field.style.borderColor = '#1a1a1a';
+        return true;
+    }
+}
+
+// ============================================================================
+// PHONE NUMBER FORMATTING
+// ============================================================================
+function setupPhoneFormatting() {
+    const phoneInput = document.getElementById('phone');
+    if (!phoneInput) return;
+
+    phoneInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/[^\d\+]/g, '');
+        
+        if (value.startsWith('+')) {
+            const digits = value.slice(1).replace(/\D/g, '');
+            if (digits.length > 12) {
+                e.target.value = '+' + digits.slice(0, 12);
+            } else {
+                e.target.value = '+' + digits;
+            }
+        } else {
+            const digits = value.replace(/\D/g, '');
+            if (digits.length > 10) {
+                e.target.value = digits.slice(0, 10);
+            } else {
+                e.target.value = digits;
+            }
+        }
+    });
+
+    phoneInput.addEventListener('blur', (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length === 10) {
+            e.target.value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6);
+        } else if (value.length > 10) {
+            e.target.value = '+' + value;
+        }
+        validateField(phoneInput);
+    });
+}
+
+// ============================================================================
+// UI UPDATE FUNCTIONS
+// ============================================================================
+function showStatus(message, isError = false) {
+    const statusMsg = document.getElementById('form-status');
+    if (!statusMsg) return;
+    
+    statusMsg.textContent = message;
+    statusMsg.style.color = isError ? CONFIG.COLORS.ERROR : CONFIG.COLORS.SUCCESS;
+    statusMsg.style.display = 'block';
+}
+
+function showSuccessMessage() {
+    const successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+        successMessage.style.display = 'block';
+        successMessage.classList.add('show');
+        
+        setTimeout(() => {
+            successMessage.classList.remove('show');
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
+}
+
+// ============================================================================
+// FORM SUBMISSION HANDLER - WITH BACKEND INTEGRATION
+// ============================================================================
+function setupFormSubmission() {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+
+    let isSubmitting = false;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Prevent multiple submissions
+        if (isSubmitting) return;
+
+        // Get form elements
+        const name = document.getElementById('name');
+        const email = document.getElementById('email');
+        const phone = document.getElementById('phone');
+        const message = document.getElementById('message');
+        const course = document.getElementById('course');
+
+        // Validate all required fields
+        let isValid = true;
+        if (name) isValid = validateField(name) && isValid;
+        if (email) isValid = validateField(email) && isValid;
+        if (phone) isValid = validateField(phone) && isValid;
+        if (course && !course.disabled) isValid = validateField(course) && isValid;
+
+        if (!isValid) {
+            showStatus(CONFIG.MESSAGES.VALIDATION_ERROR, true);
+            return;
+        }
+
+        // Set submitting state
+        isSubmitting = true;
+        const submitButton = form.querySelector('button[type="submit"]');
+        const btnText = submitButton.querySelector('.btn-text');
+        const originalText = btnText ? btnText.textContent : submitButton.textContent;
+        
+        if (btnText) {
+            btnText.textContent = CONFIG.MESSAGES.SENDING;
+        } else {
+            submitButton.textContent = CONFIG.MESSAGES.SENDING;
+        }
+        submitButton.disabled = true;
+
+        // Prepare form data - MUST MATCH BACKEND EXPECTED FIELDS
+        const enquiryType = coursesBtn && coursesBtn.classList.contains('active') ? 'courses' : 'general';
+        
+        const formData = {
+            fullName: name.value.trim(),  // Backend expects 'fullName' not 'name'
+            email: email.value.trim(),
+            phone: phone.value.trim(),
+            course: enquiryType === 'courses' ? course.value : '',  // Backend expects empty string not null
+            message: message ? message.value.trim() : ''
+        };
+
+        console.log('📤 Submitting contact form:', formData);
+        console.log('🌐 Backend URL:', CONFIG.BACKEND_URL);
+
+        try {
+            // Send to backend
+            const response = await fetch(CONFIG.BACKEND_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response ok:', response.ok);
+
+            const result = await response.json();
+            console.log('📥 Server response:', result);
+
+            if (response.ok && result.success) {
+                // Success
+                showStatus(CONFIG.MESSAGES.SUCCESS, false);
+                showSuccessMessage();
+                
+                // Reset form
+                form.reset();
+                if (generalBtn) generalBtn.click();
+                
+                // Hide status after 5 seconds
+                setTimeout(() => {
+                    const statusMsg = document.getElementById('form-status');
+                    if (statusMsg) statusMsg.style.display = 'none';
+                }, 5000);
+                
+            } else {
+                throw new Error(result.message || 'Submission failed');
+            }
+
+        } catch (error) {
+            console.error('❌ Form submission error:', error);
+            showStatus(CONFIG.MESSAGES.ERROR, true);
+        } finally {
+            // Reset button state
+            isSubmitting = false;
+            if (btnText) {
+                btnText.textContent = originalText;
+            } else {
+                submitButton.textContent = originalText;
+            }
+            submitButton.disabled = false;
+        }
+    });
+}
+
+// ============================================================================
+// INPUT FIELD ANIMATIONS AND VALIDATION
+// ============================================================================
+function setupInputAnimations() {
+    const inputs = document.querySelectorAll('.input-group input, .input-group textarea, .input-group select');
+    
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'translateX(5px)';
+            this.style.boxShadow = '0 0 0 3px rgba(0, 194, 255, 0.1)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'translateX(0)';
+            this.style.boxShadow = 'none';
+            validateField(this);
+        });
+    });
+}
+
+// ============================================================================
+// SMOOTH SCROLL FOR ANCHOR LINKS
 // ============================================================================
 function setupSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -476,7 +369,7 @@ function setupSmoothScroll() {
 }
 
 // ============================================================================
-// SCROLL ANIMATIONS
+// INTERSECTION OBSERVER FOR ANIMATIONS
 // ============================================================================
 function setupScrollAnimations() {
     const observerOptions = {
@@ -493,15 +386,49 @@ function setupScrollAnimations() {
         });
     }, observerOptions);
 
-    const sections = ['.contact-section', '.map', '.form-section'];
-    sections.forEach(selector => {
-        const element = document.querySelector(selector);
-        if (element) observer.observe(element);
+    const contactSection = document.querySelector('.contact-section');
+    const mapSection = document.querySelector('.map');
+    const formSection = document.querySelector('.form-section');
+
+    if (contactSection) observer.observe(contactSection);
+    if (mapSection) observer.observe(mapSection);
+    if (formSection) observer.observe(formSection);
+}
+
+// ============================================================================
+// KEYBOARD ACCESSIBILITY
+// ============================================================================
+function setupKeyboardNavigation() {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+
+    const formElements = form.querySelectorAll('input:not([type="hidden"]), textarea, select, button');
+
+    formElements.forEach((element, index) => {
+        element.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && e.shiftKey && index === 0) {
+                e.preventDefault();
+                formElements[formElements.length - 1].focus();
+            } else if (e.key === 'Tab' && !e.shiftKey && index === formElements.length - 1) {
+                e.preventDefault();
+                formElements[0].focus();
+            }
+        });
     });
 }
 
 // ============================================================================
-// ADD ANIMATION STYLES
+// NAVBAR PAGE LOAD ANIMATION
+// ============================================================================
+function setupNavbarAnimation() {
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+        navbar.style.animation = 'fadeIn 0.8s ease-out';
+    }
+}
+
+// ============================================================================
+// ADD FADE-IN ANIMATION KEYFRAMES
 // ============================================================================
 function addAnimationStyles() {
     const style = document.createElement('style');
@@ -518,7 +445,7 @@ function addAnimationStyles() {
         }
         
         .success-message.show {
-            display: block !important;
+            opacity: 1;
             animation: slideIn 0.3s ease-out;
         }
         
@@ -542,25 +469,23 @@ function addAnimationStyles() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Initializing Contact Form...');
     
-    // Initialize DOM elements
-    initializeElements();
-    
     // Add animations
     addAnimationStyles();
     
     // Setup all features
-    if (elements.contactForm) {
-        elements.contactForm.addEventListener('submit', handleFormSubmit);
-    }
-    
     setupPhoneFormatting();
-    setupEnquiryToggle();
+    setupFormSubmission();
     setupInputAnimations();
-    setupHamburgerMenu();
-    setupCustomCursor();
-    setupSubmitButtonEffect();
     setupSmoothScroll();
     setupScrollAnimations();
+    setupKeyboardNavigation();
     
-    console.log('✅ Contact Form initialized successfully');
+    console.log('✅ All features initialized successfully');
+});
+
+// ============================================================================
+// INITIALIZE ON WINDOW LOAD
+// ============================================================================
+window.addEventListener('load', () => {
+    setupNavbarAnimation();
 });
