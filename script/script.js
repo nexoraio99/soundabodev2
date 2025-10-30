@@ -1,4 +1,3 @@
-
 // ============================================================================
 // SOUNDABODE SCROLL ANIMATION - OPTIMIZED FOR MOBILE PERFORMANCE
 // ============================================================================
@@ -51,7 +50,6 @@ let lastScrollY = 0;
 function masterAnimationLoop() {
     state.scrollY = window.scrollY;
     
-    // Only update if scroll changed significantly (throttle)
     if (Math.abs(state.scrollY - lastScrollY) > 5 || !ticking) {
         lastScrollY = state.scrollY;
         
@@ -61,17 +59,10 @@ function masterAnimationLoop() {
         state.spacerStart = viewportHeight;
         state.spacerEnd = state.spacerStart + spacerHeight;
 
-        // Calculate intro animation progress (0 to 1)
         state.phase1Progress = Math.min(1, state.scrollY / INTRO_ANIMATION_RANGE);
 
         updateIntroOverlay();
         updateMainContent();
-        
-        // Only animate image zoom if not low-end device
-       // if (!isLowEndDevice) {
-         //   updateImageZoom();
-        //}
-        
         checkCarouselInView();
     }
 
@@ -80,7 +71,6 @@ function masterAnimationLoop() {
     }
 }
 
-// Optimized scroll listener with throttling
 function onScroll() {
     if (!ticking) {
         ticking = true;
@@ -89,14 +79,13 @@ function onScroll() {
 }
 
 // ============================================================================
-// INTRO OVERLAY - Panel sliding animation (Optimized)
+// INTRO OVERLAY - Panel sliding animation
 // ============================================================================
 function updateIntroOverlay() {
     if (!panelLeft || !panelRight || !introOverlay) return;
 
     const translateX = state.phase1Progress * 100;
     
-    // Batch transform updates
     panelLeft.style.transform = `translateX(${-translateX}%)`;
     panelRight.style.transform = `translateX(${translateX}%)`;
 
@@ -127,7 +116,6 @@ function updateIntroOverlay() {
 function updateMainContent() {
     if (!mainContent) return;
 
-    // Main content fades in as panels move away
     const opacity = state.phase1Progress;
     const scale = 1 + (state.phase1Progress * 0.05);
 
@@ -145,64 +133,17 @@ function updateMainContent() {
 }
 
 // ============================================================================
-// IMAGE ZOOM EFFECT - About section (Optimized)
-// ============================================================================
-function updateImageZoom() {
-    if (!aboutSection || imageBlocks.length === 0) return;
-
-    // Cache section boundaries on first run
-    if (!state.aboutSectionCached) {
-        state.aboutTop = aboutSection.offsetTop;
-        state.aboutBottom = state.aboutTop + aboutSection.offsetHeight;
-        state.aboutSectionCached = true;
-    }
-
-    const viewportHeight = window.innerHeight;
-    
-    // Early exit if section not in viewport
-    if (state.scrollY < state.aboutTop - viewportHeight || 
-        state.scrollY > state.aboutBottom + viewportHeight) {
-        imageBlocks.forEach(block => {
-            block.style.transform = 'scale(0)';
-        });
-        return;
-    }
-
-    // Only calculate if in view range
-    if (state.scrollY >= state.aboutTop && state.scrollY <= state.aboutBottom) {
-        const scrollProgress = (state.scrollY - state.aboutTop) / (state.aboutBottom - state.aboutTop);
-
-        // Pre-calculate transforms to avoid reflow thrashing
-        const transforms = [];
-        imageBlocks.forEach((block, index) => {
-            const delay = index * 0.08;
-            const adjustedProgress = Math.max(0, Math.min(1, scrollProgress - delay));
-            const blockScale = 1 + (adjustedProgress * 0.12);
-            transforms.push(`scale(${blockScale})`);
-        });
-
-        // Apply all transforms in one batch
-        requestAnimationFrame(() => {
-            imageBlocks.forEach((block, i) => {
-                block.style.transform = transforms[i];
-            });
-        });
-    }
-}
-
-// ============================================================================
-// CAROUSEL ANIMATION - INFINITE SEAMLESS LOOP (OPTIMIZED)
+// CAROUSEL ANIMATION - INFINITE SEAMLESS LOOP
 // ============================================================================
 let carouselAnimationId = null;
 let carouselScrollPos = 0;
 let carouselOneSetWidth = 0;
-let carouselSpeed = isMobile ? 0.3 : 0.6; // Slower on mobile
+let carouselSpeed = isMobile ? 1 : 1;
 let carouselInitialized = false;
 
 function initCarouselClones() {
     if (!carouselTrack || carouselInitialized) return;
 
-    // Get original items before any modifications
     const carouselItems = carouselTrack.querySelectorAll('.carousel-item');
     
     if (carouselItems.length === 0) {
@@ -210,15 +151,12 @@ function initCarouselClones() {
         return;
     }
 
-    // Wait a bit for images to load
     setTimeout(() => {
         try {
-            // Get computed styles for gap
             const styles = window.getComputedStyle(carouselTrack);
             const gapStr = styles.gap || '40px';
             const gap = parseInt(gapStr) || 40;
 
-            // Calculate width of one complete set
             let totalWidth = 0;
             const items = carouselTrack.querySelectorAll('.carousel-item');
             
@@ -232,17 +170,9 @@ function initCarouselClones() {
             carouselOneSetWidth = totalWidth;
 
             if (carouselOneSetWidth > 0) {
-                // Clone items
                 const originalHTML = carouselTrack.innerHTML;
                 carouselTrack.innerHTML = originalHTML + originalHTML + originalHTML;
                 carouselInitialized = true;
-
-                console.log('Carousel initialized:', {
-                    itemCount: items.length,
-                    oneSetWidth: carouselOneSetWidth,
-                    gap: gap,
-                    speed: carouselSpeed
-                });
 
                 if (state.carouselInView && !state.isCarouselAnimating) {
                     startCarouselAnimation();
@@ -281,7 +211,6 @@ function startCarouselAnimation() {
     function animateCarousel() {
         carouselScrollPos += carouselSpeed;
 
-        // Seamless loop: reset when we've scrolled through one complete set
         if (carouselScrollPos >= carouselOneSetWidth) {
             carouselScrollPos = 0;
         }
@@ -306,7 +235,6 @@ function stopCarouselAnimation() {
     state.isCarouselAnimating = false;
 }
 
-// Pause on hover
 if (carouselTrack) {
     carouselTrack.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
     carouselTrack.addEventListener('mouseleave', () => {
@@ -359,35 +287,217 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================================================
-// POPUP FORM - Use variable instead of sessionStorage
+// POPUP FORM - INITIALIZATION AND DISPLAY
 // ============================================================================
 const popup = document.getElementById('popup-form');
 const closeBtn = document.getElementById('closePopup');
 let popupShown = false;
 
 if (popup && closeBtn) {
+    // Show popup after 2 seconds on page load
     window.addEventListener('load', () => {
         if (!popupShown) {
             setTimeout(() => {
                 popup.classList.add('active');
                 popupShown = true;
+                console.log('✅ Popup displayed');
             }, 2000);
         }
     });
 
+    // Close button click
     closeBtn.addEventListener('click', () => {
         popup.classList.remove('active');
+        console.log('❌ Popup closed');
     });
 
+    // Click outside to close
     popup.addEventListener('click', (e) => {
         if (e.target === popup) {
             popup.classList.remove('active');
+            console.log('❌ Popup closed (outside click)');
         }
     });
 }
 
 // ============================================================================
-// INFINITE LOGO SCROLL - OPTIMIZED
+// POPUP FORM SUBMISSION HANDLER
+// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const popupForm = document.getElementById('popup-form-element');
+    
+    if (popupForm) {
+        popupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = popupForm.querySelector('button[type="submit"]');
+            const statusMsg = popupForm.querySelector('.popup-status');
+            
+            const formData = {
+                name: popupForm.querySelector('#popup-name')?.value.trim(),
+                email: popupForm.querySelector('#popup-email')?.value.trim(),
+                phone: popupForm.querySelector('#popup-phone')?.value.trim()
+            };
+            
+            console.log('📤 Submitting popup form:', formData);
+            
+            if (!formData.name || !formData.email || !formData.phone) {
+                if (statusMsg) {
+                    statusMsg.textContent = '❌ Please fill all fields';
+                    statusMsg.style.color = '#ff4444';
+                }
+                return;
+            }
+            
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+            }
+            
+            try {
+                const BACKEND_URL = 'https://soundabode-test.onrender.com/api/popup-form';
+                
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                console.log('📥 Server response:', result);
+                
+                if (response.ok && result.success) {
+                    if (statusMsg) {
+                        statusMsg.textContent = '✅ Thank you! We\'ll contact you soon.';
+                        statusMsg.style.color = '#00ff88';
+                    }
+                    
+                    popupForm.reset();
+                    
+                    setTimeout(() => {
+                        const popup = document.getElementById('popup-form');
+                        if (popup) {
+                            popup.classList.remove('active');
+                        }
+                    }, 2000);
+                    
+                } else {
+                    throw new Error(result.message || 'Submission failed');
+                }
+                
+            } catch (error) {
+                console.error('❌ Form submission error:', error);
+                if (statusMsg) {
+                    statusMsg.textContent = '❌ Failed to submit. Please try again.';
+                    statusMsg.style.color = '#ff4444';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Get Started';
+                }
+            }
+        });
+    }
+});
+
+// ============================================================================
+// CONTACT FORM SUBMISSION HANDLER
+// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const contactForm = document.getElementById('contact-form');
+    
+    if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const statusMsg = document.getElementById('form-status');
+            
+            const formData = {
+                fullName: contactForm.querySelector('#fullName')?.value.trim(),
+                email: contactForm.querySelector('#email')?.value.trim(),
+                phone: contactForm.querySelector('#phone')?.value.trim(),
+                course: contactForm.querySelector('#course')?.value,
+                message: contactForm.querySelector('#message')?.value.trim()
+            };
+            
+            console.log('📤 Submitting contact form:', formData);
+            
+            if (!formData.fullName || !formData.email || !formData.phone || !formData.course || !formData.message) {
+                if (statusMsg) {
+                    statusMsg.textContent = '❌ Please fill all fields';
+                    statusMsg.style.color = '#ff4444';
+                }
+                return;
+            }
+            
+            const recaptchaResponse = grecaptcha.getResponse();
+            if (!recaptchaResponse) {
+                if (statusMsg) {
+                    statusMsg.textContent = '❌ Please complete the reCAPTCHA';
+                    statusMsg.style.color = '#ff4444';
+                }
+                return;
+            }
+            
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+            }
+            
+            try {
+                const BACKEND_URL = 'https://soundabode-test.onrender.com/api/contact-form';
+                
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...formData,
+                        recaptcha: recaptchaResponse
+                    })
+                });
+                
+                const result = await response.json();
+                
+                console.log('📥 Server response:', result);
+                
+                if (response.ok && result.success) {
+                    if (statusMsg) {
+                        statusMsg.textContent = '✅ Message sent successfully! We\'ll get back to you soon.';
+                        statusMsg.style.color = '#00ff88';
+                    }
+                    
+                    contactForm.reset();
+                    grecaptcha.reset();
+                    
+                } else {
+                    throw new Error(result.message || 'Submission failed');
+                }
+                
+            } catch (error) {
+                console.error('❌ Form submission error:', error);
+                if (statusMsg) {
+                    statusMsg.textContent = '❌ Failed to send message. Please try again.';
+                    statusMsg.style.color = '#ff4444';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send Message';
+                }
+            }
+        });
+    }
+});
+
+// ============================================================================
+// INFINITE LOGO SCROLL
 // ============================================================================
 const logoTrack = document.querySelector('.logo-track');
 const logoSet = document.querySelector('.logo-set');
@@ -447,7 +557,7 @@ if (logoTrack && logoSet) {
         } else {
             logoScrollSpeed = 0.4;
         }
-        logoSetWidth = 0; // Reset cache on resize
+        logoSetWidth = 0;
     }
 
     updateLogoSpeed();
@@ -456,7 +566,7 @@ if (logoTrack && logoSet) {
 }
 
 // ============================================================================
-// REVEAL ON SCROLL - Intersection Observer
+// REVEAL ON SCROLL
 // ============================================================================
 function setupRevealObserver() {
     const observerOptions = {
@@ -480,7 +590,7 @@ function setupRevealObserver() {
         });
     }, observerOptions);
 
-    const sections = ['#about-section', '#carousel-section', '.testimonials'];
+    const sections = ['#about-section', '#carousel-section', '.testimonials', '#studio-setup', '#why-soundabode', '#faq'];
     sections.forEach(selector => {
         const section = document.querySelector(selector);
         if (section) {
@@ -549,13 +659,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================================================
-// EVENT LISTENERS - OPTIMIZED
+// EVENT LISTENERS
 // ============================================================================
 window.addEventListener('scroll', onScroll, { passive: true });
 
 window.addEventListener('resize', () => {
     INTRO_ANIMATION_RANGE = window.innerHeight * 0.8;
-    state.aboutSectionCached = false; // Reset cache on resize
+    state.aboutSectionCached = false;
 }, { passive: true });
 
 // ============================================================================
@@ -563,27 +673,23 @@ window.addEventListener('resize', () => {
 // ============================================================================
 window.addEventListener('DOMContentLoaded', () => {
     initCarouselClones();
-    animateOnScroll();
     setupRevealObserver();
 });
 
-// Initial setup
-animateOnScroll();
 setupRevealObserver();
 
-(function(w,d,t,r,u)
-  {
+// ============================================================================
+// BING UET TRACKING
+// ============================================================================
+(function(w,d,t,r,u) {
     var f,n,i;
-    w[u]=w[u]||[],f=function()
-    {
-      var o={ti:"343210550", enableAutoSpaTracking: true};
-      o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")
+    w[u]=w[u]||[],f=function() {
+        var o={ti:"343210550", enableAutoSpaTracking: true};
+        o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")
     },
-    n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function()
-    {
-      var s=this.readyState;
-      s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)
+    n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function() {
+        var s=this.readyState;
+        s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)
     },
     i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)
-  })
-  (window,document,"script","//bat.bing.com/bat.js","uetq"); 
+})(window,document,"script","//bat.bing.com/bat.js","uetq");
