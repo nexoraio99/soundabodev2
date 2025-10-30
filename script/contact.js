@@ -2,7 +2,7 @@
 // CONFIGURATION
 // ============================================================================
 const CONFIG = {
-    BACKEND_URL: 'https://soundabode-test.onrender.com/api/contact-form',
+    BACKEND_URL: 'https://soundabode-test.onrender.com/api/popup-form',  // Changed to popup-form endpoint (no reCAPTCHA required)
     MESSAGES: {
         SENDING: 'Sending...',
         SUCCESS: '✅ Message sent successfully! We\'ll get back to you soon.',
@@ -262,16 +262,22 @@ function setupFormSubmission() {
         }
         submitButton.disabled = true;
 
-        // Prepare form data - MUST MATCH BACKEND EXPECTED FIELDS
-        const enquiryType = coursesBtn && coursesBtn.classList.contains('active') ? 'courses' : 'general';
-        
+        // Prepare form data - Send only basic fields like popup form
         const formData = {
-            fullName: name.value.trim(),  // Backend expects 'fullName' not 'name'
+            name: name.value.trim(),  // Popup form uses 'name' not 'fullName'
             email: email.value.trim(),
-            phone: phone.value.trim(),
-            course: enquiryType === 'courses' ? course.value : '',  // Backend expects empty string not null
-            message: message ? message.value.trim() : ''
+            phone: phone.value.trim()
         };
+        
+        // Add optional fields if they exist
+        if (message && message.value.trim()) {
+            formData.message = message.value.trim();
+        }
+        
+        const enquiryType = coursesBtn && coursesBtn.classList.contains('active') ? 'courses' : 'general';
+        if (enquiryType === 'courses' && course.value) {
+            formData.course = course.value;
+        }
 
         console.log('📤 Submitting contact form:', formData);
         console.log('🌐 Backend URL:', CONFIG.BACKEND_URL);
