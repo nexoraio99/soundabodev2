@@ -199,7 +199,7 @@ body {
 }
 
 /* ============================================================================
-   CONTACT SECTION
+   CONTACT SECTION - SWAPPED LAYOUT
    ============================================================================ */
 .contact-section {
     color: #fff;
@@ -222,11 +222,24 @@ body {
     position: relative;
 }
 
+/* ============================================================================
+   SWAPPED GRID: Form LEFT (1.2fr), Contact Info + Map RIGHT (1fr)
+   ============================================================================ */
 .contact-grid {
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
+    grid-template-columns: 1.2fr 1fr;
     gap: clamp(40px, 8vw, 80px);
     align-items: start;
+    width: 100%;
+}
+
+/* ============================================================================
+   CONTACT INFO + MAP WRAPPER (Now on RIGHT side)
+   ============================================================================ */
+.contact-info-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(30px, 5vw, 50px);
     width: 100%;
 }
 
@@ -263,12 +276,12 @@ body {
 }
 
 /* ============================================================================
-   FORM WITH IMAGE BACKGROUND - OVERLAY LAYOUT
+   FORM WITH IMAGE BACKGROUND - OVERLAY LAYOUT (Now on LEFT side)
    ============================================================================ */
 .form-image-wrapper {
     position: relative;
     width: 100%;
-    min-height: 600px; /* ← ADJUST MINIMUM HEIGHT HERE */
+    min-height: 600px;
     border-radius: 16px;
     overflow: hidden;
 }
@@ -321,18 +334,17 @@ body {
     align-items: center;
     justify-content: center;
     padding: clamp(2rem, 5vw, 3rem);
-    min-height: 600px; /* ← ADJUST MINIMUM HEIGHT HERE */
+    min-height: 600px;
 }
 
 /* ============================================================================
-   ⭐ FORM CONTAINER SIZE CONTROLS ⭐
-   Adjust these values to make the form bigger or smaller
+   FORM CONTAINER SIZE CONTROLS
    ============================================================================ */
 .form-container {
     width: 100%;
-    max-width: 500px;        /* ← CHANGE THIS to make form wider/narrower */
-    padding: clamp(1.5rem, 4vw, 2.5rem);  /* ← CHANGE THIS for internal spacing */
-    background: rgba(10, 10, 10, 0.85);   /* Semi-transparent dark background */
+    max-width: 500px;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    background: rgba(10, 10, 10, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 255, 136, 0.2);
@@ -357,7 +369,7 @@ body {
    FORM TITLE WITH GLITCH EFFECT
    ============================================================================ */
 .form-title {
-    font-size: clamp(1.5rem, 4vw, 2rem);  /* ← CHANGE THIS for title size */
+    font-size: clamp(1.5rem, 4vw, 2rem);
     margin-bottom: 1.5rem;
     font-weight: 700;
     color: var(--text-light);
@@ -663,17 +675,13 @@ body {
 /* ============================================================================
    MAP SECTION
    ============================================================================ */
-/* ============================================================================
-   MAP SECTION - Positioned Left of Form
-   ============================================================================ */
-   .map {
+.map {
     padding: 0;
     width: 100%;
     position: relative;
     z-index: 5;
     background: transparent;
     box-sizing: border-box;
-    /* Remove extra padding since it's now inside contact-section */
 }
 
 .map-container {
@@ -691,7 +699,7 @@ body {
     border: 1px solid rgba(0, 194, 255, 0.2);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     width: 100%;
-    aspect-ratio: 1 / 1; /* Square aspect ratio for better left sidebar */
+    aspect-ratio: 1 / 1;
     margin-bottom: 1rem;
 }
 
@@ -719,7 +727,6 @@ body {
 .map .nav-link:hover {
     color: #fff;
 }
-
 
 /* ============================================================================
    FOOTER
@@ -804,7 +811,7 @@ body {
     }
 
     .form-image-wrapper {
-        min-height: 550px; /* ← ADJUST FOR TABLET */
+        min-height: 550px;
     }
 
     .form-section {
@@ -812,7 +819,7 @@ body {
     }
 
     .form-container {
-        max-width: 100%;  /* ← ADJUST FOR TABLET */
+        max-width: 100%;
     }
 
     .enquiry-buttons {
@@ -821,7 +828,7 @@ body {
     }
 }
 
-/* Mobile - 768px and below */
+/* Mobile - 768px and below - FORM FIRST, THEN DETAILS, THEN MAP */
 @media (max-width: 768px) {
     .hamburger-menu {
         display: block;
@@ -847,8 +854,27 @@ body {
         transform: translateY(-7px) rotate(-45deg);
     }
 
+    /* Reorder elements for mobile: Form first, Details second, Map last */
+    .contact-grid {
+        display: flex;
+        flex-direction: column;
+    }
+
     .form-image-wrapper {
-        min-height: 500px; /* ← ADJUST FOR MOBILE */
+        order: 1;
+        min-height: 500px;
+    }
+
+    .contact-info-wrapper {
+        order: 2;
+    }
+
+    .contact-info {
+        order: 1;
+    }
+
+    .map {
+        order: 2;
     }
 
     .form-section {
@@ -857,7 +883,7 @@ body {
     }
 
     .form-container {
-        max-width: 100%;  /* ← ADJUST FOR MOBILE */
+        max-width: 100%;
         padding: clamp(1.2rem, 3vw, 1.8rem);
     }
 
@@ -885,7 +911,7 @@ body {
     }
 
     .form-image-wrapper {
-        min-height: 450px; /* ← ADJUST FOR SMALL MOBILE */
+        min-height: 450px;
     }
 
     .form-section {
@@ -901,7 +927,7 @@ body {
 /* Extra Small Mobile - 360px and below */
 @media (max-width: 360px) {
     .form-image-wrapper {
-        min-height: 420px; /* ← ADJUST FOR EXTRA SMALL MOBILE */
+        min-height: 420px;
     }
 
     .form-section {
@@ -936,4 +962,3 @@ body {
         display: none !important;
     }
 }
-
