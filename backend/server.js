@@ -300,7 +300,7 @@ app.post('/api/popup-form', limiter, async (req, res) => {
         // Send emails
         const adminResult = await sendEmailViaGmailAPI(
             process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-            `🔥 Homepage Quick Inquiry - ${name}`,
+            ` Homepage Quick Inquiry - ${name}`,
             adminHtml,
             `New Popup Inquiry from Homepage\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}${message ? `\nMessage: ${message}` : ''}`
         );
@@ -341,7 +341,7 @@ app.post('/api/popup-form', limiter, async (req, res) => {
 // ============================================================================
 app.post('/api/contact-form', limiter, async (req, res) => {
     try {
-        console.log('📩 Contact form received:', req.body);
+        console.log(' Contact form received:', req.body);
 
         const { fullName, email, phone, course, message } = req.body;
 
