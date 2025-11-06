@@ -248,62 +248,73 @@ app.post('/api/popup-form', async (req, res) => {
   }
 });
 
-// ============================================================================
-// CONTACT FORM - /api/contact-form
-// ============================================================================
+// === REPLACE THE /api/contact-form HANDLER WITH THIS ===
 app.post('/api/contact-form', async (req, res) => {
   try {
+    console.log('➡️ Route hit: /api/contact-form');
+    console.log('Payload:', JSON.stringify(req.body));
+
     const { fullName, email, phone, course, message } = req.body || {};
 
     if (!fullName || !email || !phone) {
+      console.log('❌ Validation error: missing fields');
       return res.status(400).json({ success: false, message: 'Required fields missing' });
     }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return res.status(400).json({ success: false, message: 'Invalid email format' });
+    if (!emailRegex.test(email)) {
+      console.log('❌ Validation error: invalid email');
+      return res.status(400).json({ success: false, message: 'Invalid email format' });
+    }
 
     const isCourseEnquiry = Boolean(course && course.trim());
     const formattedCourse = isCourseEnquiry ? formatCourseName(course) : 'N/A';
     const enquiryType = isCourseEnquiry ? 'Course Enquiry' : 'General Enquiry';
 
+    // timestamp + small unique token so subjects are never identical to popup
     const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const uniqueTag = randomUUID().slice(0, 8);
 
+    // IMPORTANT: subject must explicitly include [Contact]
     const adminSubject = `${isCourseEnquiry ? '🎓' : '📧'} [Contact] ${enquiryType} — ${fullName} — ${timestamp} — ${uniqueTag}`;
     const userSubject = `Thank you for contacting Soundabode${isCourseEnquiry ? ` — ${formattedCourse}` : ''} — ${uniqueTag}`;
+
+    console.log('Admin subject ->', adminSubject);
 
     const adminHtml = `
       <h2>${isCourseEnquiry ? '🎓' : '📧'} New ${enquiryType}</h2>
       <p><strong>Name:</strong> ${fullName}</p>
-      <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-      <p><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a></p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone}</p>
       ${isCourseEnquiry ? `<p><strong>Course:</strong> ${formattedCourse}</p>` : ''}
       ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
       <p><small>Submitted at ${timestamp}</small></p>
+      <p><small>Ref: ${uniqueTag}</small></p>
     `;
 
-    // Send to admin
+    // send admin (throws if fails)
     await sendEmail({
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject: adminSubject,
       htmlBody: adminHtml,
-      textBody: `New ${enquiryType} — ${fullName}`
+      textBody: `New ${enquiryType} - ${fullName}`
     });
 
-    // Send user email (best-effort)
+    // send user (best-effort)
     try {
       await sendEmail({
         to: email,
         subject: userSubject,
-        htmlBody: `<h2>Hi ${fullName}!</h2><p>Thanks for your ${enquiryType.toLowerCase()}. We'll respond within 24 hours.</p><p><small>Ref: ${uniqueTag}</small></p>`,
+        htmlBody: `<h2>Hi ${fullName}!</h2><p>Thanks for your ${enquiryType.toLowerCase()}. We'll respond within 24 hours.</p><p>Ref: ${uniqueTag}</p>`,
         textBody: `Hi ${fullName}, thanks for contacting Soundabode. Ref: ${uniqueTag}`
       });
     } catch (userErr) {
-      console.warn('Contact form user mail failed:', userErr.message);
+      console.warn('User autoresponse failed:', userErr.message);
     }
 
     return res.status(200).json({ success: true, message: 'Message sent successfully!', reference: uniqueTag });
   } catch (err) {
-    console.error('Contact form error:', err.message);
+    console.error('Contact form error:', err && err.message ? err.message : err);
     return res.status(500).json({ success: false, message: 'Failed to send. Please try again.' });
   }
 });
