@@ -450,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             try {
-                const BACKEND_URL = 'https://soundabode-test.onrender.com/api/contact-form';
+                const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
                 
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
