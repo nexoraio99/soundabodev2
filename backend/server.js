@@ -1,446 +1,357 @@
-// server.js - Soundabode Backend with Gmail API (Direct Send)
+// server.js - Soundabode Backend (robust, single-file replacement)
+// Usage: set env vars: PORT, CORS_ORIGINS (comma separated), EMAIL_USER, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET, EMAIL_REFRESH_TOKEN, ADMIN_EMAIL (optional)
+
 import express from 'express';
 import { google } from 'googleapis';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
+import { randomUUID } from 'crypto';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
-// ============================================================================
-// MIDDLEWARE - CORS MUST BE CONFIGURED PROPERLY
-// ============================================================================
+// -----------------------
+// Security & middleware
+// -----------------------
 app.set('trust proxy', 1);
-
-// ✅ PROPER CORS CONFIGURATION
-const corsOptions = {
-    origin: [
-        'https://soundabode.com',
-        'https://www.soundabode.com',
-        'http://localhost:3000',
-        'http://localhost:5500',
-        'http://127.0.0.1:5500'
-    ],
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-    optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
-
-// Handle preflight requests explicitly
-app.options('*', cors(corsOptions));
-
-app.use(express.json());
+app.use(helmet());
+app.use(express.json({ limit: '150kb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Rate limiter for /api
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100, // Increased for legitimate traffic
-    message: 'Too many requests, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false,
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests, try again later.' }
 });
+app.use('/api/', limiter);
 
+// -----------------------
+// CORS - dynamic allowlist
+// -----------------------
+const defaultOrigins = [
+  'https://soundabode.com',
+  'https://www.soundabode.com',
+  'http://localhost:3000',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500'
+];
+const allowedOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(','))
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin(origin, callback) {
+    // If no origin (curl/postman/server-to-server) allow request to reach server for auth checks (CORS only applies to browsers)
+    if (!origin) return callback(null, false); // returns false to keep browser from accepting; non-browser clients ignore CORS
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn('CORS denied for origin:', origin);
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: false,
+  optionsSuccessStatus: 200
+};
+app.options('*', cors(corsOptions));
 app.use((req, res, next) => {
-    console.log(`📨 ${req.method} ${req.path} - ${new Date().toISOString()}`);
-    console.log('Origin:', req.get('origin'));
+  cors(corsOptions)(req, res, err => {
+    if (err) return res.status(403).json({ success: false, message: 'CORS origin denied' });
     next();
+  });
 });
 
-// ============================================================================
-// GMAIL API CONFIGURATION
-// ============================================================================
-console.log('\n📧 Configuring Gmail API...');
-console.log('EMAIL_USER:', process.env.EMAIL_USER ? '✅ Set' : '❌ NOT SET');
-console.log('EMAIL_CLIENT_ID:', process.env.EMAIL_CLIENT_ID ? '✅ Set' : '❌ NOT SET');
-console.log('EMAIL_CLIENT_SECRET:', process.env.EMAIL_CLIENT_SECRET ? '✅ Set' : '❌ NOT SET');
-console.log('EMAIL_REFRESH_TOKEN:', process.env.EMAIL_REFRESH_TOKEN ? '✅ Set' : '❌ NOT SET');
-console.log('ADMIN_EMAIL:', process.env.ADMIN_EMAIL || process.env.EMAIL_USER);
+// -----------------------
+// Logging
+// -----------------------
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.ip} ${req.method} ${req.originalUrl} Origin:${req.get('origin') || 'none'}`);
+  next();
+});
 
-// Create OAuth2 client
+// -----------------------
+// Gmail API setup
+// -----------------------
+console.log('\n📧 Gmail configuration check...');
+console.log('EMAIL_USER:', process.env.EMAIL_USER ? '✅' : '❌ NOT SET');
+console.log('EMAIL_CLIENT_ID:', process.env.EMAIL_CLIENT_ID ? '✅' : '❌ NOT SET');
+console.log('EMAIL_CLIENT_SECRET:', process.env.EMAIL_CLIENT_SECRET ? '✅' : '❌ NOT SET');
+console.log('EMAIL_REFRESH_TOKEN:', process.env.EMAIL_REFRESH_TOKEN ? '✅' : '❌ NOT SET');
+console.log('ADMIN_EMAIL:', process.env.ADMIN_EMAIL || process.env.EMAIL_USER || '(not set)');
+
 const oauth2Client = new google.auth.OAuth2(
-    process.env.EMAIL_CLIENT_ID,
-    process.env.EMAIL_CLIENT_SECRET,
-    'https://developers.google.com/oauthplayground'
+  process.env.EMAIL_CLIENT_ID,
+  process.env.EMAIL_CLIENT_SECRET,
+  'https://developers.google.com/oauthplayground'
 );
 
-oauth2Client.setCredentials({
-    refresh_token: process.env.EMAIL_REFRESH_TOKEN
-});
+if (process.env.EMAIL_REFRESH_TOKEN) {
+  oauth2Client.setCredentials({ refresh_token: process.env.EMAIL_REFRESH_TOKEN });
+}
 
 const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-// ============================================================================
-// STARTUP VERIFICATION
-// ============================================================================
+// quick token test (non-blocking)
 (async () => {
-    console.log('🔧 Testing Gmail API configuration...');
-    
-    try {
-        const accessToken = await oauth2Client.getAccessToken();
-        
-        if (accessToken && accessToken.token) {
-            console.log('✅ Gmail API is ready to send emails');
-            console.log('   Access token generated successfully\n');
-        } else {
-            console.warn('⚠️  Could not generate access token\n');
-        }
-    } catch (error) {
-        console.error('❌ Gmail API configuration issue:', error.message);
-        console.error('   Emails will fail until credentials are fixed\n');
-    }
+  if (!process.env.EMAIL_CLIENT_ID || !process.env.EMAIL_REFRESH_TOKEN) {
+    console.warn('⚠️ Gmail credentials incomplete. Emails will fail until configured.');
+    return;
+  }
+  try {
+    const at = await oauth2Client.getAccessToken();
+    if (at && at.token) console.log('✅ Gmail API access token obtained');
+    else console.warn('⚠️ Could not obtain Gmail access token at startup');
+  } catch (err) {
+    console.warn('⚠️ Gmail startup check error:', err && err.message ? err.message : err);
+  }
 })();
 
-// ============================================================================
-// HELPER FUNCTION - CREATE EMAIL MESSAGE
-// ============================================================================
-function createEmailMessage(to, subject, htmlBody, textBody) {
-    const message = [
-        `From: "Soundabode Academy" <${process.env.EMAIL_USER}>`,
-        `To: ${to}`,
-        `Subject: ${subject}`,
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=utf-8',
-        '',
-        htmlBody
-    ].join('\n');
-
-    const encodedMessage = Buffer.from(message)
-        .toString('base64')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-
-    return encodedMessage;
+// -----------------------
+// Helpers
+// -----------------------
+function normalizeName(body) {
+  if (!body) return 'Unknown';
+  return body.fullName || body.fullname || body.name || 'Unknown';
 }
 
-// ============================================================================
-// HELPER FUNCTION - SEND EMAIL VIA GMAIL API
-// ============================================================================
-async function sendEmailViaGmailAPI(to, subject, htmlBody, textBody, maxRetries = 2) {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            console.log(`📤 Attempt ${attempt}/${maxRetries} - Sending to ${to}...`);
-            
-            const raw = createEmailMessage(to, subject, htmlBody, textBody);
-            
-            const result = await gmail.users.messages.send({
-                userId: 'me',
-                requestBody: {
-                    raw: raw
-                }
-            });
-            
-            console.log(`✅ Email sent: ${result.data.id}`);
-            return { success: true, messageId: result.data.id };
-        } catch (error) {
-            console.error(`❌ Attempt ${attempt} failed:`, error.message);
-            if (attempt === maxRetries) {
-                return { success: false, error: error.message };
-            }
-            await new Promise(resolve => setTimeout(resolve, 2000));
-        }
-    }
-}
-
-// ============================================================================
-// HELPER FUNCTION - FORMAT COURSE NAME
-// ============================================================================
 function formatCourseName(courseValue) {
-    const courseMap = {
-        'dj-training': 'DJ Training',
-        'music-production': 'Music Production',
-        'audio-engineering': 'Audio Engineering'
-    };
-    return courseMap[courseValue] || courseValue;
+  const mapping = {
+    'dj-training': 'DJ Training',
+    'music-production': 'Music Production',
+    'audio-engineering': 'Audio Engineering'
+  };
+  if (!courseValue) return 'N/A';
+  return mapping[courseValue] || courseValue;
 }
 
-// ============================================================================
-// ROUTES
-// ============================================================================
+function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
+  // Add Message-ID and Date headers
+  const msgId = `<${randomUUID()}@soundabode.local>`;
+  const dateHeader = new Date().toUTCString();
 
+  const lines = [
+    `From: ${from}`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    `Message-ID: ${msgId}`,
+    `Date: ${dateHeader}`,
+    'MIME-Version: 1.0',
+    'Content-Type: text/html; charset=UTF-8',
+    '',
+    htmlBody || textBody || ''
+  ];
+  return Buffer.from(lines.join('\r\n')).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function sendEmail({ to, subject, htmlBody, textBody, maxRetries = 2 }) {
+  if (!process.env.EMAIL_USER) {
+    throw new Error('EMAIL_USER not configured');
+  }
+  let lastErr = null;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const raw = buildRawMessage({
+        from: `"Soundabode Academy" <${process.env.EMAIL_USER}>`,
+        to,
+        subject,
+        htmlBody,
+        textBody
+      });
+
+      const res = await gmail.users.messages.send({
+        userId: 'me',
+        requestBody: { raw }
+      });
+      console.log(`✅ Email sent to ${to} id=${res.data && res.data.id}`);
+      return { success: true, id: res.data && res.data.id };
+    } catch (err) {
+      lastErr = err;
+      console.warn(`Email attempt ${attempt} failed:`, err && err.message ? err.message : err);
+      if (attempt < maxRetries) await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+  return { success: false, error: lastErr && (lastErr.message || String(lastErr)) };
+}
+
+// -----------------------
+// Routes
+// -----------------------
 app.get('/', (req, res) => {
-    res.json({
-        status: 'OK',
-        message: 'Soundabode Backend Server',
-        timestamp: new Date().toISOString(),
-        emailProvider: 'Gmail API (Direct)',
-        endpoints: {
-            popupForm: '/api/popup-form',
-            contactForm: '/api/contact-form',
-            health: '/health'
-        },
-        configured: !!(process.env.EMAIL_USER && process.env.EMAIL_CLIENT_ID && 
-                      process.env.EMAIL_CLIENT_SECRET && process.env.EMAIL_REFRESH_TOKEN)
+  res.json({
+    status: 'OK',
+    service: 'Soundabode Backend',
+    timestamp: new Date().toISOString(),
+    endpoints: { popupForm: '/api/popup-form', contactForm: '/api/contact-form', health: '/health' },
+    configured: !!(process.env.EMAIL_USER && process.env.EMAIL_CLIENT_ID && process.env.EMAIL_REFRESH_TOKEN)
+  });
+});
+
+app.get('/health', (req, res) => res.json({ status: 'healthy', timestamp: new Date().toISOString() }));
+
+// -----------------------
+// Popup handler
+// -----------------------
+app.post('/api/popup-form', async (req, res) => {
+  try {
+    console.log('📩 /api/popup-form payload:', req.body);
+    const name = normalizeName(req.body);
+    const email = (req.body && req.body.email) || '';
+    const phone = (req.body && req.body.phone) || '';
+    const message = (req.body && req.body.message) || '';
+
+    if (!name || !email || !phone) {
+      return res.status(400).json({ success: false, message: 'Name, email and phone are required' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(String(email))) {
+      return res.status(400).json({ success: false, message: 'Invalid email format' });
+    }
+
+    const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const uniq = randomUUID().slice(0, 8);
+    const subject = `[Popup] Homepage Inquiry — ${name} — ${timestampLocal} — ${uniq}`;
+
+    console.log('Popup subject ->', subject);
+
+    const adminHtml = `
+      <div style="font-family: Arial, sans-serif; max-width:600px;margin:0 auto;padding:20px;">
+        <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:20px;border-radius:8px;text-align:center;color:#fff;">
+          <h2 style="margin:6px 0">🔥 New Popup Inquiry (Homepage)</h2>
+        </div>
+        <div style="background:#fff;padding:16px;border-radius:6px;margin-top:12px;color:#333">
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+          <p><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a></p>
+          ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
+          <hr/>
+          <p style="font-size:12px;color:#888">Submitted on ${timestampLocal} — Source: Homepage Popup Form — Ref: ${uniq}</p>
+        </div>
+      </div>
+    `;
+
+    const userHtml = `<h2>Hi ${name} 👋</h2><p>Thanks for contacting Soundabode. We received your inquiry and will reply within 24 hours.</p>`;
+
+    // Send admin (blocking)
+    const adminRes = await sendEmail({
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      subject,
+      htmlBody: adminHtml,
+      textBody: `Popup inquiry from ${name}`
     });
-});
+    if (!adminRes.success) throw new Error(adminRes.error || 'Admin email failed');
 
-app.get('/health', (req, res) => {
-    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
-});
-
-// ============================================================================
-// POPUP FORM - Homepage (index.html)
-// ============================================================================
-app.post('/api/popup-form', limiter, async (req, res) => {
+    // Send user (best-effort)
     try {
-        console.log('📩 Popup form received:', req.body);
-
-        const { name, email, phone, message } = req.body;
-
-        if (!name || !email || !phone) {
-            console.log('❌ Validation failed');
-            return res.status(400).json({
-                success: false,
-                message: 'Name, email, and phone are required'
-            });
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid email format'
-            });
-        }
-
-        console.log('✅ Validation passed');
-        console.log('📧 Sending emails via Gmail API...');
-
-        // Admin notification HTML
-        const adminHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="color: white; margin: 0;">🔥 New Popup Inquiry (Homepage)</h1>
-                </div>
-                
-                <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <h2 style="color: #333;">Contact Details</h2>
-                    
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                        <tr>
-                            <td style="padding: 12px; background: #f5f5f5; font-weight: bold; width: 120px;">Name:</td>
-                            <td style="padding: 12px;">${name}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 12px; background: #f5f5f5; font-weight: bold;">Email:</td>
-                            <td style="padding: 12px;"><a href="mailto:${email}" style="color: #667eea;">${email}</a></td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 12px; background: #f5f5f5; font-weight: bold;">Phone:</td>
-                            <td style="padding: 12px;"><a href="tel:${phone}" style="color: #667eea;">${phone}</a></td>
-                        </tr>
-                    </table>
-                    
-                    ${message ? `
-                    <div style="margin-top: 25px; padding: 15px; background: #f9f9f9; border-left: 4px solid #667eea; border-radius: 5px;">
-                        <h3 style="margin: 0 0 10px 0; color: #333;">Message:</h3>
-                        <p style="margin: 0; line-height: 1.6; color: #555;">${message}</p>
-                    </div>
-                    ` : ''}
-                    
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #888; font-size: 12px;">
-                        <p style="margin: 0;">Submitted on ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
-                        <p style="margin: 5px 0 0 0;">Source: Homepage Popup Form</p>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // User auto-response HTML
-        const userHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Soundabode! 🎵</h1>
-                </div>
-                
-                <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <h2 style="color: #333; margin-top: 0;">Hi ${name}! 👋</h2>
-                    
-                    <p style="line-height: 1.8; color: #555; font-size: 16px;">
-                        Thank you for reaching out to <strong>Soundabode</strong> — India's leading academy for Music Production and DJ Training!
-                    </p>
-                    
-                    <p style="line-height: 1.8; color: #555; font-size: 16px;">
-                        We've received your inquiry and our team will get back to you within <strong>24 hours</strong>.
-                    </p>
-                    
-                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 10px; margin: 25px 0; text-align: center;">
-                        <p style="color: white; margin: 0; font-size: 18px; font-weight: bold;">
-                            🎧 Ready to Start Your Musical Journey? 🎹
-                        </p>
-                    </div>
-                    
-                    <div style="text-align: center; margin: 30px 0;">
-                        <p style="color: #555; margin-bottom: 15px; font-size: 16px;">Have immediate questions?</p>
-                        <a href="tel:+919975016189" style="display: inline-block; background: #25D366; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; margin: 5px;">
-                            📞 Call: +91 997 501 6189
-                        </a>
-                        <a href="https://wa.me/919975016189" style="display: inline-block; background: #25D366; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; margin: 5px;">
-                            💬 WhatsApp Us
-                        </a>
-                    </div>
-                    
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
-                        <p style="color: #888; font-size: 14px; line-height: 1.6; margin: 0;">
-                            <strong>Soundabode Academy</strong><br>
-                            Vision 9, 2nd Floor, Pimple Saudagar, Pune 411017<br>
-                            <a href="mailto:services@soundabode.com" style="color: #667eea;">services@soundabode.com</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Send emails
-        const adminResult = await sendEmailViaGmailAPI(
-            process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-            `Homepage Quick Inquiry - ${name}`,
-            adminHtml,
-            `New Popup Inquiry from Homepage\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}${message ? `\nMessage: ${message}` : ''}`
-        );
-
-        if (!adminResult.success) {
-            throw new Error(`Admin email failed: ${adminResult.error}`);
-        }
-
-        const userResult = await sendEmailViaGmailAPI(
-            email,
-            'Thank you for contacting Soundabode!',
-            userHtml,
-            `Hi ${name}!\n\nThank you for reaching out to Soundabode Academy.`
-        );
-
-        if (!userResult.success) {
-            console.warn('⚠️  User email failed, but admin was notified');
-        }
-
-        console.log('✅ Popup form processed successfully');
-
-        res.status(200).json({
-            success: true,
-            message: 'Thank you! We\'ll contact you within 24 hours.'
-        });
-
-    } catch (error) {
-        console.error('❌ Error:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to submit. Please try again or call +91 997 501 6189'
-        });
+      await sendEmail({
+        to: email,
+        subject: `Thanks — Soundabode received your popup inquiry`,
+        htmlBody: userHtml,
+        textBody: `Thanks ${name}, we'll get back to you.`
+      });
+    } catch (err) {
+      console.warn('Non-blocking: user popup email failed:', err && err.message ? err.message : err);
     }
+
+    return res.status(200).json({ success: true, message: 'Popup inquiry received', ref: uniq });
+  } catch (err) {
+    console.error('Popup error:', err && err.message ? err.message : err);
+    return res.status(500).json({ success: false, message: 'Failed to process popup' });
+  }
 });
 
-// ============================================================================
-// CONTACT FORM - General & Course Enquiries (contact.html)
-// ============================================================================
-app.post('/api/contact-form', limiter, async (req, res) => {
-    try {
-        console.log(' Contact form received:', req.body);
+// -----------------------
+// Contact handler
+// -----------------------
+app.post('/api/contact-form', async (req, res) => {
+  try {
+    console.log('📩 /api/contact-form payload:', req.body);
+    const fullName = (req.body && (req.body.fullName || req.body.fullname || req.body.name)) || '';
+    const email = (req.body && req.body.email) || '';
+    const phone = (req.body && req.body.phone) || '';
+    const course = (req.body && req.body.course) || '';
+    const message = (req.body && req.body.message) || '';
 
-        const { fullName, email, phone, course, message } = req.body;
-
-        if (!fullName || !email || !phone) {
-            return res.status(400).json({
-                success: false,
-                message: 'Required fields missing'
-            });
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid email format'
-            });
-        }
-
-        console.log('✅ Validation passed');
-
-        const isCourseEnquiry = course && course.trim() !== '';
-        const enquiryType = isCourseEnquiry ? 'Course Enquiry' : 'General Enquiry';
-        const formattedCourse = isCourseEnquiry ? formatCourseName(course) : 'N/A';
-
-        console.log(`📝 Enquiry Type: ${enquiryType}`);
-        if (isCourseEnquiry) {
-            console.log(`📚 Course: ${formattedCourse}`);
-        }
-
-        // Admin HTML
-        const adminHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="background: linear-gradient(135deg, ${isCourseEnquiry ? '#4CAF50' : '#667eea'} 0%, ${isCourseEnquiry ? '#45a049' : '#764ba2'} 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="color: white; margin: 0;">${isCourseEnquiry ? '🎓' : '📧'} New ${enquiryType}</h1>
-                </div>
-                
-                <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <h2 style="color: #333;">Contact Details</h2>
-                    
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                        <tr><td style="padding: 12px; background: #f5f5f5; font-weight: bold; width: 140px;">Name:</td><td style="padding: 12px;">${fullName}</td></tr>
-                        <tr><td style="padding: 12px; background: #f5f5f5; font-weight: bold;">Email:</td><td style="padding: 12px;"><a href="mailto:${email}">${email}</a></td></tr>
-                        <tr><td style="padding: 12px; background: #f5f5f5; font-weight: bold;">Phone:</td><td style="padding: 12px;"><a href="tel:${phone}">${phone}</a></td></tr>
-                        ${isCourseEnquiry ? `<tr><td style="padding: 12px; background: #f5f5f5; font-weight: bold;">Course:</td><td style="padding: 12px;"><span style="background: #4CAF50; color: white; padding: 5px 15px; border-radius: 20px;">${formattedCourse}</span></td></tr>` : ''}
-                    </table>
-                    
-                    ${message ? `<div style="margin-top: 25px; padding: 20px; background: #f9f9f9; border-left: 4px solid ${isCourseEnquiry ? '#4CAF50' : '#667eea'}; border-radius: 5px;"><h3 style="margin: 0 0 10px 0; color: #333;">Message:</h3><p style="margin: 0; line-height: 1.6; color: #555;">${message}</p></div>` : ''}
-                    
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #888; font-size: 12px;">
-                        <p style="margin: 0;">Submitted on ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
-                        <p style="margin: 5px 0 0 0;">Source: Contact Page Form</p>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const adminResult = await sendEmailViaGmailAPI(
-            process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-            `${isCourseEnquiry ? '🎓' : '📧'} ${enquiryType} - ${fullName}`,
-            adminHtml,
-            `New ${enquiryType}\n\nName: ${fullName}\nEmail: ${email}\nPhone: ${phone}${isCourseEnquiry ? `\nCourse: ${formattedCourse}` : ''}${message ? `\nMessage: ${message}` : ''}`
-        );
-
-        if (!adminResult.success) {
-            throw new Error(`Failed to send email: ${adminResult.error}`);
-        }
-
-        await sendEmailViaGmailAPI(
-            email,
-            `Thank you for contacting Soundabode!${isCourseEnquiry ? ` (${formattedCourse})` : ''}`,
-            `<h2>Hi ${fullName}!</h2><p>Thank you for your ${enquiryType.toLowerCase()}. We'll respond within 24 hours.</p>`,
-            `Hi ${fullName}!\n\nThank you for contacting Soundabode Academy.`
-        );
-
-        res.status(200).json({ success: true, message: 'Message sent successfully!' });
-
-    } catch (error) {
-        console.error('❌ Error:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to send. Please try again.'
-        });
+    if (!fullName || !email || !phone) {
+      return res.status(400).json({ success: false, message: 'Required fields missing' });
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(String(email))) {
+      return res.status(400).json({ success: false, message: 'Invalid email format' });
+    }
+
+    const isCourse = Boolean(course && String(course).trim() !== '');
+    const formattedCourse = isCourse ? formatCourseName(course) : 'N/A';
+    const enquiryType = isCourse ? 'Course Enquiry' : 'General Enquiry';
+
+    const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const uniq = randomUUID().slice(0, 8);
+    const subject = isCourse
+      ? `[Contact] Course Enquiry — ${formattedCourse} — ${fullName} — ${timestampLocal} — ${uniq}`
+      : `[Contact] General Enquiry — ${fullName} — ${timestampLocal} — ${uniq}`;
+
+    console.log('Contact subject ->', subject);
+
+    const adminHtml = `
+      <div style="font-family: Arial, sans-serif; max-width:600px;margin:0 auto;padding:20px;">
+        <div style="background:linear-gradient(135deg, ${isCourse ? '#4CAF50' : '#667eea'} 0%, ${isCourse ? '#45a049' : '#764ba2'} 100%);padding:20px;border-radius:8px;text-align:center;color:#fff;">
+          <h2 style="margin:6px 0">${isCourse ? '🎓' : '📧'} New ${enquiryType}</h2>
+        </div>
+        <div style="background:#fff;padding:16px;border-radius:6px;margin-top:12px;color:#333">
+          <p><strong>Name:</strong> ${fullName}</p>
+          <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+          <p><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a></p>
+          ${isCourse ? `<p><strong>Course:</strong> ${formattedCourse}</p>` : ''}
+          ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
+          <hr/>
+          <p style="font-size:12px;color:#888">Submitted on ${timestampLocal} — Source: Contact Page Form — Ref: ${uniq}</p>
+        </div>
+      </div>
+    `;
+
+    // Send admin email
+    const adminRes = await sendEmail({
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      subject,
+      htmlBody: adminHtml,
+      textBody: `Contact enquiry: ${fullName}`
+    });
+    if (!adminRes.success) throw new Error(adminRes.error || 'Admin email failed');
+
+    // user autoresponse (best-effort)
+    try {
+      const userSubject = `Soundabode — We've received your enquiry (${uniq})`;
+      const userHtml = `<h2>Hi ${fullName}</h2><p>Thanks for contacting Soundabode. We'll reply within 24 hours. Ref: ${uniq}</p>`;
+      await sendEmail({ to: email, subject: userSubject, htmlBody: userHtml, textBody: `Thanks ${fullName}, ref ${uniq}` });
+    } catch (err) {
+      console.warn('Non-blocking: user contact email failed:', err && err.message ? err.message : err);
+    }
+
+    return res.status(200).json({ success: true, message: 'Message sent successfully!', ref: uniq });
+  } catch (err) {
+    console.error('Contact error:', err && err.message ? err.message : err);
+    return res.status(500).json({ success: false, message: 'Failed to send. Please try again.' });
+  }
 });
 
 // 404
-app.use((req, res) => {
-    res.status(404).json({ message: 'Endpoint not found' });
-});
+app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint not found' }));
 
-// ============================================================================
-// START SERVER
-// ============================================================================
+// Start
 app.listen(PORT, () => {
-    console.log('='.repeat(60));
-    console.log('✅ Soundabode Backend Server Running');
-    console.log('🌐 Port:', PORT);
-    console.log('📧 Email Provider: Gmail API (Direct)');
-    console.log('🔒 CORS Enabled for: soundabode.com');
-    console.log('⏰ Started:', new Date().toLocaleString('en-IN'));
-    console.log('='.repeat(60) + '\n');
+  console.log('='.repeat(60));
+  console.log('✅ Soundabode Backend Server Running');
+  console.log(`🌐 Port: ${PORT}`);
+  console.log('📧 Email Provider: Gmail API (Direct)');
+  console.log('🔒 CORS Allowed Origins:', allowedOrigins.join(', '));
+  console.log('⏰ Started:', new Date().toLocaleString('en-IN'));
+  console.log('='.repeat(60));
 });
