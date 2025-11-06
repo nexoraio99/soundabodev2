@@ -1,12 +1,10 @@
-// server.js - Soundabode Backend (robust, single-file replacement)
-// Usage: set env vars: PORT, CORS_ORIGINS (comma separated), EMAIL_USER, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET, EMAIL_REFRESH_TOKEN, ADMIN_EMAIL (optional)
-
+// server.js - Soundabode Backend (popup vs contact email subjects)
+// Usage: set EMAIL_USER, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET, EMAIL_REFRESH_TOKEN, ADMIN_EMAIL (optional), CORS_ORIGINS (optional)
 import express from 'express';
 import { google } from 'googleapis';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import { randomUUID } from 'crypto';
 
 dotenv.config();
@@ -14,27 +12,23 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-// -----------------------
-// Security & middleware
-// -----------------------
+// ------------------- Basic security & parsers -------------------
 app.set('trust proxy', 1);
 app.use(helmet());
 app.use(express.json({ limit: '150kb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Rate limiter for /api
-const limiter = rateLimit({
+// ------------------- Rate limiter -------------------
+const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 120,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { success: false, message: 'Too many requests, try again later.' }
+  message: { success: false, message: 'Too many requests, please try again later.' }
 });
-app.use('/api/', limiter);
+app.use('/api/', apiLimiter);
 
-// -----------------------
-// CORS - dynamic allowlist
-// -----------------------
+// ------------------- CORS (robust preflight handler) -------------------
 const defaultOrigins = [
   'https://soundabode.com',
   'https://www.soundabode.com',
@@ -42,49 +36,41 @@ const defaultOrigins = [
   'http://localhost:5500',
   'http://127.0.0.1:5500'
 ];
+
 const allowedOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(','))
   .split(',')
   .map(s => s.trim())
   .filter(Boolean);
 
-const corsOptions = {
-  origin(origin, callback) {
-    // If no origin (curl/postman/server-to-server) allow request to reach server for auth checks (CORS only applies to browsers)
-    if (!origin) return callback(null, false); // returns false to keep browser from accepting; non-browser clients ignore CORS
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    console.warn('CORS denied for origin:', origin);
-    return callback(new Error('Not allowed by CORS'), false);
-  },
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: false,
-  optionsSuccessStatus: 200
-};
-app.options('*', cors(corsOptions));
+// Lightweight preflight/CORS middleware — runs before routes
 app.use((req, res, next) => {
-  cors(corsOptions)(req, res, err => {
-    if (err) return res.status(403).json({ success: false, message: 'CORS origin denied' });
-    next();
-  });
+  const origin = req.get('Origin') || req.get('origin');
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    // If you need cookies/auth, set to 'true' and ensure credentials usage on client
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  next();
 });
 
-// -----------------------
-// Logging
-// -----------------------
+// ------------------- Logging middleware -------------------
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.ip} ${req.method} ${req.originalUrl} Origin:${req.get('origin') || 'none'}`);
   next();
 });
 
-// -----------------------
-// Gmail API setup
-// -----------------------
-console.log('\n📧 Gmail configuration check...');
-console.log('EMAIL_USER:', process.env.EMAIL_USER ? '✅' : '❌ NOT SET');
-console.log('EMAIL_CLIENT_ID:', process.env.EMAIL_CLIENT_ID ? '✅' : '❌ NOT SET');
-console.log('EMAIL_CLIENT_SECRET:', process.env.EMAIL_CLIENT_SECRET ? '✅' : '❌ NOT SET');
-console.log('EMAIL_REFRESH_TOKEN:', process.env.EMAIL_REFRESH_TOKEN ? '✅' : '❌ NOT SET');
-console.log('ADMIN_EMAIL:', process.env.ADMIN_EMAIL || process.env.EMAIL_USER || '(not set)');
+// ------------------- Gmail (OAuth2) setup -------------------
+console.log('📧 Gmail configuration:');
+console.log('  EMAIL_USER:', process.env.EMAIL_USER ? '✅' : '❌ NOT SET');
+console.log('  EMAIL_CLIENT_ID:', process.env.EMAIL_CLIENT_ID ? '✅' : '❌ NOT SET');
+console.log('  EMAIL_CLIENT_SECRET:', process.env.EMAIL_CLIENT_SECRET ? '✅' : '❌ NOT SET');
+console.log('  EMAIL_REFRESH_TOKEN:', process.env.EMAIL_REFRESH_TOKEN ? '✅' : '❌ NOT SET');
+console.log('  ADMIN_EMAIL:', process.env.ADMIN_EMAIL || process.env.EMAIL_USER || '(not set)');
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.EMAIL_CLIENT_ID,
@@ -98,45 +84,42 @@ if (process.env.EMAIL_REFRESH_TOKEN) {
 
 const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-// quick token test (non-blocking)
+// Best-effort token check (non-blocking)
 (async () => {
   if (!process.env.EMAIL_CLIENT_ID || !process.env.EMAIL_REFRESH_TOKEN) {
-    console.warn('⚠️ Gmail credentials incomplete. Emails will fail until configured.');
+    console.warn('⚠️ Gmail credentials incomplete. Email sends will fail until configured.');
     return;
   }
   try {
     const at = await oauth2Client.getAccessToken();
-    if (at && at.token) console.log('✅ Gmail API access token obtained');
-    else console.warn('⚠️ Could not obtain Gmail access token at startup');
-  } catch (err) {
-    console.warn('⚠️ Gmail startup check error:', err && err.message ? err.message : err);
+    if (at && at.token) console.log('✅ Gmail access token available');
+    else console.warn('⚠️ Could not fetch Gmail access token on startup');
+  } catch (e) {
+    console.warn('⚠️ Gmail token check error:', e && e.message ? e.message : e);
   }
 })();
 
-// -----------------------
-// Helpers
-// -----------------------
-function normalizeName(body) {
+// ------------------- Helpers -------------------
+function pickName(body) {
   if (!body) return 'Unknown';
-  return body.fullName || body.fullname || body.name || 'Unknown';
+  return (body.fullName || body.fullname || body.name || 'Unknown').trim();
 }
 
-function formatCourseName(courseValue) {
-  const mapping = {
+function formatCourseName(course) {
+  const map = {
     'dj-training': 'DJ Training',
     'music-production': 'Music Production',
     'audio-engineering': 'Audio Engineering'
   };
-  if (!courseValue) return 'N/A';
-  return mapping[courseValue] || courseValue;
+  if (!course) return 'N/A';
+  return map[course] || course;
 }
 
 function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
-  // Add Message-ID and Date headers
+  // Add Message-ID and Date headers (reduce Gmail threading)
   const msgId = `<${randomUUID()}@soundabode.local>`;
   const dateHeader = new Date().toUTCString();
-
-  const lines = [
+  const parts = [
     `From: ${from}`,
     `To: ${to}`,
     `Subject: ${subject}`,
@@ -147,13 +130,12 @@ function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
     '',
     htmlBody || textBody || ''
   ];
-  return Buffer.from(lines.join('\r\n')).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return Buffer.from(parts.join('\r\n')).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-async function sendEmail({ to, subject, htmlBody, textBody, maxRetries = 2 }) {
-  if (!process.env.EMAIL_USER) {
-    throw new Error('EMAIL_USER not configured');
-  }
+async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 2 }) {
+  if (!process.env.EMAIL_USER) throw new Error('EMAIL_USER not configured');
+
   let lastErr = null;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -164,7 +146,6 @@ async function sendEmail({ to, subject, htmlBody, textBody, maxRetries = 2 }) {
         htmlBody,
         textBody
       });
-
       const res = await gmail.users.messages.send({
         userId: 'me',
         requestBody: { raw }
@@ -180,32 +161,7 @@ async function sendEmail({ to, subject, htmlBody, textBody, maxRetries = 2 }) {
   return { success: false, error: lastErr && (lastErr.message || String(lastErr)) };
 }
 
-// quick CORS middleware — add this at top, before routes
-app.use((req, res, next) => {
-  const allowed = [
-    'https://soundabode.com',
-    'https://www.soundabode.com',
-    'http://localhost:3000',
-    'http://localhost:5500',
-    'http://127.0.0.1:5500'
-  ];
-  const origin = req.get('Origin') || req.get('origin');
-  if (origin && allowed.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Vary', 'Origin');
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  // If it's preflight, end here
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  next();
-});
-
-// -----------------------
-// Routes
-// -----------------------
+// ------------------- Routes -------------------
 app.get('/', (req, res) => {
   res.json({
     status: 'OK',
@@ -218,29 +174,28 @@ app.get('/', (req, res) => {
 
 app.get('/health', (req, res) => res.json({ status: 'healthy', timestamp: new Date().toISOString() }));
 
-// -----------------------
-// Popup handler
-// -----------------------
+// ------------------- POPUP FORM (homepage) -------------------
 app.post('/api/popup-form', async (req, res) => {
   try {
     console.log('📩 /api/popup-form payload:', req.body);
-    const name = normalizeName(req.body);
-    const email = (req.body && req.body.email) || '';
-    const phone = (req.body && req.body.phone) || '';
-    const message = (req.body && req.body.message) || '';
+    const name = pickName(req.body);
+    const email = (req.body && req.body.email) ? String(req.body.email).trim() : '';
+    const phone = (req.body && req.body.phone) ? String(req.body.phone).trim() : '';
+    const message = (req.body && req.body.message) ? String(req.body.message).trim() : '';
 
     if (!name || !email || !phone) {
+      console.log('❌ Popup validation failed');
       return res.status(400).json({ success: false, message: 'Name, email and phone are required' });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(String(email))) {
+    if (!emailRegex.test(email)) {
       return res.status(400).json({ success: false, message: 'Invalid email format' });
     }
 
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-    const uniq = randomUUID().slice(0, 8);
-    const subject = `[Popup] Homepage Inquiry — ${name} — ${timestampLocal} — ${uniq}`;
+    const ref = randomUUID().slice(0, 8);
+    const subject = `[Popup] Homepage Inquiry — ${name} — ${timestampLocal} — ${ref}`;
 
     console.log('Popup subject ->', subject);
 
@@ -255,15 +210,13 @@ app.post('/api/popup-form', async (req, res) => {
           <p><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a></p>
           ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
           <hr/>
-          <p style="font-size:12px;color:#888">Submitted on ${timestampLocal} — Source: Homepage Popup Form — Ref: ${uniq}</p>
+          <p style="font-size:12px;color:#888">Submitted on ${timestampLocal} — Source: Homepage Popup Form — Ref: ${ref}</p>
         </div>
       </div>
     `;
 
-    const userHtml = `<h2>Hi ${name} 👋</h2><p>Thanks for contacting Soundabode. We received your inquiry and will reply within 24 hours.</p>`;
-
     // Send admin (blocking)
-    const adminRes = await sendEmail({
+    const adminRes = await sendEmailRaw({
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject,
       htmlBody: adminHtml,
@@ -273,53 +226,54 @@ app.post('/api/popup-form', async (req, res) => {
 
     // Send user (best-effort)
     try {
-      await sendEmail({
+      await sendEmailRaw({
         to: email,
-        subject: `Thanks — Soundabode received your popup inquiry`,
-        htmlBody: userHtml,
-        textBody: `Thanks ${name}, we'll get back to you.`
+        subject: `Thanks — Soundabode received your homepage inquiry`,
+        htmlBody: `<h2>Hi ${name} 👋</h2><p>Thanks for contacting Soundabode. We've received your inquiry and will respond within 24 hours. Ref: ${ref}</p>`,
+        textBody: `Thanks ${name}, we will reply shortly. Ref: ${ref}`
       });
     } catch (err) {
       console.warn('Non-blocking: user popup email failed:', err && err.message ? err.message : err);
     }
 
-    return res.status(200).json({ success: true, message: 'Popup inquiry received', ref: uniq });
+    return res.status(200).json({ success: true, message: 'Popup inquiry received', ref });
   } catch (err) {
     console.error('Popup error:', err && err.message ? err.message : err);
-    return res.status(500).json({ success: false, message: 'Failed to process popup' });
+    return res.status(500).json({ success: false, message: 'Failed to process popup form' });
   }
 });
 
-// -----------------------
-// Contact handler
-// -----------------------
+// ------------------- CONTACT FORM (contact page) -------------------
 app.post('/api/contact-form', async (req, res) => {
   try {
     console.log('📩 /api/contact-form payload:', req.body);
+
+    // Accept either fullName or name (legacy)
     const fullName = (req.body && (req.body.fullName || req.body.fullname || req.body.name)) || '';
-    const email = (req.body && req.body.email) || '';
-    const phone = (req.body && req.body.phone) || '';
-    const course = (req.body && req.body.course) || '';
-    const message = (req.body && req.body.message) || '';
+    const email = (req.body && req.body.email) ? String(req.body.email).trim() : '';
+    const phone = (req.body && req.body.phone) ? String(req.body.phone).trim() : '';
+    const course = (req.body && req.body.course) ? String(req.body.course).trim() : '';
+    const message = (req.body && req.body.message) ? String(req.body.message).trim() : '';
 
     if (!fullName || !email || !phone) {
+      console.log('❌ Contact validation failed');
       return res.status(400).json({ success: false, message: 'Required fields missing' });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(String(email))) {
+    if (!emailRegex.test(email)) {
       return res.status(400).json({ success: false, message: 'Invalid email format' });
     }
 
-    const isCourse = Boolean(course && String(course).trim() !== '');
+    const isCourse = Boolean(course && course !== '');
     const formattedCourse = isCourse ? formatCourseName(course) : 'N/A';
     const enquiryType = isCourse ? 'Course Enquiry' : 'General Enquiry';
 
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-    const uniq = randomUUID().slice(0, 8);
+    const ref = randomUUID().slice(0, 8);
     const subject = isCourse
-      ? `[Contact] Course Enquiry — ${formattedCourse} — ${fullName} — ${timestampLocal} — ${uniq}`
-      : `[Contact] General Enquiry — ${fullName} — ${timestampLocal} — ${uniq}`;
+      ? `[Contact] Course Enquiry — ${formattedCourse} — ${fullName} — ${timestampLocal} — ${ref}`
+      : `[Contact] General Enquiry — ${fullName} — ${timestampLocal} — ${ref}`;
 
     console.log('Contact subject ->', subject);
 
@@ -335,13 +289,13 @@ app.post('/api/contact-form', async (req, res) => {
           ${isCourse ? `<p><strong>Course:</strong> ${formattedCourse}</p>` : ''}
           ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
           <hr/>
-          <p style="font-size:12px;color:#888">Submitted on ${timestampLocal} — Source: Contact Page Form — Ref: ${uniq}</p>
+          <p style="font-size:12px;color:#888">Submitted on ${timestampLocal} — Source: Contact Page Form — Ref: ${ref}</p>
         </div>
       </div>
     `;
 
     // Send admin email
-    const adminRes = await sendEmail({
+    const adminRes = await sendEmailRaw({
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject,
       htmlBody: adminHtml,
@@ -349,26 +303,26 @@ app.post('/api/contact-form', async (req, res) => {
     });
     if (!adminRes.success) throw new Error(adminRes.error || 'Admin email failed');
 
-    // user autoresponse (best-effort)
+    // Send user autoresponse (best-effort)
     try {
-      const userSubject = `Soundabode — We've received your enquiry (${uniq})`;
-      const userHtml = `<h2>Hi ${fullName}</h2><p>Thanks for contacting Soundabode. We'll reply within 24 hours. Ref: ${uniq}</p>`;
-      await sendEmail({ to: email, subject: userSubject, htmlBody: userHtml, textBody: `Thanks ${fullName}, ref ${uniq}` });
+      const userSubject = `Soundabode — We've received your enquiry (${ref})`;
+      const userHtml = `<h2>Hi ${fullName}</h2><p>Thanks for contacting Soundabode. We'll reply within 24 hours. Ref: ${ref}</p>`;
+      await sendEmailRaw({ to: email, subject: userSubject, htmlBody: userHtml, textBody: `Thanks ${fullName}, ref ${ref}` });
     } catch (err) {
       console.warn('Non-blocking: user contact email failed:', err && err.message ? err.message : err);
     }
 
-    return res.status(200).json({ success: true, message: 'Message sent successfully!', ref: uniq });
+    return res.status(200).json({ success: true, message: 'Message sent successfully!', ref });
   } catch (err) {
     console.error('Contact error:', err && err.message ? err.message : err);
     return res.status(500).json({ success: false, message: 'Failed to send. Please try again.' });
   }
 });
 
-// 404
+// ------------------- 404 handler -------------------
 app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint not found' }));
 
-// Start
+// ------------------- Start server -------------------
 app.listen(PORT, () => {
   console.log('='.repeat(60));
   console.log('✅ Soundabode Backend Server Running');
@@ -378,3 +332,4 @@ app.listen(PORT, () => {
   console.log('⏰ Started:', new Date().toLocaleString('en-IN'));
   console.log('='.repeat(60));
 });
+
