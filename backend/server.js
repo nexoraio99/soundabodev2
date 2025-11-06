@@ -180,6 +180,29 @@ async function sendEmail({ to, subject, htmlBody, textBody, maxRetries = 2 }) {
   return { success: false, error: lastErr && (lastErr.message || String(lastErr)) };
 }
 
+// quick CORS middleware — add this at top, before routes
+app.use((req, res, next) => {
+  const allowed = [
+    'https://soundabode.com',
+    'https://www.soundabode.com',
+    'http://localhost:3000',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500'
+  ];
+  const origin = req.get('Origin') || req.get('origin');
+  if (origin && allowed.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  // If it's preflight, end here
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 // -----------------------
 // Routes
 // -----------------------
