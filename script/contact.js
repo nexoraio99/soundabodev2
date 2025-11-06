@@ -2,7 +2,7 @@
 // CONFIGURATION
 // ============================================================================
 const CONFIG = {
-    BACKEND_URL: 'https://soundabode-test.onrender.com/api/popup-form',  // Changed to popup-form endpoint (no reCAPTCHA required)
+    BACKEND_URL: 'https://soundabodev2-server.onrender.com/api/popup-form',  // Changed to popup-form endpoint (no reCAPTCHA required)
     MESSAGES: {
         SENDING: 'Sending...',
         SUCCESS: '✅ Message sent successfully! We\'ll get back to you soon.',
