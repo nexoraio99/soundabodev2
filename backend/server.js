@@ -311,7 +311,7 @@ app.post('/api/popup-form', limiter, async (req, res) => {
 
         const userResult = await sendEmailViaGmailAPI(
             email,
-            'Thank you for contacting Soundabode! ',
+            'Thank you for contacting Soundabode!',
             userHtml,
             `Hi ${name}!\n\nThank you for reaching out to Soundabode Academy.`
         );
