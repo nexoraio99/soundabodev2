@@ -228,7 +228,7 @@ app.post('/api/popup-form', async (req, res) => {
 
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const ref = randomUUID().slice(0, 8);
-    const subject = `[Popup] Homepage Inquiry — ${fullName} — ${timestampLocal} — ${ref}`;
+    const subject = `[Popup] Homepage Inquiry  ${fullName}  ${timestampLocal}  ${ref}`;
 
     console.log('Popup subject ->', subject);
 
@@ -323,7 +323,7 @@ app.post('/api/contact-form', async (req, res) => {
           ${isCourse ? `<p><strong>Course:</strong> ${formattedCourse}</p>` : ''}
           ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
           <hr/>
-          <p style="font-size:12px;color:#888">Submitted on ${timestampLocal} — Source: Contact Page Form — Ref: ${ref}</p>
+          <p style="font-size:12px;color:#888">Submitted on ${timestampLocal}  Source: Contact Page Form  Ref: ${ref}</p>
         </div>
       </div>
     `;
@@ -339,7 +339,7 @@ app.post('/api/contact-form', async (req, res) => {
 
     // Send user autoresponse (best-effort)
     try {
-      const userSubject = `Soundabode — We've received your enquiry (${ref})`;
+      const userSubject = `Soundabode - We've received your enquiry (${ref})`;
       const userHtml = `<h2>Hi ${fullName}</h2><p>Thanks for contacting Soundabode. We'll reply within 24 hours. Ref: ${ref}</p>`;
       await sendEmailRaw({ to: email, subject: userSubject, htmlBody: userHtml, textBody: `Thanks ${fullName}, ref ${ref}` });
     } catch (err) {
