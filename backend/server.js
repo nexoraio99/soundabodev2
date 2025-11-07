@@ -211,12 +211,12 @@ app.get('/health', (req, res) => res.json({ status: 'healthy', timestamp: new Da
 app.post('/api/popup-form', async (req, res) => {
   try {
     console.log('📩 /api/popup-form payload:', req.body);
-    const name = pickName(req.body);
+    const fullName = pickName(req.body);
     const email = (req.body && req.body.email) ? String(req.body.email).trim() : '';
     const phone = (req.body && req.body.phone) ? String(req.body.phone).trim() : '';
     const message = (req.body && req.body.message) ? String(req.body.message).trim() : '';
 
-    if (!name || !email || !phone) {
+    if (!fullName || !email || !phone) {
       console.log('❌ Popup validation failed');
       return res.status(400).json({ success: false, message: 'Name, email and phone are required' });
     }
@@ -228,7 +228,7 @@ app.post('/api/popup-form', async (req, res) => {
 
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const ref = randomUUID().slice(0, 8);
-    const subject = `[Popup] Homepage Inquiry — ${name} — ${timestampLocal} — ${ref}`;
+    const subject = `[Popup] Homepage Inquiry — ${fullName} — ${timestampLocal} — ${ref}`;
 
     console.log('Popup subject ->', subject);
 
@@ -238,7 +238,7 @@ app.post('/api/popup-form', async (req, res) => {
           <h2 style="margin:6px 0">🔥 New Popup Inquiry (Homepage)</h2>
         </div>
         <div style="background:#fff;padding:16px;border-radius:6px;margin-top:12px;color:#333">
-          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Name:</strong> ${fullName}</p>
           <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
           <p><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a></p>
           ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
@@ -253,7 +253,7 @@ app.post('/api/popup-form', async (req, res) => {
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject,
       htmlBody: adminHtml,
-      textBody: `Popup inquiry from ${name}`
+      textBody: `Popup inquiry from ${fullName}`
     });
     if (!adminRes.success) throw new Error(adminRes.error || 'Admin email failed');
 
@@ -262,8 +262,8 @@ app.post('/api/popup-form', async (req, res) => {
       await sendEmailRaw({
         to: email,
         subject: `Thanks — Soundabode received your homepage inquiry`,
-        htmlBody: `<h2>Hi ${name} 👋</h2><p>Thanks for contacting Soundabode. We've received your inquiry and will respond within 24 hours. Ref: ${ref}</p>`,
-        textBody: `Thanks ${name}, we will reply shortly. Ref: ${ref}`
+        htmlBody: `<h2>Hi ${fullName} 👋</h2><p>Thanks for contacting Soundabode. We've received your inquiry and will respond within 24 hours. Ref: ${ref}</p>`,
+        textBody: `Thanks ${fullName}, we will reply shortly. Ref: ${ref}`
       });
     } catch (err) {
       console.warn('Non-blocking: user popup email failed:', err && err.message ? err.message : err);
