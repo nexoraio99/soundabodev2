@@ -261,7 +261,7 @@ app.post('/api/popup-form', async (req, res) => {
     try {
       await sendEmailRaw({
         to: email,
-        subject: `Thanks — Soundabode received your homepage inquiry`,
+        subject: `Thanks, Soundabode received your homepage inquiry`,
         htmlBody: `<h2>Hi ${fullName} 👋</h2><p>Thanks for contacting Soundabode. We've received your inquiry and will respond within 24 hours. Ref: ${ref}</p>`,
         textBody: `Thanks ${fullName}, we will reply shortly. Ref: ${ref}`
       });
