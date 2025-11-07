@@ -1,5 +1,6 @@
-// server.js - Soundabode Backend (popup vs contact email subjects)
+// server.js - Soundabode Backend (popup vs contact email subjects + token cache)
 // Usage: set EMAIL_USER, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET, EMAIL_REFRESH_TOKEN, ADMIN_EMAIL (optional), CORS_ORIGINS (optional)
+
 import express from 'express';
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
@@ -24,7 +25,7 @@ const apiLimiter = rateLimit({
   max: 120,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { success: false, message: 'Too many requests, please try again later.' }
+  message: { success: false, message: 'Too many requests, try again later.' }
 });
 app.use('/api/', apiLimiter);
 
@@ -78,31 +79,46 @@ const oauth2Client = new google.auth.OAuth2(
   'https://developers.google.com/oauthplayground'
 );
 
+// If refresh token is present, set it now (used when fetching access token)
 if (process.env.EMAIL_REFRESH_TOKEN) {
   oauth2Client.setCredentials({ refresh_token: process.env.EMAIL_REFRESH_TOKEN });
 }
 
 const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-// Best-effort token check (non-blocking)
-(async () => {
-  if (!process.env.EMAIL_CLIENT_ID || !process.env.EMAIL_REFRESH_TOKEN) {
-    console.warn('⚠️ Gmail credentials incomplete. Email sends will fail until configured.');
-    return;
+// ------------------- TOKEN CACHING (reduce latency) -------------------
+let cachedToken = null; // { token, expiry } - expiry is epoch ms
+
+async function getAccessTokenCached() {
+  const now = Date.now();
+  // If cached token is valid for >30s, reuse
+  if (cachedToken && cachedToken.token && cachedToken.expiry && (cachedToken.expiry - now > 30 * 1000)) {
+    return cachedToken.token;
   }
+
+  // Fetch a fresh token (this will use the refresh token you set earlier)
   try {
-    const at = await oauth2Client.getAccessToken();
-    if (at && at.token) console.log('✅ Gmail access token available');
-    else console.warn('⚠️ Could not fetch Gmail access token on startup');
-  } catch (e) {
-    console.warn('⚠️ Gmail token check error:', e && e.message ? e.message : e);
+    const res = await oauth2Client.getAccessToken();
+    // googleapis sometimes returns { token, res } or string; normalize
+    const token = (res && res.token) ? res.token : (typeof res === 'string' ? res : null);
+
+    // expiry_date may be on oauth2Client.credentials
+    const creds = oauth2Client.credentials || {};
+    const expiry = creds.expiry_date ? Number(creds.expiry_date) : (Date.now() + 55 * 60 * 1000);
+
+    cachedToken = { token, expiry };
+    console.log(`🔑 Gmail access token refreshed — expires in ${Math.round((expiry - now) / 60000)}m`);
+    return token;
+  } catch (err) {
+    console.warn('⚠️ getAccessTokenCached error:', err && err.message ? err.message : err);
+    return null;
   }
-})();
+}
 
 // ------------------- Helpers -------------------
 function pickName(body) {
   if (!body) return 'Unknown';
-  return (body.fullName || body.fullname || body.name || 'Unknown').trim();
+  return (body.fullName || body.fullname || body.name || 'Unknown').toString().trim();
 }
 
 function formatCourseName(course) {
@@ -116,7 +132,6 @@ function formatCourseName(course) {
 }
 
 function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
-  // Add Message-ID and Date headers (reduce Gmail threading)
   const msgId = `<${randomUUID()}@soundabode.local>`;
   const dateHeader = new Date().toUTCString();
   const parts = [
@@ -133,8 +148,19 @@ function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
   return Buffer.from(parts.join('\r\n')).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
+// ------------------- Send email with retries (uses cached token) -------------------
 async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 2 }) {
   if (!process.env.EMAIL_USER) throw new Error('EMAIL_USER not configured');
+
+  // Try to ensure we have a cached access token and set it on oauth2Client
+  try {
+    const token = await getAccessTokenCached();
+    if (token) {
+      oauth2Client.setCredentials({ access_token: token, refresh_token: process.env.EMAIL_REFRESH_TOKEN });
+    }
+  } catch (err) {
+    console.warn('⚠️ Could not set access token on oauth2 client:', err && err.message ? err.message : err);
+  }
 
   let lastErr = null;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -146,18 +172,25 @@ async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 2 })
         htmlBody,
         textBody
       });
+
+      const t0 = Date.now();
       const res = await gmail.users.messages.send({
         userId: 'me',
         requestBody: { raw }
       });
-      console.log(`✅ Email sent to ${to} id=${res.data && res.data.id}`);
+      console.log(`✅ Email sent to ${to} id=${res.data && res.data.id} (send-ms=${Date.now() - t0})`);
       return { success: true, id: res.data && res.data.id };
     } catch (err) {
       lastErr = err;
       console.warn(`Email attempt ${attempt} failed:`, err && err.message ? err.message : err);
-      if (attempt < maxRetries) await new Promise(r => setTimeout(r, 1000));
+      // On auth errors we can try to clear cached token and retry once
+      if (err && err.code && (err.code === 401 || err.code === 403)) {
+        cachedToken = null; // force refresh next loop
+      }
+      if (attempt < maxRetries) await new Promise(r => setTimeout(r, 800)); // small backoff
     }
   }
+
   return { success: false, error: lastErr && (lastErr.message || String(lastErr)) };
 }
 
@@ -255,6 +288,7 @@ app.post('/api/contact-form', async (req, res) => {
     const course = (req.body && req.body.course) ? String(req.body.course).trim() : '';
     const message = (req.body && req.body.message) ? String(req.body.message).trim() : '';
 
+    // Validate required fields (Full name, phone number, email)
     if (!fullName || !email || !phone) {
       console.log('❌ Contact validation failed');
       return res.status(400).json({ success: false, message: 'Required fields missing' });
@@ -280,7 +314,7 @@ app.post('/api/contact-form', async (req, res) => {
     const adminHtml = `
       <div style="font-family: Arial, sans-serif; max-width:600px;margin:0 auto;padding:20px;">
         <div style="background:linear-gradient(135deg, ${isCourse ? '#4CAF50' : '#667eea'} 0%, ${isCourse ? '#45a049' : '#764ba2'} 100%);padding:20px;border-radius:8px;text-align:center;color:#fff;">
-          <h2 style="margin:6px 0">${isCourse ? '' : '📧'} New ${enquiryType}</h2>
+          <h2 style="margin:6px 0">${isCourse ? '🎓' : '📧'} New ${enquiryType}</h2>
         </div>
         <div style="background:#fff;padding:16px;border-radius:6px;margin-top:12px;color:#333">
           <p><strong>Name:</strong> ${fullName}</p>
@@ -294,7 +328,7 @@ app.post('/api/contact-form', async (req, res) => {
       </div>
     `;
 
-    // Send admin email
+    // Send admin email (blocking)
     const adminRes = await sendEmailRaw({
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject,
