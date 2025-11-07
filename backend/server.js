@@ -280,7 +280,7 @@ app.post('/api/contact-form', async (req, res) => {
     const adminHtml = `
       <div style="font-family: Arial, sans-serif; max-width:600px;margin:0 auto;padding:20px;">
         <div style="background:linear-gradient(135deg, ${isCourse ? '#4CAF50' : '#667eea'} 0%, ${isCourse ? '#45a049' : '#764ba2'} 100%);padding:20px;border-radius:8px;text-align:center;color:#fff;">
-          <h2 style="margin:6px 0">${isCourse ? '🎓' : '📧'} New ${enquiryType}</h2>
+          <h2 style="margin:6px 0">${isCourse ? '' : '📧'} New ${enquiryType}</h2>
         </div>
         <div style="background:#fff;padding:16px;border-radius:6px;margin-top:12px;color:#333">
           <p><strong>Name:</strong> ${fullName}</p>
