@@ -1,4 +1,4 @@
- {
+{
   "name": "soundabode-backend",
   "version": "1.0.0",
   "description": "Backend server for Soundabode contact forms",
@@ -16,7 +16,8 @@
     "googleapis": "^128.0.0",
     "cors": "^2.8.5",
     "express-rate-limit": "^7.1.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "helmet": "^7.1.0"        // ✅ Added
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
