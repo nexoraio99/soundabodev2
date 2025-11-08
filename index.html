@@ -2,13 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <!-- CRITICAL: Android viewport optimization -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    
+    <!-- Android-specific performance optimization -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Disable automatic phone number detection that can cause layout issues -->
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- Android Chrome theme color -->
+    <meta name="theme-color" content="#000000">
+    <meta name="msapplication-navbutton-color" content="#000000">
+    
+    <!-- Preconnect to critical domains for faster loading -->
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    
+    <!-- DNS Prefetch for better mobile performance -->
+    <link rel="dns-prefetch" href="https://res.cloudinary.com">
+    <link rel="dns-prefetch" href="https://soundabodev2-server.onrender.com">
+    
     <link rel="canonical" href="https://soundabode.com/">
 
     <title>Music Production, DJ & Audio Engineering Courses | Soundabode Pune & India</title>
-    <meta name="description" content="Go beyond music production — explore game music composition, background scoring for films, web series & ads, and sound design for YouTube creators. Learn Electronic, Techno, Psytrance, Hip-Hop, House, Drum & Bass, Dubstep, Club & Underground Music Production & DJing at Soundabode — India’s top audio engineering academy in Pune & across India.">
+    <meta name="description" content="Go beyond music production — explore game music composition, background scoring for films, web series & ads, and sound design for YouTube creators. Learn Electronic, Techno, Psytrance, Hip-Hop, House, Drum & Bass, Dubstep, Club & Underground Music Production & DJing at Soundabode — India's top audio engineering academy in Pune & across India.">
     <meta name="keywords" content="Music production course Pune India, Audio engineering course India, Sound engineering academy Pune India, Psytrance production India, Techno DJ training India, Hip-Hop beat-making Pune India, Game music composition India, Film background scoring India, Sound design for YouTube, EDM course India, Drum & Bass production India, House music production Pune India, Dubstep mixing India, Club DJ course Pune India, Underground music production India">
-    <meta name="theme-color" content="#000000">
 
     <!-- GEO META -->
     <meta name="geo.region" content="IN-MH">
@@ -17,8 +41,8 @@
     <meta name="ICBM" content="18.5973,73.7867">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Soundabode | India’s Leading Music Production, DJ & Audio Engineering Academy">
-    <meta property="og:description" content="Learn Electronic, Techno, Psytrance, Hip-Hop, and Game & Film Sound Design at Soundabode Pune — India’s top audio engineering academy.">
+    <meta property="og:title" content="Soundabode | India's Leading Music Production, DJ & Audio Engineering Academy">
+    <meta property="og:description" content="Learn Electronic, Techno, Psytrance, Hip-Hop, and Game & Film Sound Design at Soundabode Pune — India's top audio engineering academy.">
     <meta property="og:url" content="https://soundabode.com/">
     <meta property="og:image" content="https://soundabode.com/images/logo.png">
     <meta property="og:type" content="website">
@@ -27,7 +51,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Soundabode | Music Production, DJ & Audio Engineering Academy">
-    <meta name="twitter:description" content="Master Electronic, Techno, Psytrance, Hip-Hop, and Film Scoring at India’s leading academy for modern sound.">
+    <meta name="twitter:description" content="Master Electronic, Techno, Psytrance, Hip-Hop, and Film Scoring at India's leading academy for modern sound.">
     <meta name="twitter:image" content="https://soundabode.com/images/logo.png">
     
     <!-- Google Tag Manager -->
@@ -42,21 +66,15 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/di5bqvkma/image/upload/v1761233576/sa-logo_edited_vycsd0.png">
     
-    <!-- Stylesheets -->
+    <!-- Google Fonts - Optimized loading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet - Use the optimized version -->
     <link rel="stylesheet" href="style/style.css">
     
-    <!-- Preload Critical Images -->
+    <!-- Preload critical images -->
     <link rel="preload" as="image" href="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png">
-    
-    <!-- DNS Prefetch & Preconnect -->
-    <link rel="dns-prefetch" href="https://res.cloudinary.com">
-    <link rel="preconnect" href="https://res.cloudinary.com">
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -66,7 +84,7 @@
       "name": "Soundabode Academy",
       "url": "https://soundabode.com/",
       "logo": "https://soundabode.com/images/logo.png",
-      "description": "Soundabode is India’s leading academy for Music Production, Audio Engineering, and DJ Training based in Pune. Go beyond music production — explore game music composition, background scoring for films, web series, and advertisements, and sound design for YouTube creators.",
+      "description": "Soundabode is India's leading academy for Music Production, Audio Engineering, and DJ Training based in Pune. Go beyond music production — explore game music composition, background scoring for films, web series, and advertisements, and sound design for YouTube creators.",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Shop No. 218, Vision 9 Mall, Pimple Saudagar",
@@ -153,12 +171,52 @@
       ]
     }
     </script>
+    
+    <!-- CRITICAL: Android performance optimization script -->
+    <script>
+        // Detect Android and apply performance optimizations
+        (function() {
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const isLowEnd = navigator.hardwareConcurrency < 4 || (navigator.deviceMemory && navigator.deviceMemory < 4);
+            
+            if (isAndroid || isLowEnd) {
+                // Disable autoplay videos on low-end Android devices
+                document.addEventListener('DOMContentLoaded', function() {
+                    const videos = document.querySelectorAll('video[autoplay]');
+                    videos.forEach(function(video) {
+                        // On Android, replace videos with poster images
+                        const poster = video.getAttribute('poster');
+                        if (poster || isLowEnd) {
+                            video.removeAttribute('autoplay');
+                            video.pause();
+                            
+                            // Create static image fallback
+                            if (poster) {
+                                const img = document.createElement('img');
+                                img.src = poster;
+                                img.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;';
+                                img.loading = 'lazy';
+                                video.parentNode.insertBefore(img, video);
+                                video.style.display = 'none';
+                            }
+                        }
+                    });
+                    
+                    console.log('🤖 Android optimizations applied');
+                });
+            }
+        })();
+    </script>
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
     <noscript>
         <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KVRWZ2DP" height="0" width="0" style="display:none;visibility:hidden"></iframe>
     </noscript>
+
+    <!-- Rest of your HTML content continues here... -->
+</body>
+</html>
 
 <div id="popup-form" class="popup-overlay">
     <div class="popup-content">
