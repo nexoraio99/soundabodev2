@@ -84,16 +84,24 @@ function onScroll() {
 function updateIntroOverlay() {
     if (!panelLeft || !panelRight || !introOverlay) return;
 
-    const translateX = state.phase1Progress * 100;
+    const progressPercent = state.phase1Progress * 100;
+    const mobile = window.innerWidth < 768;
     
-    panelLeft.style.transform = `translateX(${-translateX}%)`;
-    panelRight.style.transform = `translateX(${translateX}%)`;
+    if (mobile) {
+        // Panels are stacked vertically (each 50vh) → slide up/down
+        panelLeft.style.transform = `translateY(${-progressPercent}%)`;
+        panelRight.style.transform = `translateY(${progressPercent}%)`;
+    } else {
+        // Desktop/tablet → horizontal split panels
+        panelLeft.style.transform = `translateX(${-progressPercent}%)`;
+        panelRight.style.transform = `translateX(${progressPercent}%)`;
+    }
 
     if (overlayLeft) {
-        overlayLeft.style.transform = `translateX(${-state.phase1Progress * 10}px)`;
+        overlayLeft.style.transform = mobile ? 'translateX(0)' : `translateX(${-state.phase1Progress * 10}px)`;
     }
     if (overlayRight) {
-        overlayRight.style.transform = `translateX(${state.phase1Progress * 10}px)`;
+        overlayRight.style.transform = mobile ? 'translateX(0)' : `translateX(${state.phase1Progress * 10}px)`;
     }
 
     const fadeStartPoint = 0.75;
