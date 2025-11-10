@@ -1242,7 +1242,7 @@
     }
     
     .popup-content {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+         background: linear-gradient(135deg, #161616 0%, #000000 100%);
         padding: clamp(2rem, 4vw, 2.5rem);
         border-radius: 1.2rem;
         width: 90%;
@@ -1333,9 +1333,9 @@
     }
     
     .popup-content form button {
-        background: linear-gradient(135deg, #00ff88 0%, #00cc70 100%);
+        background: linear-gradient(165deg, #0000000d 0%, #18181888 100%);
         border: none;
-        color: #000;
+        color: #dedede;
         padding: clamp(0.8rem, 2vw, 1rem);
         border-radius: 0.6rem;
         cursor: pointer;
