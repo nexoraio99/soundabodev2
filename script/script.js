@@ -606,7 +606,43 @@ function setupRevealObserver() {
         }
     });
 }
+// ============================================================================
+// FAQS
+// ============================================================================
 
+document.addEventListener('DOMContentLoaded', function () {
+  const items = document.querySelectorAll('.faq-item');
+
+  items.forEach(item => {
+    const head = item.querySelector('.faq-head');
+    const body = item.querySelector('.faq-body');
+
+    head.addEventListener('click', () => {
+      const open = item.getAttribute('data-open') === 'true';
+      if (open) {
+        // close
+        item.setAttribute('data-open', 'false');
+        head.setAttribute('aria-expanded', 'false');
+        // smooth collapse: set explicit height then zero
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(() => { body.style.maxHeight = '0'; });
+        // hide after animation
+        setTimeout(()=> { body.hidden = true; }, 360);
+      } else {
+        // open
+        item.setAttribute('data-open', 'true');
+        head.setAttribute('aria-expanded', 'true');
+        body.hidden = false;
+        // let browser compute then set to scrollHeight for animation
+        requestAnimationFrame(() => {
+          body.style.maxHeight = body.scrollHeight + 'px';
+        });
+      }
+      // optional: close siblings (accordion behaviour)
+      // items.forEach(sib => { if (sib !== item) sib.setAttribute('data-open','false'); });
+    });
+  });
+});
 // ============================================================================
 // AURORA TEXT ANIMATION
 // ============================================================================
