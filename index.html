@@ -54,13 +54,19 @@
     <meta name="twitter:description" content="Master Electronic, Techno, Psytrance, Hip-Hop, and Film Scoring at India's leading academy for modern sound.">
     <meta name="twitter:image" content="https://soundabode.com/images/logo.png">
     
-    <!-- Google Tag Manager -->
+    <!-- Google Tag Manager (lazy) -->
     <script>
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-KVRWZ2DP');
+      (function(id){
+        function loadGTM(){
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer',id);
+        }
+        if('requestIdleCallback' in window){ requestIdleCallback(loadGTM); }
+        else { window.addEventListener('load', loadGTM); }
+      })('GTM-KVRWZ2DP');
     </script>
     
     <!-- Favicon -->
@@ -70,11 +76,11 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Stylesheet - Use the optimized version -->
-    <link rel="stylesheet" href="style/style.css">
+    <!-- Stylesheet - non-blocking -->
+    <link rel="preload" href="/frontend/script/style1.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/frontend/script/style1.css"></noscript>
     
-    <!-- Preload critical images -->
-    <link rel="preload" as="image" href="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png">
+    <!-- Removed image preload to avoid unused-preload warnings -->
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -600,25 +606,65 @@ Craft, compose and produce your signature sound through expert led programs desi
     <!-- ============================================================================
          BLOCK 6 — FAQS
          ============================================================================ -->
-    <section id="faq" class="content-section">
-        <h2 class="section-title reveal-up">Frequently Asked Questions</h2>
-        <div style="max-width: 900px; width: 100%;">
-            <h3 class="reveal-up">Do you teach Psytrance and Electronic Music Production in India?</h3>
-            <p class="reveal-up">Yes, Soundabode offers full Psytrance and Electronic Music Production courses in Pune and online across India using Ableton Live and pro gear.</p>
-            <br>  
-            <h3 class="reveal-up">Can I learn Techno, House or Drum & Bass production?</h3>  
-            <p class="reveal-up">Absolutely. Students from across India join our Pune studio or live online sessions to master Techno, House, Drum & Bass, Dubstep and Underground production.</p>
-            <br>
-            <h3 class="reveal-up">Do you teach Hip-Hop and Trap beat-making?</h3> 
-            <p class="reveal-up">Yes. Hip-Hop and Trap production form part of our core course with sampling, groove and mixing techniques.</p>
-            <br>
-            <h3 class="reveal-up">Do you train DJs for live club and festival gigs?</h3>
-            <p class="reveal-up">Yes. Soundabode’s DJ training prepares you for real events across India using Pioneer CDJs and Rekordbox workflows.</p>
-            <br>
-            <h3 class="reveal-up">Is this a certified sound engineering program?</h3>
-            <p class="reveal-up">Yes. All Soundabode courses include certification in Music Production, Audio Engineering and DJ Performance recognized across India.</p>
-        </div>
-    </section>
+         <section id="faq" class="content-section">
+            <h2 class="faq-heading">Frequently Asked Questions</h2>
+            <div class="faq-list">
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">01</span>
+                  <span class="faq-title">Do you teach Psytrance and Electronic Music Production in India?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Yes, Soundabode offers full Psytrance and Electronic Music Production courses in Pune and online across India using Ableton Live and pro gear.</p>
+                </div>
+              </div>
+          
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">02</span>
+                  <span class="faq-title">Can I learn Techno, House or Drum & Bass production?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Absolutely. Students from across India join our Pune studio or live online sessions to master Techno, House, Drum & Bass, Dubstep and Underground production.</p>
+                </div>
+              </div>
+          
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">03</span>
+                  <span class="faq-title">Do you teach Hip-Hop and Trap beat-making?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Yes. Hip-Hop and Trap production form part of our core course with sampling, groove and mixing techniques.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">04</span>
+                  <span class="faq-title">Do you train DJs for live club and festival gigs?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Yes. Soundabode’s DJ training prepares you for real events across India using Pioneer CDJs and Rekordbox workflows.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">05</span>
+                  <span class="faq-title">Is this a certified sound engineering program?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Yes. All Soundabode courses include certification in Music Production, Audio Engineering and DJ Performance recognized across India.</p>
+                </div>
+              </div>
+            </div>
+          </section>
     <!-- ============================================================================
          FOOTER
          ============================================================================ -->
@@ -651,9 +697,9 @@ Craft, compose and produce your signature sound through expert led programs desi
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h4>PRIVACY POLICY</h4>
+                    <h4>PRIVACY & POLICY</h4>
                     <ul>
-                        <li><a href="privacy.html">PRIVACY POLICY</a></li>
+                        <li><a href="privacy.html">PRIVACY & POLICY</a></li>
             </div>
             <div class="footer-copyright">
                 <p>2025 © SOUNDABODE. All rights reserved.</p>
@@ -662,6 +708,6 @@ Craft, compose and produce your signature sound through expert led programs desi
     </footer>
 
     <!-- JavaScript -->
-    <script src="script/script.js" defer></script>
+    <script src="/frontend/script/script1.js" defer></script>
 </body>
-</html>
+</html> 
