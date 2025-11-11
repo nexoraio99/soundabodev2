@@ -76,7 +76,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style/contact.css"> 
+    <link rel="stylesheet" href="/styles/contact.css"> 
     <link rel="icon" type="image/png" sizes="32x32" href="https://res.cloudinary.com/di5bqvkma/image/upload/v1761233576/sa-logo_edited_vycsd0.png">
     <link rel="apple-touch-icon" sizes="180x180" href="https://res.cloudinary.com/di5bqvkma/image/upload/v1761233576/sa-logo_edited_vycsd0.png">
 </head>
@@ -91,32 +91,45 @@
     <div class="cursor"></div>
     <div class="cursor-follower"></div>
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <a href="index.html" class="logo">
-            <img src="https://res.cloudinary.com/di5bqvkma/image/upload/v1761233576/sa-logo_edited_vycsd0.png" alt="Soundabode Logo" class="logo-img">
-        </a>        
-        <div class="nav-menu">
-            <div class="nav-links">
-                <a href="index.html" data-text="HOME"><span>HOME</span></a>
-                <a href="index.html#about-section" data-text="ABOUT"><span>ABOUT</span></a>
-                <a href="index.html#carousel-section" data-text="COURSES"><span>COURSES</span></a>
-            </div>
-        </div>
-        <button class="hamburger-menu" aria-label="Toggle menu">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </button>
-        <div class="nav-actions">
-            <a href="tel:+919975016189" class="action-btn call-btn" title="Call us">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor"/>
-                </svg>
-            </a>
-        </div>
-    </nav>
-
+  <!-- NAVBAR -->
+<nav class="navbar" role="navigation" aria-label="Primary">
+    <a href="index.html" class="logo" aria-label="Soundabode Home">
+      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="Soundabode Logo" class="logo-img">
+    </a>
+  
+    <!-- Desktop links -->
+    <div class="nav-links" role="menubar">
+      <a role="menuitem" href="index.html#about-section">About</a>
+      <a role="menuitem" href="index.html#carousel-section">Portfolio</a>
+      <a role="menuitem" href="contact.html" aria-current="page">Contact</a>
+    </div>
+  
+    <!-- Hamburger -->
+    <button class="hamburger-menu"
+            aria-label="Toggle menu"
+            aria-controls="mobile-menu"
+            aria-expanded="false">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  
+    <!-- Right actions -->
+    <div class="nav-actions">
+      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" aria-label="Call us">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor"/>
+        </svg>
+      </a>
+    </div>
+  </nav>
+  
+  <!-- MOBILE MENU -->
+  <div id="mobile-menu" class="nav-menu" role="dialog" aria-modal="true" aria-label="Mobile menu">
+    <a href="index.html#about-section">About</a>
+    <a href="index.html#carousel-section">Portfolio</a>
+    <a href="contact.html" aria-current="page">Contact</a>
+  </div>
     <!-- WhatsApp Float -->
     <a href="https://wa.me/919975016189" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp">
         <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp" class="whatsapp-icon">
@@ -266,6 +279,6 @@
         </div>
     </footer>
 
-    <script src="script/contact.js"></script>
+    <script src="/script/contact.js"></script>
 </body>
 </html>
