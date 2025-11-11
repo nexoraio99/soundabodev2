@@ -70,104 +70,68 @@ body {
     }
 }
 
-/* ============================================================================
-   NAVBAR
-   ============================================================================ */
-.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: clamp(12px, 3vw, 20px) clamp(15px, 5vw, 50px);
-    box-sizing: border-box;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
-    background-color: rgba(10, 10, 10, 0.5);
+/* === Contact page navbar (extracted from index) === */
+.navbar{
+    position: fixed; /* override: fixed on contact page */
+    top: 0; left: 0; width: 100%;
+    padding: 10px clamp(12px, 5vw, 50px);
+    height: clamp(48px, 12vw, 60px);
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100;
+    background-color: rgba(10,10,10,0.097);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    height: clamp(48px, 12vw, 70px);
-}
-
-.navbar a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 200;
-    font-size: clamp(0.65rem, 1.5vw, 0.8rem);
-    position: relative;
-    display: inline-block;
-    padding: 5px 0;
-    overflow: hidden;
-}
-
-.nav-links {
-    display: flex;
-    gap: clamp(20px, 5vw, 40px);
-}
-
-.logo-img {
-    height: clamp(24px, 5vw, 40px);
-    width: auto;
-    object-fit: contain;
-}
-
-.navbar a::before {
-    content: attr(data-text);
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-.navbar a:hover::before {
-    transform: translateY(-100%);
-}
-
-/* Hamburger Menu */
-.hamburger-menu {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    z-index: 1001;
-}
-
-.hamburger-menu .bar {
-    display: block;
-    width: 25px;
-    height: 2px;
-    background-color: #fff;
-    margin: 5px 0;
-    transition: transform 0.3s, opacity 0.3s;
-}
-
-.nav-menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color:rgb(0 0 0 / 51%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 40px;
-    transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
-    z-index: 900;
-}
-
-.nav-menu.is-active {
-    transform: translateX(0);
-    z-index: 2000;
-}
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .navbar a{
+    color:#fff; text-decoration:none; font-weight:200;
+    font-size: clamp(0.65rem,1.5vw,0.8rem);
+  }
+  .logo-img{ height:clamp(20px,5vw,40px); width:auto; object-fit:contain; }
+  .nav-links{ display:flex; gap:clamp(20px,5vw,40px); flex:1; justify-content:center; }
+  .nav-actions{ display:flex; gap:clamp(8px,2vw,15px); align-items:center; }
+  .action-btn{
+    width:clamp(32px,8vw,40px); height:clamp(32px,8vw,40px); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(24,24,24,0.1);
+    border:1px solid rgba(255,255,255,0.2);
+    transition:all .3s ease; padding:0; cursor:pointer; color:#fff;
+  }
+  .action-btn:hover{ background:rgba(255,255,255,0.2); transform:scale(1.1); }
+  .call-btn:hover{ background:rgba(0,194,255,0.2); border-color:#00c3ff95; }
+  
+  /* Hamburger + mobile menu (from index) */
+  .hamburger-menu{ display:none; background:none; border:0; cursor:pointer; padding:0; z-index:101; }
+  .hamburger-menu .bar{
+    display:block; width:25px; height:2px; background:#fff; margin:5px 0;
+    transition:transform .3s, opacity .3s;
+  }
+  .hamburger-menu.is-active .bar:nth-child(1){ transform: translateY(7px) rotate(45deg); }
+  .hamburger-menu.is-active .bar:nth-child(2){ opacity:0; }
+  .hamburger-menu.is-active .bar:nth-child(3){ transform: translateY(-7px) rotate(-45deg); }
+  
+  .nav-menu{
+    position:fixed; inset:0 0 0 0; width:100%; height:100vh;
+    background:rgba(0,0,0,0.9);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    gap:40px; transform: translateX(100%); transition: transform .4s cubic-bezier(.76,0,.24,1);
+    z-index:99;
+  }
+  .nav-menu.is-active{ transform: translateX(0); }
+  .nav-menu a{ color:#fff; text-decoration:none; font-size:clamp(1.2rem,4vw,1.5rem); font-weight:300; }
+  
+  /* Responsive: show hamburger on tablet/mobile like index does */
+  @media (max-width: 768px){
+    .hamburger-menu{ display:block; }
+    .nav-links{ display:none; }
+    .logo-img{ height: clamp(24px,4vw,30px); }
+    .nav-actions{ gap: clamp(8px,1.5vw,12px); }
+    .action-btn{ width: clamp(32px,6vw,38px); height:clamp(32px,6vw,38px); }
+  }
+  
+  /* Optional: add top padding so content doesn't sit under fixed navbar */
+  body{ padding-top: clamp(48px, 10vw, 64px); }
 
 /* WhatsApp Float */
 .whatsapp-float {
