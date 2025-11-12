@@ -260,11 +260,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevBtn = document.querySelector('.prev');
     const nextBtn = document.querySelector('.next');
     const dotsContainer = document.querySelector('.dots');
+    const container = document.querySelector('.testimonial-container');
 
-    if (!testimonials.length || !dotsContainer || !prevBtn || !nextBtn) return;
+    if (!testimonials.length || !dotsContainer || !prevBtn || !nextBtn || !container) return;
 
     let currentIndex = 0;
+    let autoSlideInterval;
 
+    // Create dots dynamically
     testimonials.forEach((_, i) => {
         const dot = document.createElement('span');
         dot.setAttribute('data-index', i);
@@ -275,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const dots = Array.from(dotsContainer.querySelectorAll('span'));
 
+    /** Show selected testimonial */
     function showTestimonial(index) {
         const n = testimonials.length;
         const newIndex = ((index % n) + n) % n;
@@ -288,12 +292,52 @@ document.addEventListener('DOMContentLoaded', () => {
         dots[newIndex].classList.add('active');
 
         currentIndex = newIndex;
+
+        adjustHeight();
+        restartAutoSlide();
     }
 
+    /** Adjust container height smoothly to match active testimonial */
+    function adjustHeight() {
+        const active = document.querySelector('.testimonial.active');
+        if (!active) return;
+
+        // get the current height and new height
+        const newHeight = active.offsetHeight;
+        container.style.height = newHeight + 'px';
+    }
+
+    /** Initialize height once */
+    function initHeight() {
+        adjustHeight();
+        window.addEventListener('resize', adjustHeight);
+    }
+
+    /** Buttons control */
     nextBtn.addEventListener('click', () => showTestimonial(currentIndex + 1));
     prevBtn.addEventListener('click', () => showTestimonial(currentIndex - 1));
-});
 
+    /** Auto-slide every few seconds */
+    function startAutoSlide() {
+        stopAutoSlide();
+        autoSlideInterval = setInterval(() => {
+            showTestimonial(currentIndex + 1);
+        }, 3000); // 6 seconds per slide
+    }
+
+    function stopAutoSlide() {
+        if (autoSlideInterval) clearInterval(autoSlideInterval);
+    }
+
+    function restartAutoSlide() {
+        stopAutoSlide();
+        startAutoSlide();
+    }
+
+    /** Initialize */
+    initHeight();
+    startAutoSlide();
+});
 // ============================================================================
 // POPUP FORM - INITIALIZATION AND DISPLAY
 // ============================================================================
