@@ -72,16 +72,15 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/di5bqvkma/image/upload/v1761233576/sa-logo_edited_vycsd0.png">
     
-    <!-- Google Fonts - Optimized loading -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Optimized loading (preload with onload + noscript fallback) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style" onload="this.rel='stylesheet'" crossorigin>
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" crossorigin></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" crossorigin>
     
-    <!-- Stylesheet - non-blocking -->
+    <!-- Stylesheet - non-blocking (preload + onload; noscript fallback uses same file) -->
     <link rel="preload" href="/style/style.css" as="style" onload="this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="/frontend/script/style1.css"></noscript>
+    <noscript><link rel="stylesheet" href="/style/style.css"></noscript>
     
-    <!-- Removed image preload to avoid unused-preload warnings -->
-
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -221,26 +220,24 @@
     </noscript>
 
     <!-- Rest of your HTML content continues here... -->
-</body>
-</html>
 
-<div id="popup-form" class="popup-overlay">
-    <div class="popup-content">
-        <button class="close-btn" id="closePopup">&times;</button>
-        <h2>Start Your Musical Journey</h2>
-        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Fill in your details and we'll get back to you!</p>
-        
-        <form id="popup-form-element">
-            <input type="text" id="popup-name" name="name" placeholder="Your Name" required>
-            <input type="email" id="popup-email" name="email" placeholder="Your Email" required>
-            <input type="tel" id="popup-phone" name="phone" placeholder="Your Phone" required>
+    <div id="popup-form" class="popup-overlay">
+        <div class="popup-content">
+            <button class="close-btn" id="closePopup">&times;</button>
+            <h2>Start Your Musical Journey</h2>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Fill in your details and we'll get back to you!</p>
             
-            <button type="submit">Get Started</button>
-            
-            <p class="popup-status" style="margin-top: 10px; font-size: 0.85rem; text-align: center;"></p>
-        </form>
+            <form id="popup-form-element">
+                <input type="text" id="popup-name" name="name" placeholder="Your Name" required>
+                <input type="email" id="popup-email" name="email" placeholder="Your Email" required>
+                <input type="tel" id="popup-phone" name="phone" placeholder="Your Phone" required>
+                
+                <button type="submit">Get Started</button>
+                
+                <p class="popup-status" style="margin-top: 10px; font-size: 0.85rem; text-align: center;"></p>
+            </form>
+        </div>
     </div>
-</div>
 
 
     <!-- ============================================================================
@@ -631,7 +628,6 @@ Craft, compose and produce your signature sound through expert led programs desi
     </div>
   </section>
 
-
     <!-- ============================================================================
          BLOCK 6 — FAQS
          ============================================================================ -->
@@ -656,7 +652,7 @@ Craft, compose and produce your signature sound through expert led programs desi
                   <span class="faq-toggle">+</span>
                 </button>
                 <div class="faq-body" hidden>
-                  <p>Absolutely. Students from across India join our Pune studio or live online sessions to master Techno, House, Drum & Bass, Dubstep and Underground production.</p>
+                  <p>Absolutely. Students from across India join our Pune studio or live online sessions to master Techno, House, Drum Bass, Dubstep and Underground production.</p>
                 </div>
               </div>
           
@@ -729,6 +725,8 @@ Craft, compose and produce your signature sound through expert led programs desi
                     <h4>PRIVACY POLICY</h4>
                     <ul>
                         <li><a href="privacy.html">PRIVACY POLICY</a></li>
+                    </ul>
+                </div>
             </div>
             <div class="footer-copyright">
                 <p>2025 © SOUNDABODE. All rights reserved.</p>
@@ -739,4 +737,4 @@ Craft, compose and produce your signature sound through expert led programs desi
     <!-- JavaScript -->
     <script src="/script/script.js" defer></script>
 </body>
-</html> 
+</html>
