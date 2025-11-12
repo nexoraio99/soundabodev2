@@ -24,8 +24,8 @@
     
     body {
         font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background-color: #0a0a0a;
-        color: #1a1a1a;
+        background-color: #000000;
+        color: #000000;
         overflow-x: hidden;
     }
     
@@ -1096,123 +1096,173 @@
     /* ============================================================================
         TESTIMONIALS SECTION
         ============================================================================ */
-    
-    .testimonials {
-        background: #000;
-        color: #fff;
-        border-top: 1px solid #fffdfd2e;
-        border-bottom: 1px solid #fffdfd2e;
-        padding: clamp(40px, 8vw, 100px) clamp(15px, 3vw, 20px);
-        text-align: center;
-        font-family: "Inter", sans-serif;
-        position: relative;
-        overflow: visible;
-        z-index: 2;
-    }
-    
-    .section-title {
-        font-size: clamp(1.5rem, 5vw, 3rem);
-        letter-spacing: clamp(0.5px, 1vw, 2px);
-        margin-bottom: clamp(30px, 5vw, 60px);
-        font-weight: 300;
-    }
-    
-    .testimonial-container {
-        max-width: 800px;
-        margin: 0 auto;
-        position: relative;
-        min-height: 180px;
-    }
-    
-    .testimonial {
-        display: none;
-        opacity: 0;
-        transition: opacity 0.6s ease;
-    }
-    
-    .testimonial.active {
-        display: block;
-        opacity: 1;
-    }
-    
-    .quote {
-        font-size: clamp(0.9rem, 2vw, 1.1rem);
-        line-height: 1.6;
-        margin-bottom: clamp(8px, 1vw, 10px);
-        color: #ddd;
-    }
-    
-    .author {
-        font-weight: 700;
-        letter-spacing: 1px;
-        font-size: clamp(0.8rem, 1.5vw, 0.9rem);
-    }
-    
-    .role {
-        font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-        letter-spacing: 1px;
-        color: #888;
-    }
-    
-    .controls {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: clamp(15px, 2vw, 20px);
-        gap: clamp(15px, 3vw, 20px);
-        flex-wrap: wrap;
-    }
-    
-    button.prev,
-    button.next {
-        background: #111;
-        color: #fff;
-        border: none;
-        border-radius: 50%;
-        width: clamp(35px, 8vw, 40px);
-        height: clamp(35px, 8vw, 40px);
-        font-size: clamp(14px, 2vw, 18px);
-        cursor: pointer;
-        transition: background 0.3s;
-    }
-    
-    button.prev:hover,
-    button.next:hover {
-        background: #222;
-    }
-    
-    .dots {
-        display: flex;
-        gap: clamp(6px, 1vw, 10px);
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .dots span {
-        width: clamp(8px, 1.5vw, 10px);
-        height: clamp(8px, 1.5vw, 10px);
-        background: #555;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .dots span.active {
-        background: #fff;
-    }
-    
-    .reveal-up {
-        opacity: 0;
-        transform: translateY(50px);
-        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        color: #fff;
-    }
-    
-    .reveal-up.active {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
+        /* ==========================
+   Testimonials — fixed-size responsive cards
+   Replace the old testimonials CSS with this block
+   ========================== */
+
+.testimonials {
+    background: #000;
+    color: #fff;
+    border-top: 1px solid rgba(255,253,253,0.18);
+    border-bottom: 1px solid rgba(255,253,253,0.18);
+    padding: clamp(40px, 8vw, 100px) clamp(15px, 3vw, 20px);
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    position: relative;
+    z-index: 2;
+    overflow: hidden; /* ensure no stray overflow from cards */
+}
+
+/* Section title */
+.section-title {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    letter-spacing: clamp(0.5px, 1vw, 2px);
+    margin-bottom: clamp(30px, 5vw, 60px);
+    font-weight: 300;
+}
+
+/* Center container that acts as the fixed viewport for cards */
+.testimonial-container {
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    position: relative;
+    /* fixed viewport height prevents jumps when different reviews show */
+    --card-w: min(720px, 92%);       /* desktop max width for card */
+    --card-h: clamp(180px, 22vh, 240px); /* fixed-ish height but responsive */
+    height: var(--card-h);
+    min-height: var(--card-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Individual testimonial - stacked absolutely inside container */
+.testimonial {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--card-w);
+    max-width: 100%;
+    height: var(--card-h);
+    min-height: var(--card-h);
+    box-sizing: border-box;
+
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: clamp(14px, 2.4vw, 20px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;             /* clip long content */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+/* Visible testimonial */
+.testimonial.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%); /* same position, prevents jump */
+}
+
+/* Quote text: limit number of visible lines */
+.quote {
+    font-size: clamp(0.9rem, 2vw, 1.05rem);
+    line-height: 1.45;
+    margin: 0 0 clamp(8px, 1vw, 10px) 0;
+    color: #ddd;
+
+    /* line-clamp: show consistent number of lines and ellipsis */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4; /* adjust lines shown */
+    overflow: hidden;
+    max-height: calc(1.45em * 4); /* fallback for non-webkit */
+}
+
+/* Author/role fixed at bottom area */
+.author {
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: clamp(0.82rem, 1.5vw, 0.95rem);
+    color: #fff;
+    margin: 0;
+}
+.role {
+    font-size: clamp(0.7rem, 1.2vw, 0.82rem);
+    letter-spacing: 1px;
+    color: #bdbdbd;
+    margin: 4px 0 0 0;
+}
+
+/* Controls stay under the testimonial container, won't shift cards */
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: clamp(16px, 2vw, 22px);
+    gap: clamp(12px, 2vw, 20px);
+    flex-wrap: wrap;
+}
+
+/* Prev/Next buttons */
+button.prev,
+button.next {
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: clamp(36px, 7vw, 40px);
+    height: clamp(36px, 7vw, 40px);
+    font-size: clamp(14px, 2vw, 18px);
+    cursor: pointer;
+    transition: background 0.25s;
+}
+button.prev:hover,
+button.next:hover { background: #222; }
+
+/* Dots row */
+.dots {
+    display: flex;
+    gap: clamp(6px, 1vw, 10px);
+}
+.dots span {
+    width: clamp(8px, 1.5vw, 10px);
+    height: clamp(8px, 1.5vw, 10px);
+    background: #555;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-block;
+    transition: transform .18s, background .18s;
+}
+.dots span.active { background: #fff; transform: scale(1.14); }
+
+/* reveal-up (entry animation) — keep same visual but won't affect layout */
+.reveal-up { color: #fff; opacity: 0; transform: translateY(24px); transition: opacity .6s ease-out, transform .6s ease-out; }
+.reveal-up.active { opacity: 1; transform: translateY(0); }
+
+/* SMALL DEVICES: adjust card height/line clamp */
+@media (max-width: 520px) {
+    .testimonial-container { --card-h: 200px; height: var(--card-h); min-height: var(--card-h); }
+    .testimonial { padding: 12px; border-radius:10px; }
+    .quote { -webkit-line-clamp: 3; max-height: calc(1.45em * 3); font-size: .95rem; }
+    .author { font-size: .9rem; }
+}
+
+/* VERY SMALL PHONES: slightly narrower card width */
+@media (max-width: 360px) {
+    .testimonial-container { --card-w: 92%; --card-h: 180px; height: var(--card-h); min-height: var(--card-h); }
+    .quote { -webkit-line-clamp: 3; max-height: calc(1.45em * 3); }
+}
+
+/* Safety: ensure no horizontal scroll from testimonials */
+html, body { overflow-x: hidden; }
+  
     /* ============================================================================
         POPUP OVERLAY - Updated for JavaScript Integration
         ============================================================================ */
@@ -1242,7 +1292,7 @@
     }
     
     .popup-content {
-         background: linear-gradient(135deg, #161616 0%, #000000 100%);
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         padding: clamp(2rem, 4vw, 2.5rem);
         border-radius: 1.2rem;
         width: 90%;
@@ -1333,9 +1383,9 @@
     }
     
     .popup-content form button {
-        background: linear-gradient(165deg, #0000000d 0%, #18181888 100%);
+        background: linear-gradient(135deg, #00ff88 0%, #00cc70 100%);
         border: none;
-        color: #dedede;
+        color: #000;
         padding: clamp(0.8rem, 2vw, 1rem);
         border-radius: 0.6rem;
         cursor: pointer;
@@ -1417,6 +1467,203 @@
         height: clamp(24px, 6vw, 30px);
         filter: brightness(0) invert(1);
     }
+
+        /* ============================
+   Studio Setup — Responsive CSS
+   Paste this into style1.css
+   ============================ */
+
+/* Box-sizing safety */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+/* CSS variables to tweak sizing from one place */
+:root{
+  --studio-max-width:1200px;
+  --studio-gap:16px;
+  --card-radius:12px;
+  --card-padding:14px;
+  --card-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  --section-padding-vertical:48px;
+  --text-muted: rgba(234,234,234,0.82);
+}
+
+/* Section wrapper */
+.studio-setup-enhanced{
+  background: #000;
+  color: #eaeaea;
+  padding: var(--section-padding-vertical) 0;
+  overflow-x: hidden; /* prevent accidental horizontal scroll */
+}
+
+/* Inner container: centers content and adds horizontal padding */
+.studio-inner{
+  max-width: var(--studio-max-width);
+  margin: 0 auto;
+  padding: 0 18px;
+}
+
+/* Header text */
+.studio-header { text-align: center; margin-bottom: 10px; }
+.studio-header .section-title {
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  margin: 0;
+  font-size: clamp(1.45rem, 3.2vw, 2rem);
+}
+.studio-sub { color: var(--text-muted); margin-top:8px; font-size: clamp(.95rem,1.6vw,1.05rem); }
+
+/* -------------------------------------------------------
+   The responsive grid
+   - auto-fit with fluid min width using clamp()
+   - avoids fixed large min widths that break mobile
+   ------------------------------------------------------- */
+.gear-grid {
+  display: grid;
+  gap: var(--studio-gap);
+  margin-top: 20px;
+
+  /* fluid "min" for minmax using clamp: browser picks appropriate column count */
+  grid-template-columns: repeat(auto-fit, minmax(clamp(130px, 22vw, 240px), 1fr));
+  align-items: stretch;
+}
+
+/* Desktop override: 3 columns wide when plenty of space */
+@media (min-width: 1100px) {
+  .gear-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+}
+
+/* Slightly wider columns on medium widths */
+@media (min-width: 760px) and (max-width: 1099px) {
+  .gear-grid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(150px, 20vw, 260px), 1fr));
+  }
+}
+
+/* Card appearance & layout */
+.gear-card{
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: var(--card-padding);
+  border-radius: var(--card-radius);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 110px;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s;
+  overflow: hidden;
+}
+
+/* Reduced hover transform for touch friendliness */
+.gear-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.5);
+  border-color: rgba(255,255,255,0.06);
+}
+
+/* Card media (icon/thumbnail) */
+.card-media{
+  height: 78px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 36px; /* swap with image if you have thumbnails */
+  margin-bottom: 6px;
+}
+
+/* Text within the card */
+.card-title{
+  font-weight: 700;
+  color: #ffffff;
+  font-size: clamp(1rem, 2.2vw, 1.06rem);
+  margin: 6px 0;
+}
+.card-excerpt{
+  color: rgba(234,234,234,0.92);
+  font-size: clamp(.86rem, 1.8vw, .96rem);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* CTA at card bottom */
+.card-cta{
+  align-self: flex-end;
+  margin-top: 10px;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: .95rem;
+}
+
+/* Studio footer & CTA button */
+.studio-footer{ text-align:center; margin-top:18px; }
+.studio-cta{
+  display:inline-block;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#120d0d,#3c3c3b);
+  color:#fff;
+  font-weight:700;
+  text-decoration:none;
+}
+
+/* Modal styles (responsive) */
+.gear-modal{
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2,2,2,0.6);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .18s ease, visibility .18s ease;
+  padding: 18px;
+  z-index: 1200;
+}
+.gear-modal[aria-hidden="false"]{ visibility: visible; opacity: 1; }
+.modal-inner{
+  background: #0f0f10;
+  border-radius: 12px;
+  padding: 18px;
+  max-width: 720px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.03);
+  position: relative;
+}
+.modal-close{
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+.modal-content h3{ margin: 4px 0 8px; font-size: 1.15rem; }
+.modal-specs{ margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.04); color: rgba(234,234,234,0.9); }
+
+/* Mobile specific tweaks */
+@media (max-width: 420px){
+  :root { --section-padding-vertical: 30px; }
+  .studio-inner{ padding: 0 12px; }
+  .card-media{ height: 64px; font-size: 32px; }
+  .gear-card{ padding: 12px; min-height: 88px; }
+  .studio-cta{ padding: 9px 14px; }
+  .modal-inner{ padding: 14px; }
+}
+
+/* Safety: prevent page-level horizontal overflow from rogue elements */
+html, body { width: 100%; overflow-x: hidden; }
+    
     /* ============================================================================
         FAQS
         ============================================================================ */
@@ -1434,7 +1681,7 @@
     .why-header { text-align: left; margin-bottom: clamp(28px, 6vw, 40px); }
     .why-title {
         font-family: 'Inter', system-ui, sans-serif;
-        font-size: clamp(1.5rem, 3.5vw, 2rem);
+        font-size: clamp(1.75rem, 4.5vw, 2.6rem);
         margin: 0;
         font-weight: 700;
         color: #fff;
