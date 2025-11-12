@@ -72,26 +72,16 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/di5bqvkma/image/upload/v1761233576/sa-logo_edited_vycsd0.png">
     
-    <!-- Inline CRITICAL CSS (tiny) to avoid any flash-of-unstyled-content -->
-    <style>
-      /* Critical above-the-fold styles only (keep small) */
-      html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-      .navbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;position:fixed;top:0;left:0;right:0;background:#000;color:#fff;z-index:1000}
-      .logo-img{height:36px;display:block}
-      .nav-links{display:flex;gap:12px;align-items:center}
-      .main-content{padding-top:76px}
-      .intro-overlay{min-height:60vh;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
-      /* prevent layout jump for images */
-      img{max-width:100%;height:auto;display:block}
-    </style>
-
-    <!-- Google Fonts (keep as regular stylesheet; small CSS that loads quickly) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" crossorigin>
-
-    <!-- Main stylesheet: use blocking stylesheet so rules apply before paint (prevents FOUC) -->
-    <link rel="stylesheet" href="/style/style.css">
-    <noscript><link rel="stylesheet" href="/style/style.css"></noscript>
+    <!-- Google Fonts - Optimized loading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Stylesheet - non-blocking -->
+    <link rel="preload" href="/style/style.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/frontend/script/style1.css"></noscript>
+    
+    <!-- Removed image preload to avoid unused-preload warnings -->
+
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -231,24 +221,26 @@
     </noscript>
 
     <!-- Rest of your HTML content continues here... -->
+</body>
+</html>
 
-    <div id="popup-form" class="popup-overlay">
-        <div class="popup-content">
-            <button class="close-btn" id="closePopup">&times;</button>
-            <h2>Start Your Musical Journey</h2>
-            <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Fill in your details and we'll get back to you!</p>
+<div id="popup-form" class="popup-overlay">
+    <div class="popup-content">
+        <button class="close-btn" id="closePopup">&times;</button>
+        <h2>Start Your Musical Journey</h2>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Fill in your details and we'll get back to you!</p>
+        
+        <form id="popup-form-element">
+            <input type="text" id="popup-name" name="name" placeholder="Your Name" required>
+            <input type="email" id="popup-email" name="email" placeholder="Your Email" required>
+            <input type="tel" id="popup-phone" name="phone" placeholder="Your Phone" required>
             
-            <form id="popup-form-element">
-                <input type="text" id="popup-name" name="name" placeholder="Your Name" required>
-                <input type="email" id="popup-email" name="email" placeholder="Your Email" required>
-                <input type="tel" id="popup-phone" name="phone" placeholder="Your Phone" required>
-                
-                <button type="submit">Get Started</button>
-                
-                <p class="popup-status" style="margin-top: 10px; font-size: 0.85rem; text-align: center;"></p>
-            </form>
-        </div>
+            <button type="submit">Get Started</button>
+            
+            <p class="popup-status" style="margin-top: 10px; font-size: 0.85rem; text-align: center;"></p>
+        </form>
     </div>
+</div>
 
 
     <!-- ============================================================================
@@ -447,8 +439,261 @@ Craft, compose and produce your signature sound through expert led programs desi
         </section>
     </section>
 
-    <!-- rest of page continues (carousel, testimonials, footer...) -->
+    
 
+    <!-- ============================================================================
+         CAROUSEL SECTION - PORTFOLIO
+         ============================================================================ -->
+    <section id="carousel-section">
+        <h2 class="carousel-title">OUR PORTFOLIO</h2>
+
+        <div class="carousel-wrapper">
+            <div class="carousel-track">
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233577/Third_Eye_Groove_DJ_TEG_rwcmhy.jpg" alt="Third Eye Groove - DJ TEG" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="carousel-info">Project 01</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233577/Sumone_jbab60.jpg" alt="Sumone - DJ Project" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="carousel-info">Project 02</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233577/Yeti_hfgxhp.jpg" alt="Yeti - Music Production" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="carousel-info">Project 03</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233575/nihar_-_completely_twisted_jjdfyu.jpg" alt="Nihar - Completely Twisted" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="carousel-info">Project 04</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233571/DJ_Tanisha_vdpgxy.jpg" alt="DJ Tanisha - Studio" loading="lazy" style="width: 100%; height: 100%; object-fit: contain; background: rgba(0,0,0,0.1);">
+                    <div class="carousel-info">Project 05</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233573/Homeboy_kuupjg.jpg" alt="Homeboy - DJ Set" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="carousel-info">Project 06</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233575/karamati_sihdlw.jpg" alt="Karamati - Music Event" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="carousel-info">Project 07</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233573/Jack_forest_enrjaf.jpg" alt="Jack Forest - Production" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="carousel-info">Project 08</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233576/Redeyemusic_b6lc1t.jpg" alt="Redeye Music - DJ" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="carousel-info">Project 09</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_400,q_auto,f_auto/v1761233575/karamati_sihdlw.jpg" alt="Karamati - Final" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="carousel-info">Project 10</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================================
+         TESTIMONIALS SECTION
+         ============================================================================ -->
+    <section class="testimonials">
+        <h2 class="section-title">WHAT THEY SAID</h2>
+
+        <div class="testimonial-container">
+            <div class="testimonial active">
+                <p class="quote">
+                    "I've had an incredible experience at Soundabode. The instructors here are not just passionate, they're deeply experienced and truly know what they're teaching. From understanding the basics of beat matching to mastering bar-to-bar flow, every session is packed with knowledge that comes from real world experience. I can safely say if you're here to learn production or mixing and you're serious about music, rhythm and the art of mixing, this is the place to be. What truly sets them apart from the rest is, the fact that they emphasise on different genres of music, which allows one to try genres out of their comfort zone's and not feel restricted to just try one style of music."
+                </p>
+                <h3 class="author">Tanisha Railkar</h3>
+                <p class="role">Tech House Producer</p>
+            </div>
+
+            <div class="testimonial">
+                <p class="quote">
+                    "I recently completed a DJ course and I couldn't be happier with my experience. The course was well-structured and covered all the basics of DJing, from beatmatching to EQing to reading the crowd. The instructor was knowledgeable, patient, and always willing to answer my questions. By the end of the course, I felt confident enough to start playing gigs and experimenting with my own style. I highly recommend this course to anyone who wants to learn how to DJ or improve their skills. SOUNDABODE - THE BEST 💥💥💥"
+                </p>
+                <h3 class="author">Anmol Bhat</h3>
+                <p class="role">DJ Student</p>
+            </div>
+
+            <div class="testimonial">
+                <p class="quote">
+                    "I recently completed my level course with Sound Abode, and I couldn't be happier with my experience. I must highlight the instructor, Mr. Harsh who is exceptionally knowledgeable and passionate about music production. His personalized attention really supports your growth as an artist. The curriculum is well-organized, covering everything from basic to advanced techniques making it suitable for all ages. I'm 40 years old, and I found it incredibly easy to learn with their assistance. The hands-on projects are especially valuable, and the community is both welcoming and supportive. Last but not least, Mr. Abhinav, owner of Soundabode is not only passionate about music but also deeply committed to fostering a positive and enriching learning environment. If you're serious about enhancing your music production skills, this academy is an excellent choice."
+                </p>
+                <h3 class="author">Sudarsan Venkata Chilakalapalli</h3>
+                <p class="role">Art Director Creative House</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="prev" aria-label="Previous testimonial">&#10094;</button>
+            <div class="dots"></div>
+            <button class="next" aria-label="Next testimonial">&#10095;</button>
+        </div>
+    </section>
+
+    <!-- ============================================================================
+         BLOCK 4 — STUDIO SETUP & GEAR
+         ============================================================================ -->
+    <section id="studio-setup" class="content-section">
+        <h2 class="section-title reveal-up">Studio Setup & Gear</h2>
+        <div style="max-width: 1200px; width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+            <div>
+                <h3 class="reveal-up">DAW</h3>
+                <ul>
+                    <li class="reveal-up"><strong>Ableton Live 12 Suite</strong>, Logic Pro X & FL Studio</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="reveal-up">Hardware</h3>
+                <ul>
+                    <li class="reveal-up">Pioneer <strong>CDJ-2000 Nexus</strong>, DJM-900 Mixer, Native Instruments Traktor & Kontrol Series</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="reveal-up">Synths & Controllers</h3>
+                <ul>
+                    <li class="reveal-up">Arturia, Novation, Roland, and Akai Professional</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="reveal-up">Audio Interface & Monitors</h3>
+                <ul>
+                    <li class="reveal-up">Universal Audio Apollo, KRK Rokit, Yamaha HS Series, Adam Audio</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="reveal-up">Plugins & Tools</h3>
+                <ul>
+                    <li class="reveal-up">Waves, iZotope, FabFilter, UAD, and Soundtoys</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="reveal-up">Recording Gear</h3>
+                <ul>
+                    <li class="reveal-up">Shure & Rode microphones, Focusrite preamps, acoustic isolation booths</li>
+                </ul>
+            </div>
+        </div>
+        <br>
+        <div style="max-width: 900px; width: 100%; margin-top: 24px;">
+            <h3 class="reveal-up">What Makes It Special</h3>
+            <ul>
+                <li class="reveal-up">Real <strong>sound treated studio rooms</strong> for accurate monitoring</li>
+                <li class="reveal-up"><strong>Hybrid analog digital workflow</strong>  learn on both hardware and software</li>
+                <li class="reveal-up"><strong>Live recording, mixing & mastering stations</strong></li>
+                <li class="reveal-up"><strong>Hands on gear training</strong> in every course</li>
+                <li class="reveal-up"><strong>Collaborative sessions</strong> with other producers & DJs</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ============================================================================
+         BLOCK 5 — WHY CHOOSE SOUNDABODE
+         ============================================================================ -->
+    <section id="why-soundabode" class="content-section why-soundabode">
+    <div class="why-inner container">
+      <div class="why-header">
+        <h2 class="why-title">Why Choose Soundabode</h2>
+      </div>
+  
+      <div class="why-cards">
+        <article class="why-card">
+          <div class="card-icon" aria-hidden>🎚️</div>
+          <h3 class="card-title">Hands-On Studio Training</h3>
+          <ul class="card-list">
+            <li>100% hands-on studio training</li>
+            <li>Access to India’s most advanced production setups</li>
+          </ul>
+          <a class="learn-btn" href="/contact.html">Learn more →</a>
+        </article>
+  
+        <article class="why-card">
+          <div class="card-icon" aria-hidden>🎧</div>
+          <h3 class="card-title">Mentors & Performance</h3>
+          <ul class="card-list">
+            <li>Industry mentors & touring DJs</li>
+            <li>Real performance opportunities (Pune & across India)</li>
+          </ul>
+          <a class="learn-btn" href="/contact.html">Learn more →</a>
+        </article>
+  
+        <article class="why-card">
+          <div class="card-icon" aria-hidden>🚀</div>
+          <h3 class="card-title">Artist Support & Flexibility</h3>
+          <ul class="card-list">
+            <li>Artist branding & release support</li>
+            <li>Online + offline learning modes</li>
+          </ul>
+          <a class="learn-btn" href="/contact.html">Learn more →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
+    <!-- ============================================================================
+         BLOCK 6 — FAQS
+         ============================================================================ -->
+         <section id="faq" class="content-section">
+            <h2 class="faq-heading">Frequently Asked Questions</h2>
+            <div class="faq-list">
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">01</span>
+                  <span class="faq-title">Do you teach Psytrance and Electronic Music Production in India?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Yes, Soundabode offers full Psytrance and Electronic Music Production courses in Pune and online across India using Ableton Live and pro gear.</p>
+                </div>
+              </div>
+          
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">02</span>
+                  <span class="faq-title">Can I learn Techno, House or Drum & Bass production?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Absolutely. Students from across India join our Pune studio or live online sessions to master Techno, House, Drum & Bass, Dubstep and Underground production.</p>
+                </div>
+              </div>
+          
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">03</span>
+                  <span class="faq-title">Do you teach Hip-Hop and Trap beat-making?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Yes. Hip-Hop and Trap production form part of our core course with sampling, groove and mixing techniques.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">04</span>
+                  <span class="faq-title">Do you train DJs for live club and festival gigs?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Yes. Soundabode’s DJ training prepares you for real events across India using Pioneer CDJs and Rekordbox workflows.</p>
+                </div>
+              </div>
+
+              <div class="faq-item">
+                <button class="faq-head" aria-expanded="false">
+                  <span class="faq-number">05</span>
+                  <span class="faq-title">Is this a certified sound engineering program?</span>
+                  <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-body" hidden>
+                  <p>Yes. All Soundabode courses include certification in Music Production, Audio Engineering and DJ Performance recognized across India.</p>
+                </div>
+              </div>
+            </div>
+          </section>
     <!-- ============================================================================
          FOOTER
          ============================================================================ -->
@@ -484,8 +729,6 @@ Craft, compose and produce your signature sound through expert led programs desi
                     <h4>PRIVACY POLICY</h4>
                     <ul>
                         <li><a href="privacy.html">PRIVACY POLICY</a></li>
-                    </ul>
-                </div>
             </div>
             <div class="footer-copyright">
                 <p>2025 © SOUNDABODE. All rights reserved.</p>
@@ -496,4 +739,4 @@ Craft, compose and produce your signature sound through expert led programs desi
     <!-- JavaScript -->
     <script src="/script/script.js" defer></script>
 </body>
-</html>
+</html> 
