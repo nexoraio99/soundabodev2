@@ -75,12 +75,16 @@
 <link rel="icon" href="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_48,h_48,q_auto/v1761233576/sa-logo_edited_vycsd0.png" sizes="48x48" type="image/png">
 <link rel="apple-touch-icon" href="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_180,h_180,q_auto/v1761233576/sa-logo_edited_vycsd0.png">
     
-     <!-- Google Fonts (keep as regular stylesheet; small CSS that loads quickly) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" crossorigin>
+    <!-- Google Fonts - Optimized loading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet - non-blocking -->
+    <link rel="preload" href="/frontend/script/style1.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/frontend/script/style1.css"></noscript>
+    
+    <!-- Removed image preload to avoid unused-preload warnings -->
 
-    <!-- Main stylesheet: use blocking stylesheet so rules apply before paint (prevents FOUC) -->
-    <link rel="stylesheet" href="/style/style.css">
-    <noscript><link rel="stylesheet" href="/style/style.css"></noscript>
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -495,7 +499,46 @@ Craft, compose and produce your signature sound through expert led programs desi
     <!-- ============================================================================
          TESTIMONIALS SECTION
          ============================================================================ -->
-            <section id="studio-setup" class="content-section studio-setup-enhanced" aria-label="Studio setup and gear">
+    <section class="testimonials">
+        <h2 class="section-title">WHAT THEY SAID</h2>
+
+        <div class="testimonial-container">
+            <div class="testimonial active">
+                <p class="quote">
+                    "I've had an incredible experience at Soundabode. The instructors here are not just passionate, they're deeply experienced and truly know what they're teaching. From understanding the basics of beat matching to mastering bar-to-bar flow, every session is packed with knowledge that comes from real world experience. I can safely say if you're here to learn production or mixing and you're serious about music, rhythm and the art of mixing, this is the place to be. What truly sets them apart from the rest is, the fact that they emphasise on different genres of music, which allows one to try genres out of their comfort zone's and not feel restricted to just try one style of music."
+                </p>
+                <h3 class="author">Tanisha Railkar</h3>
+                <p class="role">Tech House Producer</p>
+            </div>
+
+            <div class="testimonial">
+                <p class="quote">
+                    "I recently completed a DJ course and I couldn't be happier with my experience. The course was well-structured and covered all the basics of DJing, from beatmatching to EQing to reading the crowd. The instructor was knowledgeable, patient, and always willing to answer my questions. By the end of the course, I felt confident enough to start playing gigs and experimenting with my own style. I highly recommend this course to anyone who wants to learn how to DJ or improve their skills. SOUNDABODE - THE BEST 💥💥💥"
+                </p>
+                <h3 class="author">Anmol Bhat</h3>
+                <p class="role">DJ Student</p>
+            </div>
+
+            <div class="testimonial">
+                <p class="quote">
+                    "I recently completed my level course with Sound Abode, and I couldn't be happier with my experience. I must highlight the instructor, Mr. Harsh who is exceptionally knowledgeable and passionate about music production. His personalized attention really supports your growth as an artist. The curriculum is well-organized, covering everything from basic to advanced techniques making it suitable for all ages. I'm 40 years old, and I found it incredibly easy to learn with their assistance. The hands-on projects are especially valuable, and the community is both welcoming and supportive. Last but not least, Mr. Abhinav, owner of Soundabode is not only passionate about music but also deeply committed to fostering a positive and enriching learning environment. If you're serious about enhancing your music production skills, this academy is an excellent choice."
+                </p>
+                <h3 class="author">Sudarsan Venkata Chilakalapalli</h3>
+                <p class="role">Art Director Creative House</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="prev" aria-label="Previous testimonial">&#10094;</button>
+            <div class="dots"></div>
+            <button class="next" aria-label="Next testimonial">&#10095;</button>
+        </div>
+    </section>
+
+    <!-- ============================================================================
+         BLOCK 4 — STUDIO SETUP & GEAR
+         ============================================================================ -->
+         <section id="studio-setup" class="content-section studio-setup-enhanced" aria-label="Studio setup and gear">
             <div class="studio-inner">
               <div class="studio-header">
                 <h2 class="section-title">Studio Setup & Gear - Welcome to the Lab</h2>
@@ -564,14 +607,10 @@ Craft, compose and produce your signature sound through expert led programs desi
               </div>
             </div>
     <!-- ============================================================================
-         BLOCK 4 — STUDIO SETUP & GEAR
-         ============================================================================ -->
-   
-
-    <!-- ============================================================================
          BLOCK 5 — WHY CHOOSE SOUNDABODE
          ============================================================================ -->
-    <section id="why-soundabode" class="content-section why-soundabode">
+    <!-- WHY CHOOSE SOUNDABODE -->
+<section id="why-soundabode" class="content-section why-soundabode">
     <div class="why-inner container">
       <div class="why-header">
         <h2 class="why-title">Why Choose Soundabode</h2>
@@ -585,7 +624,7 @@ Craft, compose and produce your signature sound through expert led programs desi
             <li>100% hands-on studio training</li>
             <li>Access to India’s most advanced production setups</li>
           </ul>
-          <a class="learn-btn" href="/contact.html">Learn more →</a>
+          <a class="learn-btn" href="/contact">Learn more →</a>
         </article>
   
         <article class="why-card">
@@ -595,7 +634,7 @@ Craft, compose and produce your signature sound through expert led programs desi
             <li>Industry mentors & touring DJs</li>
             <li>Real performance opportunities (Pune & across India)</li>
           </ul>
-          <a class="learn-btn" href="/contact.html">Learn more →</a>
+          <a class="learn-btn" href="/contact">Learn more →</a>
         </article>
   
         <article class="why-card">
@@ -605,12 +644,11 @@ Craft, compose and produce your signature sound through expert led programs desi
             <li>Artist branding & release support</li>
             <li>Online + offline learning modes</li>
           </ul>
-          <a class="learn-btn" href="/contact.html">Learn more →</a>
+          <a class="learn-btn" href="/contact">Learn more →</a>
         </article>
       </div>
     </div>
   </section>
-
 
     <!-- ============================================================================
          BLOCK 6 — FAQS
@@ -706,9 +744,9 @@ Craft, compose and produce your signature sound through expert led programs desi
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h4>PRIVACY POLICY</h4>
+                    <h4>PRIVACY & POLICY</h4>
                     <ul>
-                        <li><a href="privacy.html">PRIVACY POLICY</a></li>
+                        <li><a href="privacy.html">PRIVACY & POLICY</a></li>
             </div>
             <div class="footer-copyright">
                 <p>2025 © SOUNDABODE. All rights reserved.</p>
@@ -717,6 +755,6 @@ Craft, compose and produce your signature sound through expert led programs desi
     </footer>
 
     <!-- JavaScript -->
-    <script src="/script/script.js" defer></script>
+    <script src="/frontend/script/script1.js" defer></script>
 </body>
 </html> 
