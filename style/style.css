@@ -1484,10 +1484,11 @@ html, body { overflow-x: hidden; }
   --studio-gap:16px;
   --card-radius:12px;
   --card-padding:14px;
-  --card-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  --card-bg: linear-gradient(180deg, rgba(131, 129, 129, 0.136), rgba(32, 32, 32, 0.01));
   --section-padding-vertical:48px;
   --text-muted: rgba(234,234,234,0.82);
 }
+
 
 /* Section wrapper */
 .studio-setup-enhanced{
