@@ -77,16 +77,22 @@
     
     <!-- Google Fonts - Optimized loading -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <!-- Stylesheet - non-blocking -->
-    <link rel="preload" href="/style/style.css" as="style" />
+    <link rel="preload" href="/frontend/script/style1.css" as="style" />
+
 <link
   rel="stylesheet"
-  href="/style/style.css"
+  href="/frontend/script/style1.css"
   media="print"
-  onload="this.media='all'"/>
+  onload="this.media='all'"
+/>
+
 <noscript><link rel="stylesheet" href="/style/style.css"></noscript>
+    
     <!-- Removed image preload to avoid unused-preload warnings -->
+
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -95,7 +101,7 @@
       "name": "Soundabode Academy",
       "url": "https://soundabode.com/",
       "logo": "https://soundabode.com/images/logo.png",
-      "description": "Soundabode is India's leading academy for Music Production, Audio Engineering, and DJ Training based in Pune. Go beyond music production — explore game music composition, background scoring for films, web series, and advertisements, and sound design for YouTube creators.",
+      "description": "Soundabode is India's leading academy for Music Production, Audio Engineering, and DJ Training based in Pune. Go beyond music production explore game music composition, background scoring for films, web series, and advertisements, and sound design for YouTube creators.",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Shop No. 218, Vision 9 Mall, Pimple Saudagar",
@@ -157,7 +163,7 @@
         {
           "@type": "Question",
           "name": "What makes Soundabode different from other music schools?",
-          "acceptedAnswer": {"@type": "Answer", "text": "Soundabode combines world-class hardware, industry mentors, and genre-specific training across Techno, Psytrance, Hip-Hop, and Film/Ad scoring — all in one ecosystem."}
+          "acceptedAnswer": {"@type": "Answer", "text": "Soundabode combines world-class hardware, industry mentors, and genre-specific training across Techno, Psytrance, Hip-Hop, and Film/Ad scoring all in one ecosystem."}
         },
         {
           "@type": "Question",
@@ -167,7 +173,7 @@
         {
           "@type": "Question",
           "name": "Can I learn both Music Production and DJing together?",
-          "acceptedAnswer": {"@type": "Answer", "text": "Absolutely. Our integrated programs allow you to learn both production and DJ performance — from studio to stage."}
+          "acceptedAnswer": {"@type": "Answer", "text": "Absolutely. Our integrated programs allow you to learn both production and DJ performance from studio to stage."}
         },
         {
           "@type": "Question",
@@ -451,7 +457,10 @@ Craft, compose and produce your signature sound through expert led programs desi
          ============================================================================ -->
     <section id="carousel-section">
         <h2 class="carousel-title">OUR PORTFOLIO</h2>
-
+        <div class="portfolio-wrapper fade-mask">
+          <!-- left shadow -->
+          <div class="fade-left"></div>
+      
         <div class="carousel-wrapper">
             <div class="carousel-track">
                 <div class="carousel-item">
@@ -495,6 +504,9 @@ Craft, compose and produce your signature sound through expert led programs desi
                     <div class="carousel-info">Project 10</div>
                 </div>
             </div>
+            <!-- right shadow -->
+    <div class="fade-right"></div>
+  </div>
         </div>
     </section>
 
@@ -540,74 +552,112 @@ Craft, compose and produce your signature sound through expert led programs desi
     <!-- ============================================================================
          BLOCK 4 — STUDIO SETUP & GEAR
          ============================================================================ -->
-         <section id="studio-setup" class="content-section studio-setup-enhanced" aria-label="Studio setup and gear">
-            <div class="studio-inner">
-              <div class="studio-header">
-                <h2 class="section-title">Studio Setup & Gear - Welcome to the Lab</h2>
-                <p class="studio-sub">Hand-picked tools, pro-grade rooms, and hybrid workflows to turn ideas into records.</p>
-              </div>
-        
-              <div class="gear-grid" role="list">
-                <article class="gear-card" role="listitem" data-title="Ableton Live 12 Suite" data-desc="The backbone of our production workflow. Session + Arrangement, advanced warping & devices." data-specs="Version: Live 12 Suite • Templates & Racks • Custom presets">
-                  <div class="card-media" aria-hidden>🎚️</div>
-                  <div>
-                    <h3 class="card-title">Ableton Live 12</h3>
-                    <p class="card-excerpt">Fast sketching, clip-based ideas and studio-grade arrangement tools.</p>
-                  </div>
-                  <button class="card-cta" type="button">Details →</button>
-                </article>
-        
-                <article class="gear-card" role="listitem" data-title="Pioneer CDJ-2000 & DJM-900" data-desc="Club-standard DJ rigs used in our performance lab for hands-on mixing and gig practice." data-specs="CDJs: Rekordbox USB/Link • Mixer: 4-channel, FX">
-                  <div class="card-media" aria-hidden>🎧</div>
-                  <div>
-                    <h3 class="card-title">Pioneer CDJ + Mixer</h3>
-                    <p class="card-excerpt">Real-club gear so your mixes translate to stages and festivals.</p>
-                  </div>
-                  <button class="card-cta" type="button">Details →</button>
-                </article>
-        
-                <article class="gear-card" role="listitem" data-title="Universal Audio Apollo" data-desc="Low-latency recording with premium AD/DA and UAD plugins for mixing and mastering." data-specs="I/O: 6in/8out • Plugins: UAD emulations">
-                  <div class="card-media" aria-hidden>🔊</div>
-                  <div>
-                    <h3 class="card-title">Apollo Interfaces</h3>
-                    <p class="card-excerpt">Studio-grade converters and realtime UAD processing.</p>
-                  </div>
-                  <button class="card-cta" type="button">Details →</button>
-                </article>
-        
-                <article class="gear-card" role="listitem" data-title="Synths & Controllers" data-desc="Arturia, Roland, Novation, and modular flavour for sound design and basslines." data-specs="Hardware + VSTs • Patch library">
-                  <div class="card-media" aria-hidden>🎛️</div>
-                  <div>
-                    <h3 class="card-title">Synths & Controllers</h3>
-                    <p class="card-excerpt">From warm analog fatness to digital wavetables—build signature sounds.</p>
-                  </div>
-                  <button class="card-cta" type="button">Details →</button>
-                </article>
-        
-                <article class="gear-card" role="listitem" data-title="Monitors & Rooms" data-desc="Tuned rooms with multiple monitor pairs so you can reference mixes across systems." data-specs="KRK • Yamaha • Adam • Acoustic treatment">
-                  <div class="card-media" aria-hidden>🎚️</div>
-                  <div>
-                    <h3 class="card-title">Monitors & Rooms</h3>
-                    <p class="card-excerpt">Accurate translation with acoustic treatment and multiple reference points.</p>
-                  </div>
-                  <button class="card-cta" type="button">Details →</button>
-                </article>
-        
-                <article class="gear-card" role="listitem" data-title="Plugins & Tools" data-desc="Waves, iZotope, FabFilter, Soundtoys and bespoke mixing chains for professional results." data-specs="Mixing chains • Mastering presets">
-                  <div class="card-media" aria-hidden>🧰</div>
-                  <div>
-                    <h3 class="card-title">Plugins & Tools</h3>
-                    <p class="card-excerpt">A curated plugin rack for mixing, mastering and creative sound design.</p>
-                  </div>
-                  <button class="card-cta" type="button">Details →</button>
-                </article>
-              </div>
-        
-              <div class="studio-footer">
-                <a class="studio-cta" href="/contact.html">Book a Studio Tour</a>
-                <p class="studio-note" style="color:rgba(234,234,234,0.8); margin-top:12px;">Tell us which gear you care about and we’ll include it.</p>
+         <section id="studio-setup" class="content-section studio-setup-enhanced" aria-labelledby="studioHeading">
+          <div class="studio-inner">
+            <header class="studio-header">
+              <h2 id="studioHeading" class="section-title">Studio Setup & Gear Welcome to the Lab</h2>
+             
+            </header>
+      
+            <!-- gear grid: responsive using CSS grid + minmax/clamp -->
+            <div class="gear-grid" role="list">
+              <!-- DAW -->
+              <article class="gear-card" role="listitem" tabindex="0"
+                       data-title="DAW"
+                       data-desc="Ableton Live 12 Suite with Push 2 & Push 3  session + arrangement workflows, custom racks and templates used in courses and production sessions."
+                       data-specs="Ableton Live 12 Suite • Push 2 & Push 3 • Custom racks & templates">
+                <div class="card-media" aria-hidden>🎚️</div>
+                <div class="card-body">
+                  <h3 class="card-title">DAW</h3>
+                  <p class="card-excerpt">Ableton Live 12 Suite + Push 2 & Push 3 setup the core of composition, arrangement and live performance.</p>
+                </div>
+                <button class="card-cta" type="button" aria-label="View DAW details">Details →</button>
+              </article>
+      
+              <!-- Hardware -->
+              <article class="gear-card" role="listitem" tabindex="0"
+                       data-title="Hardware"
+                       data-desc="Pioneer Nexus series, Pioneer XDJ-RX3 & RX series, Native Instruments Traktor S4 & S8 series used in our DJ lab for realistic gig practice."
+                       data-specs="Pioneer Nexus • XDJ-RX3 / RX • NI Traktor S4 / S8">
+                <div class="card-media" aria-hidden>🎧</div>
+                <div class="card-body">
+                  <h3 class="card-title">Hardware</h3>
+                  <p class="card-excerpt">Pioneer Nexus, XDJ-RX3/RX & Native Instruments Traktor S4/S8 industry-standard DJ rigs for real gig workflows.</p>
+                </div>
+                <button class="card-cta" type="button" aria-label="View Hardware details">Details →</button>
+              </article>
+      
+              <!-- Synths & Controllers -->
+              <article class="gear-card" role="listitem" tabindex="0"
+                       data-title="Synths & Controllers"
+                       data-desc="Arturia MicroFreak, Novation LaunchKey & XL series, Behringer analog synth racks, Roland drum machines, Soundcraft mixers, VCV Rack setups, Nord Lead 2x, and Kontakt-capable MIDI controllers."
+                       data-specs="Arturia • Novation • Behringer • Roland • Soundcraft • VCV • Nord • Kontakt">
+                <div class="card-media" aria-hidden>🎛️</div>
+                <div class="card-body">
+                  <h3 class="card-title">Synths & Controllers</h3>
+                  <p class="card-excerpt">Arturia MicroFreak, Novation LaunchKey/XL, Behringer racks, Roland drum machines, Soundcraft mixers, VCV & Nord  for sound design and performance.</p>
+                </div>
+                <button class="card-cta" type="button" aria-label="View Synths details">Details →</button>
+              </article>
+      
+              <!-- Audio Interface & Monitors -->
+              <article class="gear-card" role="listitem" tabindex="0"
+                       data-title="Audio Interface & Monitors"
+                       data-desc="Universal Audio Apollo, KRK Rokit, Yamaha HS series, Presonus interfaces, Scarlett and EVO series for tracking and accurate referencing."
+                       data-specs="Apollo • KRK • Yamaha HS • Presonus • Scarlett • EVO">
+                <div class="card-media" aria-hidden>🔊</div>
+                <div class="card-body">
+                  <h3 class="card-title">Audio Interface & Monitors</h3>
+                  <p class="card-excerpt">Universal Audio Apollo, KRK Rokit, Yamaha HS, Presonus, Scarlett & EVO  reliable I/O and reference monitors for production and mixing.</p>
+                </div>
+                <button class="card-cta" type="button" aria-label="View Interfaces details">Details →</button>
+              </article>
+      
+              <!-- Plugins & Tools -->
+              <article class="gear-card" role="listitem" tabindex="0"
+                       data-title="Plugins & Tools"
+                       data-desc="Waves, iZotope, FabFilter, UAD, Native Instruments, Spectrasonics, Xfer, u-he, Arturia, Korg and many more used across mixing and sound design classes."
+                       data-specs="Waves • iZotope • FabFilter • UAD • NI • Spectrasonics • Xfer • u-he • Arturia">
+                <div class="card-media" aria-hidden>🧰</div>
+                <div class="card-body">
+                  <h3 class="card-title">Plugins & Tools</h3>
+                  <p class="card-excerpt">A curated plugin rack: Waves, iZotope, FabFilter, UAD, Native Instruments, Xfer and more for mixing, mastering and design.</p>
+                </div>
+                <button class="card-cta" type="button" aria-label="View Plugins details">Details →</button>
+              </article>
+      
+              <!-- Recording Gear -->
+              <article class="gear-card" role="listitem" tabindex="0"
+                       data-title="Recording Gear"
+                       data-desc="Shure & Rode microphones, Focusrite & Soundcraft preamps, and acoustic isolation booths for high-quality capture."
+                       data-specs="Shure • Rode • Focusrite • Soundcraft • Acoustic booths">
+                <div class="card-media" aria-hidden>🎙️</div>
+                <div class="card-body">
+                  <h3 class="card-title">Recording Gear</h3>
+                  <p class="card-excerpt">Shure & Rode mics, Focusrite & Soundcraft preamps, and treated booths for pro recording sessions.</p>
+                </div>
+                <button class="card-cta" type="button" aria-label="View Recording details">Details →</button>
+              </article>
+            </div>
+      
+            <div class="studio-footer">
+              <a href="/contact.html" class="studio-cta">Book a Studio Tour</a>
+              
+            </div>
+          </div>
+      
+          <!-- modal used by JS for detail view -->
+          <div id="gearModal" class="gear-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+            <div class="modal-inner" role="document">
+              <button id="modalClose" class="modal-close" aria-label="Close">✕</button>
+              <div class="modal-content">
+                <h3 id="modalTitle"></h3>
+                <p id="modalDesc"></p>
+                <p class="modal-specs" id="modalSpecs"></p>
               </div>
             </div>
+          </div>
+        </section>
     <!-- ============================================================================
          BLOCK 5 — WHY CHOOSE SOUNDABODE
          ============================================================================ -->
@@ -746,9 +796,9 @@ Craft, compose and produce your signature sound through expert led programs desi
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h4>PRIVACY & POLICY</h4>
+                    <h4>PRIVACY POLICY</h4>
                     <ul>
-                        <li><a href="privacy.html">PRIVACY & POLICY</a></li>
+                        <li><a href="privacy.html">PRIVACY POLICY</a></li>
             </div>
             <div class="footer-copyright">
                 <p>2025 © SOUNDABODE. All rights reserved.</p>
@@ -757,6 +807,6 @@ Craft, compose and produce your signature sound through expert led programs desi
     </footer>
 
     <!-- JavaScript -->
-    <script src="/script/script.js" defer></script>
+    <script src="/frontend/script/script1.js" defer></script>
 </body>
 </html> 
