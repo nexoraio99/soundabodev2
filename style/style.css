@@ -1678,7 +1678,7 @@ html, body { width: 100%; overflow-x: hidden; }
     
     .why-inner { max-width: var(--section-content-max); margin: 0 auto; }
     
-    .why-header { text-align: left; margin-bottom: clamp(28px, 6vw, 40px); }
+    .why-header { text-align: center; margin-bottom: clamp(28px, 6vw, 40px); }
     .why-title {
         font-family: 'Inter', system-ui, sans-serif;
         font-size: clamp(1.75rem, 4.5vw, 2.6rem);
@@ -2569,3 +2569,28 @@ html, body { width: 100%; overflow-x: hidden; }
         padding: clamp(20px, 2.5vw, 30px) clamp(10px, 1.5vw, 15px);
         }
     }
+    /* Fade shadow overlays */
+.fade-mask {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .fade-left,
+  .fade-right {
+    position: absolute;
+    top: 0;
+    width: 200px;              /* control shadow width */
+    height: 100%;
+    pointer-events: none;      /* doesn't block mouse */
+    z-index: 5;
+  }
+  
+  .fade-left {
+    left: 0;
+    background: linear-gradient(to right, #000000 0%, transparent 100%);
+  }
+  
+  .fade-right {
+    right: 0;
+    background: linear-gradient(to left, #000000 0%, transparent 100%);
+  }
