@@ -1,41 +1,43 @@
-// JS to dynamically place images with controlled gaps
-function positionCollage() {
-    const collage = document.querySelector('.image-collage');
-    const images = collage.querySelectorAll('.img-wrapper');
-    const collageWidth = collage.offsetWidth;
-    const collageHeight = collage.offsetHeight;
-    const margin = 20; // minimum gap between images
-  
-    let positions = [];
-  
-    images.forEach(img => {
-      const imgWidth = img.offsetWidth;
-      const imgHeight = img.offsetHeight;
-  
-      let left, top;
-      let attempts = 0;
-  
-      do {
-        left = Math.random() * (collageWidth - imgWidth);
-        top = Math.random() * (collageHeight - imgHeight);
-        attempts++;
-      } while (
-        positions.some(pos => 
-          !(left + imgWidth + margin < pos.left || 
-            left > pos.left + pos.width + margin || 
-            top + imgHeight + margin < pos.top || 
-            top > pos.top + pos.height + margin)
-        ) && attempts < 50
-      );
-  
-      positions.push({ left, top, width: imgWidth, height: imgHeight });
-      img.style.left = `${left}px`;
-      img.style.top = `${top}px`;
-      img.style.animationDelay = `${Math.random() * 1}s`;
+// about.js - cleaned up
+
+// Set footer year (safe guard if element missing)
+const yearEl = document.getElementById('year');
+if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+// CTA behaviour: navigate to contact or provide micro-feedback
+const cta = document.getElementById('ctaBtn');
+if (cta) {
+  cta.addEventListener('click', () => {
+    // Prefer direct contact page if exists; otherwise do a small press-flash
+    const contactHref = '/contact.html';
+    // Only navigate if contact page likely exists — this is a best-effort assumption.
+    // If you prefer always to go to contact, remove the check.
+    fetch(contactHref, { method: 'HEAD' })
+      .then(res => {
+        if (res.ok) location.href = contactHref;
+        else cta.animate([{ transform: 'scale(1)' }, { transform: 'scale(.98)' }, { transform: 'scale(1)' }], { duration: 180 });
+      })
+      .catch(() => {
+        cta.animate([{ transform: 'scale(1)' }, { transform: 'scale(.98)' }, { transform: 'scale(1)' }], { duration: 180 });
+      });
+  });
+}
+
+// Scroll-in reveal for elements (intersection observer)
+try {
+  const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
+      }
     });
-  }
-  
-  // Run on load
-  window.addEventListener('load', positionCollage);
-  // Recalculate on resize
-  window.addEventListener('resize', positionCollage);
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-in-left, .fade-in-right, .fade-in-up, .divider')
+    .forEach((el) => io.observe(el));
+} catch (err) {
+  // on older browsers or if IntersectionObserver blocked, just reveal elements
+  document.querySelectorAll('.fade-in-left, .fade-in-right, .fade-in-up, .divider')
+    .forEach((el) => { el.classList.add('revealed'); });
+}
