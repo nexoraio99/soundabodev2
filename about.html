@@ -1,53 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style/about.css">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=5"
+  />
+  <title>About Soundabode</title>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="/frontend/styles/about.css" />
+  <meta name="description" content="Soundabode — Pune & India's hands-on Music Production, DJ & Audio Engineering Academy. Hands-on learning, studio tools, industry-ready courses." />
 </head>
 <body>
+  
     <nav class="navbar">
-        <a href="#" class="logo">
-            <img src="assets/logo.png" alt="SoundAbode Logo" class="logo-img">
-        </a>
-        <div class="nav-links">
-            <a href="about.html">About</a>
-            <a href="#carousel-section">Portfolio</a>
-            <a href="contact.html">Contact</a>
+      <a href="#" class="logo">
+          <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img">
+      </a>
+  
+      <!-- Desktop Navigation Links -->
+      <div class="nav-links">
+          <a href="#about-section">About</a>
+          <a href="#carousel-section">Portfolio</a>
+          <a href="contact.html">Contact</a>
+      </div>
+  
+      <!-- Hamburger Menu Button -->
+      <button class="hamburger-menu" aria-label="Toggle menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+      </button>
+  
+      <!-- Call Action Button -->
+      <div class="nav-actions">
+          <a href="tel:+919975016189" class="action-btn call-btn" title="Call us">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor"/>
+              </svg>
+          </a>
+      </div>
+  </nav>
+  
+  <!-- MOBILE MENU -->
+  <div class="nav-menu">
+      <a href="#about-section">About</a>
+      <a href="#carousel-section">Portfolio</a>
+      <a href="contact.html">Contact</a>
+  </div>
+  <!-- PAGE WRAPPER -->
+  <div class="page">
+    <h2 class="split-title">
+      ABOUT
+      <span>ABOUT</span>
+      <span>ABOUT</span>
+      <span>SOUNDABODE</span>
+    </h2>
+
+    <!-- INTRO BLOCK -->
+    <section class="container section">
+      <div class="grid-two">
+        <div class="fade-in-left">
+          <p class="p-xl">
+            At Soundabode Pune &amp; India’s most handson Music Production, DJ, and
+            Audio Engineering Academy, we don't just teach music we turn dreams
+            into chart topping realities.
+          </p>
+          <p class="p-lg">
+            Whether you want to drop killer DJ sets, produce Electronic, Techno,
+            Psytrance, Hip-Hop, House, Drum &amp; Bass, Dubstep or EDM tracks, or
+            score games, films, and OTT shows, our courses are your launchpad.
+          </p>
+          <p class="p-lg">
+            We're all about hands on learning, next-level studio tools, and getting
+            you industry ready fast.
+          </p>
         </div>
-        <div class="nav-actions">
-            <a href="https://wa.me/919975016189" target="_blank" class="action-btn whatsapp-btn" title="WhatsApp">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" fill="currentColor"/>
-                </svg>
-            </a>
-            <a href="tel:+919975016189" class="action-btn call-btn" title="Call">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor"/>
-                </svg>
-            </a>
+
+        <div class="img-card fade-in-right">
+          <img
+            src="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=800&q=80"
+            alt="Music production studio"
+          />
+          <div class="img-gradient" aria-hidden="true"></div>
         </div>
-    </nav>
-    <section class="who-we-are">
-        <div class="container">
-          <div class="text-content">
-            <h2>Who Are We?</h2>
-            <p>We are a team of innovators bringing ideas to life through design, technology, and creativity.</p>
+      </div>
+    </section>
+
+    <!-- DIVIDER -->
+    <div class="container">
+      <div class="divider"></div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <section class="container section">
+      <div class="fade-in-up">
+        <h3 class="h3 mb-8">But wait… we don't stop at teaching.</h3>
+        <p class="p-xl mb-16">Our students are already killing it on the global and Indian stage:</p>
+        <div class="achievements-grid">
+          <!-- cards -->
+          <article class="card" style="--delay:0.1s">
+            <div class="card-img">
+              <img src="https://images.unsplash.com/photo-1574267432644-f610f5b58e3d?w=400&q=80" alt="OTT scoring" />
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">OTT Platform Scores</h4>
+              <p class="card-text">16-year old prodigies crafting background scores for OTT platforms</p>
+            </div>
+          </article>
+
+          <article class="card" style="--delay:0.2s">
+            <div class="card-img">
+              <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&q=80" alt="Game soundtracks" />
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Game Soundtracks</h4>
+              <p class="card-text">Epic soundtracks for iOS and Android games</p>
+            </div>
+          </article>
+
+          <article class="card" style="--delay:0.3s">
+            <div class="card-img">
+              <img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?w=400&q=80" alt="Professional mixing" />
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Professional Mixing</h4>
+              <p class="card-text">Mixing &amp; mastering projects for international record labels and artists</p>
+            </div>
+          </article>
+
+          <article class="card" style="--delay:0.4s">
+            <div class="card-img">
+              <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=80" alt="Ad & film scores" />
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Ad &amp; Film Scores</h4>
+              <p class="card-text">Ad and short film background scores that sell</p>
+            </div>
+          </article>
+
+          <article class="card" style="--delay:0.5s">
+            <div class="card-img">
+              <img src="https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=400&q=80" alt="Audio restoration" />
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Audio Restoration</h4>
+              <p class="card-text">Audio restoration &amp; remastering that resurrect tracks like magic</p>
+            </div>
+          </article>
+
+          <article class="card" style="--delay:0.6s">
+            <div class="card-img">
+              <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&q=80" alt="Live sound" />
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Live Sound</h4>
+              <p class="card-text">Corporate events &amp; society shows powered by pro level sound</p>
+            </div>
+          </article>
+
+          <article class="card" style="--delay:0.7s">
+            <div class="card-img">
+              <img src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=400&q=80" alt="Voice production" />
+              <div class="card-overlay"></div>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Voice Production</h4>
+              <p class="card-text">Voiceovers &amp; audiobooks that hook listeners from start to finish</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIVIDER -->
+    <div class="container">
+      <div class="divider"></div>
+    </div>
+
+    <!-- PHILOSOPHY -->
+    <section class="container section">
+      <div class="grid-two grid-swap">
+        <div class="img-card fade-in-left">
+          <img
+            src="https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=800&q=80"
+            alt="Students learning music production"
+          />
+          <div class="img-gradient"></div>
+        </div>
+
+        <div class="fade-in-right">
+          <h3 class="h3 mb-8">At Soundabode, we don't just make music we make makers.</h3>
+          <p class="p-xl mb-8">Every course, every session, every project is designed to:</p>
+          <ul class="bullet-list">
+            <li><span class="bullet">•</span> Push you past creative limits</li>
+            <li><span class="bullet">•</span> Plug you into India's and the world's music opportunities</li>
+            <li><span class="bullet">•</span> Help your sound rule the stage, the stream, and the scene</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="center mt-16">
+        <p class="p-xl mb-6">Your tracks. Your score. Your stage. Our playground.</p>
+        <button class="cta-btn" id="ctaBtn">Step in. Level up. Own your sound.</button>
+      </div>
+    </section>
+  </div>
+   <!-- ============================================================================
+         FOOTER
+         ============================================================================ -->
+         <footer class="site-footer">
+          <div class="footer-container">
+              <div class="footer-columns">
+                  <div class="footer-column">
+                      <h4>ABOUT</h4>
+                      <ul>
+                          <li><a href="#about-section">ABOUT</a></li>
+                          <li><a href="#carousel-section">COURSES</a></li>
+                          <li><a href="contact.html">CONTACT</a></li>
+                      </ul>
+                  </div>
+                  <div class="footer-column">
+                      <h4>LOCATION</h4>
+                      <p>
+                          VISION 9, 2ND FLOOR,<br>
+                          KUNAL ICON RD,<br>
+                          PIMPLE SAUDAGAR, PUNE,<br>
+                          MAHARASHTRA 411017
+                      </p>
+                  </div>
+                  <div class="footer-column">
+                      <h4>SOCIALS</h4>
+                      <ul>
+                          <li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">INSTAGRAM</a></li>
+                          <li><a href="https://www.facebook.com/soundabode/" target="_blank" rel="noopener noreferrer">FACEBOOK</a></li>
+                          <li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YOUTUBE</a></li>
+                      </ul>
+                  </div>
+                  <div class="footer-column">
+                      <h4>PRIVACY POLICY</h4>
+                      <ul>
+                          <li><a href="privacy.html">PRIVACY POLICY</a></li>
+              </div>
+              <div class="footer-copyright">
+                  <p>2025 © SOUNDABODE. All rights reserved.</p>
+              </div>
           </div>
-          <div class="image-collage">
-            <div class="img-wrapper size-large" style="--i:0;"><img src="assets/Sumone.jpg" alt="Team 1"></div>
-            <div class="img-wrapper size-small" style="--i:1;"><img src="assets/ravonix.jpg" alt="Team 2"></div>
-            <div class="img-wrapper size-medium" style="--i:2;"><img src="assets/DJ Madko.jpg" alt="Project 1"></div>
-            <div class="img-wrapper size-large" style="--i:3;"><img src="assets/DJ Tanisha.jpg" alt="Project 2"></div>
-            <div class="img-wrapper size-small" style="--i:4;"><img src="assets/dj-7113737.jpg" alt="Team 3"></div>
-            <div class="img-wrapper size-medium" style="--i:5;"><img src="assets/Jack forest.jpg" alt="Project 3"></div>
-          </div>
-        </div>
-      </section>
-     <script src="script/aboout.js"></script>
+      </footer>
+  
+  <script src="/frontend/script/about.js"></script>
 </body>
 </html>
