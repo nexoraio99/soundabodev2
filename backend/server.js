@@ -551,7 +551,7 @@ app.post('/api/popup-form', async (req, res) => {
 
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const ref = randomUUID().slice(0, 8).toUpperCase();
-    const subject = `[Popup] Homepage Inquiry — ${fullName} — ${timestampLocal} — ${ref}`;
+    const subject = `[Popup] Homepage Inquiry  ${fullName} ${timestampLocal} ${ref}`;
 
     console.log('Popup subject ->', subject);
 
