@@ -1,783 +1,884 @@
+/* ============================================================================
+   script1.js — soundabode site script (refactor)
+   - Organized, modular, defensive and performance-aware
+   - Usage: replace your existing script1.js with this file
+   ============================================================================ */
 
-// SOUNDABODE SCROLL ANIMATION - OPTIMIZED FOR MOBILE PERFORMANCE
-// ============================================================================
-
-let INTRO_ANIMATION_RANGE = window.innerHeight * 0.8;
-
-// ============================================================================
-// DETECT DEVICE & PERFORMANCE
-// ============================================================================
-const isMobile = window.innerWidth < 768;
-const isLowEndDevice = navigator.deviceMemory && navigator.deviceMemory < 4;
-
-// ============================================================================
-// DOM ELEMENTS
-// ============================================================================
-const panelLeft = document.querySelector('.panel-left');
-const panelRight = document.querySelector('.panel-right');
-const mainContent = document.querySelector('.main-content');
-const introOverlay = document.querySelector('.intro-overlay');
-const navbar = document.querySelector('.navbar');
-const spacer = document.querySelector('.spacer');
-const overlayLeft = document.querySelector('.overlay-left');
-const overlayRight = document.querySelector('.overlay-right');
-const carouselTrack = document.querySelector('.carousel-track');
-const imageBlocks = document.querySelectorAll('.image-block');
-const aboutSection = document.getElementById('about-section');
-
-// ============================================================================
-// STATE MANAGEMENT
-// ============================================================================
-let state = {
-    scrollY: 0,
-    phase1Progress: 0,
-    spacerStart: 0,
-    spacerEnd: 0,
-    carouselInView: false,
-    isCarouselAnimating: false,
-    aboutSectionCached: false,
-    aboutTop: 0,
-    aboutBottom: 0
-};
-
-// ============================================================================
-// MASTER ANIMATION LOOP - Consolidated RAF for better performance
-// ============================================================================
-let masterAnimationId = null;
-let ticking = false;
-let lastScrollY = 0;
-
-function masterAnimationLoop() {
-    state.scrollY = window.scrollY;
-    
-    if (Math.abs(state.scrollY - lastScrollY) > 5 || !ticking) {
-        lastScrollY = state.scrollY;
-        
+   (() => {
+    'use strict';
+  
+    /* ==========================================================================
+       Config / Constants
+       ========================================================================== */
+    const CONFIG = {
+      INTRO_ANIMATION_RATIO: 0.8,          // portion of viewport used for intro animation
+      RAF_STOP_DELAY: 180,                // ms to stop RAF after scroll ends
+      POPUP_DELAY: 2000,                  // ms to show popup after load
+      TESTIMONIAL_AUTO_MS: 3000,          // testimonial auto-advance interval
+      CAROUSEL_CLONE_DELAY: 500,          // delay before computing widths & cloning carousel
+      LOGO_SCROLL_SPEEDS: { xs: 0.03, sm: 0.05, md: 0.25, lg: 0.4 },
+      CAROUSEL_STRICT_VIEWPORT_FACTOR: 1.2
+    };
+  
+    /* ==========================================================================
+       Environment / Device detection
+       ========================================================================== */
+    const isMobile = () => window.innerWidth < 768;
+    const isLowEndDevice = () => (navigator.deviceMemory && navigator.deviceMemory < 4) || navigator.hardwareConcurrency < 3;
+  
+    /* ==========================================================================
+       DOM Caching
+       ========================================================================== */
+    const DOM = {
+      // intro
+      panelLeft: document.querySelector('.panel-left'),
+      panelRight: document.querySelector('.panel-right'),
+      introOverlay: document.querySelector('.intro-overlay'),
+      overlayLeft: document.querySelector('.overlay-left'),
+      overlayRight: document.querySelector('.overlay-right'),
+  
+      // main
+      mainContent: document.querySelector('.main-content'),
+      navbar: document.querySelector('.navbar'),
+      spacer: document.querySelector('.spacer'),
+  
+      // carousel
+      carouselTrack: document.querySelector('.carousel-track'),
+      carouselSection: document.getElementById('carousel-section'),
+  
+      // logos
+      logoTrack: document.querySelector('.logo-track'),
+      logoSet: document.querySelector('.logo-set'),
+      clientLogoBanner: document.querySelector('.client-logo-banner'),
+  
+      // testimonials
+      testimonialContainer: document.querySelector('.testimonial-container'),
+      prevBtn: document.querySelector('.prev'),
+      nextBtn: document.querySelector('.next'),
+      dotsContainer: document.querySelector('.dots'),
+  
+      // popup
+      popup: document.getElementById('popup-form'),
+      popupClose: document.getElementById('closePopup'),
+      popupForm: document.getElementById('popup-form-element'),
+  
+      // contact
+      contactForm: document.getElementById('contact-form'),
+      contactStatus: document.getElementById('form-status'),
+  
+      // reveal
+      aboutSection: document.getElementById('about-section'),
+  
+      // faq
+      faqItems: document.querySelectorAll('.faq-item'),
+  
+      // gear modals
+      gearCards: document.querySelectorAll('.gear-card'),
+      gearModal: document.getElementById('gearModal'),
+      gearModalTitle: document.getElementById('modalTitle'),
+      gearModalDesc: document.getElementById('modalDesc'),
+      gearModalSpecs: document.getElementById('modalSpecs'),
+      gearModalClose: document.getElementById('modalClose'),
+  
+      // studio modal (optional)
+      studioModal: document.getElementById('studioModal'),
+      studioModalTitle: document.getElementById('studioModalTitle'),
+      studioModalDesc: document.getElementById('studioModalDesc'),
+      studioModalClose: document.getElementById('studioModalClose'),
+  
+      // why dropdown
+      whyDropdown: document.querySelector('.why-dropdown'),
+      whyDropdownToggle: document.getElementById('whyDropdownToggle'),
+      whyDropdownPanel: document.getElementById('whyDropdownPanel'),
+  
+      // misc
+      hamburger: document.querySelector('.hamburger-menu'),
+      navMenu: document.querySelector('.nav-menu'),
+      joinBtns: document.querySelectorAll('.glow-border'),
+      auroraText: document.querySelector('.aurora-text'),
+      revealSelectors: ['#about-section', '#carousel-section', '.testimonials', '#studio-setup', '#why-soundabode', '#faq']
+    };
+  
+    /* ==========================================================================
+       State
+       ========================================================================== */
+    const state = {
+      // intro / scroll
+      scrollY: 0,
+      phase1Progress: 0,
+      spacerStart: 0,
+      spacerEnd: 0,
+      ticking: false,
+      lastScrollY: 0,
+      rafId: null,
+      rafStopTimer: null,
+  
+      // carousel
+      carouselInView: false,
+      isCarouselAnimating: false,
+      carouselOneSetWidth: 0,
+      carouselInitialized: false,
+      carouselScrollPos: 0,
+      carouselAnimationId: null,
+      carouselSpeed: isMobile() ? 1 : 1,
+  
+      // logos
+      logoAnimationId: null,
+      logoCurrentPosition: 0,
+      logoScrollSpeed: CONFIG.LOGO_SCROLL_SPEEDS.md,
+      logoSetWidth: 0,
+      logoIsPaused: false,
+  
+      // testimonials
+      testimonialIndex: 0,
+      testimonialAutoInterval: null,
+  
+      // popup
+      popupShown: false
+    };
+  
+    /* ==========================================================================
+       Utilities
+       ========================================================================== */
+    const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+    const rAF = (fn) => requestAnimationFrame(fn);
+    const cAF = (id) => cancelAnimationFrame(id);
+    const q = (sel) => document.querySelector(sel);
+  
+    /* ==========================================================================
+       Master animation loop (scroll-driven, single RAF)
+       ========================================================================== */
+    const INTRO_ANIMATION_RANGE = () => window.innerHeight * CONFIG.INTRO_ANIMATION_RATIO;
+  
+    function masterAnimationLoop() {
+      state.scrollY = window.scrollY || window.pageYOffset || 0;
+  
+      // Only update visuals if significant movement or first tick
+      if (Math.abs(state.scrollY - state.lastScrollY) > 5 || !state.ticking) {
+        state.lastScrollY = state.scrollY;
+  
         const viewportHeight = window.innerHeight;
-        const spacerHeight = spacer ? spacer.offsetHeight : 0;
-        
+        const spacerHeight = (DOM.spacer && DOM.spacer.offsetHeight) || 0;
+  
         state.spacerStart = viewportHeight;
         state.spacerEnd = state.spacerStart + spacerHeight;
-
-        state.phase1Progress = Math.min(1, state.scrollY / INTRO_ANIMATION_RANGE);
-
+  
+        state.phase1Progress = clamp(state.scrollY / INTRO_ANIMATION_RANGE(), 0, 1);
+  
         updateIntroOverlay();
         updateMainContent();
         checkCarouselInView();
+      }
+  
+      // Continue RAF loop while ticking
+      if (state.ticking) {
+        state.rafId = rAF(masterAnimationLoop);
+      }
     }
-
-    if (ticking) {
-        masterAnimationId = requestAnimationFrame(masterAnimationLoop);
-    }
-}
-
-function onScroll() {
-    if (!ticking) {
-        ticking = true;
+  
+    function onScrollHandler() {
+      if (!state.ticking) {
+        state.ticking = true;
         masterAnimationLoop();
+      }
+  
+      // Stop RAF shortly after scrolling stops
+      if (state.rafStopTimer) clearTimeout(state.rafStopTimer);
+      state.rafStopTimer = setTimeout(() => {
+        if (state.ticking) {
+          cAF(state.rafId);
+          state.rafId = null;
+          state.ticking = false;
+        }
+      }, CONFIG.RAF_STOP_DELAY);
     }
-}
-
-// ============================================================================
-// INTRO OVERLAY - Panel sliding animation
-// ============================================================================
-function updateIntroOverlay() {
-    if (!panelLeft || !panelRight || !introOverlay) return;
-
-    const progressPercent = state.phase1Progress * 100;
-    const mobile = window.innerWidth < 768;
-    
-    if (mobile) {
-        // Panels are stacked vertically (each 50vh) → slide up/down
-        panelLeft.style.transform = `translateY(${-progressPercent}%)`;
-        panelRight.style.transform = `translateY(${progressPercent}%)`;
-    } else {
-        // Desktop/tablet → horizontal split panels
-        panelLeft.style.transform = `translateX(${-progressPercent}%)`;
-        panelRight.style.transform = `translateX(${progressPercent}%)`;
-    }
-
-    if (overlayLeft) {
-        overlayLeft.style.transform = mobile ? 'translateX(0)' : `translateX(${-state.phase1Progress * 10}px)`;
-    }
-    if (overlayRight) {
-        overlayRight.style.transform = mobile ? 'translateX(0)' : `translateX(${state.phase1Progress * 10}px)`;
-    }
-
-    const fadeStartPoint = 0.75;
-    const fadeOutOpacity = Math.max(0, 1 - (state.phase1Progress - fadeStartPoint) / (1 - fadeStartPoint));
-    
-    introOverlay.style.opacity = fadeOutOpacity.toString();
-
-    if (fadeOutOpacity < 0.05) {
+  
+    /* ==========================================================================
+       Intro overlay animations (panel sliding & fade)
+       ========================================================================== */
+    function updateIntroOverlay() {
+      const { panelLeft, panelRight, introOverlay, overlayLeft, overlayRight } = DOM;
+      if (!panelLeft || !panelRight || !introOverlay) return;
+  
+      const mobile = isMobile();
+      const progress = state.phase1Progress;
+      const percent = progress * 100;
+  
+      if (mobile) {
+        // vertical slide
+        panelLeft.style.transform = `translate3d(0, ${-percent}%, 0)`;
+        panelRight.style.transform = `translate3d(0, ${percent}%, 0)`;
+      } else {
+        // horizontal slide
+        panelLeft.style.transform = `translate3d(${-percent}%, 0, 0)`;
+        panelRight.style.transform = `translate3d(${percent}%, 0, 0)`;
+      }
+  
+      // small parallax for overlay text panels on larger screens
+      if (overlayLeft) overlayLeft.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${-progress * 10}px, 0, 0)`;
+      if (overlayRight) overlayRight.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${progress * 10}px, 0, 0)`;
+  
+      // fade out overlay near completion
+      const fadeStart = 0.75;
+      const fadeOpacity = Math.max(0, 1 - (progress - fadeStart) / (1 - fadeStart));
+      introOverlay.style.opacity = String(fadeOpacity);
+  
+      if (fadeOpacity < 0.05) {
         introOverlay.style.pointerEvents = 'none';
         introOverlay.style.zIndex = '1';
-    } else {
+      } else {
         introOverlay.style.pointerEvents = 'auto';
         introOverlay.style.zIndex = '50';
+      }
     }
-}
-
-// ============================================================================
-// MAIN CONTENT - Reveal synchronized with panel movement
-// ============================================================================
-function updateMainContent() {
-    if (!mainContent) return;
-
-    const opacity = state.phase1Progress;
-    const scale = 1 + (state.phase1Progress * 0.05);
-
-    mainContent.style.transform = `scale(${scale})`;
-    mainContent.style.opacity = opacity;
-
-    if (state.phase1Progress > 0.1) {
-        mainContent.style.pointerEvents = 'auto';
+  
+    /* ==========================================================================
+       Main content reveal & navbar
+       ========================================================================== */
+    function updateMainContent() {
+      if (!DOM.mainContent) return;
+      const progress = state.phase1Progress;
+      const opacity = progress;
+      const scale = 1 + progress * 0.05;
+  
+      DOM.mainContent.style.transform = `scale(${scale})`;
+      DOM.mainContent.style.opacity = String(opacity);
+  
+      if (progress > 0.1) {
+        DOM.mainContent.style.pointerEvents = 'auto';
+      }
+      if (DOM.navbar) {
+        DOM.navbar.style.opacity = '1';
+        DOM.navbar.style.pointerEvents = 'auto';
+      }
     }
-
-    if (navbar) {
-        navbar.style.opacity = '1';
-        navbar.style.pointerEvents = 'auto';
-    }
-}
-
-// ============================================================================
-// CAROUSEL ANIMATION - INFINITE SEAMLESS LOOP
-// ============================================================================
-let carouselAnimationId = null;
-let carouselScrollPos = 0;
-let carouselOneSetWidth = 0;
-let carouselSpeed = isMobile ? 1 : 1;
-let carouselInitialized = false;
-
-function initCarouselClones() {
-    if (!carouselTrack || carouselInitialized) return;
-
-    const carouselItems = carouselTrack.querySelectorAll('.carousel-item');
-    
-    if (carouselItems.length === 0) {
-        console.warn('No carousel items found');
-        return;
-    }
-
-    setTimeout(() => {
+  
+    /* ==========================================================================
+       Carousel (infinite loop, clones, in-view detection)
+       ========================================================================== */
+    function initCarouselClones() {
+      const track = DOM.carouselTrack;
+      if (!track || state.carouselInitialized) return;
+  
+      const items = track.querySelectorAll('.carousel-item');
+      if (!items.length) return;
+  
+      setTimeout(() => {
         try {
-            const styles = window.getComputedStyle(carouselTrack);
-            const gapStr = styles.gap || '40px';
-            const gap = parseInt(gapStr) || 40;
-
-            let totalWidth = 0;
-            const items = carouselTrack.querySelectorAll('.carousel-item');
-            
-            items.forEach((item, index) => {
-                totalWidth += item.offsetWidth;
-                if (index < items.length - 1) {
-                    totalWidth += gap;
-                }
-            });
-
-            carouselOneSetWidth = totalWidth;
-
-            if (carouselOneSetWidth > 0) {
-                const originalHTML = carouselTrack.innerHTML;
-                carouselTrack.innerHTML = originalHTML + originalHTML + originalHTML;
-                carouselInitialized = true;
-
-                if (state.carouselInView && !state.isCarouselAnimating) {
-                    startCarouselAnimation();
-                }
-            }
-        } catch (e) {
-            console.error('Carousel init error:', e);
+          const styles = getComputedStyle(track);
+          const gapStr = styles.gap || '40px';
+          const gap = parseInt(gapStr, 10) || 40;
+  
+          let totalWidth = 0;
+          items.forEach((item, idx) => {
+            totalWidth += item.offsetWidth + (idx < items.length - 1 ? gap : 0);
+          });
+  
+          state.carouselOneSetWidth = totalWidth || 0;
+  
+          if (state.carouselOneSetWidth > 0) {
+            const original = track.innerHTML;
+            track.innerHTML = original + original; // duplicate once
+            state.carouselInitialized = true;
+  
+            // start animation if already in view
+            if (state.carouselInView && !state.isCarouselAnimating) startCarouselAnimation();
+          }
+        } catch (err) {
+          console.error('Carousel init error', err);
         }
-    }, 500);
-}
-
-function checkCarouselInView() {
-    const carouselSection = document.getElementById('carousel-section');
-    if (!carouselSection || !carouselTrack) return;
-
-    const rect = carouselSection.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    
-    const inView = rect.top < viewportHeight * 1.2 && rect.bottom > -viewportHeight * 0.2;
-
-    if (inView && !state.carouselInView) {
+      }, CONFIG.CAROUSEL_CLONE_DELAY);
+    }
+  
+    function checkCarouselInView() {
+      const section = DOM.carouselSection;
+      const track = DOM.carouselTrack;
+      if (!section || !track) return;
+  
+      const rect = section.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const inView = rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR && rect.bottom > -vh * 0.2;
+  
+      if (inView && !state.carouselInView) {
         state.carouselInView = true;
-        if (!state.isCarouselAnimating && carouselInitialized && carouselOneSetWidth > 0) {
-            startCarouselAnimation();
+        if (state.carouselInitialized && state.carouselOneSetWidth > 0 && !state.isCarouselAnimating) {
+          startCarouselAnimation();
         }
-    } else if (!inView && state.carouselInView) {
+      } else if (!inView && state.carouselInView) {
         state.carouselInView = false;
         stopCarouselAnimation();
+      }
     }
-}
-
-function startCarouselAnimation() {
-    if (state.isCarouselAnimating || carouselOneSetWidth === 0 || !carouselInitialized) return;
-    state.isCarouselAnimating = true;
-
-    function animateCarousel() {
-        carouselScrollPos += carouselSpeed;
-
-        if (carouselScrollPos >= carouselOneSetWidth) {
-            carouselScrollPos = 0;
-        }
-
-        if (carouselTrack) {
-            carouselTrack.style.transform = `translateX(-${carouselScrollPos}px)`;
-        }
-        
-        if (state.isCarouselAnimating) {
-            carouselAnimationId = requestAnimationFrame(animateCarousel);
-        }
+  
+    function startCarouselAnimation() {
+      if (state.isCarouselAnimating || state.carouselOneSetWidth === 0 || !state.carouselInitialized) return;
+      state.isCarouselAnimating = true;
+  
+      const track = DOM.carouselTrack;
+      function step() {
+        // speed can be tuned
+        state.carouselScrollPos += state.carouselSpeed;
+        if (state.carouselScrollPos >= state.carouselOneSetWidth) state.carouselScrollPos = 0;
+        if (track) track.style.transform = `translate3d(-${state.carouselScrollPos}px, 0, 0)`;
+        if (state.isCarouselAnimating) state.carouselAnimationId = rAF(step);
+      }
+      step();
     }
-
-    animateCarousel();
-}
-
-function stopCarouselAnimation() {
-    if (carouselAnimationId) {
-        cancelAnimationFrame(carouselAnimationId);
-        carouselAnimationId = null;
+  
+    function stopCarouselAnimation() {
+      if (state.carouselAnimationId) cAF(state.carouselAnimationId);
+      state.carouselAnimationId = null;
+      state.isCarouselAnimating = false;
     }
-    state.isCarouselAnimating = false;
-}
-
-if (carouselTrack) {
-    carouselTrack.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
-    carouselTrack.addEventListener('mouseleave', () => {
-        if (state.carouselInView && carouselInitialized && carouselOneSetWidth > 0) {
-            startCarouselAnimation();
-        }
-    }, { passive: true });
-}
-
-// ============================================================================
-// TESTIMONIAL CAROUSEL
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const testimonials = Array.from(document.querySelectorAll('.testimonial'));
-    const prevBtn = document.querySelector('.prev');
-    const nextBtn = document.querySelector('.next');
-    const dotsContainer = document.querySelector('.dots');
-    const container = document.querySelector('.testimonial-container');
-
-    if (!testimonials.length || !dotsContainer || !prevBtn || !nextBtn || !container) return;
-
-    let currentIndex = 0;
-    let autoSlideInterval;
-
-    // Create dots dynamically
-    testimonials.forEach((_, i) => {
-        const dot = document.createElement('span');
-        dot.setAttribute('data-index', i);
-        if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => showTestimonial(i));
-        dotsContainer.appendChild(dot);
-    });
-
-    const dots = Array.from(dotsContainer.querySelectorAll('span'));
-
-    /** Show selected testimonial */
-    function showTestimonial(index) {
+  
+    /* mouse hover pause for carousel */
+    function bindCarouselHoverPause() {
+      const track = DOM.carouselTrack;
+      if (!track) return;
+      track.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
+      track.addEventListener('mouseleave', () => {
+        if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) startCarouselAnimation();
+      }, { passive: true });
+    }
+  
+    /* ==========================================================================
+       Testimonial slider (simple and accessible)
+       ========================================================================== */
+    function initTestimonials() {
+      const testimonials = Array.from(document.querySelectorAll('.testimonial'));
+      const dotsContainer = DOM.dotsContainer;
+      const prevBtn = DOM.prevBtn;
+      const nextBtn = DOM.nextBtn;
+      const container = DOM.testimonialContainer;
+  
+      if (!testimonials.length || !dotsContainer || !prevBtn || !nextBtn || !container) return;
+  
+      // create dots
+      testimonials.forEach((_, i) => {
+        const d = document.createElement('span');
+        d.dataset.index = i;
+        if (i === 0) d.classList.add('active');
+        d.addEventListener('click', () => showTestimonial(i));
+        dotsContainer.appendChild(d);
+      });
+  
+      const dots = Array.from(dotsContainer.querySelectorAll('span'));
+      let current = 0;
+  
+      function showTestimonial(index) {
         const n = testimonials.length;
         const newIndex = ((index % n) + n) % n;
-
-        if (newIndex === currentIndex) return;
-
-        testimonials[currentIndex].classList.remove('active');
-        dots[currentIndex].classList.remove('active');
-
+        if (newIndex === current) return;
+  
+        testimonials[current].classList.remove('active');
+        dots[current].classList.remove('active');
         testimonials[newIndex].classList.add('active');
         dots[newIndex].classList.add('active');
-
-        currentIndex = newIndex;
-
+        current = newIndex;
         adjustHeight();
         restartAutoSlide();
-    }
-
-    /** Adjust container height smoothly to match active testimonial */
-    function adjustHeight() {
-        const active = document.querySelector('.testimonial.active');
-        if (!active) return;
-
-        // get the current height and new height
-        const newHeight = active.offsetHeight;
-        container.style.height = newHeight + 'px';
-    }
-
-    /** Initialize height once */
-    function initHeight() {
-        adjustHeight();
-        window.addEventListener('resize', adjustHeight);
-    }
-
-    /** Buttons control */
-    nextBtn.addEventListener('click', () => showTestimonial(currentIndex + 1));
-    prevBtn.addEventListener('click', () => showTestimonial(currentIndex - 1));
-
-    /** Auto-slide every few seconds */
-    function startAutoSlide() {
-        stopAutoSlide();
-        autoSlideInterval = setInterval(() => {
-            showTestimonial(currentIndex + 1);
-        }, 3000); // 6 seconds per slide
-    }
-
-    function stopAutoSlide() {
-        if (autoSlideInterval) clearInterval(autoSlideInterval);
-    }
-
-    function restartAutoSlide() {
-        stopAutoSlide();
-        startAutoSlide();
-    }
-
-    /** Initialize */
-    initHeight();
-    startAutoSlide();
-});
-// ============================================================================
-// POPUP FORM - INITIALIZATION AND DISPLAY
-// ============================================================================
-const popup = document.getElementById('popup-form');
-const closeBtn = document.getElementById('closePopup');
-let popupShown = false;
-
-if (popup && closeBtn) {
-    // Show popup after 2 seconds on page load
-    window.addEventListener('load', () => {
-        if (!popupShown) {
-            setTimeout(() => {
-                popup.classList.add('active');
-                popupShown = true;
-                console.log('✅ Popup displayed');
-            }, 2000);
-        }
-    });
-
-    // Close button click
-    closeBtn.addEventListener('click', () => {
-        popup.classList.remove('active');
-        console.log('❌ Popup closed');
-    });
-
-    // Click outside to close
-    popup.addEventListener('click', (e) => {
-        if (e.target === popup) {
-            popup.classList.remove('active');
-            console.log('❌ Popup closed (outside click)');
-        }
-    });
-}
-
-// ============================================================================
-// POPUP FORM SUBMISSION HANDLER
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const popupForm = document.getElementById('popup-form-element');
-    
-    if (popupForm) {
-        popupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitBtn = popupForm.querySelector('button[type="submit"]');
-            const statusMsg = popupForm.querySelector('.popup-status');
-            
-            const formData = {
-                name: popupForm.querySelector('#popup-name')?.value.trim(),
-                email: popupForm.querySelector('#popup-email')?.value.trim(),
-                phone: popupForm.querySelector('#popup-phone')?.value.trim()
-            };
-            
-            console.log('📤 Submitting popup form:', formData);
-            
-            if (!formData.name || !formData.email || !formData.phone) {
-                if (statusMsg) {
-                    statusMsg.textContent = '❌ Please fill all fields';
-                    statusMsg.style.color = '#ff4444';
-                }
-                return;
-            }
-            
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Sending...';
-            }
-            
-            try {
-                const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
-                
-                const response = await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                const result = await response.json();
-                
-                console.log('📥 Server response:', result);
-                
-                if (response.ok && result.success) {
-                    if (statusMsg) {
-                        statusMsg.textContent = '✅ Thank you! We\'ll contact you soon.';
-                        statusMsg.style.color = '#00ff88';
-                    }
-                    
-                    popupForm.reset();
-                    
-                    setTimeout(() => {
-                        const popup = document.getElementById('popup-form');
-                        if (popup) {
-                            popup.classList.remove('active');
-                        }
-                    }, 2000);
-                    
-                } else {
-                    throw new Error(result.message || 'Submission failed');
-                }
-                
-            } catch (error) {
-                console.error('❌ Form submission error:', error);
-                if (statusMsg) {
-                    statusMsg.textContent = '❌ Failed to submit. Please try again.';
-                    statusMsg.style.color = '#ff4444';
-                }
-            } finally {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Get Started';
-                }
-            }
-        });
-    }
-});
-
-// ============================================================================
-// CONTACT FORM SUBMISSION HANDLER
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const contactForm = document.getElementById('contact-form');
-    
-    if (contactForm) {
-        contactForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitBtn = contactForm.querySelector('button[type="submit"]');
-            const statusMsg = document.getElementById('form-status');
-            
-            const formData = {
-                fullName: contactForm.querySelector('#fullName')?.value.trim(),
-                email: contactForm.querySelector('#email')?.value.trim(),
-                phone: contactForm.querySelector('#phone')?.value.trim(),
-                course: contactForm.querySelector('#course')?.value,
-                message: contactForm.querySelector('#message')?.value.trim()
-            };
-            
-            console.log('📤 Submitting contact form:', formData);
-            
-            if (!formData.fullName || !formData.email || !formData.phone || !formData.course || !formData.message) {
-                if (statusMsg) {
-                    statusMsg.textContent = '❌ Please fill all fields';
-                    statusMsg.style.color = '#ff4444';
-                }
-                return;
-            }
-            
-            const recaptchaResponse = grecaptcha.getResponse();
-            if (!recaptchaResponse) {
-                if (statusMsg) {
-                    statusMsg.textContent = '❌ Please complete the reCAPTCHA';
-                    statusMsg.style.color = '#ff4444';
-                }
-                return;
-            }
-            
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Sending...';
-            }
-            
-            try {
-                const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
-                
-                const response = await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        ...formData,
-                        recaptcha: recaptchaResponse
-                    })
-                });
-                
-                const result = await response.json();
-                
-                console.log('📥 Server response:', result);
-                
-                if (response.ok && result.success) {
-                    if (statusMsg) {
-                        statusMsg.textContent = '✅ Message sent successfully! We\'ll get back to you soon.';
-                        statusMsg.style.color = '#00ff88';
-                    }
-                    
-                    contactForm.reset();
-                    grecaptcha.reset();
-                    
-                } else {
-                    throw new Error(result.message || 'Submission failed');
-                }
-                
-            } catch (error) {
-                console.error('❌ Form submission error:', error);
-                if (statusMsg) {
-                    statusMsg.textContent = '❌ Failed to send message. Please try again.';
-                    statusMsg.style.color = '#ff4444';
-                }
-            } finally {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Send Message';
-                }
-            }
-        });
-    }
-});
-
-// ============================================================================
-// INFINITE LOGO SCROLL
-// ============================================================================
-const logoTrack = document.querySelector('.logo-track');
-const logoSet = document.querySelector('.logo-set');
-
-if (logoTrack && logoSet) {
-    const originalHTML = logoSet.outerHTML;
-    logoTrack.innerHTML = originalHTML + originalHTML + originalHTML + originalHTML + originalHTML;
-
-    let logoScrollSpeed = isMobile ? 0.03 : 0.1;
-    let logoCurrentPosition = 0;
-    let logoIsPaused = false;
-    let logoSetWidth = 0;
-    let logoAnimationId = null;
-
-    function getLogoSetWidth() {
-        if (logoSetWidth === 0) {
-            const sets = logoTrack.querySelectorAll('.logo-set');
-            logoSetWidth = sets[0] ? sets[0].offsetWidth : 0;
-        }
-        return logoSetWidth;
-    }
-
-    function animateLogo() {
-        if (!logoIsPaused) {
-            logoCurrentPosition -= logoScrollSpeed;
-            const setWidth = getLogoSetWidth();
-
-            if (Math.abs(logoCurrentPosition) >= setWidth * 2) {
-                logoCurrentPosition = 0;
-            }
-
-            logoTrack.style.transform = `translateX(${logoCurrentPosition}px)`;
-        }
-
-        logoAnimationId = requestAnimationFrame(animateLogo);
-    }
-
-    const banner = document.querySelector('.client-logo-banner');
-    if (banner) {
-        banner.addEventListener('mouseenter', () => {
-            logoIsPaused = true;
-        }, { passive: true });
-
-        banner.addEventListener('mouseleave', () => {
-            logoIsPaused = false;
-        }, { passive: true });
-    }
-
-    function updateLogoSpeed() {
-        const screenWidth = window.innerWidth;
-        if (screenWidth < 660) {
-            logoScrollSpeed = 0.03;
-        } else if (screenWidth < 768) {
-            logoScrollSpeed = 0.05;
-        } else if (screenWidth < 1440) {
-            logoScrollSpeed = 0.25;
-        } else {
-            logoScrollSpeed = 0.4;
-        }
-        logoSetWidth = 0;
-    }
-
-    updateLogoSpeed();
-    window.addEventListener('resize', updateLogoSpeed, { passive: true });
-    animateLogo();
-}
-
-// ============================================================================
-// REVEAL ON SCROLL
-// ============================================================================
-function setupRevealObserver() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const elements = entry.target.querySelectorAll('.reveal-up');
-                elements.forEach((el, index) => {
-                    if (!el.classList.contains('active')) {
-                        setTimeout(() => {
-                            el.classList.add('active');
-                        }, index * 100);
-                    }
-                });
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    const sections = ['#about-section', '#carousel-section', '.testimonials', '#studio-setup', '#why-soundabode', '#faq'];
-    sections.forEach(selector => {
-        const section = document.querySelector(selector);
-        if (section) {
-            observer.observe(section);
-        }
-    });
-}
-// ============================================================================
-// FAQS
-// ============================================================================
-
-document.addEventListener('DOMContentLoaded', function () {
-  const items = document.querySelectorAll('.faq-item');
-
-  items.forEach(item => {
-    const head = item.querySelector('.faq-head');
-    const body = item.querySelector('.faq-body');
-
-    head.addEventListener('click', () => {
-      const open = item.getAttribute('data-open') === 'true';
-      if (open) {
-        // close
-        item.setAttribute('data-open', 'false');
-        head.setAttribute('aria-expanded', 'false');
-        // smooth collapse: set explicit height then zero
-        body.style.maxHeight = body.scrollHeight + 'px';
-        requestAnimationFrame(() => { body.style.maxHeight = '0'; });
-        // hide after animation
-        setTimeout(()=> { body.hidden = true; }, 360);
-      } else {
-        // open
-        item.setAttribute('data-open', 'true');
-        head.setAttribute('aria-expanded', 'true');
-        body.hidden = false;
-        // let browser compute then set to scrollHeight for animation
-        requestAnimationFrame(() => {
-          body.style.maxHeight = body.scrollHeight + 'px';
-        });
       }
-      // optional: close siblings (accordion behaviour)
-      // items.forEach(sib => { if (sib !== item) sib.setAttribute('data-open','false'); });
-    });
-  });
-});
-// ============================================================================
-// AURORA TEXT ANIMATION
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const el = document.querySelector('.aurora-text');
   
-    if (!el) return;
+      function adjustHeight() {
+        const active = container.querySelector('.testimonial.active');
+        if (!active) return;
+        container.style.height = active.offsetHeight + 'px';
+      }
   
-    const cs = window.getComputedStyle(el);
-    const clip = cs.getPropertyValue('background-clip');
-    const webkitFill = cs.getPropertyValue('-webkit-text-fill-color');
+      function initHeight() {
+        adjustHeight();
+        window.addEventListener('resize', adjustHeight, { passive: true });
+      }
   
-    if (!/text/.test(clip) || webkitFill !== 'transparent') {
+      function next() { showTestimonial(current + 1); }
+      function prev() { showTestimonial(current - 1); }
+  
+      nextBtn.addEventListener('click', next);
+      prevBtn.addEventListener('click', prev);
+  
+      function startAuto() {
+        stopAuto();
+        state.testimonialAutoInterval = setInterval(() => showTestimonial(current + 1), CONFIG.TESTIMONIAL_AUTO_MS);
+      }
+      function stopAuto() {
+        if (state.testimonialAutoInterval) clearInterval(state.testimonialAutoInterval);
+      }
+      function restartAutoSlide() {
+        stopAuto(); startAuto();
+      }
+  
+      // initialize
+      initHeight();
+      startAuto();
+    }
+  
+    /* ==========================================================================
+       Popup form show / hide and basic events
+       ========================================================================== */
+    function initPopup() {
+      const popup = DOM.popup;
+      const closeBtn = DOM.popupClose;
+      if (!popup || !closeBtn) return;
+  
+      // show after delay (only once)
+      window.addEventListener('load', () => {
+        if (!state.popupShown) {
+          setTimeout(() => {
+            popup.classList.add('active');
+            state.popupShown = true;
+          }, CONFIG.POPUP_DELAY);
+        }
+      });
+  
+      closeBtn.addEventListener('click', () => popup.classList.remove('active'));
+      popup.addEventListener('click', (e) => { if (e.target === popup) popup.classList.remove('active'); });
+    }
+  
+    /* ==========================================================================
+       Popup form submission (async)
+       ========================================================================== */
+    function initPopupFormHandler() {
+      const form = DOM.popupForm;
+      if (!form) return;
+  
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const statusMsg = form.querySelector('.popup-status');
+  
+        const data = {
+          name: form.querySelector('#popup-name')?.value.trim(),
+          email: form.querySelector('#popup-email')?.value.trim(),
+          phone: form.querySelector('#popup-phone')?.value.trim()
+        };
+  
+        if (!data.name || !data.email || !data.phone) {
+          if (statusMsg) { statusMsg.textContent = '❌ Please fill all fields'; statusMsg.style.color = '#ff4444'; }
+          return;
+        }
+  
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
+  
+        try {
+          const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
+          const resp = await fetch(BACKEND_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const result = await resp.json();
+          if (resp.ok && result.success) {
+            if (statusMsg) { statusMsg.textContent = "✅ Thank you! We'll contact you soon."; statusMsg.style.color = '#00ff88'; }
+            form.reset();
+            setTimeout(() => { const p = document.getElementById('popup-form'); if (p) p.classList.remove('active'); }, 2000);
+          } else {
+            throw new Error(result.message || 'Submission failed');
+          }
+        } catch (err) {
+          console.error('Popup submit error', err);
+          if (statusMsg) { statusMsg.textContent = '❌ Failed to submit. Please try again.'; statusMsg.style.color = '#ff4444'; }
+        } finally {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Get Started'; }
+        }
+      });
+    }
+  
+    /* ==========================================================================
+       Contact form submission (async) - expects grecaptcha instance
+       ========================================================================== */
+    function initContactFormHandler() {
+      const form = DOM.contactForm;
+      const statusMsg = DOM.contactStatus;
+      if (!form) return;
+  
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+  
+        const data = {
+          fullName: form.querySelector('#fullName')?.value.trim(),
+          email: form.querySelector('#email')?.value.trim(),
+          phone: form.querySelector('#phone')?.value.trim(),
+          course: form.querySelector('#course')?.value,
+          message: form.querySelector('#message')?.value.trim()
+        };
+  
+        if (!data.fullName || !data.email || !data.phone || !data.course || !data.message) {
+          if (statusMsg) { statusMsg.textContent = '❌ Please fill all fields'; statusMsg.style.color = '#ff4444'; }
+          return;
+        }
+  
+        // reCAPTCHA check (if present)
+        const recaptchaResponse = (window.grecaptcha && grecaptcha.getResponse && grecaptcha.getResponse()) || '';
+        if (!recaptchaResponse) {
+          if (statusMsg) { statusMsg.textContent = '❌ Please complete the reCAPTCHA'; statusMsg.style.color = '#ff4444'; }
+          return;
+        }
+  
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
+  
+        try {
+          const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
+          const resp = await fetch(BACKEND_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...data, recaptcha: recaptchaResponse })
+          });
+          const result = await resp.json();
+          if (resp.ok && result.success) {
+            if (statusMsg) { statusMsg.textContent = "✅ Message sent successfully! We'll get back to you soon."; statusMsg.style.color = '#00ff88'; }
+            form.reset();
+            if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset();
+          } else {
+            throw new Error(result.message || 'Submission failed');
+          }
+        } catch (err) {
+          console.error('Contact submit error', err);
+          if (statusMsg) { statusMsg.textContent = '❌ Failed to send message. Please try again.'; statusMsg.style.color = '#ff4444'; }
+        } finally {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send Message'; }
+        }
+      });
+    }
+  
+    /* ==========================================================================
+       Infinite logo scroll
+       ========================================================================== */
+    function initLogoScroller() {
+      const track = DOM.logoTrack, set = DOM.logoSet, banner = DOM.clientLogoBanner;
+      if (!track || !set || !banner) return;
+  
+      // duplicate once for seamless loop
+      const original = set.outerHTML;
+      track.innerHTML = original + original;
+  
+      // responsive speed
+      function updateLogoSpeed() {
+        const w = window.innerWidth;
+        if (w < 660) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.xs;
+        else if (w < 768) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.sm;
+        else if (w < 1440) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.md;
+        else state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.lg;
+        // reset measured width so it recalculates
+        state.logoSetWidth = 0;
+      }
+  
+      function getLogoSetWidth() {
+        if (!state.logoSetWidth) {
+          const sets = track.querySelectorAll('.logo-set');
+          state.logoSetWidth = sets[0] ? sets[0].offsetWidth : 0;
+        }
+        return state.logoSetWidth;
+      }
+  
+      function animateLogo() {
+        if (!state.logoIsPaused) {
+          state.logoCurrentPosition -= state.logoScrollSpeed;
+          const w = getLogoSetWidth();
+          if (Math.abs(state.logoCurrentPosition) >= w) state.logoCurrentPosition = 0;
+          track.style.transform = `translate3d(${state.logoCurrentPosition}px, 0, 0)`;
+        }
+        state.logoAnimationId = rAF(animateLogo);
+      }
+  
+      banner.addEventListener('mouseenter', () => { state.logoIsPaused = true; }, { passive: true });
+      banner.addEventListener('mouseleave', () => { state.logoIsPaused = false; }, { passive: true });
+  
+      // pause when offscreen using IntersectionObserver
+      const bannerObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) {
+            state.logoIsPaused = true;
+            if (state.logoAnimationId) { cAF(state.logoAnimationId); state.logoAnimationId = null; }
+          } else {
+            state.logoIsPaused = false;
+            if (!state.logoAnimationId) animateLogo();
+          }
+        });
+      }, { threshold: 0.01 });
+  
+      bannerObserver.observe(banner);
+  
+      updateLogoSpeed();
+      window.addEventListener('resize', updateLogoSpeed, { passive: true });
+      animateLogo();
+    }
+  
+    /* ==========================================================================
+       Reveal on scroll (IntersectionObserver)
+       ========================================================================== */
+    function setupRevealObserver() {
+      const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const elements = entry.target.querySelectorAll('.reveal-up');
+            elements.forEach((el, i) => {
+              if (!el.classList.contains('active')) setTimeout(() => el.classList.add('active'), i * 100);
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+  
+      DOM.revealSelectors.forEach(selector => {
+        const el = document.querySelector(selector);
+        if (el) observer.observe(el);
+      });
+    }
+  
+    /* ==========================================================================
+       Aurora text fallback polyfill (ensures gradient text on older browsers)
+       ========================================================================== */
+    function ensureAuroraText() {
+      const el = DOM.auroraText;
+      if (!el) return;
+      const cs = getComputedStyle(el);
+      const clip = cs.getPropertyValue('background-clip');
+      const webkitFill = cs.getPropertyValue('-webkit-text-fill-color');
+      if (!/text/.test(clip) || webkitFill !== 'transparent') {
         el.style.setProperty('background-image', 'linear-gradient(135deg,#ff0080 0%,#7928ca 25%,#0070f3 50%,#38bdf8 75%,#ff0080 100%)', 'important');
         el.style.setProperty('background-size', '200% 200%', 'important');
         el.style.setProperty('-webkit-background-clip', 'text', 'important');
         el.style.setProperty('background-clip', 'text', 'important');
         el.style.setProperty('-webkit-text-fill-color', 'transparent', 'important');
         el.style.setProperty('color', 'transparent', 'important');
+      }
     }
-});
-
-// ============================================================================
-// HAMBURGER MENU
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const hamburger = document.querySelector('.hamburger-menu');
-    const navMenu = document.querySelector('.nav-menu');
-
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('is-active');
-            navMenu.classList.toggle('is-active');
+  
+    /* ==========================================================================
+       Hamburger menu toggle
+       ========================================================================== */
+    function initHamburger() {
+      const hamburger = DOM.hamburger, navMenu = DOM.navMenu;
+      if (!hamburger || !navMenu) return;
+  
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('is-active');
+        navMenu.classList.toggle('is-active');
+      });
+  
+      navMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          hamburger.classList.remove('is-active');
+          navMenu.classList.remove('is-active');
         });
-
-        const navLinks = navMenu.querySelectorAll('a');
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('is-active');
-                navMenu.classList.remove('is-active');
-            });
-        });
+      });
     }
-});
-
-// ============================================================================
-// JOIN US BUTTON
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const joinBtn = document.querySelector('.glow-border');
-    const popup = document.getElementById('popup-form');
-
-    if (joinBtn && popup) {
-        joinBtn.addEventListener('click', () => {
-            popup.classList.add('active');
+  
+    /* ==========================================================================
+       Join buttons that open the popup
+       ========================================================================== */
+    function initJoinButtons() {
+      const btns = DOM.joinBtns;
+      const popup = DOM.popup;
+      if (!btns.length || !popup) return;
+      btns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          popup.classList.add('active');
         });
+      });
     }
-});
-
-// ============================================================================
-// EVENT LISTENERS
-// ============================================================================
-window.addEventListener('scroll', onScroll, { passive: true });
-
-window.addEventListener('resize', () => {
-    INTRO_ANIMATION_RANGE = window.innerHeight * 0.8;
-    state.aboutSectionCached = false;
-}, { passive: true });
-
-// ============================================================================
-// INITIALIZE
-// ============================================================================
-window.addEventListener('DOMContentLoaded', () => {
-    initCarouselClones();
-    setupRevealObserver();
-});
-
-setupRevealObserver();
-
-// ============================================================================
-// BING UET TRACKING
-// ============================================================================
-(function(w,d,t,r,u) {
-    var f,n,i;
-    w[u]=w[u]||[],f=function() {
-        var o={ti:"343210550", enableAutoSpaTracking: true};
-        o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")
-    },
-    n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function() {
-        var s=this.readyState;
-        s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)
-    },
-    i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)
-})(window,document,"script","//bat.bing.com/bat.js","uetq");
+  
+    /* ==========================================================================
+       FAQ accordion
+       ========================================================================== */
+    function initFaqAccordion() {
+      const items = DOM.faqItems;
+      if (!items || items.length === 0) return;
+  
+      items.forEach(item => {
+        const head = item.querySelector('.faq-head');
+        const body = item.querySelector('.faq-body');
+        if (!head || !body) return;
+  
+        head.addEventListener('click', () => {
+          const open = item.getAttribute('data-open') === 'true';
+          if (open) {
+            item.setAttribute('data-open', 'false');
+            head.setAttribute('aria-expanded', 'false');
+            body.style.maxHeight = body.scrollHeight + 'px';
+            requestAnimationFrame(() => body.style.maxHeight = '0');
+            setTimeout(() => { body.hidden = true; }, 360);
+          } else {
+            item.setAttribute('data-open', 'true');
+            head.setAttribute('aria-expanded', 'true');
+            body.hidden = false;
+            requestAnimationFrame(() => body.style.maxHeight = body.scrollHeight + 'px');
+          }
+        });
+      });
+    }
+  
+    /* ==========================================================================
+       Gear modal (cards -> modal)
+       ========================================================================== */
+    function initGearModal() {
+      const cards = DOM.gearCards;
+      const modal = DOM.gearModal;
+      const modalClose = DOM.gearModalClose;
+      if (!cards.length || !modal || !modalClose) return;
+  
+      function openModal(title, desc, specs) {
+        if (DOM.gearModalTitle) DOM.gearModalTitle.textContent = title || '';
+        if (DOM.gearModalDesc) DOM.gearModalDesc.textContent = desc || '';
+        if (DOM.gearModalSpecs) DOM.gearModalSpecs.textContent = specs || '';
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        modalClose.focus();
+      }
+  
+      function closeModal() {
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+  
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          const title = card.dataset.title || card.querySelector('.card-title')?.textContent || '';
+          const desc = card.dataset.desc || card.querySelector('.card-excerpt')?.textContent || '';
+          const specs = card.dataset.specs || '';
+          openModal(title, desc, specs);
+        });
+      });
+  
+      modalClose.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+    }
+  
+    /* ==========================================================================
+       Studio modal (optional separate modal)
+       ========================================================================== */
+    function initStudioModal() {
+      if (!DOM.studioModal) return;
+      const cards = Array.from(document.querySelectorAll('#studio-setup .gear-card'));
+      const modal = DOM.studioModal, closeBtn = DOM.studioModalClose;
+      if (!cards.length || !modal || !closeBtn) return;
+  
+      function openModal(title, desc) {
+        if (DOM.studioModalTitle) DOM.studioModalTitle.textContent = title || '';
+        if (DOM.studioModalDesc) DOM.studioModalDesc.textContent = desc || '';
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+      }
+  
+      function closeModal() {
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+  
+      cards.forEach(card => {
+        const title = card.dataset.title;
+        const desc = card.dataset.desc;
+        card.addEventListener('click', () => openModal(title, desc));
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(title, desc); }
+        });
+        const cta = card.querySelector('.card-cta');
+        if (cta) cta.addEventListener('click', (e) => { e.stopPropagation(); openModal(title, desc); });
+      });
+  
+      closeBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+    }
+  
+    /* ==========================================================================
+       Why-dropdown (toggle panel under heading)
+       ========================================================================== */
+    function initWhyDropdown() {
+      const wd = DOM.whyDropdown;
+      const toggle = DOM.whyDropdownToggle;
+      const panel = DOM.whyDropdownPanel;
+      if (!wd || !toggle || !panel) return;
+  
+      function openPanel() { wd.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
+      function closePanel() { wd.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
+      function togglePanel(e) { e.preventDefault(); if (wd.classList.contains('open')) closePanel(); else openPanel(); }
+  
+      toggle.addEventListener('click', togglePanel);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && wd.classList.contains('open')) { closePanel(); toggle.focus(); }
+      });
+      document.addEventListener('click', (e) => {
+        if (!wd.contains(e.target) && wd.classList.contains('open')) closePanel();
+      });
+    }
+  
+    /* ==========================================================================
+       Event listeners & lifecycle
+       ========================================================================== */
+    function bindGlobalListeners() {
+      window.addEventListener('scroll', onScrollHandler, { passive: true });
+      window.addEventListener('resize', () => {
+        // update intro range and re-evaluate
+        state.carouselOneSetWidth = 0;     // force carousel width recalculation
+        state.logoSetWidth = 0;            // force logo width recalculation
+        state.lastScrollY = window.scrollY || 0;
+      }, { passive: true });
+    }
+  
+    /* ==========================================================================
+       Bing UET (unchanged, lazy-load safe)
+       ========================================================================== */
+    function initBingUET() {
+      (function(w, d, t, r, u) {
+        var f, n, i;
+        w[u] = w[u] || [], f = function() {
+          var o = { ti: "343210550", enableAutoSpaTracking: true };
+          o.q = w[u], w[u] = new UET(o), w[u].push("pageLoad");
+        },
+        n = d.createElement(t), n.src = r, n.async = 1, n.onload = n.onreadystatechange = function() {
+          var s = this.readyState;
+          s && s !== "loaded" && s !== "complete" || (f(), n.onload = n.onreadystatechange = null);
+        },
+        i = d.getElementsByTagName(t)[0], i.parentNode.insertBefore(n, i);
+      })(window, document, "script", "//bat.bing.com/bat.js", "uetq");
+    }
+  
+    /* ==========================================================================
+       Initialization entrypoint
+       ========================================================================== */
+    function init() {
+      // Setup initial small things
+      ensureAuroraText();
+      bindGlobalListeners();
+  
+      // Start master loop with initial tick
+      state.ticking = true;
+      masterAnimationLoop();
+  
+      // Init modules
+      initCarouselClones();
+      bindCarouselHoverPause();
+      initTestimonials();
+      initPopup();
+      initPopupFormHandler();
+      initContactFormHandler();
+      initLogoScroller();
+      setupRevealObserver();
+      initHamburger();
+      initJoinButtons();
+      initFaqAccordion();
+      initGearModal();
+      initStudioModal();
+      initWhyDropdown();
+      initBingUET();
+  
+      // Defensive: if DOM ready but some modules rely on cloned content, ensure carousel init again after short delay
+      setTimeout(initCarouselClones, CONFIG.CAROUSEL_CLONE_DELAY * 2);
+    }
+  
+    /* ==========================================================================
+       DOMContentLoaded bootstrap
+       ========================================================================== */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  
+  })();
