@@ -280,7 +280,7 @@ button { font-family: inherit; }
   font-weight:200;
   padding: clamp(16px,3vw,24px) clamp(20px,5vw,64px);
   line-height:1.6;
-  text-align:left;
+  text-align:center;
 }
 .overlay-left h2, .overlay-left p, .overlay-right h2, .overlay-right p {
   width: min(92%, var(--panel-content-max));
