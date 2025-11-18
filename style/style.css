@@ -587,6 +587,7 @@ body {
   font-weight: 500;
   letter-spacing: 1px;
   border: none;
+  text-decoration:none;
   border-radius: 8px 10px;
   padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 28px);
   cursor: pointer;
