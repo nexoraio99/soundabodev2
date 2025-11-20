@@ -1,5 +1,5 @@
 /* ============================================================================
-   script1.js — soundabode site script (refactor)
+   script1.js — soundabode site script (refactor, carousel width fix)
    - Organized, modular, defensive and performance-aware
    - Usage: replace your existing script1.js with this file
    ============================================================================ */
@@ -12,10 +12,10 @@
        ========================================================================== */
     const CONFIG = {
       INTRO_ANIMATION_RATIO: 0.8,          // portion of viewport used for intro animation
-      RAF_STOP_DELAY: 180,                // ms to stop RAF after scroll ends
-      POPUP_DELAY: 2000,                  // ms to show popup after load
-      TESTIMONIAL_AUTO_MS: 3000,          // testimonial auto-advance interval
-      CAROUSEL_CLONE_DELAY: 500,          // delay before computing widths & cloning carousel
+      RAF_STOP_DELAY: 180,                 // ms to stop RAF after scroll ends
+      POPUP_DELAY: 2000,                   // ms to show popup after load
+      TESTIMONIAL_AUTO_MS: 3000,           // testimonial auto-advance interval
+      CAROUSEL_CLONE_DELAY: 500,           // delay before computing widths & cloning carousel
       LOGO_SCROLL_SPEEDS: { xs: 0.03, sm: 0.05, md: 0.25, lg: 0.4 },
       CAROUSEL_STRICT_VIEWPORT_FACTOR: 1.2
     };
@@ -24,7 +24,9 @@
        Environment / Device detection
        ========================================================================== */
     const isMobile = () => window.innerWidth < 768;
-    const isLowEndDevice = () => (navigator.deviceMemory && navigator.deviceMemory < 4) || navigator.hardwareConcurrency < 3;
+    const isLowEndDevice = () =>
+      (navigator.deviceMemory && navigator.deviceMemory < 4) ||
+      navigator.hardwareConcurrency < 3;
   
     /* ==========================================================================
        DOM Caching
@@ -96,7 +98,14 @@
       navMenu: document.querySelector('.nav-menu'),
       joinBtns: document.querySelectorAll('.glow-border'),
       auroraText: document.querySelector('.aurora-text'),
-      revealSelectors: ['#about-section', '#carousel-section', '.testimonials', '#studio-setup', '#why-soundabode', '#faq']
+      revealSelectors: [
+        '#about-section',
+        '#carousel-section',
+        '.testimonials',
+        '#studio-setup',
+        '#why-soundabode',
+        '#faq'
+      ]
     };
   
     /* ==========================================================================
@@ -148,7 +157,8 @@
     /* ==========================================================================
        Master animation loop (scroll-driven, single RAF)
        ========================================================================== */
-    const INTRO_ANIMATION_RANGE = () => window.innerHeight * CONFIG.INTRO_ANIMATION_RATIO;
+    const INTRO_ANIMATION_RANGE = () =>
+      window.innerHeight * CONFIG.INTRO_ANIMATION_RATIO;
   
     function masterAnimationLoop() {
       state.scrollY = window.scrollY || window.pageYOffset || 0;
@@ -163,7 +173,11 @@
         state.spacerStart = viewportHeight;
         state.spacerEnd = state.spacerStart + spacerHeight;
   
-        state.phase1Progress = clamp(state.scrollY / INTRO_ANIMATION_RANGE(), 0, 1);
+        state.phase1Progress = clamp(
+          state.scrollY / INTRO_ANIMATION_RANGE(),
+          0,
+          1
+        );
   
         updateIntroOverlay();
         updateMainContent();
@@ -197,7 +211,13 @@
        Intro overlay animations (panel sliding & fade)
        ========================================================================== */
     function updateIntroOverlay() {
-      const { panelLeft, panelRight, introOverlay, overlayLeft, overlayRight } = DOM;
+      const {
+        panelLeft,
+        panelRight,
+        introOverlay,
+        overlayLeft,
+        overlayRight
+      } = DOM;
       if (!panelLeft || !panelRight || !introOverlay) return;
   
       const mobile = isMobile();
@@ -215,12 +235,21 @@
       }
   
       // small parallax for overlay text panels on larger screens
-      if (overlayLeft) overlayLeft.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${-progress * 10}px, 0, 0)`;
-      if (overlayRight) overlayRight.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${progress * 10}px, 0, 0)`;
+      if (overlayLeft)
+        overlayLeft.style.transform = mobile
+          ? 'translate3d(0,0,0)'
+          : `translate3d(${-progress * 10}px, 0, 0)`;
+      if (overlayRight)
+        overlayRight.style.transform = mobile
+          ? 'translate3d(0,0,0)'
+          : `translate3d(${progress * 10}px, 0, 0)`;
   
       // fade out overlay near completion
       const fadeStart = 0.75;
-      const fadeOpacity = Math.max(0, 1 - (progress - fadeStart) / (1 - fadeStart));
+      const fadeOpacity = Math.max(
+        0,
+        1 - (progress - fadeStart) / (1 - fadeStart)
+      );
       introOverlay.style.opacity = String(fadeOpacity);
   
       if (fadeOpacity < 0.05) {
@@ -256,6 +285,7 @@
     /* ==========================================================================
        Carousel (infinite loop, clones, in-view detection)
        ========================================================================== */
+    // FIXED: use scrollWidth instead of summing offsetWidth, more robust
     function initCarouselClones() {
       const track = DOM.carouselTrack;
       if (!track || state.carouselInitialized) return;
@@ -265,24 +295,24 @@
   
       setTimeout(() => {
         try {
-          const styles = getComputedStyle(track);
-          const gapStr = styles.gap || '40px';
-          const gap = parseInt(gapStr, 10) || 40;
+          // measure width of single set BEFORE cloning
+          const singleSetWidth = track.scrollWidth;
   
-          let totalWidth = 0;
-          items.forEach((item, idx) => {
-            totalWidth += item.offsetWidth + (idx < items.length - 1 ? gap : 0);
-          });
+          if (singleSetWidth > 0) {
+            state.carouselOneSetWidth = singleSetWidth;
   
-          state.carouselOneSetWidth = totalWidth || 0;
-  
-          if (state.carouselOneSetWidth > 0) {
             const original = track.innerHTML;
             track.innerHTML = original + original; // duplicate once
             state.carouselInitialized = true;
   
             // start animation if already in view
-            if (state.carouselInView && !state.isCarouselAnimating) startCarouselAnimation();
+            if (state.carouselInView && !state.isCarouselAnimating) {
+              startCarouselAnimation();
+            }
+          } else {
+            console.warn(
+              'Carousel width is 0 – check CSS of .carousel-track / .carousel-item'
+            );
           }
         } catch (err) {
           console.error('Carousel init error', err);
@@ -290,18 +320,33 @@
       }, CONFIG.CAROUSEL_CLONE_DELAY);
     }
   
+    // FIXED: more forgiving when section wrapper is missing; relies on start fn guard
     function checkCarouselInView() {
       const section = DOM.carouselSection;
       const track = DOM.carouselTrack;
-      if (!section || !track) return;
+      if (!track) return;
+  
+      // If there is no wrapper section, assume always in view
+      if (!section) {
+        if (!state.carouselInView) {
+          state.carouselInView = true;
+          if (state.carouselInitialized && !state.isCarouselAnimating) {
+            startCarouselAnimation();
+          }
+        }
+        return;
+      }
   
       const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
-      const inView = rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR && rect.bottom > -vh * 0.2;
+  
+      const inView =
+        rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR &&
+        rect.bottom > -vh * 0.2;
   
       if (inView && !state.carouselInView) {
         state.carouselInView = true;
-        if (state.carouselInitialized && state.carouselOneSetWidth > 0 && !state.isCarouselAnimating) {
+        if (state.carouselInitialized && !state.isCarouselAnimating) {
           startCarouselAnimation();
         }
       } else if (!inView && state.carouselInView) {
@@ -311,15 +356,22 @@
     }
   
     function startCarouselAnimation() {
-      if (state.isCarouselAnimating || state.carouselOneSetWidth === 0 || !state.carouselInitialized) return;
+      if (
+        state.isCarouselAnimating ||
+        state.carouselOneSetWidth === 0 ||
+        !state.carouselInitialized
+      )
+        return;
       state.isCarouselAnimating = true;
   
       const track = DOM.carouselTrack;
       function step() {
         // speed can be tuned
         state.carouselScrollPos += state.carouselSpeed;
-        if (state.carouselScrollPos >= state.carouselOneSetWidth) state.carouselScrollPos = 0;
-        if (track) track.style.transform = `translate3d(-${state.carouselScrollPos}px, 0, 0)`;
+        if (state.carouselScrollPos >= state.carouselOneSetWidth)
+          state.carouselScrollPos = 0;
+        if (track)
+          track.style.transform = `translate3d(-${state.carouselScrollPos}px, 0, 0)`;
         if (state.isCarouselAnimating) state.carouselAnimationId = rAF(step);
       }
       step();
@@ -335,23 +387,43 @@
     function bindCarouselHoverPause() {
       const track = DOM.carouselTrack;
       if (!track) return;
-      track.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
-      track.addEventListener('mouseleave', () => {
-        if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) startCarouselAnimation();
-      }, { passive: true });
+      track.addEventListener('mouseenter', stopCarouselAnimation, {
+        passive: true
+      });
+      track.addEventListener(
+        'mouseleave',
+        () => {
+          if (
+            state.carouselInView &&
+            state.carouselInitialized &&
+            state.carouselOneSetWidth > 0
+          )
+            startCarouselAnimation();
+        },
+        { passive: true }
+      );
     }
   
     /* ==========================================================================
        Testimonial slider (simple and accessible)
        ========================================================================== */
     function initTestimonials() {
-      const testimonials = Array.from(document.querySelectorAll('.testimonial'));
+      const testimonials = Array.from(
+        document.querySelectorAll('.testimonial')
+      );
       const dotsContainer = DOM.dotsContainer;
       const prevBtn = DOM.prevBtn;
       const nextBtn = DOM.nextBtn;
       const container = DOM.testimonialContainer;
   
-      if (!testimonials.length || !dotsContainer || !prevBtn || !nextBtn || !container) return;
+      if (
+        !testimonials.length ||
+        !dotsContainer ||
+        !prevBtn ||
+        !nextBtn ||
+        !container
+      )
+        return;
   
       // create dots
       testimonials.forEach((_, i) => {
@@ -390,21 +462,30 @@
         window.addEventListener('resize', adjustHeight, { passive: true });
       }
   
-      function next() { showTestimonial(current + 1); }
-      function prev() { showTestimonial(current - 1); }
+      function next() {
+        showTestimonial(current + 1);
+      }
+      function prev() {
+        showTestimonial(current - 1);
+      }
   
       nextBtn.addEventListener('click', next);
       prevBtn.addEventListener('click', prev);
   
       function startAuto() {
         stopAuto();
-        state.testimonialAutoInterval = setInterval(() => showTestimonial(current + 1), CONFIG.TESTIMONIAL_AUTO_MS);
+        state.testimonialAutoInterval = setInterval(
+          () => showTestimonial(current + 1),
+          CONFIG.TESTIMONIAL_AUTO_MS
+        );
       }
       function stopAuto() {
-        if (state.testimonialAutoInterval) clearInterval(state.testimonialAutoInterval);
+        if (state.testimonialAutoInterval)
+          clearInterval(state.testimonialAutoInterval);
       }
       function restartAutoSlide() {
-        stopAuto(); startAuto();
+        stopAuto();
+        startAuto();
       }
   
       // initialize
@@ -431,7 +512,9 @@
       });
   
       closeBtn.addEventListener('click', () => popup.classList.remove('active'));
-      popup.addEventListener('click', (e) => { if (e.target === popup) popup.classList.remove('active'); });
+      popup.addEventListener('click', (e) => {
+        if (e.target === popup) popup.classList.remove('active');
+      });
     }
   
     /* ==========================================================================
@@ -453,14 +536,21 @@
         };
   
         if (!data.name || !data.email || !data.phone) {
-          if (statusMsg) { statusMsg.textContent = '❌ Please fill all fields'; statusMsg.style.color = '#ff4444'; }
+          if (statusMsg) {
+            statusMsg.textContent = '❌ Please fill all fields';
+            statusMsg.style.color = '#ff4444';
+          }
           return;
         }
   
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Sending...';
+        }
   
         try {
-          const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
+          const BACKEND_URL =
+            'https://soundabodev2-server.onrender.com/api/popup-form';
           const resp = await fetch(BACKEND_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -468,17 +558,31 @@
           });
           const result = await resp.json();
           if (resp.ok && result.success) {
-            if (statusMsg) { statusMsg.textContent = "✅ Thank you! We'll contact you soon."; statusMsg.style.color = '#00ff88'; }
+            if (statusMsg) {
+              statusMsg.textContent =
+                "✅ Thank you! We'll contact you soon.";
+              statusMsg.style.color = '#00ff88';
+            }
             form.reset();
-            setTimeout(() => { const p = document.getElementById('popup-form'); if (p) p.classList.remove('active'); }, 2000);
+            setTimeout(() => {
+              const p = document.getElementById('popup-form');
+              if (p) p.classList.remove('active');
+            }, 2000);
           } else {
             throw new Error(result.message || 'Submission failed');
           }
         } catch (err) {
           console.error('Popup submit error', err);
-          if (statusMsg) { statusMsg.textContent = '❌ Failed to submit. Please try again.'; statusMsg.style.color = '#ff4444'; }
+          if (statusMsg) {
+            statusMsg.textContent =
+              '❌ Failed to submit. Please try again.';
+            statusMsg.style.color = '#ff4444';
+          }
         } finally {
-          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Get Started'; }
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Get Started';
+          }
         }
       });
     }
@@ -503,22 +607,42 @@
           message: form.querySelector('#message')?.value.trim()
         };
   
-        if (!data.fullName || !data.email || !data.phone || !data.course || !data.message) {
-          if (statusMsg) { statusMsg.textContent = '❌ Please fill all fields'; statusMsg.style.color = '#ff4444'; }
+        if (
+          !data.fullName ||
+          !data.email ||
+          !data.phone ||
+          !data.course ||
+          !data.message
+        ) {
+          if (statusMsg) {
+            statusMsg.textContent = '❌ Please fill all fields';
+            statusMsg.style.color = '#ff4444';
+          }
           return;
         }
   
         // reCAPTCHA check (if present)
-        const recaptchaResponse = (window.grecaptcha && grecaptcha.getResponse && grecaptcha.getResponse()) || '';
+        const recaptchaResponse =
+          (window.grecaptcha &&
+            grecaptcha.getResponse &&
+            grecaptcha.getResponse()) ||
+          '';
         if (!recaptchaResponse) {
-          if (statusMsg) { statusMsg.textContent = '❌ Please complete the reCAPTCHA'; statusMsg.style.color = '#ff4444'; }
+          if (statusMsg) {
+            statusMsg.textContent = '❌ Please complete the reCAPTCHA';
+            statusMsg.style.color = '#ff4444';
+          }
           return;
         }
   
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Sending...';
+        }
   
         try {
-          const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
+          const BACKEND_URL =
+            'https://soundabodev2-server.onrender.com/api/popup-form';
           const resp = await fetch(BACKEND_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -526,7 +650,11 @@
           });
           const result = await resp.json();
           if (resp.ok && result.success) {
-            if (statusMsg) { statusMsg.textContent = "✅ Message sent successfully! We'll get back to you soon."; statusMsg.style.color = '#00ff88'; }
+            if (statusMsg) {
+              statusMsg.textContent =
+                "✅ Message sent successfully! We'll get back to you soon.";
+              statusMsg.style.color = '#00ff88';
+            }
             form.reset();
             if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset();
           } else {
@@ -534,9 +662,16 @@
           }
         } catch (err) {
           console.error('Contact submit error', err);
-          if (statusMsg) { statusMsg.textContent = '❌ Failed to send message. Please try again.'; statusMsg.style.color = '#ff4444'; }
+          if (statusMsg) {
+            statusMsg.textContent =
+              '❌ Failed to send message. Please try again.';
+            statusMsg.style.color = '#ff4444';
+          }
         } finally {
-          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send Message'; }
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+          }
         }
       });
     }
@@ -545,7 +680,9 @@
        Infinite logo scroll
        ========================================================================== */
     function initLogoScroller() {
-      const track = DOM.logoTrack, set = DOM.logoSet, banner = DOM.clientLogoBanner;
+      const track = DOM.logoTrack,
+        set = DOM.logoSet,
+        banner = DOM.clientLogoBanner;
       if (!track || !set || !banner) return;
   
       // duplicate once for seamless loop
@@ -575,27 +712,46 @@
         if (!state.logoIsPaused) {
           state.logoCurrentPosition -= state.logoScrollSpeed;
           const w = getLogoSetWidth();
-          if (Math.abs(state.logoCurrentPosition) >= w) state.logoCurrentPosition = 0;
+          if (Math.abs(state.logoCurrentPosition) >= w)
+            state.logoCurrentPosition = 0;
           track.style.transform = `translate3d(${state.logoCurrentPosition}px, 0, 0)`;
         }
         state.logoAnimationId = rAF(animateLogo);
       }
   
-      banner.addEventListener('mouseenter', () => { state.logoIsPaused = true; }, { passive: true });
-      banner.addEventListener('mouseleave', () => { state.logoIsPaused = false; }, { passive: true });
+      banner.addEventListener(
+        'mouseenter',
+        () => {
+          state.logoIsPaused = true;
+        },
+        { passive: true }
+      );
+      banner.addEventListener(
+        'mouseleave',
+        () => {
+          state.logoIsPaused = false;
+        },
+        { passive: true }
+      );
   
       // pause when offscreen using IntersectionObserver
-      const bannerObserver = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) {
-            state.logoIsPaused = true;
-            if (state.logoAnimationId) { cAF(state.logoAnimationId); state.logoAnimationId = null; }
-          } else {
-            state.logoIsPaused = false;
-            if (!state.logoAnimationId) animateLogo();
-          }
-        });
-      }, { threshold: 0.01 });
+      const bannerObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              state.logoIsPaused = true;
+              if (state.logoAnimationId) {
+                cAF(state.logoAnimationId);
+                state.logoAnimationId = null;
+              }
+            } else {
+              state.logoIsPaused = false;
+              if (!state.logoAnimationId) animateLogo();
+            }
+          });
+        },
+        { threshold: 0.01 }
+      );
   
       bannerObserver.observe(banner);
   
@@ -608,20 +764,24 @@
        Reveal on scroll (IntersectionObserver)
        ========================================================================== */
     function setupRevealObserver() {
-      const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
       const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const elements = entry.target.querySelectorAll('.reveal-up');
             elements.forEach((el, i) => {
-              if (!el.classList.contains('active')) setTimeout(() => el.classList.add('active'), i * 100);
+              if (!el.classList.contains('active'))
+                setTimeout(() => el.classList.add('active'), i * 100);
             });
             observer.unobserve(entry.target);
           }
         });
       }, observerOptions);
   
-      DOM.revealSelectors.forEach(selector => {
+      DOM.revealSelectors.forEach((selector) => {
         const el = document.querySelector(selector);
         if (el) observer.observe(el);
       });
@@ -637,7 +797,11 @@
       const clip = cs.getPropertyValue('background-clip');
       const webkitFill = cs.getPropertyValue('-webkit-text-fill-color');
       if (!/text/.test(clip) || webkitFill !== 'transparent') {
-        el.style.setProperty('background-image', 'linear-gradient(135deg,#ff0080 0%,#7928ca 25%,#0070f3 50%,#38bdf8 75%,#ff0080 100%)', 'important');
+        el.style.setProperty(
+          'background-image',
+          'linear-gradient(135deg,#ff0080 0%,#7928ca 25%,#0070f3 50%,#38bdf8 75%,#ff0080 100%)',
+          'important'
+        );
         el.style.setProperty('background-size', '200% 200%', 'important');
         el.style.setProperty('-webkit-background-clip', 'text', 'important');
         el.style.setProperty('background-clip', 'text', 'important');
@@ -650,7 +814,8 @@
        Hamburger menu toggle
        ========================================================================== */
     function initHamburger() {
-      const hamburger = DOM.hamburger, navMenu = DOM.navMenu;
+      const hamburger = DOM.hamburger,
+        navMenu = DOM.navMenu;
       if (!hamburger || !navMenu) return;
   
       hamburger.addEventListener('click', () => {
@@ -658,7 +823,7 @@
         navMenu.classList.toggle('is-active');
       });
   
-      navMenu.querySelectorAll('a').forEach(link => {
+      navMenu.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', () => {
           hamburger.classList.remove('is-active');
           navMenu.classList.remove('is-active');
@@ -673,7 +838,7 @@
       const btns = DOM.joinBtns;
       const popup = DOM.popup;
       if (!btns.length || !popup) return;
-      btns.forEach(btn => {
+      btns.forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
           popup.classList.add('active');
@@ -688,7 +853,7 @@
       const items = DOM.faqItems;
       if (!items || items.length === 0) return;
   
-      items.forEach(item => {
+      items.forEach((item) => {
         const head = item.querySelector('.faq-head');
         const body = item.querySelector('.faq-body');
         if (!head || !body) return;
@@ -699,13 +864,17 @@
             item.setAttribute('data-open', 'false');
             head.setAttribute('aria-expanded', 'false');
             body.style.maxHeight = body.scrollHeight + 'px';
-            requestAnimationFrame(() => body.style.maxHeight = '0');
-            setTimeout(() => { body.hidden = true; }, 360);
+            requestAnimationFrame(() => (body.style.maxHeight = '0'));
+            setTimeout(() => {
+              body.hidden = true;
+            }, 360);
           } else {
             item.setAttribute('data-open', 'true');
             head.setAttribute('aria-expanded', 'true');
             body.hidden = false;
-            requestAnimationFrame(() => body.style.maxHeight = body.scrollHeight + 'px');
+            requestAnimationFrame(
+              () => (body.style.maxHeight = body.scrollHeight + 'px')
+            );
           }
         });
       });
@@ -721,7 +890,8 @@
       if (!cards.length || !modal || !modalClose) return;
   
       function openModal(title, desc, specs) {
-        if (DOM.gearModalTitle) DOM.gearModalTitle.textContent = title || '';
+        if (DOM.gearModalTitle)
+          DOM.gearModalTitle.textContent = title || '';
         if (DOM.gearModalDesc) DOM.gearModalDesc.textContent = desc || '';
         if (DOM.gearModalSpecs) DOM.gearModalSpecs.textContent = specs || '';
         modal.setAttribute('aria-hidden', 'false');
@@ -734,18 +904,28 @@
         document.body.style.overflow = '';
       }
   
-      cards.forEach(card => {
+      cards.forEach((card) => {
         card.addEventListener('click', () => {
-          const title = card.dataset.title || card.querySelector('.card-title')?.textContent || '';
-          const desc = card.dataset.desc || card.querySelector('.card-excerpt')?.textContent || '';
+          const title =
+            card.dataset.title ||
+            card.querySelector('.card-title')?.textContent ||
+            '';
+          const desc =
+            card.dataset.desc ||
+            card.querySelector('.card-excerpt')?.textContent ||
+            '';
           const specs = card.dataset.specs || '';
           openModal(title, desc, specs);
         });
       });
   
       modalClose.addEventListener('click', closeModal);
-      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+      });
     }
   
     /* ==========================================================================
@@ -753,13 +933,18 @@
        ========================================================================== */
     function initStudioModal() {
       if (!DOM.studioModal) return;
-      const cards = Array.from(document.querySelectorAll('#studio-setup .gear-card'));
-      const modal = DOM.studioModal, closeBtn = DOM.studioModalClose;
+      const cards = Array.from(
+        document.querySelectorAll('#studio-setup .gear-card')
+      );
+      const modal = DOM.studioModal,
+        closeBtn = DOM.studioModalClose;
       if (!cards.length || !modal || !closeBtn) return;
   
       function openModal(title, desc) {
-        if (DOM.studioModalTitle) DOM.studioModalTitle.textContent = title || '';
-        if (DOM.studioModalDesc) DOM.studioModalDesc.textContent = desc || '';
+        if (DOM.studioModalTitle)
+          DOM.studioModalTitle.textContent = title || '';
+        if (DOM.studioModalDesc)
+          DOM.studioModalDesc.textContent = desc || '';
         modal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
         closeBtn.focus();
@@ -770,20 +955,31 @@
         document.body.style.overflow = '';
       }
   
-      cards.forEach(card => {
+      cards.forEach((card) => {
         const title = card.dataset.title;
         const desc = card.dataset.desc;
         card.addEventListener('click', () => openModal(title, desc));
         card.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(title, desc); }
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openModal(title, desc);
+          }
         });
         const cta = card.querySelector('.card-cta');
-        if (cta) cta.addEventListener('click', (e) => { e.stopPropagation(); openModal(title, desc); });
+        if (cta)
+          cta.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openModal(title, desc);
+          });
       });
   
       closeBtn.addEventListener('click', closeModal);
-      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+      });
     }
   
     /* ==========================================================================
@@ -795,16 +991,30 @@
       const panel = DOM.whyDropdownPanel;
       if (!wd || !toggle || !panel) return;
   
-      function openPanel() { wd.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
-      function closePanel() { wd.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
-      function togglePanel(e) { e.preventDefault(); if (wd.classList.contains('open')) closePanel(); else openPanel(); }
+      function openPanel() {
+        wd.classList.add('open');
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+      function closePanel() {
+        wd.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+      function togglePanel(e) {
+        e.preventDefault();
+        if (wd.classList.contains('open')) closePanel();
+        else openPanel();
+      }
   
       toggle.addEventListener('click', togglePanel);
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && wd.classList.contains('open')) { closePanel(); toggle.focus(); }
+        if (e.key === 'Escape' && wd.classList.contains('open')) {
+          closePanel();
+          toggle.focus();
+        }
       });
       document.addEventListener('click', (e) => {
-        if (!wd.contains(e.target) && wd.classList.contains('open')) closePanel();
+        if (!wd.contains(e.target) && wd.classList.contains('open'))
+          closePanel();
       });
     }
   
@@ -813,30 +1023,41 @@
        ========================================================================== */
     function bindGlobalListeners() {
       window.addEventListener('scroll', onScrollHandler, { passive: true });
-      window.addEventListener('resize', () => {
-        // update intro range and re-evaluate
-        state.carouselOneSetWidth = 0;     // force carousel width recalculation
-        state.logoSetWidth = 0;            // force logo width recalculation
-        state.lastScrollY = window.scrollY || 0;
-      }, { passive: true });
+      window.addEventListener(
+        'resize',
+        () => {
+          // update intro range and re-evaluate
+          state.carouselOneSetWidth = 0; // force carousel width recalculation (if needed later)
+          state.logoSetWidth = 0; // force logo width recalculation
+          state.lastScrollY = window.scrollY || 0;
+        },
+        { passive: true }
+      );
     }
   
     /* ==========================================================================
        Bing UET (unchanged, lazy-load safe)
        ========================================================================== */
     function initBingUET() {
-      (function(w, d, t, r, u) {
+      (function (w, d, t, r, u) {
         var f, n, i;
-        w[u] = w[u] || [], f = function() {
-          var o = { ti: "343210550", enableAutoSpaTracking: true };
-          o.q = w[u], w[u] = new UET(o), w[u].push("pageLoad");
-        },
-        n = d.createElement(t), n.src = r, n.async = 1, n.onload = n.onreadystatechange = function() {
+        w[u] = w[u] || [];
+        f = function () {
+          var o = { ti: '343210550', enableAutoSpaTracking: true };
+          o.q = w[u];
+          w[u] = new UET(o);
+          w[u].push('pageLoad');
+        };
+        n = d.createElement(t);
+        n.src = r;
+        n.async = 1;
+        n.onload = n.onreadystatechange = function () {
           var s = this.readyState;
-          s && s !== "loaded" && s !== "complete" || (f(), n.onload = n.onreadystatechange = null);
-        },
-        i = d.getElementsByTagName(t)[0], i.parentNode.insertBefore(n, i);
-      })(window, document, "script", "//bat.bing.com/bat.js", "uetq");
+          s && s !== 'loaded' && s !== 'complete' || (f(), (n.onload = n.onreadystatechange = null));
+        };
+        i = d.getElementsByTagName(t)[0];
+        i.parentNode.insertBefore(n, i);
+      })(window, document, 'script', '//bat.bing.com/bat.js', 'uetq');
     }
   
     /* ==========================================================================
@@ -868,7 +1089,8 @@
       initWhyDropdown();
       initBingUET();
   
-      // Defensive: if DOM ready but some modules rely on cloned content, ensure carousel init again after short delay
+      // Defensive: if DOM ready but some modules rely on cloned content,
+      // ensure carousel init again after short delay
       setTimeout(initCarouselClones, CONFIG.CAROUSEL_CLONE_DELAY * 2);
     }
   
@@ -880,5 +1102,4 @@
     } else {
       init();
     }
-  
   })();
