@@ -1,6 +1,6 @@
 /* ============================================================================
-   script1.js — soundabode site script (refactor, carousel width fix)
-   - Organized, modular, defensive and performance-aware
+   script1.js — soundabode site script (refactor, carousel + logo fixes)
+   - Updated: safer carousel & logo scroller, defensive guards
    - Usage: replace your existing script1.js with this file
    ============================================================================ */
 
@@ -11,11 +11,11 @@
        Config / Constants
        ========================================================================== */
     const CONFIG = {
-      INTRO_ANIMATION_RATIO: 0.8,          // portion of viewport used for intro animation
-      RAF_STOP_DELAY: 180,                 // ms to stop RAF after scroll ends
-      POPUP_DELAY: 2000,                   // ms to show popup after load
-      TESTIMONIAL_AUTO_MS: 3000,           // testimonial auto-advance interval
-      CAROUSEL_CLONE_DELAY: 500,           // delay before computing widths & cloning carousel
+      INTRO_ANIMATION_RATIO: 0.8, // portion of viewport used for intro animation
+      RAF_STOP_DELAY: 180, // ms to stop RAF after scroll ends
+      POPUP_DELAY: 2000, // ms to show popup after load
+      TESTIMONIAL_AUTO_MS: 3000, // testimonial auto-advance interval
+      CAROUSEL_CLONE_DELAY: 500, // delay before computing widths & cloning carousel
       LOGO_SCROLL_SPEEDS: { xs: 0.03, sm: 0.05, md: 0.25, lg: 0.4 },
       CAROUSEL_STRICT_VIEWPORT_FACTOR: 1.2
     };
@@ -26,7 +26,7 @@
     const isMobile = () => window.innerWidth < 768;
     const isLowEndDevice = () =>
       (navigator.deviceMemory && navigator.deviceMemory < 4) ||
-      navigator.hardwareConcurrency < 3;
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 3);
   
     /* ==========================================================================
        DOM Caching
@@ -151,7 +151,13 @@
        ========================================================================== */
     const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
     const rAF = (fn) => requestAnimationFrame(fn);
-    const cAF = (id) => cancelAnimationFrame(id);
+    const cAF = (id) => {
+      try {
+        if (id) cancelAnimationFrame(id);
+      } catch (e) {
+        // ignore
+      }
+    };
     const q = (sel) => document.querySelector(sel);
   
     /* ==========================================================================
@@ -285,7 +291,6 @@
     /* ==========================================================================
        Carousel (infinite loop, clones, in-view detection)
        ========================================================================== */
-    // FIXED: use scrollWidth instead of summing offsetWidth, more robust
     function initCarouselClones() {
       const track = DOM.carouselTrack;
       if (!track || state.carouselInitialized) return;
@@ -293,16 +298,31 @@
       const items = track.querySelectorAll('.carousel-item');
       if (!items.length) return;
   
+      // Delay measuring until layout has settled
       setTimeout(() => {
         try {
           // measure width of single set BEFORE cloning
-          const singleSetWidth = track.scrollWidth;
+          const singleSetWidth = track.scrollWidth || track.offsetWidth || 0;
   
           if (singleSetWidth > 0) {
             state.carouselOneSetWidth = singleSetWidth;
   
-            const original = track.innerHTML;
-            track.innerHTML = original + original; // duplicate once
+            // clone the children cleanly (avoid innerHTML duplication which can break events/styles)
+            const wrapper = document.createElement('div');
+            wrapper.className = 'carousel-set-temp';
+            // move current children into wrapper (shallow)
+            while (track.firstChild) {
+              wrapper.appendChild(track.firstChild);
+            }
+            // now append two copies of wrapper's inner content
+            const set1 = wrapper.cloneNode(true);
+            const set2 = wrapper.cloneNode(true);
+            // clear track and append
+            track.innerHTML = '';
+            track.appendChild(set1);
+            track.appendChild(set2);
+  
+            // mark initialized
             state.carouselInitialized = true;
   
             // start animation if already in view
@@ -320,7 +340,6 @@
       }, CONFIG.CAROUSEL_CLONE_DELAY);
     }
   
-    // FIXED: more forgiving when section wrapper is missing; relies on start fn guard
     function checkCarouselInView() {
       const section = DOM.carouselSection;
       const track = DOM.carouselTrack;
@@ -365,13 +384,27 @@
       state.isCarouselAnimating = true;
   
       const track = DOM.carouselTrack;
+  
+      // ensure any previous animation is canceled
+      if (state.carouselAnimationId) cAF(state.carouselAnimationId);
+      state.carouselAnimationId = null;
+  
       function step() {
-        // speed can be tuned
+        // advance
         state.carouselScrollPos += state.carouselSpeed;
-        if (state.carouselScrollPos >= state.carouselOneSetWidth)
+  
+        // wrap smoothly using modulo (avoids a visible jump)
+        const w = state.carouselOneSetWidth || track.scrollWidth || track.offsetWidth;
+        if (w > 0) {
+          // keep carouselScrollPos within [0, w)
+          if (state.carouselScrollPos >= w) state.carouselScrollPos = state.carouselScrollPos % w;
+        } else {
           state.carouselScrollPos = 0;
+        }
+  
         if (track)
           track.style.transform = `translate3d(-${state.carouselScrollPos}px, 0, 0)`;
+  
         if (state.isCarouselAnimating) state.carouselAnimationId = rAF(step);
       }
       step();
@@ -387,9 +420,7 @@
     function bindCarouselHoverPause() {
       const track = DOM.carouselTrack;
       if (!track) return;
-      track.addEventListener('mouseenter', stopCarouselAnimation, {
-        passive: true
-      });
+      track.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
       track.addEventListener(
         'mouseleave',
         () => {
@@ -408,9 +439,7 @@
        Testimonial slider (simple and accessible)
        ========================================================================== */
     function initTestimonials() {
-      const testimonials = Array.from(
-        document.querySelectorAll('.testimonial')
-      );
+      const testimonials = Array.from(document.querySelectorAll('.testimonial'));
       const dotsContainer = DOM.dotsContainer;
       const prevBtn = DOM.prevBtn;
       const nextBtn = DOM.nextBtn;
@@ -480,8 +509,7 @@
         );
       }
       function stopAuto() {
-        if (state.testimonialAutoInterval)
-          clearInterval(state.testimonialAutoInterval);
+        if (state.testimonialAutoInterval) clearInterval(state.testimonialAutoInterval);
       }
       function restartAutoSlide() {
         stopAuto();
@@ -559,8 +587,7 @@
           const result = await resp.json();
           if (resp.ok && result.success) {
             if (statusMsg) {
-              statusMsg.textContent =
-                "✅ Thank you! We'll contact you soon.";
+              statusMsg.textContent = "✅ Thank you! We'll contact you soon.";
               statusMsg.style.color = '#00ff88';
             }
             form.reset();
@@ -574,8 +601,7 @@
         } catch (err) {
           console.error('Popup submit error', err);
           if (statusMsg) {
-            statusMsg.textContent =
-              '❌ Failed to submit. Please try again.';
+            statusMsg.textContent = '❌ Failed to submit. Please try again.';
             statusMsg.style.color = '#ff4444';
           }
         } finally {
@@ -651,8 +677,7 @@
           const result = await resp.json();
           if (resp.ok && result.success) {
             if (statusMsg) {
-              statusMsg.textContent =
-                "✅ Message sent successfully! We'll get back to you soon.";
+              statusMsg.textContent = "✅ Message sent successfully! We'll get back to you soon.";
               statusMsg.style.color = '#00ff88';
             }
             form.reset();
@@ -663,8 +688,7 @@
         } catch (err) {
           console.error('Contact submit error', err);
           if (statusMsg) {
-            statusMsg.textContent =
-              '❌ Failed to send message. Please try again.';
+            statusMsg.textContent = '❌ Failed to send message. Please try again.';
             statusMsg.style.color = '#ff4444';
           }
         } finally {
@@ -677,7 +701,7 @@
     }
   
     /* ==========================================================================
-       Infinite logo scroll
+       Infinite logo scroll (robust)
        ========================================================================== */
     function initLogoScroller() {
       const track = DOM.logoTrack,
@@ -685,9 +709,23 @@
         banner = DOM.clientLogoBanner;
       if (!track || !set || !banner) return;
   
-      // duplicate once for seamless loop
-      const original = set.outerHTML;
-      track.innerHTML = original + original;
+      // Defensive: ensure there's at least one logo item
+      if (!set.children || set.children.length === 0) {
+        console.warn('Logo scroller: no .logo-item children found inside .logo-set');
+        return;
+      }
+  
+      // Cleanly create two sets (cloneNode) for seamless loop
+      track.innerHTML = '';
+      const set1 = set.cloneNode(true);
+      const set2 = set.cloneNode(true);
+  
+      // Ensure proper display to avoid wrapping
+      set1.style.display = 'inline-flex';
+      set2.style.display = 'inline-flex';
+  
+      track.appendChild(set1);
+      track.appendChild(set2);
   
       // responsive speed
       function updateLogoSpeed() {
@@ -696,6 +734,8 @@
         else if (w < 768) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.sm;
         else if (w < 1440) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.md;
         else state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.lg;
+  
+        if (isLowEndDevice()) state.logoScrollSpeed *= 0.6;
         // reset measured width so it recalculates
         state.logoSetWidth = 0;
       }
@@ -703,20 +743,51 @@
       function getLogoSetWidth() {
         if (!state.logoSetWidth) {
           const sets = track.querySelectorAll('.logo-set');
-          state.logoSetWidth = sets[0] ? sets[0].offsetWidth : 0;
+          if (sets.length > 0) {
+            // prefer scrollWidth for accurate total width including overflow content
+            state.logoSetWidth = sets[0].scrollWidth || sets[0].offsetWidth || 0;
+            if (!state.logoSetWidth) {
+              // fallback: sum child widths
+              let w = 0;
+              Array.from(sets[0].children).forEach((c) => {
+                const rect = c.getBoundingClientRect();
+                w += rect.width;
+              });
+              state.logoSetWidth = Math.max(0, w);
+            }
+          } else {
+            state.logoSetWidth = 0;
+          }
         }
         return state.logoSetWidth;
       }
   
       function animateLogo() {
-        if (!state.logoIsPaused) {
-          state.logoCurrentPosition -= state.logoScrollSpeed;
-          const w = getLogoSetWidth();
-          if (Math.abs(state.logoCurrentPosition) >= w)
-            state.logoCurrentPosition = 0;
-          track.style.transform = `translate3d(${state.logoCurrentPosition}px, 0, 0)`;
+        // cancel existing RAF guard
+        if (state.logoAnimationId) cAF(state.logoAnimationId);
+        state.logoAnimationId = null;
+  
+        function step() {
+          if (!state.logoIsPaused) {
+            // fractional movement for smoothness
+            state.logoCurrentPosition -= state.logoScrollSpeed;
+  
+            const w = getLogoSetWidth();
+            if (!w) {
+              // try recomputing next frame
+              state.logoSetWidth = 0;
+            } else {
+              // wrap using modulo to avoid visible jump
+              if (-state.logoCurrentPosition >= w) {
+                state.logoCurrentPosition += w;
+              }
+              // apply transform
+              track.style.transform = `translate3d(${state.logoCurrentPosition}px, 0, 0)`;
+            }
+          }
+          state.logoAnimationId = rAF(step);
         }
-        state.logoAnimationId = rAF(animateLogo);
+        step();
       }
   
       banner.addEventListener(
@@ -734,20 +805,11 @@
         { passive: true }
       );
   
-      // pause when offscreen using IntersectionObserver
+      // pause when offscreen using IntersectionObserver (improves perf)
       const bannerObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (!entry.isIntersecting) {
-              state.logoIsPaused = true;
-              if (state.logoAnimationId) {
-                cAF(state.logoAnimationId);
-                state.logoAnimationId = null;
-              }
-            } else {
-              state.logoIsPaused = false;
-              if (!state.logoAnimationId) animateLogo();
-            }
+            state.logoIsPaused = !entry.isIntersecting;
           });
         },
         { threshold: 0.01 }
@@ -757,6 +819,10 @@
   
       updateLogoSpeed();
       window.addEventListener('resize', updateLogoSpeed, { passive: true });
+  
+      // start RAF loop
+      if (state.logoAnimationId) cAF(state.logoAnimationId);
+      state.logoAnimationId = null;
       animateLogo();
     }
   
@@ -782,8 +848,12 @@
       }, observerOptions);
   
       DOM.revealSelectors.forEach((selector) => {
-        const el = document.querySelector(selector);
-        if (el) observer.observe(el);
+        try {
+          const el = document.querySelector(selector);
+          if (el) observer.observe(el);
+        } catch (e) {
+          // ignore invalid selectors
+        }
       });
     }
   
@@ -890,8 +960,7 @@
       if (!cards.length || !modal || !modalClose) return;
   
       function openModal(title, desc, specs) {
-        if (DOM.gearModalTitle)
-          DOM.gearModalTitle.textContent = title || '';
+        if (DOM.gearModalTitle) DOM.gearModalTitle.textContent = title || '';
         if (DOM.gearModalDesc) DOM.gearModalDesc.textContent = desc || '';
         if (DOM.gearModalSpecs) DOM.gearModalSpecs.textContent = specs || '';
         modal.setAttribute('aria-hidden', 'false');
@@ -933,18 +1002,14 @@
        ========================================================================== */
     function initStudioModal() {
       if (!DOM.studioModal) return;
-      const cards = Array.from(
-        document.querySelectorAll('#studio-setup .gear-card')
-      );
+      const cards = Array.from(document.querySelectorAll('#studio-setup .gear-card'));
       const modal = DOM.studioModal,
         closeBtn = DOM.studioModalClose;
       if (!cards.length || !modal || !closeBtn) return;
   
       function openModal(title, desc) {
-        if (DOM.studioModalTitle)
-          DOM.studioModalTitle.textContent = title || '';
-        if (DOM.studioModalDesc)
-          DOM.studioModalDesc.textContent = desc || '';
+        if (DOM.studioModalTitle) DOM.studioModalTitle.textContent = title || '';
+        if (DOM.studioModalDesc) DOM.studioModalDesc.textContent = desc || '';
         modal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
         closeBtn.focus();
@@ -1013,8 +1078,7 @@
         }
       });
       document.addEventListener('click', (e) => {
-        if (!wd.contains(e.target) && wd.classList.contains('open'))
-          closePanel();
+        if (!wd.contains(e.target) && wd.classList.contains('open')) closePanel();
       });
     }
   
