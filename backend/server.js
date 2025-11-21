@@ -170,7 +170,7 @@ function getUserContactEmail({ fullName, course, ref, isCourse }) {
       <p>If urgent, call us at <a href="tel:${PHONE_NUMBER}">${PHONE_NUMBER}</a> or message on WhatsApp.</p>
     </div>
   `;
-  return getBaseEmailTemplate({ title: `Thanks — ${COMPANY_NAME}`, content, footerNote: 'We will get back to you shortly.' });
+  return getBaseEmailTemplate({ title: `Thanks  ${COMPANY_NAME}`, content, footerNote: 'We will get back to you shortly.' });
 }
 
 function getAdminPopupEmail({ fullName, email, phone, message, timestamp, ref }) {
