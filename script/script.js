@@ -23,6 +23,29 @@
   };
 
   /* ==========================================================================
+     Backend base configuration (single source of truth)
+     - Set window.SOUNDABODE_BACKEND_BASE in your HTML BEFORE this script, e.g.:
+       <script>
+         window.SOUNDABODE_BACKEND_BASE = 'https://your-backend.com';
+       </script>
+       <script src="frontend/script/script1.js"></script>
+     - We will automatically call:
+         POST {BASE}/api/popup-form
+         POST {BASE}/api/contact-form
+     ========================================================================== */
+  const API = {
+    base: (function () {
+      // Prefer explicit BASE var, then legacy URL var, then default Render URL
+      const base =
+        window.SOUNDABODE_BACKEND_BASE ||
+        window.SOUNDABODE_BACKEND_URL ||
+        'https://soundabodev2-server.onrender.com';
+      // remove trailing slashes to avoid // in URLs
+      return String(base).replace(/\/+$/, '');
+    })()
+  };
+
+  /* ==========================================================================
      Environment / Device detection
      ========================================================================== */
   const isMobile = () => window.innerWidth < 768;
@@ -150,12 +173,29 @@
 
   /* ==========================================================================
      CSS & Font readiness helper (optimization)
+     - FIXED: no more temporal-dead-zone bug with styleObservers.
      - Waits (best-effort) for stylesheet/link load events and document.fonts.ready.
      - Falls back after STYLES_READY_TIMEOUT so it never blocks indefinitely.
      ========================================================================== */
   function whenStylesAndFontsReady(timeout = CONFIG.STYLES_READY_TIMEOUT) {
     return new Promise((resolve) => {
       let resolved = false;
+      const styleObservers = [];
+      let fontListener = null;
+      let timeoutId = null;
+
+      const clear = () => {
+        if (styleObservers && styleObservers.length) {
+          styleObservers.forEach((s) => {
+            try { s(); } catch (e) { /* ignore */ }
+          });
+        }
+        if (fontListener) {
+          try { fontListener(); } catch (e) { /* ignore */ }
+        }
+        if (timeoutId) clearTimeout(timeoutId);
+      };
+
       const tidy = () => {
         if (!resolved) {
           resolved = true;
@@ -164,42 +204,36 @@
         }
       };
 
-      const clear = () => {
-        if (styleObservers && styleObservers.length) {
-          styleObservers.forEach((s) => s());
-        }
-        if (fontListener) fontListener();
-        if (timeoutId) clearTimeout(timeoutId);
-      };
-
       // timeout fallback
-      const timeoutId = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         tidy();
       }, timeout);
 
       // 1) Wait for font loading if supported
-      let fontListener = null;
       try {
         if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(() => {
-            setTimeout(() => {
-              if (!resolved) {
-                setTimeout(() => {
-                  tidy();
-                }, 30);
-              }
-            }, 0);
-          }).catch(() => {});
+          document.fonts.ready
+            .then(() => {
+              setTimeout(() => {
+                if (!resolved) {
+                  setTimeout(() => {
+                    tidy();
+                  }, 30);
+                }
+              }, 0);
+            })
+            .catch(() => {});
           fontListener = () => { /* nothing to unbind for fonts.ready */ };
         }
       } catch (e) {
-        // ignore
+        // ignore fonts support errors
       }
 
       // 2) Observe <link rel="stylesheet"> & <link rel="preload" as="style">
-      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"], link[rel="preload"][as="style"]'));
+      const links = Array.from(
+        document.querySelectorAll('link[rel="stylesheet"], link[rel="preload"][as="style"]')
+      );
       const pending = [];
-      const styleObservers = [];
 
       links.forEach((link) => {
         try {
@@ -607,7 +641,7 @@
   }
 
   /* ==========================================================================
-     Popup form submission (fixed, includes tracking)
+     Popup form submission (fixed, includes tracking, fixed backend wiring)
      ========================================================================== */
   function initPopupFormHandler() {
     const form = DOM.popupForm;
@@ -637,11 +671,9 @@
         submitBtn.textContent = 'Sending...';
       }
 
-      // Try to keep submission under ~5s: use fetch with timeout wrapper
-      const BACKEND_URL = (() => {
-        // preserve original host; you can override by setting a global SOUNDABODE_BACKEND if needed
-        return window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com/api/popup-form';
-      })();
+      // Backend URL now always based on API.base
+      const BACKEND_URL = API.base + '/api/popup-form';
+      console.log('[Popup] submitting to', BACKEND_URL);
 
       try {
         const controller = new AbortController();
@@ -650,7 +682,11 @@
         const resp = await fetch(BACKEND_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fullName: data.name, email: data.email, phone: data.phone }),
+          body: JSON.stringify({
+            fullName: data.name,
+            email: data.email,
+            phone: data.phone
+          }),
           signal: controller.signal
         });
 
@@ -664,7 +700,10 @@
           }
           // fire conversion tracking
           try {
-            sendConversionTracking('popup_form_submitted', { name: data.name, email: data.email });
+            sendConversionTracking('popup_form_submitted', {
+              name: data.name,
+              email: data.email
+            });
           } catch (tErr) {
             // ignore
           }
@@ -682,7 +721,9 @@
         // if aborted, show friendly message
         console.error('Popup submit error', err);
         if (statusMsg) {
-          statusMsg.textContent = err.name === 'AbortError' ? '❌ Request timed out. Try again.' : '❌ Failed to submit. Please try again.';
+          statusMsg.textContent = err.name === 'AbortError'
+            ? '❌ Request timed out. Try again.'
+            : '❌ Failed to submit. Please try again.';
           statusMsg.style.color = '#ff4444';
         }
       } finally {
@@ -695,7 +736,7 @@
   }
 
   /* ==========================================================================
-     Contact form handler
+     Contact form handler (fixed backend wiring)
      ========================================================================== */
   function initContactFormHandler() {
     const form = DOM.contactForm;
@@ -723,20 +764,29 @@
       }
 
       // recaptcha optional guard left intact if present
-      const recaptchaResponse = (window.grecaptcha && grecaptcha.getResponse && grecaptcha.getResponse()) || '';
+      const recaptchaResponse =
+        (window.grecaptcha && grecaptcha.getResponse && grecaptcha.getResponse()) || '';
 
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending...';
       }
 
-      const BACKEND_URL = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com/api/contact-form';
+      const BACKEND_URL = API.base + '/api/contact-form';
+      console.log('[Contact] submitting to', BACKEND_URL);
 
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        const body = { fullName: data.fullName, email: data.email, phone: data.phone, course: data.course || '', message: data.message || '', recaptcha: recaptchaResponse };
+        const body = {
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          course: data.course || '',
+          message: data.message || '',
+          recaptcha: recaptchaResponse
+        };
 
         const resp = await fetch(BACKEND_URL, {
           method: 'POST',
@@ -755,7 +805,10 @@
           }
           // conversion tracking
           try {
-            sendConversionTracking('contact_form_submitted', { name: data.fullName, email: data.email });
+            sendConversionTracking('contact_form_submitted', {
+              name: data.fullName,
+              email: data.email
+            });
           } catch (tErr) {}
           form.reset();
           if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset();
@@ -766,7 +819,9 @@
       } catch (err) {
         console.error('Contact submit error', err);
         if (statusMsg) {
-          statusMsg.textContent = err.name === 'AbortError' ? '❌ Request timed out. Try again.' : '❌ Failed to send message. Please try again.';
+          statusMsg.textContent = err.name === 'AbortError'
+            ? '❌ Request timed out. Try again.'
+            : '❌ Failed to send message. Please try again.';
           statusMsg.style.color = '#ff4444';
         }
       } finally {
@@ -1087,6 +1142,8 @@
     // guard against double init
     if (state.inited) return;
     state.inited = true;
+
+    console.log('[Soundabode] Using backend base:', API.base);
 
     ensureAuroraText();
     bindGlobalListeners();
