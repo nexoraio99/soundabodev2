@@ -2,998 +2,1134 @@
    script1.js — soundabode site script (refactor, carousel + logo fixes)
    - Rewritten to fix root cause: clone .carousel-item nodes (direct children)
    - Defensive, performance-aware, and mobile-friendly
+   - Added CSS & font readiness helper to reduce layout thrash (no other logic
+     changes to original modules were made).
    ============================================================================ */
 
-   (() => {
-    'use strict';
-  
-    /* ==========================================================================
-       Config / Constants
-       ========================================================================== */
-    const CONFIG = {
-      INTRO_ANIMATION_RATIO: 0.8,
-      RAF_STOP_DELAY: 180,
-      POPUP_DELAY: 2000,
-      TESTIMONIAL_AUTO_MS: 3000,
-      CAROUSEL_CLONE_DELAY: 400,
-      LOGO_SCROLL_SPEEDS: { xs: 0.03, sm: 0.05, md: 0.25, lg: 0.4 },
-      CAROUSEL_STRICT_VIEWPORT_FACTOR: 1.2
-    };
-  
-    /* ==========================================================================
-       Environment / Device detection
-       ========================================================================== */
-    const isMobile = () => window.innerWidth < 768;
-    const isLowEndDevice = () =>
-      (navigator.deviceMemory && navigator.deviceMemory < 4) ||
-      (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 3);
-  
-    /* ==========================================================================
-       DOM Cache
-       ========================================================================== */
-    const DOM = {
-      panelLeft: document.querySelector('.panel-left'),
-      panelRight: document.querySelector('.panel-right'),
-      introOverlay: document.querySelector('.intro-overlay'),
-      overlayLeft: document.querySelector('.overlay-left'),
-      overlayRight: document.querySelector('.overlay-right'),
-  
-      mainContent: document.querySelector('.main-content'),
-      navbar: document.querySelector('.navbar'),
-      spacer: document.querySelector('.spacer'),
-  
-      carouselTrack: document.querySelector('.carousel-track'),
-      carouselSection: document.getElementById('carousel-section'),
-  
-      logoTrack: document.querySelector('.logo-track'),
-      logoSet: document.querySelector('.logo-set'),
-      clientLogoBanner: document.querySelector('.client-logo-banner'),
-  
-      testimonialContainer: document.querySelector('.testimonial-container'),
-      prevBtn: document.querySelector('.prev'),
-      nextBtn: document.querySelector('.next'),
-      dotsContainer: document.querySelector('.dots'),
-  
-      popup: document.getElementById('popup-form'),
-      popupClose: document.getElementById('closePopup'),
-      popupForm: document.getElementById('popup-form-element'),
-  
-      contactForm: document.getElementById('contact-form'),
-      contactStatus: document.getElementById('form-status'),
-  
-      aboutSection: document.getElementById('about-section'),
-  
-      faqItems: document.querySelectorAll('.faq-item'),
-  
-      gearCards: document.querySelectorAll('.gear-card'),
-      gearModal: document.getElementById('gearModal'),
-      gearModalTitle: document.getElementById('modalTitle'),
-      gearModalDesc: document.getElementById('modalDesc'),
-      gearModalSpecs: document.getElementById('modalSpecs'),
-      gearModalClose: document.getElementById('modalClose'),
-  
-      studioModal: document.getElementById('studioModal'),
-      studioModalTitle: document.getElementById('studioModalTitle'),
-      studioModalDesc: document.getElementById('studioModalDesc'),
-      studioModalClose: document.getElementById('studioModalClose'),
-  
-      whyDropdown: document.querySelector('.why-dropdown'),
-      whyDropdownToggle: document.getElementById('whyDropdownToggle'),
-      whyDropdownPanel: document.getElementById('whyDropdownPanel'),
-  
-      hamburger: document.querySelector('.hamburger-menu'),
-      navMenu: document.querySelector('.nav-menu'),
-      joinBtns: document.querySelectorAll('.glow-border'),
-      auroraText: document.querySelector('.aurora-text'),
-  
-      revealSelectors: [
-        '#about-section',
-        '#carousel-section',
-        '.testimonials',
-        '#studio-setup',
-        '#why-soundabode',
-        '#faq'
-      ]
-    };
-  
-    /* ==========================================================================
-       State
-       ========================================================================== */
-    const state = {
-      scrollY: 0,
-      phase1Progress: 0,
-      spacerStart: 0,
-      spacerEnd: 0,
-      ticking: false,
-      lastScrollY: 0,
-      rafId: null,
-      rafStopTimer: null,
-  
-      // carousel
-      carouselInView: false,
-      isCarouselAnimating: false,
-      carouselOneSetWidth: 0, // width of one full group of items
-      carouselInitialized: false,
-      carouselScrollPos: 0,
-      carouselAnimationId: null,
-      carouselSpeed: isMobile() ? 0.8 : 1.0,
-  
-      // logos
-      logoAnimationId: null,
-      logoCurrentPosition: 0,
-      logoScrollSpeed: CONFIG.LOGO_SCROLL_SPEEDS.md,
-      logoSetWidth: 0,
-      logoIsPaused: false,
-  
-      // testimonials
-      testimonialIndex: 0,
-      testimonialAutoInterval: null,
-  
-      popupShown: false
-    };
-  
-    /* ==========================================================================
-       Utilities
-       ========================================================================== */
-    const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
-    const rAF = (fn) => requestAnimationFrame(fn);
-    const cAF = (id) => {
-      try {
-        if (id) cancelAnimationFrame(id);
-      } catch (e) {
-        // ignore
-      }
-    };
-  
-    /* ==========================================================================
-       Master animation loop (scroll-driven)
-       ========================================================================== */
-    const INTRO_ANIMATION_RANGE = () =>
-      Math.max(1, window.innerHeight * CONFIG.INTRO_ANIMATION_RATIO);
-  
-    function masterAnimationLoop() {
-      state.scrollY = window.scrollY || window.pageYOffset || 0;
-  
-      if (Math.abs(state.scrollY - state.lastScrollY) > 5 || !state.ticking) {
-        state.lastScrollY = state.scrollY;
-  
-        const viewportHeight = window.innerHeight;
-        const spacerHeight = (DOM.spacer && DOM.spacer.offsetHeight) || 0;
-  
-        state.spacerStart = viewportHeight;
-        state.spacerEnd = state.spacerStart + spacerHeight;
-  
-        state.phase1Progress = clamp(state.scrollY / INTRO_ANIMATION_RANGE(), 0, 1);
-  
-        updateIntroOverlay();
-        updateMainContent();
-        checkCarouselInView();
-      }
-  
-      if (state.ticking) state.rafId = rAF(masterAnimationLoop);
+(function () {
+  'use strict';
+
+  /* ==========================================================================
+     Config / Constants
+     ========================================================================== */
+  const CONFIG = {
+    INTRO_ANIMATION_RATIO: 0.8,
+    RAF_STOP_DELAY: 180,
+    POPUP_DELAY: 2000,
+    TESTIMONIAL_AUTO_MS: 3000,
+    CAROUSEL_CLONE_DELAY: 400,
+    LOGO_SCROLL_SPEEDS: { xs: 0.03, sm: 0.05, md: 0.25, lg: 0.4 },
+    CAROUSEL_STRICT_VIEWPORT_FACTOR: 1.2,
+    STYLES_READY_TIMEOUT: 2500 // ms - fall back if styles/fonts don't report
+  };
+
+  /* ==========================================================================
+     Environment / Device detection
+     ========================================================================== */
+  const isMobile = () => window.innerWidth < 768;
+  const isLowEndDevice = () =>
+    (navigator.deviceMemory && navigator.deviceMemory < 4) ||
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 3);
+
+  /* ==========================================================================
+     DOM Cache
+     ========================================================================== */
+  const DOM = {
+    panelLeft: document.querySelector('.panel-left'),
+    panelRight: document.querySelector('.panel-right'),
+    introOverlay: document.querySelector('.intro-overlay'),
+    overlayLeft: document.querySelector('.overlay-left'),
+    overlayRight: document.querySelector('.overlay-right'),
+
+    mainContent: document.querySelector('.main-content'),
+    navbar: document.querySelector('.navbar'),
+    spacer: document.querySelector('.spacer'),
+
+    carouselTrack: document.querySelector('.carousel-track'),
+    carouselSection: document.getElementById('carousel-section'),
+
+    logoTrack: document.querySelector('.logo-track'),
+    logoSet: document.querySelector('.logo-set'),
+    clientLogoBanner: document.querySelector('.client-logo-banner'),
+
+    testimonialContainer: document.querySelector('.testimonial-container'),
+    prevBtn: document.querySelector('.prev'),
+    nextBtn: document.querySelector('.next'),
+    dotsContainer: document.querySelector('.dots'),
+
+    popup: document.getElementById('popup-form'),
+    popupClose: document.getElementById('closePopup'),
+    popupForm: document.getElementById('popup-form-element'),
+
+    contactForm: document.getElementById('contact-form'),
+    contactStatus: document.getElementById('form-status'),
+
+    aboutSection: document.getElementById('about-section'),
+
+    faqItems: document.querySelectorAll('.faq-item'),
+
+    gearCards: document.querySelectorAll('.gear-card'),
+    gearModal: document.getElementById('gearModal'),
+    gearModalTitle: document.getElementById('modalTitle'),
+    gearModalDesc: document.getElementById('modalDesc'),
+    gearModalSpecs: document.getElementById('modalSpecs'),
+    gearModalClose: document.getElementById('modalClose'),
+
+    studioModal: document.getElementById('studioModal'),
+    studioModalTitle: document.getElementById('studioModalTitle'),
+    studioModalDesc: document.getElementById('studioModalDesc'),
+    studioModalClose: document.getElementById('studioModalClose'),
+
+    whyDropdown: document.querySelector('.why-dropdown'),
+    whyDropdownToggle: document.getElementById('whyDropdownToggle'),
+    whyDropdownPanel: document.getElementById('whyDropdownPanel'),
+
+    hamburger: document.querySelector('.hamburger-menu'),
+    navMenu: document.querySelector('.nav-menu'),
+    joinBtns: document.querySelectorAll('.glow-border'),
+    auroraText: document.querySelector('.aurora-text'),
+
+    revealSelectors: [
+      '#about-section',
+      '#carousel-section',
+      '.testimonials',
+      '#studio-setup',
+      '#why-soundabode',
+      '#faq'
+    ]
+  };
+
+  /* ==========================================================================
+     State
+     ========================================================================== */
+  const state = {
+    scrollY: 0,
+    phase1Progress: 0,
+    spacerStart: 0,
+    spacerEnd: 0,
+    ticking: false,
+    lastScrollY: 0,
+    rafId: null,
+    rafStopTimer: null,
+
+    // carousel
+    carouselInView: false,
+    isCarouselAnimating: false,
+    carouselOneSetWidth: 0, // width of one full group of items
+    carouselInitialized: false,
+    carouselScrollPos: 0,
+    carouselAnimationId: null,
+    carouselSpeed: isMobile() ? 0.8 : 1.0,
+
+    // logos
+    logoAnimationId: null,
+    logoCurrentPosition: 0,
+    logoScrollSpeed: CONFIG.LOGO_SCROLL_SPEEDS.md,
+    logoSetWidth: 0,
+    logoIsPaused: false,
+
+    // testimonials
+    testimonialIndex: 0,
+    testimonialAutoInterval: null,
+
+    popupShown: false
+  };
+
+  /* ==========================================================================
+     Utilities
+     ========================================================================== */
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const rAF = (fn) => requestAnimationFrame(fn);
+  const cAF = (id) => {
+    try {
+      if (id) cancelAnimationFrame(id);
+    } catch (e) {
+      // ignore
     }
-  
-    function onScrollHandler() {
-      if (!state.ticking) {
-        state.ticking = true;
-        masterAnimationLoop();
-      }
-  
-      if (state.rafStopTimer) clearTimeout(state.rafStopTimer);
-      state.rafStopTimer = setTimeout(() => {
-        if (state.ticking) {
-          cAF(state.rafId);
-          state.rafId = null;
-          state.ticking = false;
+  };
+
+  /* ==========================================================================
+     CSS & Font readiness helper (optimization)
+     - Waits (best-effort) for stylesheet/link load events and document.fonts.ready.
+     - Falls back after STYLES_READY_TIMEOUT so it never blocks indefinitely.
+     ========================================================================== */
+  function whenStylesAndFontsReady(timeout = CONFIG.STYLES_READY_TIMEOUT) {
+    return new Promise((resolve) => {
+      let resolved = false;
+      const tidy = () => {
+        if (!resolved) {
+          resolved = true;
+          clear();
+          resolve();
         }
-      }, CONFIG.RAF_STOP_DELAY);
-    }
-  
-    /* ==========================================================================
-       Intro overlay behavior
-       ========================================================================== */
-    function updateIntroOverlay() {
-      const { panelLeft, panelRight, introOverlay, overlayLeft, overlayRight } = DOM;
-      if (!panelLeft || !panelRight || !introOverlay) return;
-      const mobile = isMobile();
-      const progress = state.phase1Progress;
-      const percent = progress * 100;
-  
-      if (mobile) {
-        panelLeft.style.transform = `translate3d(0, ${-percent}%, 0)`;
-        panelRight.style.transform = `translate3d(0, ${percent}%, 0)`;
-      } else {
-        panelLeft.style.transform = `translate3d(${-percent}%, 0, 0)`;
-        panelRight.style.transform = `translate3d(${percent}%, 0, 0)`;
-      }
-  
-      if (overlayLeft)
-        overlayLeft.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${-progress * 10}px, 0, 0)`;
-      if (overlayRight)
-        overlayRight.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${progress * 10}px, 0, 0)`;
-  
-      const fadeStart = 0.75;
-      const fadeOpacity = Math.max(0, 1 - (progress - fadeStart) / (1 - fadeStart));
-      introOverlay.style.opacity = String(fadeOpacity);
-  
-      if (fadeOpacity < 0.05) {
-        introOverlay.style.pointerEvents = 'none';
-        introOverlay.style.zIndex = '1';
-      } else {
-        introOverlay.style.pointerEvents = 'auto';
-        introOverlay.style.zIndex = '50';
-      }
-    }
-  
-    /* ==========================================================================
-       Main content reveal
-       ========================================================================== */
-    function updateMainContent() {
-      if (!DOM.mainContent) return;
-      const p = state.phase1Progress;
-      DOM.mainContent.style.transform = `scale(${1 + p * 0.05})`;
-      DOM.mainContent.style.opacity = String(p);
-      if (p > 0.1) DOM.mainContent.style.pointerEvents = 'auto';
-      if (DOM.navbar) {
-        DOM.navbar.style.opacity = '1';
-        DOM.navbar.style.pointerEvents = 'auto';
-      }
-    }
-  
-    /* ==========================================================================
-       Carousel — fixed cloning & measurement (root-cause fix)
-       ========================================================================== */
-    function getGapValuePx(el) {
-      try {
-        const cs = getComputedStyle(el);
-        const gap = cs.getPropertyValue('gap') || cs.getPropertyValue('column-gap') || '0px';
-        return parseFloat(gap) || 0;
-      } catch (e) {
-        return 0;
-      }
-    }
-  
-    function measureOneSetWidth(items) {
-      // sum bounding widths (includes padding/border visually)
-      let total = 0;
-      for (let i = 0; i < items.length; i++) {
-        const rect = items[i].getBoundingClientRect();
-        total += rect.width;
-      }
-      // include gaps between items (n-1 gaps)
-      const track = DOM.carouselTrack;
-      const gap = track ? getGapValuePx(track) : 0;
-      if (items.length > 1) total += gap * (items.length - 1);
-      return Math.round(total);
-    }
-  
-    function initCarouselClones() {
-      const track = DOM.carouselTrack;
-      if (!track || state.carouselInitialized) return;
-  
-      // find actual carousel items anywhere under track (avoid nested wrappers)
-      const originalItems = Array.from(track.querySelectorAll('.carousel-item'));
-      if (!originalItems.length) return;
-  
-      // ensure track behaves as single-row flex container
-      track.style.display = track.style.display || 'flex';
-      track.style.flexWrap = 'nowrap';
-      track.style.justifyContent = track.style.justifyContent || 'flex-start';
-      // ensure wrapper clips overflow
-      const wrapper = DOM.carouselSection ? DOM.carouselSection : track.parentElement;
-      if (wrapper) {
-        wrapper.style.overflow = wrapper.style.overflow || 'hidden';
-      }
-  
-      // Defer cloning until layout settled so widths are measurable
-      setTimeout(() => {
-        try {
-          // measure width of the original set (before we touch the DOM)
-          // if items are currently within wrappers, measure those nodes
-          const measuredWidth = measureOneSetWidth(originalItems);
-  
-          if (measuredWidth <= 0) {
-            console.warn('Carousel: measured set width is 0 — check styles.');
-            // still attempt a safe fallback: use track.scrollWidth / 2 if possible
-            const fallback = Math.round((track.scrollWidth || track.offsetWidth || 0) / 2);
-            state.carouselOneSetWidth = fallback;
-          } else {
-            state.carouselOneSetWidth = measuredWidth;
-          }
-  
-          // CLEAR track children and append clones of the original items directly
-          // (root cause fix: items must be direct children of .carousel-track)
-          const clones = originalItems.map((it) => it.cloneNode(true));
-  
-          // empty track
-          while (track.firstChild) track.removeChild(track.firstChild);
-  
-          // append first set
-          clones.forEach((c) => {
-            c.style.flex = c.style.flex || c.getAttribute('data-flex') || '';
-            track.appendChild(c.cloneNode(true));
-          });
-          // append second (duplicate) set
-          clones.forEach((c) => {
-            track.appendChild(c.cloneNode(true));
-          });
-  
-          // If we couldn't measure earlier, try a second pass
-          if (!state.carouselOneSetWidth || state.carouselOneSetWidth === 0) {
-            const newItems = track.querySelectorAll('.carousel-item');
-            state.carouselOneSetWidth = measureOneSetWidth(Array.from(newItems).slice(0, clones.length));
-          }
-  
-          // mark initialized and possibly start animation
-          state.carouselInitialized = true;
-          if (state.carouselInView && !state.isCarouselAnimating) startCarouselAnimation();
-        } catch (err) {
-          console.error('initCarouselClones error', err);
-        }
-      }, CONFIG.CAROUSEL_CLONE_DELAY);
-    }
-  
-    function checkCarouselInView() {
-      const section = DOM.carouselSection;
-      const track = DOM.carouselTrack;
-      if (!track) return;
-      if (!section) {
-        if (!state.carouselInView) {
-          state.carouselInView = true;
-          if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation();
-        }
-        return;
-      }
-      const rect = section.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const inView = rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR && rect.bottom > -vh * 0.2;
-      if (inView && !state.carouselInView) {
-        state.carouselInView = true;
-        if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation();
-      } else if (!inView && state.carouselInView) {
-        state.carouselInView = false;
-        stopCarouselAnimation();
-      }
-    }
-  
-    function startCarouselAnimation() {
-      if (state.isCarouselAnimating || !state.carouselInitialized) return;
-      // require a sensible width
-      if (!state.carouselOneSetWidth || state.carouselOneSetWidth <= 0) {
-        // try to recompute from DOM
-        const track = DOM.carouselTrack;
-        const allItems = track ? track.querySelectorAll('.carousel-item') : [];
-        if (allItems.length) {
-          state.carouselOneSetWidth = measureOneSetWidth(Array.from(allItems).slice(0, Math.max(1, Math.floor(allItems.length / 2))));
-        } else {
-          return;
-        }
-      }
-  
-      state.isCarouselAnimating = true;
-      const track = DOM.carouselTrack;
-      if (!track) return;
-  
-      // cancel any existing RAF
-      if (state.carouselAnimationId) cAF(state.carouselAnimationId);
-      state.carouselAnimationId = null;
-  
-      function step() {
-        // advance scroll pos
-        state.carouselScrollPos += state.carouselSpeed;
-  
-        const w = state.carouselOneSetWidth || (track.scrollWidth / 2) || 0;
-        if (w > 0) {
-          // wrap using modulo to keep position bounded
-          state.carouselScrollPos = state.carouselScrollPos % w;
-        } else {
-          state.carouselScrollPos = 0;
-        }
-  
-        track.style.transform = `translate3d(-${Math.max(0, Math.round(state.carouselScrollPos))}px, 0, 0)`;
-  
-        if (state.isCarouselAnimating) state.carouselAnimationId = rAF(step);
-      }
-  
-      step();
-    }
-  
-    function stopCarouselAnimation() {
-      if (state.carouselAnimationId) cAF(state.carouselAnimationId);
-      state.carouselAnimationId = null;
-      state.isCarouselAnimating = false;
-    }
-  
-    function bindCarouselHoverPause() {
-      const track = DOM.carouselTrack;
-      if (!track) return;
-      track.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
-      track.addEventListener(
-        'mouseleave',
-        () => {
-          if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) startCarouselAnimation();
-        },
-        { passive: true }
-      );
-    }
-  
-    /* ==========================================================================
-       Testimonials (unchanged logic, robust guards)
-       ========================================================================== */
-    function initTestimonials() {
-      const testimonials = Array.from(document.querySelectorAll('.testimonial'));
-      const dotsContainer = DOM.dotsContainer;
-      const prevBtn = DOM.prevBtn;
-      const nextBtn = DOM.nextBtn;
-      const container = DOM.testimonialContainer;
-  
-      if (!testimonials.length || !dotsContainer || !prevBtn || !nextBtn || !container) return;
-  
-      testimonials.forEach((_, i) => {
-        const d = document.createElement('span');
-        d.dataset.index = i;
-        if (i === 0) d.classList.add('active');
-        d.addEventListener('click', () => showTestimonial(i));
-        dotsContainer.appendChild(d);
-      });
-  
-      const dots = Array.from(dotsContainer.querySelectorAll('span'));
-      let current = 0;
-  
-      function showTestimonial(index) {
-        const n = testimonials.length;
-        const newIndex = ((index % n) + n) % n;
-        if (newIndex === current) return;
-  
-        testimonials[current].classList.remove('active');
-        dots[current].classList.remove('active');
-        testimonials[newIndex].classList.add('active');
-        dots[newIndex].classList.add('active');
-        current = newIndex;
-        adjustHeight();
-        restartAutoSlide();
-      }
-  
-      function adjustHeight() {
-        const active = container.querySelector('.testimonial.active');
-        if (!active) return;
-        container.style.height = active.offsetHeight + 'px';
-      }
-  
-      function initHeight() {
-        adjustHeight();
-        window.addEventListener('resize', adjustHeight, { passive: true });
-      }
-  
-      function next() {
-        showTestimonial(current + 1);
-      }
-      function prev() {
-        showTestimonial(current - 1);
-      }
-  
-      nextBtn.addEventListener('click', next);
-      prevBtn.addEventListener('click', prev);
-  
-      function startAuto() {
-        stopAuto();
-        state.testimonialAutoInterval = setInterval(() => showTestimonial(current + 1), CONFIG.TESTIMONIAL_AUTO_MS);
-      }
-      function stopAuto() {
-        if (state.testimonialAutoInterval) clearInterval(state.testimonialAutoInterval);
-      }
-      function restartAutoSlide() {
-        stopAuto();
-        startAuto();
-      }
-  
-      initHeight();
-      startAuto();
-    }
-  
-    /* ==========================================================================
-       Popup show/hide
-       ========================================================================== */
-    function initPopup() {
-      const popup = DOM.popup;
-      const closeBtn = DOM.popupClose;
-      if (!popup || !closeBtn) return;
-  
-      window.addEventListener('load', () => {
-        if (!state.popupShown) {
-          setTimeout(() => {
-            popup.classList.add('active');
-            state.popupShown = true;
-          }, CONFIG.POPUP_DELAY);
-        }
-      });
-  
-      closeBtn.addEventListener('click', () => popup.classList.remove('active'));
-      popup.addEventListener('click', (e) => {
-        if (e.target === popup) popup.classList.remove('active');
-      });
-    }
-  
-    /* ==========================================================================
-       Popup form submission
-       ========================================================================== */
-    function initPopupFormHandler() {
-      const form = DOM.popupForm;
-      if (!form) return;
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const statusMsg = form.querySelector('.popup-status');
-  
-        const data = {
-          name: form.querySelector('#popup-name')?.value.trim(),
-          email: form.querySelector('#popup-email')?.value.trim(),
-          phone: form.querySelector('#popup-phone')?.value.trim()
-        };
-  
-        if (!data.name || !data.email || !data.phone) {
-          if (statusMsg) {
-            statusMsg.textContent = '❌ Please fill all fields';
-            statusMsg.style.color = '#ff4444';
-          }
-          return;
-        }
-  
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'Sending...';
-        }
-  
-        try {
-          const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
-          const resp = await fetch(BACKEND_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          const result = await resp.json();
-          if (resp.ok && result.success) {
-            if (statusMsg) {
-              statusMsg.textContent = "✅ Thank you! We'll contact you soon.";
-              statusMsg.style.color = '#00ff88';
-            }
-            form.reset();
-            setTimeout(() => {
-              const p = document.getElementById('popup-form');
-              if (p) p.classList.remove('active');
-            }, 2000);
-          } else {
-            throw new Error(result.message || 'Submission failed');
-          }
-        } catch (err) {
-          console.error('Popup submit error', err);
-          if (statusMsg) {
-            statusMsg.textContent = '❌ Failed to submit. Please try again.';
-            statusMsg.style.color = '#ff4444';
-          }
-        } finally {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Get Started';
-          }
-        }
-      });
-    }
-  
-    /* ==========================================================================
-       Contact form handler
-       ========================================================================== */
-    function initContactFormHandler() {
-      const form = DOM.contactForm;
-      const statusMsg = DOM.contactStatus;
-      if (!form) return;
-  
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitBtn = form.querySelector('button[type="submit"]');
-  
-        const data = {
-          fullName: form.querySelector('#fullName')?.value.trim(),
-          email: form.querySelector('#email')?.value.trim(),
-          phone: form.querySelector('#phone')?.value.trim(),
-          course: form.querySelector('#course')?.value,
-          message: form.querySelector('#message')?.value.trim()
-        };
-  
-        if (!data.fullName || !data.email || !data.phone || !data.course || !data.message) {
-          if (statusMsg) {
-            statusMsg.textContent = '❌ Please fill all fields';
-            statusMsg.style.color = '#ff4444';
-          }
-          return;
-        }
-  
-        const recaptchaResponse = (window.grecaptcha && grecaptcha.getResponse && grecaptcha.getResponse()) || '';
-        if (!recaptchaResponse) {
-          if (statusMsg) {
-            statusMsg.textContent = '❌ Please complete the reCAPTCHA';
-            statusMsg.style.color = '#ff4444';
-          }
-          return;
-        }
-  
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'Sending...';
-        }
-  
-        try {
-          const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
-          const resp = await fetch(BACKEND_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...data, recaptcha: recaptchaResponse })
-          });
-          const result = await resp.json();
-          if (resp.ok && result.success) {
-            if (statusMsg) {
-              statusMsg.textContent = "✅ Message sent successfully! We'll get back to you soon.";
-              statusMsg.style.color = '#00ff88';
-            }
-            form.reset();
-            if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset();
-          } else {
-            throw new Error(result.message || 'Submission failed');
-          }
-        } catch (err) {
-          console.error('Contact submit error', err);
-          if (statusMsg) {
-            statusMsg.textContent = '❌ Failed to send message. Please try again.';
-            statusMsg.style.color = '#ff4444';
-          }
-        } finally {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Message';
-          }
-        }
-      });
-    }
-  
-    /* ==========================================================================
-       Logo scroller — more robust measurement & no-wrap behavior
-       ========================================================================== */
-    function initLogoScroller() {
-      const track = DOM.logoTrack;
-      const set = DOM.logoSet;
-      const banner = DOM.clientLogoBanner;
-      if (!track || !set || !banner) return;
-  
-      if (!set.children || set.children.length === 0) {
-        console.warn('Logo scroller: no .logo-item children found inside .logo-set');
-        return;
-      }
-  
-      // clear and create two inline sets
-      track.innerHTML = '';
-      const set1 = set.cloneNode(true);
-      const set2 = set.cloneNode(true);
-      set1.classList.add('logo-set'); // keep class for measurement logic
-      set2.classList.add('logo-set');
-      set1.style.display = 'inline-flex';
-      set2.style.display = 'inline-flex';
-      track.appendChild(set1);
-      track.appendChild(set2);
-  
-      // ensure no wrap
-      track.style.display = 'flex';
-      track.style.flexWrap = 'nowrap';
-      track.style.alignItems = 'center';
-  
-      function updateLogoSpeed() {
-        const w = window.innerWidth;
-        if (w < 660) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.xs;
-        else if (w < 768) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.sm;
-        else if (w < 1440) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.md;
-        else state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.lg;
-  
-        if (isLowEndDevice()) state.logoScrollSpeed *= 0.6;
-        state.logoSetWidth = 0;
-      }
-  
-      function computeLogoSetWidth() {
-        if (!state.logoSetWidth) {
-          const sets = track.querySelectorAll('.logo-set');
-          if (sets.length > 0) {
-            const rect = sets[0].getBoundingClientRect();
-            state.logoSetWidth = Math.round(rect.width);
-          } else {
-            state.logoSetWidth = 0;
-          }
-        }
-        return state.logoSetWidth;
-      }
-  
-      function animateLogo() {
-        if (state.logoAnimationId) cAF(state.logoAnimationId);
-        state.logoAnimationId = null;
-  
-        function step() {
-          if (!state.logoIsPaused) {
-            state.logoCurrentPosition -= state.logoScrollSpeed;
-            const w = computeLogoSetWidth();
-            if (w > 0) {
-              if (-state.logoCurrentPosition >= w) {
-                // wrap smoothly
-                state.logoCurrentPosition += w;
-              }
-              track.style.transform = `translate3d(${state.logoCurrentPosition}px, 0, 0)`;
-            }
-          }
-          state.logoAnimationId = rAF(step);
-        }
-        step();
-      }
-  
-      banner.addEventListener('mouseenter', () => { state.logoIsPaused = true; }, { passive: true });
-      banner.addEventListener('mouseleave', () => { state.logoIsPaused = false; }, { passive: true });
-  
-      // pause when offscreen
-      const bannerObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          state.logoIsPaused = !entry.isIntersecting;
-        });
-      }, { threshold: 0.01 });
-      bannerObserver.observe(banner);
-  
-      updateLogoSpeed();
-      window.addEventListener('resize', updateLogoSpeed, { passive: true });
-  
-      // start
-      animateLogo();
-    }
-  
-    /* ==========================================================================
-       Reveal on scroll
-       ========================================================================== */
-    function setupRevealObserver() {
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
       };
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const elements = entry.target.querySelectorAll('.reveal-up');
-            elements.forEach((el, i) => {
-              if (!el.classList.contains('active')) setTimeout(() => el.classList.add('active'), i * 100);
-            });
-            observer.unobserve(entry.target);
-          }
-        });
-      }, observerOptions);
-  
-      DOM.revealSelectors.forEach((selector) => {
-        try {
-          const el = document.querySelector(selector);
-          if (el) observer.observe(el);
-        } catch (e) {
-          // ignore invalid selector
+
+      const clear = () => {
+        if (styleObservers && styleObservers.length) {
+          styleObservers.forEach((s) => s());
         }
-      });
-    }
-  
-    /* ==========================================================================
-       Aurora fallback, hamburger, join buttons, faq, modals — unchanged logic
-       ========================================================================== */
-    function ensureAuroraText() {
-      const el = DOM.auroraText;
-      if (!el) return;
-      const cs = getComputedStyle(el);
-      const clip = cs.getPropertyValue('background-clip');
-      const webkitFill = cs.getPropertyValue('-webkit-text-fill-color');
-      if (!/text/.test(clip) || webkitFill !== 'transparent') {
-        el.style.setProperty('background-image', 'linear-gradient(135deg,#ff0080 0%,#7928ca 25%,#0070f3 50%,#38bdf8 75%,#ff0080 100%)', 'important');
-        el.style.setProperty('background-size', '200% 200%', 'important');
-        el.style.setProperty('-webkit-background-clip', 'text', 'important');
-        el.style.setProperty('background-clip', 'text', 'important');
-        el.style.setProperty('-webkit-text-fill-color', 'transparent', 'important');
-        el.style.setProperty('color', 'transparent', 'important');
-      }
-    }
-  
-    function initHamburger() {
-      const hamburger = DOM.hamburger, navMenu = DOM.navMenu;
-      if (!hamburger || !navMenu) return;
-      hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('is-active');
-        navMenu.classList.toggle('is-active');
-      });
-      navMenu.querySelectorAll('a').forEach((link) => {
-        link.addEventListener('click', () => {
-          hamburger.classList.remove('is-active');
-          navMenu.classList.remove('is-active');
+        if (fontListener) fontListener();
+        if (timeoutId) clearTimeout(timeoutId);
+      };
+
+      // timeout fallback
+      const timeoutId = setTimeout(() => {
+        tidy();
+      }, timeout);
+
+      // 1) Wait for font loading if supported
+      let fontListener = null;
+      if (document.fonts && document.fonts.ready) {
+        // document.fonts.ready is a Promise; use it but also race with timeout
+        document.fonts.ready.then(() => {
+          // don't resolve immediately — allow link load handlers to finish first
+          // schedule microtask to check if we should resolve
+          setTimeout(() => {
+            // if not resolved yet, let the link load logic finalize it
+            if (!resolved) {
+              // small safety: wait a tiny frame to let link load events if they've fired
+              setTimeout(() => {
+                tidy();
+              }, 30);
+            }
+          }, 0);
+        }).catch(() => {
+          // ignore and rely on other signals / timeout
         });
-      });
-    }
-  
-    function initJoinButtons() {
-      const btns = DOM.joinBtns;
-      const popup = DOM.popup;
-      if (!btns.length || !popup) return;
-      btns.forEach((btn) => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          popup.classList.add('active');
-        });
-      });
-    }
-  
-    function initFaqAccordion() {
-      const items = DOM.faqItems;
-      if (!items || items.length === 0) return;
-      items.forEach((item) => {
-        const head = item.querySelector('.faq-head');
-        const body = item.querySelector('.faq-body');
-        if (!head || !body) return;
-        head.addEventListener('click', () => {
-          const open = item.getAttribute('data-open') === 'true';
-          if (open) {
-            item.setAttribute('data-open', 'false');
-            head.setAttribute('aria-expanded', 'false');
-            body.style.maxHeight = body.scrollHeight + 'px';
-            requestAnimationFrame(() => (body.style.maxHeight = '0'));
-            setTimeout(() => { body.hidden = true; }, 360);
-          } else {
-            item.setAttribute('data-open', 'true');
-            head.setAttribute('aria-expanded', 'true');
-            body.hidden = false;
-            requestAnimationFrame(() => (body.style.maxHeight = body.scrollHeight + 'px'));
-          }
-        });
-      });
-    }
-  
-    function initGearModal() {
-      const cards = DOM.gearCards;
-      const modal = DOM.gearModal;
-      const modalClose = DOM.gearModalClose;
-      if (!cards.length || !modal || !modalClose) return;
-  
-      function openModal(title, desc, specs) {
-        if (DOM.gearModalTitle) DOM.gearModalTitle.textContent = title || '';
-        if (DOM.gearModalDesc) DOM.gearModalDesc.textContent = desc || '';
-        if (DOM.gearModalSpecs) DOM.gearModalSpecs.textContent = specs || '';
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        modalClose.focus();
+        fontListener = () => { /* nothing to unbind for fonts.ready */ };
       }
-      function closeModal() {
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      }
-  
-      cards.forEach((card) => {
-        card.addEventListener('click', () => {
-          const title = card.dataset.title || card.querySelector('.card-title')?.textContent || '';
-          const desc = card.dataset.desc || card.querySelector('.card-excerpt')?.textContent || '';
-          const specs = card.dataset.specs || '';
-          openModal(title, desc, specs);
-        });
-      });
-  
-      modalClose.addEventListener('click', closeModal);
-      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-    }
-  
-    function initStudioModal() {
-      if (!DOM.studioModal) return;
-      const cards = Array.from(document.querySelectorAll('#studio-setup .gear-card'));
-      const modal = DOM.studioModal, closeBtn = DOM.studioModalClose;
-      if (!cards.length || !modal || !closeBtn) return;
-  
-      function openModal(title, desc) {
-        if (DOM.studioModalTitle) DOM.studioModalTitle.textContent = title || '';
-        if (DOM.studioModalDesc) DOM.studioModalDesc.textContent = desc || '';
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        closeBtn.focus();
-      }
-      function closeModal() {
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      }
-  
-      cards.forEach((card) => {
-        const title = card.dataset.title;
-        const desc = card.dataset.desc;
-        card.addEventListener('click', () => openModal(title, desc));
-        card.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(title, desc); }
-        });
-        const cta = card.querySelector('.card-cta');
-        if (cta) cta.addEventListener('click', (e) => { e.stopPropagation(); openModal(title, desc); });
-      });
-  
-      closeBtn.addEventListener('click', closeModal);
-      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-    }
-  
-    function initWhyDropdown() {
-      const wd = DOM.whyDropdown, toggle = DOM.whyDropdownToggle, panel = DOM.whyDropdownPanel;
-      if (!wd || !toggle || !panel) return;
-  
-      function openPanel() { wd.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
-      function closePanel() { wd.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
-      function togglePanel(e) { e.preventDefault(); if (wd.classList.contains('open')) closePanel(); else openPanel(); }
-  
-      toggle.addEventListener('click', togglePanel);
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && wd.classList.contains('open')) { closePanel(); toggle.focus(); }});
-      document.addEventListener('click', (e) => { if (!wd.contains(e.target) && wd.classList.contains('open')) closePanel(); });
-    }
-  
-    /* ==========================================================================
-       Event lifecycle & bootstrap
-       ========================================================================== */
-    function bindGlobalListeners() {
-      window.addEventListener('scroll', onScrollHandler, { passive: true });
-      window.addEventListener('resize', () => {
-        state.carouselOneSetWidth = 0;
-        state.logoSetWidth = 0;
-        state.lastScrollY = window.scrollY || 0;
-      }, { passive: true });
-    }
-  
-    function initBingUET() {
-      (function (w, d, t, r, u) {
-        var f, n, i;
-        w[u] = w[u] || [];
-        f = function () {
-          var o = { ti: '343210550', enableAutoSpaTracking: true };
-          o.q = w[u];
-          w[u] = new UET(o);
-          w[u].push('pageLoad');
+
+      // 2) Observe <link rel="stylesheet"> & <link rel="preload" as="style">
+      // collect all style links that are not already complete
+      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"], link[rel="preload"][as="style"]'));
+      const pending = [];
+      const styleObservers = [];
+
+      links.forEach((link) => {
+        // If link already finished, skip
+        if (link.sheet || link.__loaded || link.media === 'all' || link.media === '') {
+          // mark as loaded but continue
+          return;
+        }
+
+        // if link has onload already fired or readyState indicates done, we can skip
+        // Otherwise attach event listeners
+        const onLoad = () => {
+          try { link.__loaded = true; } catch (e) {}
+          const idx = pending.indexOf(handler);
+          if (idx >= 0) pending.splice(idx, 1);
+          // if no pending left, tidy up
+          if (pending.length === 0) tidy();
         };
-        n = d.createElement(t);
-        n.src = r;
-        n.async = 1;
-        n.onload = n.onreadystatechange = function () {
-          var s = this.readyState;
-          s && s !== 'loaded' && s !== 'complete' || (f(), (n.onload = n.onreadystatechange = null));
+        const onError = () => {
+          // treat error as loaded so we don't block forever
+          onLoad();
         };
-        i = d.getElementsByTagName(t)[0];
-        i.parentNode.insertBefore(n, i);
-      })(window, document, 'script', '//bat.bing.com/bat.js', 'uetq');
+
+        const handler = { onLoad, onError };
+        pending.push(handler);
+
+        link.addEventListener('load', onLoad, { passive: true });
+        link.addEventListener('error', onError, { passive: true });
+
+        // unbind function
+        styleObservers.push(() => {
+          try {
+            link.removeEventListener('load', onLoad);
+            link.removeEventListener('error', onError);
+          } catch (e) {}
+        });
+
+        // If rel=preload as=style, the browser may not fire load in some cases;
+        // we keep the timeout fallback to guarantee progress.
+      });
+
+      // If there were no relevant links, resolve after a tiny delay (allow fonts to settle)
+      if (links.length === 0) {
+        // wait a microtask then resolve
+        setTimeout(tidy, 30);
+      }
+      // Otherwise, resolution will happen when all link listeners call onLoad or timeout triggers.
+    });
+  }
+
+  /* ==========================================================================
+     Master animation loop (scroll-driven)
+     ========================================================================== */
+  const INTRO_ANIMATION_RANGE = () =>
+    Math.max(1, window.innerHeight * CONFIG.INTRO_ANIMATION_RATIO);
+
+  function masterAnimationLoop() {
+    state.scrollY = window.scrollY || window.pageYOffset || 0;
+
+    if (Math.abs(state.scrollY - state.lastScrollY) > 5 || !state.ticking) {
+      state.lastScrollY = state.scrollY;
+
+      const viewportHeight = window.innerHeight;
+      const spacerHeight = (DOM.spacer && DOM.spacer.offsetHeight) || 0;
+
+      state.spacerStart = viewportHeight;
+      state.spacerEnd = state.spacerStart + spacerHeight;
+
+      state.phase1Progress = clamp(state.scrollY / INTRO_ANIMATION_RANGE(), 0, 1);
+
+      updateIntroOverlay();
+      updateMainContent();
+      checkCarouselInView();
     }
-  
-    function init() {
-      ensureAuroraText();
-      bindGlobalListeners();
-  
+
+    if (state.ticking) state.rafId = rAF(masterAnimationLoop);
+  }
+
+  function onScrollHandler() {
+    if (!state.ticking) {
       state.ticking = true;
       masterAnimationLoop();
-  
-      // modules
-      initCarouselClones();
-      bindCarouselHoverPause();
-      initTestimonials();
-      initPopup();
-      initPopupFormHandler();
-      initContactFormHandler();
-      initLogoScroller();
-      setupRevealObserver();
-      initHamburger();
-      initJoinButtons();
-      initFaqAccordion();
-      initGearModal();
-      initStudioModal();
-      initWhyDropdown();
-      initBingUET();
-  
-      // defensive re-run in case layout changed after fonts/images load
-      setTimeout(initCarouselClones, CONFIG.CAROUSEL_CLONE_DELAY * 2);
     }
-  
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+
+    if (state.rafStopTimer) clearTimeout(state.rafStopTimer);
+    state.rafStopTimer = setTimeout(() => {
+      if (state.ticking) {
+        cAF(state.rafId);
+        state.rafId = null;
+        state.ticking = false;
+      }
+    }, CONFIG.RAF_STOP_DELAY);
+  }
+
+  /* ==========================================================================
+     Intro overlay behavior
+     ========================================================================== */
+  function updateIntroOverlay() {
+    const { panelLeft, panelRight, introOverlay, overlayLeft, overlayRight } = DOM;
+    if (!panelLeft || !panelRight || !introOverlay) return;
+    const mobile = isMobile();
+    const progress = state.phase1Progress;
+    const percent = progress * 100;
+
+    if (mobile) {
+      panelLeft.style.transform = `translate3d(0, ${-percent}%, 0)`;
+      panelRight.style.transform = `translate3d(0, ${percent}%, 0)`;
     } else {
-      init();
+      panelLeft.style.transform = `translate3d(${-percent}%, 0, 0)`;
+      panelRight.style.transform = `translate3d(${percent}%, 0, 0)`;
     }
-  })();
+
+    if (overlayLeft)
+      overlayLeft.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${-progress * 10}px, 0, 0)`;
+    if (overlayRight)
+      overlayRight.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${progress * 10}px, 0, 0)`;
+
+    const fadeStart = 0.75;
+    const fadeOpacity = Math.max(0, 1 - (progress - fadeStart) / (1 - fadeStart));
+    introOverlay.style.opacity = String(fadeOpacity);
+
+    if (fadeOpacity < 0.05) {
+      introOverlay.style.pointerEvents = 'none';
+      introOverlay.style.zIndex = '1';
+    } else {
+      introOverlay.style.pointerEvents = 'auto';
+      introOverlay.style.zIndex = '50';
+    }
+  }
+
+  /* ==========================================================================
+     Main content reveal
+     ========================================================================== */
+  function updateMainContent() {
+    if (!DOM.mainContent) return;
+    const p = state.phase1Progress;
+    DOM.mainContent.style.transform = `scale(${1 + p * 0.05})`;
+    DOM.mainContent.style.opacity = String(p);
+    if (p > 0.1) DOM.mainContent.style.pointerEvents = 'auto';
+    if (DOM.navbar) {
+      DOM.navbar.style.opacity = '1';
+      DOM.navbar.style.pointerEvents = 'auto';
+    }
+  }
+
+  /* ==========================================================================
+     Carousel — fixed cloning & measurement (root-cause fix)
+     ========================================================================== */
+  function getGapValuePx(el) {
+    try {
+      const cs = getComputedStyle(el);
+      const gap = cs.getPropertyValue('gap') || cs.getPropertyValue('column-gap') || '0px';
+      return parseFloat(gap) || 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  function measureOneSetWidth(items) {
+    // sum bounding widths (includes padding/border visually)
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+      const rect = items[i].getBoundingClientRect();
+      total += rect.width;
+    }
+    // include gaps between items (n-1 gaps)
+    const track = DOM.carouselTrack;
+    const gap = track ? getGapValuePx(track) : 0;
+    if (items.length > 1) total += gap * (items.length - 1);
+    return Math.round(total);
+  }
+
+  function initCarouselClones() {
+    const track = DOM.carouselTrack;
+    if (!track || state.carouselInitialized) return;
+
+    // find actual carousel items anywhere under track (avoid nested wrappers)
+    const originalItems = Array.from(track.querySelectorAll('.carousel-item'));
+    if (!originalItems.length) return;
+
+    // ensure track behaves as single-row flex container
+    track.style.display = track.style.display || 'flex';
+    track.style.flexWrap = 'nowrap';
+    track.style.justifyContent = track.style.justifyContent || 'flex-start';
+    // ensure wrapper clips overflow
+    const wrapper = DOM.carouselSection ? DOM.carouselSection : track.parentElement;
+    if (wrapper) {
+      wrapper.style.overflow = wrapper.style.overflow || 'hidden';
+    }
+
+    // Defer cloning until layout settled so widths are measurable
+    setTimeout(() => {
+      try {
+        // measure width of the original set (before we touch the DOM)
+        // if items are currently within wrappers, measure those nodes
+        const measuredWidth = measureOneSetWidth(originalItems);
+
+        if (measuredWidth <= 0) {
+          console.warn('Carousel: measured set width is 0 — check styles.');
+          // still attempt a safe fallback: use track.scrollWidth / 2 if possible
+          const fallback = Math.round((track.scrollWidth || track.offsetWidth || 0) / 2);
+          state.carouselOneSetWidth = fallback;
+        } else {
+          state.carouselOneSetWidth = measuredWidth;
+        }
+
+        // CLEAR track children and append clones of the original items directly
+        // (root cause fix: items must be direct children of .carousel-track)
+        const clones = originalItems.map((it) => it.cloneNode(true));
+
+        // empty track
+        while (track.firstChild) track.removeChild(track.firstChild);
+
+        // append first set
+        clones.forEach((c) => {
+          c.style.flex = c.style.flex || c.getAttribute('data-flex') || '';
+          track.appendChild(c.cloneNode(true));
+        });
+        // append second (duplicate) set
+        clones.forEach((c) => {
+          track.appendChild(c.cloneNode(true));
+        });
+
+        // If we couldn't measure earlier, try a second pass
+        if (!state.carouselOneSetWidth || state.carouselOneSetWidth === 0) {
+          const newItems = track.querySelectorAll('.carousel-item');
+          state.carouselOneSetWidth = measureOneSetWidth(Array.from(newItems).slice(0, clones.length));
+        }
+
+        // mark initialized and possibly start animation
+        state.carouselInitialized = true;
+        if (state.carouselInView && !state.isCarouselAnimating) startCarouselAnimation();
+      } catch (err) {
+        console.error('initCarouselClones error', err);
+      }
+    }, CONFIG.CAROUSEL_CLONE_DELAY);
+  }
+
+  function checkCarouselInView() {
+    const section = DOM.carouselSection;
+    const track = DOM.carouselTrack;
+    if (!track) return;
+    if (!section) {
+      if (!state.carouselInView) {
+        state.carouselInView = true;
+        if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation();
+      }
+      return;
+    }
+    const rect = section.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const inView = rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR && rect.bottom > -vh * 0.2;
+    if (inView && !state.carouselInView) {
+      state.carouselInView = true;
+      if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation();
+    } else if (!inView && state.carouselInView) {
+      state.carouselInView = false;
+      stopCarouselAnimation();
+    }
+  }
+
+  function startCarouselAnimation() {
+    if (state.isCarouselAnimating || !state.carouselInitialized) return;
+    // require a sensible width
+    if (!state.carouselOneSetWidth || state.carouselOneSetWidth <= 0) {
+      // try to recompute from DOM
+      const track = DOM.carouselTrack;
+      const allItems = track ? track.querySelectorAll('.carousel-item') : [];
+      if (allItems.length) {
+        state.carouselOneSetWidth = measureOneSetWidth(Array.from(allItems).slice(0, Math.max(1, Math.floor(allItems.length / 2))));
+      } else {
+        return;
+      }
+    }
+
+    state.isCarouselAnimating = true;
+    const track = DOM.carouselTrack;
+    if (!track) return;
+
+    // cancel any existing RAF
+    if (state.carouselAnimationId) cAF(state.carouselAnimationId);
+    state.carouselAnimationId = null;
+
+    function step() {
+      // advance scroll pos
+      state.carouselScrollPos += state.carouselSpeed;
+
+      const w = state.carouselOneSetWidth || (track.scrollWidth / 2) || 0;
+      if (w > 0) {
+        // wrap using modulo to keep position bounded
+        state.carouselScrollPos = state.carouselScrollPos % w;
+      } else {
+        state.carouselScrollPos = 0;
+      }
+
+      track.style.transform = `translate3d(-${Math.max(0, Math.round(state.carouselScrollPos))}px, 0, 0)`;
+
+      if (state.isCarouselAnimating) state.carouselAnimationId = rAF(step);
+    }
+
+    step();
+  }
+
+  function stopCarouselAnimation() {
+    if (state.carouselAnimationId) cAF(state.carouselAnimationId);
+    state.carouselAnimationId = null;
+    state.isCarouselAnimating = false;
+  }
+
+  function bindCarouselHoverPause() {
+    const track = DOM.carouselTrack;
+    if (!track) return;
+    track.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
+    track.addEventListener(
+      'mouseleave',
+      () => {
+        if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) startCarouselAnimation();
+      },
+      { passive: true }
+    );
+  }
+
+  /* ==========================================================================
+     Testimonials (unchanged logic, robust guards)
+     ========================================================================== */
+  function initTestimonials() {
+    const testimonials = Array.from(document.querySelectorAll('.testimonial'));
+    const dotsContainer = DOM.dotsContainer;
+    const prevBtn = DOM.prevBtn;
+    const nextBtn = DOM.nextBtn;
+    const container = DOM.testimonialContainer;
+
+    if (!testimonials.length || !dotsContainer || !prevBtn || !nextBtn || !container) return;
+
+    testimonials.forEach((_, i) => {
+      const d = document.createElement('span');
+      d.dataset.index = i;
+      if (i === 0) d.classList.add('active');
+      d.addEventListener('click', () => showTestimonial(i));
+      dotsContainer.appendChild(d);
+    });
+
+    const dots = Array.from(dotsContainer.querySelectorAll('span'));
+    let current = 0;
+
+    function showTestimonial(index) {
+      const n = testimonials.length;
+      const newIndex = ((index % n) + n) % n;
+      if (newIndex === current) return;
+
+      testimonials[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      testimonials[newIndex].classList.add('active');
+      dots[newIndex].classList.add('active');
+      current = newIndex;
+      adjustHeight();
+      restartAutoSlide();
+    }
+
+    function adjustHeight() {
+      const active = container.querySelector('.testimonial.active');
+      if (!active) return;
+      container.style.height = active.offsetHeight + 'px';
+    }
+
+    function initHeight() {
+      adjustHeight();
+      window.addEventListener('resize', adjustHeight, { passive: true });
+    }
+
+    function next() {
+      showTestimonial(current + 1);
+    }
+    function prev() {
+      showTestimonial(current - 1);
+    }
+
+    nextBtn.addEventListener('click', next);
+    prevBtn.addEventListener('click', prev);
+
+    function startAuto() {
+      stopAuto();
+      state.testimonialAutoInterval = setInterval(() => showTestimonial(current + 1), CONFIG.TESTIMONIAL_AUTO_MS);
+    }
+    function stopAuto() {
+      if (state.testimonialAutoInterval) clearInterval(state.testimonialAutoInterval);
+    }
+    function restartAutoSlide() {
+      stopAuto();
+      startAuto();
+    }
+
+    initHeight();
+    startAuto();
+  }
+
+  /* ==========================================================================
+     Popup show/hide
+     ========================================================================== */
+  function initPopup() {
+    const popup = DOM.popup;
+    const closeBtn = DOM.popupClose;
+    if (!popup || !closeBtn) return;
+
+    window.addEventListener('load', () => {
+      if (!state.popupShown) {
+        setTimeout(() => {
+          popup.classList.add('active');
+          state.popupShown = true;
+        }, CONFIG.POPUP_DELAY);
+      }
+    });
+
+    closeBtn.addEventListener('click', () => popup.classList.remove('active'));
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) popup.classList.remove('active');
+    });
+  }
+
+  /* ==========================================================================
+     Popup form submission
+     ========================================================================== */
+  function initPopupFormHandler() {
+    const form = DOM.popupForm;
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const statusMsg = form.querySelector('.popup-status');
+
+      const data = {
+        name: form.querySelector('#popup-name')?.value.trim(),
+        email: form.querySelector('#popup-email')?.value.trim(),
+        phone: form.querySelector('#popup-phone')?.value.trim()
+      };
+
+      if (!data.name || !data.email || !data.phone) {
+        if (statusMsg) {
+          statusMsg.textContent = '❌ Please fill all fields';
+          statusMsg.style.color = '#ff4444';
+        }
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+      }
+
+      try {
+        const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
+        const resp = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await resp.json();
+        if (resp.ok && result.success) {
+          if (statusMsg) {
+            statusMsg.textContent = "✅ Thank you! We'll contact you soon.";
+            statusMsg.style.color = '#00ff88';
+          }
+          form.reset();
+          setTimeout(() => {
+            const p = document.getElementById('popup-form');
+            if (p) p.classList.remove('active');
+          }, 2000);
+        } else {
+          throw new Error(result.message || 'Submission failed');
+        }
+      } catch (err) {
+        console.error('Popup submit error', err);
+        if (statusMsg) {
+          statusMsg.textContent = '❌ Failed to submit. Please try again.';
+          statusMsg.style.color = '#ff4444';
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Get Started';
+        }
+      }
+    });
+  }
+
+  /* ==========================================================================
+     Contact form handler
+     ========================================================================== */
+  function initContactFormHandler() {
+    const form = DOM.contactForm;
+    const statusMsg = DOM.contactStatus;
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+
+      const data = {
+        fullName: form.querySelector('#fullName')?.value.trim(),
+        email: form.querySelector('#email')?.value.trim(),
+        phone: form.querySelector('#phone')?.value.trim(),
+        course: form.querySelector('#course')?.value,
+        message: form.querySelector('#message')?.value.trim()
+      };
+
+      if (!data.fullName || !data.email || !data.phone || !data.course || !data.message) {
+        if (statusMsg) {
+          statusMsg.textContent = '❌ Please fill all fields';
+          statusMsg.style.color = '#ff4444';
+        }
+        return;
+      }
+
+      const recaptchaResponse = (window.grecaptcha && grecaptcha.getResponse && grecaptcha.getResponse()) || '';
+      if (!recaptchaResponse) {
+        if (statusMsg) {
+          statusMsg.textContent = '❌ Please complete the reCAPTCHA';
+          statusMsg.style.color = '#ff4444';
+        }
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+      }
+
+      try {
+        const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
+        const resp = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...data, recaptcha: recaptchaResponse })
+        });
+        const result = await resp.json();
+        if (resp.ok && result.success) {
+          if (statusMsg) {
+            statusMsg.textContent = "✅ Message sent successfully! We'll get back to you soon.";
+            statusMsg.style.color = '#00ff88';
+          }
+          form.reset();
+          if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset();
+        } else {
+          throw new Error(result.message || 'Submission failed');
+        }
+      } catch (err) {
+        console.error('Contact submit error', err);
+        if (statusMsg) {
+          statusMsg.textContent = '❌ Failed to send message. Please try again.';
+          statusMsg.style.color = '#ff4444';
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send Message';
+        }
+      }
+    });
+  }
+
+  /* ==========================================================================
+     Logo scroller — more robust measurement & no-wrap behavior
+     ========================================================================== */
+  function initLogoScroller() {
+    const track = DOM.logoTrack;
+    const set = DOM.logoSet;
+    const banner = DOM.clientLogoBanner;
+    if (!track || !set || !banner) return;
+
+    if (!set.children || set.children.length === 0) {
+      console.warn('Logo scroller: no .logo-item children found inside .logo-set');
+      return;
+    }
+
+    // clear and create two inline sets
+    track.innerHTML = '';
+    const set1 = set.cloneNode(true);
+    const set2 = set.cloneNode(true);
+    set1.classList.add('logo-set'); // keep class for measurement logic
+    set2.classList.add('logo-set');
+    set1.style.display = 'inline-flex';
+    set2.style.display = 'inline-flex';
+    track.appendChild(set1);
+    track.appendChild(set2);
+
+    // ensure no wrap
+    track.style.display = 'flex';
+    track.style.flexWrap = 'nowrap';
+    track.style.alignItems = 'center';
+
+    function updateLogoSpeed() {
+      const w = window.innerWidth;
+      if (w < 660) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.xs;
+      else if (w < 768) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.sm;
+      else if (w < 1440) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.md;
+      else state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.lg;
+
+      if (isLowEndDevice()) state.logoScrollSpeed *= 0.6;
+      state.logoSetWidth = 0;
+    }
+
+    function computeLogoSetWidth() {
+      if (!state.logoSetWidth) {
+        const sets = track.querySelectorAll('.logo-set');
+        if (sets.length > 0) {
+          const rect = sets[0].getBoundingClientRect();
+          state.logoSetWidth = Math.round(rect.width);
+        } else {
+          state.logoSetWidth = 0;
+        }
+      }
+      return state.logoSetWidth;
+    }
+
+    function animateLogo() {
+      if (state.logoAnimationId) cAF(state.logoAnimationId);
+      state.logoAnimationId = null;
+
+      function step() {
+        if (!state.logoIsPaused) {
+          state.logoCurrentPosition -= state.logoScrollSpeed;
+          const w = computeLogoSetWidth();
+          if (w > 0) {
+            if (-state.logoCurrentPosition >= w) {
+              // wrap smoothly
+              state.logoCurrentPosition += w;
+            }
+            track.style.transform = `translate3d(${state.logoCurrentPosition}px, 0, 0)`;
+          }
+        }
+        state.logoAnimationId = rAF(step);
+      }
+      step();
+    }
+
+    banner.addEventListener('mouseenter', () => { state.logoIsPaused = true; }, { passive: true });
+    banner.addEventListener('mouseleave', () => { state.logoIsPaused = false; }, { passive: true });
+
+    // pause when offscreen
+    const bannerObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        state.logoIsPaused = !entry.isIntersecting;
+      });
+    }, { threshold: 0.01 });
+    bannerObserver.observe(banner);
+
+    updateLogoSpeed();
+    window.addEventListener('resize', updateLogoSpeed, { passive: true });
+
+    // start
+    animateLogo();
+  }
+
+  /* ==========================================================================
+     Reveal on scroll
+     ========================================================================== */
+  function setupRevealObserver() {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const elements = entry.target.querySelectorAll('.reveal-up');
+          elements.forEach((el, i) => {
+            if (!el.classList.contains('active')) setTimeout(() => el.classList.add('active'), i * 100);
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    DOM.revealSelectors.forEach((selector) => {
+      try {
+        const el = document.querySelector(selector);
+        if (el) observer.observe(el);
+      } catch (e) {
+        // ignore invalid selector
+      }
+    });
+  }
+
+  /* ==========================================================================
+     Aurora fallback, hamburger, join buttons, faq, modals — unchanged logic
+     ========================================================================== */
+  function ensureAuroraText() {
+    const el = DOM.auroraText;
+    if (!el) return;
+    const cs = getComputedStyle(el);
+    const clip = cs.getPropertyValue('background-clip');
+    const webkitFill = cs.getPropertyValue('-webkit-text-fill-color');
+    if (!/text/.test(clip) || webkitFill !== 'transparent') {
+      el.style.setProperty('background-image', 'linear-gradient(135deg,#ff0080 0%,#7928ca 25%,#0070f3 50%,#38bdf8 75%,#ff0080 100%)', 'important');
+      el.style.setProperty('background-size', '200% 200%', 'important');
+      el.style.setProperty('-webkit-background-clip', 'text', 'important');
+      el.style.setProperty('background-clip', 'text', 'important');
+      el.style.setProperty('-webkit-text-fill-color', 'transparent', 'important');
+      el.style.setProperty('color', 'transparent', 'important');
+    }
+  }
+
+  function initHamburger() {
+    const hamburger = DOM.hamburger, navMenu = DOM.navMenu;
+    if (!hamburger || !navMenu) return;
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('is-active');
+      navMenu.classList.toggle('is-active');
+    });
+    navMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('is-active');
+        navMenu.classList.remove('is-active');
+      });
+    });
+  }
+
+  function initJoinButtons() {
+    const btns = DOM.joinBtns;
+    const popup = DOM.popup;
+    if (!btns.length || !popup) return;
+    btns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        popup.classList.add('active');
+      });
+    });
+  }
+
+  function initFaqAccordion() {
+    const items = DOM.faqItems;
+    if (!items || items.length === 0) return;
+    items.forEach((item) => {
+      const head = item.querySelector('.faq-head');
+      const body = item.querySelector('.faq-body');
+      if (!head || !body) return;
+      head.addEventListener('click', () => {
+        const open = item.getAttribute('data-open') === 'true';
+        if (open) {
+          item.setAttribute('data-open', 'false');
+          head.setAttribute('aria-expanded', 'false');
+          body.style.maxHeight = body.scrollHeight + 'px';
+          requestAnimationFrame(() => (body.style.maxHeight = '0'));
+          setTimeout(() => { body.hidden = true; }, 360);
+        } else {
+          item.setAttribute('data-open', 'true');
+          head.setAttribute('aria-expanded', 'true');
+          body.hidden = false;
+          requestAnimationFrame(() => (body.style.maxHeight = body.scrollHeight + 'px'));
+        }
+      });
+    });
+  }
+
+  function initGearModal() {
+    const cards = DOM.gearCards;
+    const modal = DOM.gearModal;
+    const modalClose = DOM.gearModalClose;
+    if (!cards.length || !modal || !modalClose) return;
+
+    function openModal(title, desc, specs) {
+      if (DOM.gearModalTitle) DOM.gearModalTitle.textContent = title || '';
+      if (DOM.gearModalDesc) DOM.gearModalDesc.textContent = desc || '';
+      if (DOM.gearModalSpecs) DOM.gearModalSpecs.textContent = specs || '';
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      modalClose.focus();
+    }
+    function closeModal() {
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const title = card.dataset.title || card.querySelector('.card-title')?.textContent || '';
+        const desc = card.dataset.desc || card.querySelector('.card-excerpt')?.textContent || '';
+        const specs = card.dataset.specs || '';
+        openModal(title, desc, specs);
+      });
+    });
+
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  }
+
+  function initStudioModal() {
+    if (!DOM.studioModal) return;
+    const cards = Array.from(document.querySelectorAll('#studio-setup .gear-card'));
+    const modal = DOM.studioModal, closeBtn = DOM.studioModalClose;
+    if (!cards.length || !modal || !closeBtn) return;
+
+    function openModal(title, desc) {
+      if (DOM.studioModalTitle) DOM.studioModalTitle.textContent = title || '';
+      if (DOM.studioModalDesc) DOM.studioModalDesc.textContent = desc || '';
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      closeBtn.focus();
+    }
+    function closeModal() {
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    cards.forEach((card) => {
+      const title = card.dataset.title;
+      const desc = card.dataset.desc;
+      card.addEventListener('click', () => openModal(title, desc));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(title, desc); }
+      });
+      const cta = card.querySelector('.card-cta');
+      if (cta) cta.addEventListener('click', (e) => { e.stopPropagation(); openModal(title, desc); });
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  }
+
+  function initWhyDropdown() {
+    const wd = DOM.whyDropdown, toggle = DOM.whyDropdownToggle, panel = DOM.whyDropdownPanel;
+    if (!wd || !toggle || !panel) return;
+
+    function openPanel() { wd.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
+    function closePanel() { wd.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
+    function togglePanel(e) { e.preventDefault(); if (wd.classList.contains('open')) closePanel(); else openPanel(); }
+
+    toggle.addEventListener('click', togglePanel);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && wd.classList.contains('open')) { closePanel(); toggle.focus(); }});
+    document.addEventListener('click', (e) => { if (!wd.contains(e.target) && wd.classList.contains('open')) closePanel(); });
+  }
+
+  /* ==========================================================================
+     Event lifecycle & bootstrap
+     ========================================================================== */
+  function bindGlobalListeners() {
+    window.addEventListener('scroll', onScrollHandler, { passive: true });
+    window.addEventListener('resize', () => {
+      state.carouselOneSetWidth = 0;
+      state.logoSetWidth = 0;
+      state.lastScrollY = window.scrollY || 0;
+    }, { passive: true });
+  }
+
+  function initBingUET() {
+    (function (w, d, t, r, u) {
+      var f, n, i;
+      w[u] = w[u] || [];
+      f = function () {
+        var o = { ti: '343210550', enableAutoSpaTracking: true };
+        o.q = w[u];
+        w[u] = new UET(o);
+        w[u].push('pageLoad');
+      };
+      n = d.createElement(t);
+      n.src = r;
+      n.async = 1;
+      n.onload = n.onreadystatechange = function () {
+        var s = this.readyState;
+        s && s !== 'loaded' && s !== 'complete' || (f(), (n.onload = n.onreadystatechange = null));
+      };
+      i = d.getElementsByTagName(t)[0];
+      i.parentNode.insertBefore(n, i);
+    })(window, document, 'script', '//bat.bing.com/bat.js', 'uetq');
+  }
+
+  function init() {
+    ensureAuroraText();
+    bindGlobalListeners();
+
+    state.ticking = true;
+    masterAnimationLoop();
+
+    // modules
+    initCarouselClones();
+    bindCarouselHoverPause();
+    initTestimonials();
+    initPopup();
+    initPopupFormHandler();
+    initContactFormHandler();
+    initLogoScroller();
+    setupRevealObserver();
+    initHamburger();
+    initJoinButtons();
+    initFaqAccordion();
+    initGearModal();
+    initStudioModal();
+    initWhyDropdown();
+    initBingUET();
+
+    // defensive re-run in case layout changed after fonts/images load
+    setTimeout(initCarouselClones, CONFIG.CAROUSEL_CLONE_DELAY * 2);
+  }
+
+  /* ==========================================================================
+     BOOTSTRAP: Wait for styles/fonts readiness then schedule init during idle
+     ========================================================================== */
+  function scheduleInitWhenReady() {
+    whenStylesAndFontsReady(CONFIG.STYLES_READY_TIMEOUT).then(() => {
+      // schedule during idle time for minimal impact on initial paint
+      if ('requestIdleCallback' in window) {
+        try {
+          requestIdleCallback(() => {
+            // small safety guard to avoid double-init
+            if (!state.ticking) init();
+          }, { timeout: 500 });
+        } catch (e) {
+          // fallback if requestIdleCallback throws
+          setTimeout(() => { if (!state.ticking) init(); }, 50);
+        }
+      } else {
+        // fallback schedule
+        setTimeout(() => { if (!state.ticking) init(); }, 50);
+      }
+    }).catch(() => {
+      // on unexpected error, still init safely
+      if (!state.ticking) init();
+    });
+  }
+
+  // Start: prefer waiting for readiness; if document already interactive, still call the readiness helper
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scheduleInitWhenReady);
+  } else {
+    scheduleInitWhenReady();
+  }
+
+})();
