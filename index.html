@@ -79,17 +79,25 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Stylesheet - non-blocking -->
-    <link rel="preload" href="/style/style.css" as="style" />
+    <!-- =======================
+         CSS OPTIMIZATION (only changes)
+         - preload the stylesheet so the browser fetches it early
+         - use onload trick to make it non-render-blocking
+         - small critical inline CSS to avoid FOUC (minimal)
+         ======================= -->
+    <style>
+      /* Minimal critical CSS to keep layout stable before full CSS loads */
+      html{background:#000;color:#fff}
+      body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh;-webkit-text-size-adjust:100%}
+      .navbar{opacity:1}
+      img{max-width:100%;height:auto;display:block}
+    </style>
 
-<link
-  rel="stylesheet"
-  href="/style/style.css"
-  media="print"
-  onload="this.media='all'"
-/>
-
-<noscript><link rel="stylesheet" href="/style/style.css"></noscript>
+    <!-- Preload and non-blocking load for stylesheet.
+         Using the uploaded local file path so you can test: /mnt/data/style1.css -->
+    <link rel="preload" href="/style/style.css" as="style">
+    <link rel="stylesheet" href="/style/style.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/style/style.css"></noscript>
     
     <!-- Removed image preload to avoid unused-preload warnings -->
 
@@ -835,4 +843,4 @@ Craft, compose and produce your signature sound through expert led programs desi
     <!-- JavaScript -->
     <script src="/script/script.js" defer></script>
 </body>
-</html> 
+</html>
