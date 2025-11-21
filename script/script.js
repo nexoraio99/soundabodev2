@@ -1,7 +1,7 @@
 /* ============================================================================
    script1.js — soundabode site script (refactor, carousel + logo fixes)
-   - Updated: safer carousel & logo scroller, defensive guards
-   - Usage: replace your existing script1.js with this file
+   - Rewritten to fix root cause: clone .carousel-item nodes (direct children)
+   - Defensive, performance-aware, and mobile-friendly
    ============================================================================ */
 
    (() => {
@@ -11,11 +11,11 @@
        Config / Constants
        ========================================================================== */
     const CONFIG = {
-      INTRO_ANIMATION_RATIO: 0.8, // portion of viewport used for intro animation
-      RAF_STOP_DELAY: 180, // ms to stop RAF after scroll ends
-      POPUP_DELAY: 2000, // ms to show popup after load
-      TESTIMONIAL_AUTO_MS: 3000, // testimonial auto-advance interval
-      CAROUSEL_CLONE_DELAY: 500, // delay before computing widths & cloning carousel
+      INTRO_ANIMATION_RATIO: 0.8,
+      RAF_STOP_DELAY: 180,
+      POPUP_DELAY: 2000,
+      TESTIMONIAL_AUTO_MS: 3000,
+      CAROUSEL_CLONE_DELAY: 400,
       LOGO_SCROLL_SPEEDS: { xs: 0.03, sm: 0.05, md: 0.25, lg: 0.4 },
       CAROUSEL_STRICT_VIEWPORT_FACTOR: 1.2
     };
@@ -29,52 +29,42 @@
       (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 3);
   
     /* ==========================================================================
-       DOM Caching
+       DOM Cache
        ========================================================================== */
     const DOM = {
-      // intro
       panelLeft: document.querySelector('.panel-left'),
       panelRight: document.querySelector('.panel-right'),
       introOverlay: document.querySelector('.intro-overlay'),
       overlayLeft: document.querySelector('.overlay-left'),
       overlayRight: document.querySelector('.overlay-right'),
   
-      // main
       mainContent: document.querySelector('.main-content'),
       navbar: document.querySelector('.navbar'),
       spacer: document.querySelector('.spacer'),
   
-      // carousel
       carouselTrack: document.querySelector('.carousel-track'),
       carouselSection: document.getElementById('carousel-section'),
   
-      // logos
       logoTrack: document.querySelector('.logo-track'),
       logoSet: document.querySelector('.logo-set'),
       clientLogoBanner: document.querySelector('.client-logo-banner'),
   
-      // testimonials
       testimonialContainer: document.querySelector('.testimonial-container'),
       prevBtn: document.querySelector('.prev'),
       nextBtn: document.querySelector('.next'),
       dotsContainer: document.querySelector('.dots'),
   
-      // popup
       popup: document.getElementById('popup-form'),
       popupClose: document.getElementById('closePopup'),
       popupForm: document.getElementById('popup-form-element'),
   
-      // contact
       contactForm: document.getElementById('contact-form'),
       contactStatus: document.getElementById('form-status'),
   
-      // reveal
       aboutSection: document.getElementById('about-section'),
   
-      // faq
       faqItems: document.querySelectorAll('.faq-item'),
   
-      // gear modals
       gearCards: document.querySelectorAll('.gear-card'),
       gearModal: document.getElementById('gearModal'),
       gearModalTitle: document.getElementById('modalTitle'),
@@ -82,22 +72,20 @@
       gearModalSpecs: document.getElementById('modalSpecs'),
       gearModalClose: document.getElementById('modalClose'),
   
-      // studio modal (optional)
       studioModal: document.getElementById('studioModal'),
       studioModalTitle: document.getElementById('studioModalTitle'),
       studioModalDesc: document.getElementById('studioModalDesc'),
       studioModalClose: document.getElementById('studioModalClose'),
   
-      // why dropdown
       whyDropdown: document.querySelector('.why-dropdown'),
       whyDropdownToggle: document.getElementById('whyDropdownToggle'),
       whyDropdownPanel: document.getElementById('whyDropdownPanel'),
   
-      // misc
       hamburger: document.querySelector('.hamburger-menu'),
       navMenu: document.querySelector('.nav-menu'),
       joinBtns: document.querySelectorAll('.glow-border'),
       auroraText: document.querySelector('.aurora-text'),
+  
       revealSelectors: [
         '#about-section',
         '#carousel-section',
@@ -112,7 +100,6 @@
        State
        ========================================================================== */
     const state = {
-      // intro / scroll
       scrollY: 0,
       phase1Progress: 0,
       spacerStart: 0,
@@ -125,11 +112,11 @@
       // carousel
       carouselInView: false,
       isCarouselAnimating: false,
-      carouselOneSetWidth: 0,
+      carouselOneSetWidth: 0, // width of one full group of items
       carouselInitialized: false,
       carouselScrollPos: 0,
       carouselAnimationId: null,
-      carouselSpeed: isMobile() ? 1 : 1,
+      carouselSpeed: isMobile() ? 0.8 : 1.0,
   
       // logos
       logoAnimationId: null,
@@ -142,7 +129,6 @@
       testimonialIndex: 0,
       testimonialAutoInterval: null,
   
-      // popup
       popupShown: false
     };
   
@@ -158,18 +144,16 @@
         // ignore
       }
     };
-    const q = (sel) => document.querySelector(sel);
   
     /* ==========================================================================
-       Master animation loop (scroll-driven, single RAF)
+       Master animation loop (scroll-driven)
        ========================================================================== */
     const INTRO_ANIMATION_RANGE = () =>
-      window.innerHeight * CONFIG.INTRO_ANIMATION_RATIO;
+      Math.max(1, window.innerHeight * CONFIG.INTRO_ANIMATION_RATIO);
   
     function masterAnimationLoop() {
       state.scrollY = window.scrollY || window.pageYOffset || 0;
   
-      // Only update visuals if significant movement or first tick
       if (Math.abs(state.scrollY - state.lastScrollY) > 5 || !state.ticking) {
         state.lastScrollY = state.scrollY;
   
@@ -179,21 +163,14 @@
         state.spacerStart = viewportHeight;
         state.spacerEnd = state.spacerStart + spacerHeight;
   
-        state.phase1Progress = clamp(
-          state.scrollY / INTRO_ANIMATION_RANGE(),
-          0,
-          1
-        );
+        state.phase1Progress = clamp(state.scrollY / INTRO_ANIMATION_RANGE(), 0, 1);
   
         updateIntroOverlay();
         updateMainContent();
         checkCarouselInView();
       }
   
-      // Continue RAF loop while ticking
-      if (state.ticking) {
-        state.rafId = rAF(masterAnimationLoop);
-      }
+      if (state.ticking) state.rafId = rAF(masterAnimationLoop);
     }
   
     function onScrollHandler() {
@@ -202,7 +179,6 @@
         masterAnimationLoop();
       }
   
-      // Stop RAF shortly after scrolling stops
       if (state.rafStopTimer) clearTimeout(state.rafStopTimer);
       state.rafStopTimer = setTimeout(() => {
         if (state.ticking) {
@@ -214,48 +190,30 @@
     }
   
     /* ==========================================================================
-       Intro overlay animations (panel sliding & fade)
+       Intro overlay behavior
        ========================================================================== */
     function updateIntroOverlay() {
-      const {
-        panelLeft,
-        panelRight,
-        introOverlay,
-        overlayLeft,
-        overlayRight
-      } = DOM;
+      const { panelLeft, panelRight, introOverlay, overlayLeft, overlayRight } = DOM;
       if (!panelLeft || !panelRight || !introOverlay) return;
-  
       const mobile = isMobile();
       const progress = state.phase1Progress;
       const percent = progress * 100;
   
       if (mobile) {
-        // vertical slide
         panelLeft.style.transform = `translate3d(0, ${-percent}%, 0)`;
         panelRight.style.transform = `translate3d(0, ${percent}%, 0)`;
       } else {
-        // horizontal slide
         panelLeft.style.transform = `translate3d(${-percent}%, 0, 0)`;
         panelRight.style.transform = `translate3d(${percent}%, 0, 0)`;
       }
   
-      // small parallax for overlay text panels on larger screens
       if (overlayLeft)
-        overlayLeft.style.transform = mobile
-          ? 'translate3d(0,0,0)'
-          : `translate3d(${-progress * 10}px, 0, 0)`;
+        overlayLeft.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${-progress * 10}px, 0, 0)`;
       if (overlayRight)
-        overlayRight.style.transform = mobile
-          ? 'translate3d(0,0,0)'
-          : `translate3d(${progress * 10}px, 0, 0)`;
+        overlayRight.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${progress * 10}px, 0, 0)`;
   
-      // fade out overlay near completion
       const fadeStart = 0.75;
-      const fadeOpacity = Math.max(
-        0,
-        1 - (progress - fadeStart) / (1 - fadeStart)
-      );
+      const fadeOpacity = Math.max(0, 1 - (progress - fadeStart) / (1 - fadeStart));
       introOverlay.style.opacity = String(fadeOpacity);
   
       if (fadeOpacity < 0.05) {
@@ -268,20 +226,14 @@
     }
   
     /* ==========================================================================
-       Main content reveal & navbar
+       Main content reveal
        ========================================================================== */
     function updateMainContent() {
       if (!DOM.mainContent) return;
-      const progress = state.phase1Progress;
-      const opacity = progress;
-      const scale = 1 + progress * 0.05;
-  
-      DOM.mainContent.style.transform = `scale(${scale})`;
-      DOM.mainContent.style.opacity = String(opacity);
-  
-      if (progress > 0.1) {
-        DOM.mainContent.style.pointerEvents = 'auto';
-      }
+      const p = state.phase1Progress;
+      DOM.mainContent.style.transform = `scale(${1 + p * 0.05})`;
+      DOM.mainContent.style.opacity = String(p);
+      if (p > 0.1) DOM.mainContent.style.pointerEvents = 'auto';
       if (DOM.navbar) {
         DOM.navbar.style.opacity = '1';
         DOM.navbar.style.pointerEvents = 'auto';
@@ -289,53 +241,94 @@
     }
   
     /* ==========================================================================
-       Carousel (infinite loop, clones, in-view detection)
+       Carousel — fixed cloning & measurement (root-cause fix)
        ========================================================================== */
+    function getGapValuePx(el) {
+      try {
+        const cs = getComputedStyle(el);
+        const gap = cs.getPropertyValue('gap') || cs.getPropertyValue('column-gap') || '0px';
+        return parseFloat(gap) || 0;
+      } catch (e) {
+        return 0;
+      }
+    }
+  
+    function measureOneSetWidth(items) {
+      // sum bounding widths (includes padding/border visually)
+      let total = 0;
+      for (let i = 0; i < items.length; i++) {
+        const rect = items[i].getBoundingClientRect();
+        total += rect.width;
+      }
+      // include gaps between items (n-1 gaps)
+      const track = DOM.carouselTrack;
+      const gap = track ? getGapValuePx(track) : 0;
+      if (items.length > 1) total += gap * (items.length - 1);
+      return Math.round(total);
+    }
+  
     function initCarouselClones() {
       const track = DOM.carouselTrack;
       if (!track || state.carouselInitialized) return;
   
-      const items = track.querySelectorAll('.carousel-item');
-      if (!items.length) return;
+      // find actual carousel items anywhere under track (avoid nested wrappers)
+      const originalItems = Array.from(track.querySelectorAll('.carousel-item'));
+      if (!originalItems.length) return;
   
-      // Delay measuring until layout has settled
+      // ensure track behaves as single-row flex container
+      track.style.display = track.style.display || 'flex';
+      track.style.flexWrap = 'nowrap';
+      track.style.justifyContent = track.style.justifyContent || 'flex-start';
+      // ensure wrapper clips overflow
+      const wrapper = DOM.carouselSection ? DOM.carouselSection : track.parentElement;
+      if (wrapper) {
+        wrapper.style.overflow = wrapper.style.overflow || 'hidden';
+      }
+  
+      // Defer cloning until layout settled so widths are measurable
       setTimeout(() => {
         try {
-          // measure width of single set BEFORE cloning
-          const singleSetWidth = track.scrollWidth || track.offsetWidth || 0;
+          // measure width of the original set (before we touch the DOM)
+          // if items are currently within wrappers, measure those nodes
+          const measuredWidth = measureOneSetWidth(originalItems);
   
-          if (singleSetWidth > 0) {
-            state.carouselOneSetWidth = singleSetWidth;
-  
-            // clone the children cleanly (avoid innerHTML duplication which can break events/styles)
-            const wrapper = document.createElement('div');
-            wrapper.className = 'carousel-set-temp';
-            // move current children into wrapper (shallow)
-            while (track.firstChild) {
-              wrapper.appendChild(track.firstChild);
-            }
-            // now append two copies of wrapper's inner content
-            const set1 = wrapper.cloneNode(true);
-            const set2 = wrapper.cloneNode(true);
-            // clear track and append
-            track.innerHTML = '';
-            track.appendChild(set1);
-            track.appendChild(set2);
-  
-            // mark initialized
-            state.carouselInitialized = true;
-  
-            // start animation if already in view
-            if (state.carouselInView && !state.isCarouselAnimating) {
-              startCarouselAnimation();
-            }
+          if (measuredWidth <= 0) {
+            console.warn('Carousel: measured set width is 0 — check styles.');
+            // still attempt a safe fallback: use track.scrollWidth / 2 if possible
+            const fallback = Math.round((track.scrollWidth || track.offsetWidth || 0) / 2);
+            state.carouselOneSetWidth = fallback;
           } else {
-            console.warn(
-              'Carousel width is 0 – check CSS of .carousel-track / .carousel-item'
-            );
+            state.carouselOneSetWidth = measuredWidth;
           }
+  
+          // CLEAR track children and append clones of the original items directly
+          // (root cause fix: items must be direct children of .carousel-track)
+          const clones = originalItems.map((it) => it.cloneNode(true));
+  
+          // empty track
+          while (track.firstChild) track.removeChild(track.firstChild);
+  
+          // append first set
+          clones.forEach((c) => {
+            c.style.flex = c.style.flex || c.getAttribute('data-flex') || '';
+            track.appendChild(c.cloneNode(true));
+          });
+          // append second (duplicate) set
+          clones.forEach((c) => {
+            track.appendChild(c.cloneNode(true));
+          });
+  
+          // If we couldn't measure earlier, try a second pass
+          if (!state.carouselOneSetWidth || state.carouselOneSetWidth === 0) {
+            const newItems = track.querySelectorAll('.carousel-item');
+            state.carouselOneSetWidth = measureOneSetWidth(Array.from(newItems).slice(0, clones.length));
+          }
+  
+          // mark initialized and possibly start animation
+          state.carouselInitialized = true;
+          if (state.carouselInView && !state.isCarouselAnimating) startCarouselAnimation();
         } catch (err) {
-          console.error('Carousel init error', err);
+          console.error('initCarouselClones error', err);
         }
       }, CONFIG.CAROUSEL_CLONE_DELAY);
     }
@@ -344,30 +337,19 @@
       const section = DOM.carouselSection;
       const track = DOM.carouselTrack;
       if (!track) return;
-  
-      // If there is no wrapper section, assume always in view
       if (!section) {
         if (!state.carouselInView) {
           state.carouselInView = true;
-          if (state.carouselInitialized && !state.isCarouselAnimating) {
-            startCarouselAnimation();
-          }
+          if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation();
         }
         return;
       }
-  
       const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
-  
-      const inView =
-        rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR &&
-        rect.bottom > -vh * 0.2;
-  
+      const inView = rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR && rect.bottom > -vh * 0.2;
       if (inView && !state.carouselInView) {
         state.carouselInView = true;
-        if (state.carouselInitialized && !state.isCarouselAnimating) {
-          startCarouselAnimation();
-        }
+        if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation();
       } else if (!inView && state.carouselInView) {
         state.carouselInView = false;
         stopCarouselAnimation();
@@ -375,38 +357,44 @@
     }
   
     function startCarouselAnimation() {
-      if (
-        state.isCarouselAnimating ||
-        state.carouselOneSetWidth === 0 ||
-        !state.carouselInitialized
-      )
-        return;
+      if (state.isCarouselAnimating || !state.carouselInitialized) return;
+      // require a sensible width
+      if (!state.carouselOneSetWidth || state.carouselOneSetWidth <= 0) {
+        // try to recompute from DOM
+        const track = DOM.carouselTrack;
+        const allItems = track ? track.querySelectorAll('.carousel-item') : [];
+        if (allItems.length) {
+          state.carouselOneSetWidth = measureOneSetWidth(Array.from(allItems).slice(0, Math.max(1, Math.floor(allItems.length / 2))));
+        } else {
+          return;
+        }
+      }
+  
       state.isCarouselAnimating = true;
-  
       const track = DOM.carouselTrack;
+      if (!track) return;
   
-      // ensure any previous animation is canceled
+      // cancel any existing RAF
       if (state.carouselAnimationId) cAF(state.carouselAnimationId);
       state.carouselAnimationId = null;
   
       function step() {
-        // advance
+        // advance scroll pos
         state.carouselScrollPos += state.carouselSpeed;
   
-        // wrap smoothly using modulo (avoids a visible jump)
-        const w = state.carouselOneSetWidth || track.scrollWidth || track.offsetWidth;
+        const w = state.carouselOneSetWidth || (track.scrollWidth / 2) || 0;
         if (w > 0) {
-          // keep carouselScrollPos within [0, w)
-          if (state.carouselScrollPos >= w) state.carouselScrollPos = state.carouselScrollPos % w;
+          // wrap using modulo to keep position bounded
+          state.carouselScrollPos = state.carouselScrollPos % w;
         } else {
           state.carouselScrollPos = 0;
         }
   
-        if (track)
-          track.style.transform = `translate3d(-${state.carouselScrollPos}px, 0, 0)`;
+        track.style.transform = `translate3d(-${Math.max(0, Math.round(state.carouselScrollPos))}px, 0, 0)`;
   
         if (state.isCarouselAnimating) state.carouselAnimationId = rAF(step);
       }
+  
       step();
     }
   
@@ -416,7 +404,6 @@
       state.isCarouselAnimating = false;
     }
   
-    /* mouse hover pause for carousel */
     function bindCarouselHoverPause() {
       const track = DOM.carouselTrack;
       if (!track) return;
@@ -424,19 +411,14 @@
       track.addEventListener(
         'mouseleave',
         () => {
-          if (
-            state.carouselInView &&
-            state.carouselInitialized &&
-            state.carouselOneSetWidth > 0
-          )
-            startCarouselAnimation();
+          if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) startCarouselAnimation();
         },
         { passive: true }
       );
     }
   
     /* ==========================================================================
-       Testimonial slider (simple and accessible)
+       Testimonials (unchanged logic, robust guards)
        ========================================================================== */
     function initTestimonials() {
       const testimonials = Array.from(document.querySelectorAll('.testimonial'));
@@ -445,16 +427,8 @@
       const nextBtn = DOM.nextBtn;
       const container = DOM.testimonialContainer;
   
-      if (
-        !testimonials.length ||
-        !dotsContainer ||
-        !prevBtn ||
-        !nextBtn ||
-        !container
-      )
-        return;
+      if (!testimonials.length || !dotsContainer || !prevBtn || !nextBtn || !container) return;
   
-      // create dots
       testimonials.forEach((_, i) => {
         const d = document.createElement('span');
         d.dataset.index = i;
@@ -503,10 +477,7 @@
   
       function startAuto() {
         stopAuto();
-        state.testimonialAutoInterval = setInterval(
-          () => showTestimonial(current + 1),
-          CONFIG.TESTIMONIAL_AUTO_MS
-        );
+        state.testimonialAutoInterval = setInterval(() => showTestimonial(current + 1), CONFIG.TESTIMONIAL_AUTO_MS);
       }
       function stopAuto() {
         if (state.testimonialAutoInterval) clearInterval(state.testimonialAutoInterval);
@@ -516,20 +487,18 @@
         startAuto();
       }
   
-      // initialize
       initHeight();
       startAuto();
     }
   
     /* ==========================================================================
-       Popup form show / hide and basic events
+       Popup show/hide
        ========================================================================== */
     function initPopup() {
       const popup = DOM.popup;
       const closeBtn = DOM.popupClose;
       if (!popup || !closeBtn) return;
   
-      // show after delay (only once)
       window.addEventListener('load', () => {
         if (!state.popupShown) {
           setTimeout(() => {
@@ -546,12 +515,11 @@
     }
   
     /* ==========================================================================
-       Popup form submission (async)
+       Popup form submission
        ========================================================================== */
     function initPopupFormHandler() {
       const form = DOM.popupForm;
       if (!form) return;
-  
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = form.querySelector('button[type="submit"]');
@@ -577,8 +545,7 @@
         }
   
         try {
-          const BACKEND_URL =
-            'https://soundabodev2-server.onrender.com/api/popup-form';
+          const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
           const resp = await fetch(BACKEND_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -614,7 +581,7 @@
     }
   
     /* ==========================================================================
-       Contact form submission (async) - expects grecaptcha instance
+       Contact form handler
        ========================================================================== */
     function initContactFormHandler() {
       const form = DOM.contactForm;
@@ -633,13 +600,7 @@
           message: form.querySelector('#message')?.value.trim()
         };
   
-        if (
-          !data.fullName ||
-          !data.email ||
-          !data.phone ||
-          !data.course ||
-          !data.message
-        ) {
+        if (!data.fullName || !data.email || !data.phone || !data.course || !data.message) {
           if (statusMsg) {
             statusMsg.textContent = '❌ Please fill all fields';
             statusMsg.style.color = '#ff4444';
@@ -647,12 +608,7 @@
           return;
         }
   
-        // reCAPTCHA check (if present)
-        const recaptchaResponse =
-          (window.grecaptcha &&
-            grecaptcha.getResponse &&
-            grecaptcha.getResponse()) ||
-          '';
+        const recaptchaResponse = (window.grecaptcha && grecaptcha.getResponse && grecaptcha.getResponse()) || '';
         if (!recaptchaResponse) {
           if (statusMsg) {
             statusMsg.textContent = '❌ Please complete the reCAPTCHA';
@@ -667,8 +623,7 @@
         }
   
         try {
-          const BACKEND_URL =
-            'https://soundabodev2-server.onrender.com/api/popup-form';
+          const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
           const resp = await fetch(BACKEND_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -701,33 +656,35 @@
     }
   
     /* ==========================================================================
-       Infinite logo scroll (robust)
+       Logo scroller — more robust measurement & no-wrap behavior
        ========================================================================== */
     function initLogoScroller() {
-      const track = DOM.logoTrack,
-        set = DOM.logoSet,
-        banner = DOM.clientLogoBanner;
+      const track = DOM.logoTrack;
+      const set = DOM.logoSet;
+      const banner = DOM.clientLogoBanner;
       if (!track || !set || !banner) return;
   
-      // Defensive: ensure there's at least one logo item
       if (!set.children || set.children.length === 0) {
         console.warn('Logo scroller: no .logo-item children found inside .logo-set');
         return;
       }
   
-      // Cleanly create two sets (cloneNode) for seamless loop
+      // clear and create two inline sets
       track.innerHTML = '';
       const set1 = set.cloneNode(true);
       const set2 = set.cloneNode(true);
-  
-      // Ensure proper display to avoid wrapping
+      set1.classList.add('logo-set'); // keep class for measurement logic
+      set2.classList.add('logo-set');
       set1.style.display = 'inline-flex';
       set2.style.display = 'inline-flex';
-  
       track.appendChild(set1);
       track.appendChild(set2);
   
-      // responsive speed
+      // ensure no wrap
+      track.style.display = 'flex';
+      track.style.flexWrap = 'nowrap';
+      track.style.alignItems = 'center';
+  
       function updateLogoSpeed() {
         const w = window.innerWidth;
         if (w < 660) state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.xs;
@@ -736,25 +693,15 @@
         else state.logoScrollSpeed = CONFIG.LOGO_SCROLL_SPEEDS.lg;
   
         if (isLowEndDevice()) state.logoScrollSpeed *= 0.6;
-        // reset measured width so it recalculates
         state.logoSetWidth = 0;
       }
   
-      function getLogoSetWidth() {
+      function computeLogoSetWidth() {
         if (!state.logoSetWidth) {
           const sets = track.querySelectorAll('.logo-set');
           if (sets.length > 0) {
-            // prefer scrollWidth for accurate total width including overflow content
-            state.logoSetWidth = sets[0].scrollWidth || sets[0].offsetWidth || 0;
-            if (!state.logoSetWidth) {
-              // fallback: sum child widths
-              let w = 0;
-              Array.from(sets[0].children).forEach((c) => {
-                const rect = c.getBoundingClientRect();
-                w += rect.width;
-              });
-              state.logoSetWidth = Math.max(0, w);
-            }
+            const rect = sets[0].getBoundingClientRect();
+            state.logoSetWidth = Math.round(rect.width);
           } else {
             state.logoSetWidth = 0;
           }
@@ -763,25 +710,18 @@
       }
   
       function animateLogo() {
-        // cancel existing RAF guard
         if (state.logoAnimationId) cAF(state.logoAnimationId);
         state.logoAnimationId = null;
   
         function step() {
           if (!state.logoIsPaused) {
-            // fractional movement for smoothness
             state.logoCurrentPosition -= state.logoScrollSpeed;
-  
-            const w = getLogoSetWidth();
-            if (!w) {
-              // try recomputing next frame
-              state.logoSetWidth = 0;
-            } else {
-              // wrap using modulo to avoid visible jump
+            const w = computeLogoSetWidth();
+            if (w > 0) {
               if (-state.logoCurrentPosition >= w) {
+                // wrap smoothly
                 state.logoCurrentPosition += w;
               }
-              // apply transform
               track.style.transform = `translate3d(${state.logoCurrentPosition}px, 0, 0)`;
             }
           }
@@ -790,44 +730,26 @@
         step();
       }
   
-      banner.addEventListener(
-        'mouseenter',
-        () => {
-          state.logoIsPaused = true;
-        },
-        { passive: true }
-      );
-      banner.addEventListener(
-        'mouseleave',
-        () => {
-          state.logoIsPaused = false;
-        },
-        { passive: true }
-      );
+      banner.addEventListener('mouseenter', () => { state.logoIsPaused = true; }, { passive: true });
+      banner.addEventListener('mouseleave', () => { state.logoIsPaused = false; }, { passive: true });
   
-      // pause when offscreen using IntersectionObserver (improves perf)
-      const bannerObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            state.logoIsPaused = !entry.isIntersecting;
-          });
-        },
-        { threshold: 0.01 }
-      );
-  
+      // pause when offscreen
+      const bannerObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          state.logoIsPaused = !entry.isIntersecting;
+        });
+      }, { threshold: 0.01 });
       bannerObserver.observe(banner);
   
       updateLogoSpeed();
       window.addEventListener('resize', updateLogoSpeed, { passive: true });
   
-      // start RAF loop
-      if (state.logoAnimationId) cAF(state.logoAnimationId);
-      state.logoAnimationId = null;
+      // start
       animateLogo();
     }
   
     /* ==========================================================================
-       Reveal on scroll (IntersectionObserver)
+       Reveal on scroll
        ========================================================================== */
     function setupRevealObserver() {
       const observerOptions = {
@@ -839,8 +761,7 @@
           if (entry.isIntersecting) {
             const elements = entry.target.querySelectorAll('.reveal-up');
             elements.forEach((el, i) => {
-              if (!el.classList.contains('active'))
-                setTimeout(() => el.classList.add('active'), i * 100);
+              if (!el.classList.contains('active')) setTimeout(() => el.classList.add('active'), i * 100);
             });
             observer.unobserve(entry.target);
           }
@@ -852,13 +773,13 @@
           const el = document.querySelector(selector);
           if (el) observer.observe(el);
         } catch (e) {
-          // ignore invalid selectors
+          // ignore invalid selector
         }
       });
     }
   
     /* ==========================================================================
-       Aurora text fallback polyfill (ensures gradient text on older browsers)
+       Aurora fallback, hamburger, join buttons, faq, modals — unchanged logic
        ========================================================================== */
     function ensureAuroraText() {
       const el = DOM.auroraText;
@@ -867,11 +788,7 @@
       const clip = cs.getPropertyValue('background-clip');
       const webkitFill = cs.getPropertyValue('-webkit-text-fill-color');
       if (!/text/.test(clip) || webkitFill !== 'transparent') {
-        el.style.setProperty(
-          'background-image',
-          'linear-gradient(135deg,#ff0080 0%,#7928ca 25%,#0070f3 50%,#38bdf8 75%,#ff0080 100%)',
-          'important'
-        );
+        el.style.setProperty('background-image', 'linear-gradient(135deg,#ff0080 0%,#7928ca 25%,#0070f3 50%,#38bdf8 75%,#ff0080 100%)', 'important');
         el.style.setProperty('background-size', '200% 200%', 'important');
         el.style.setProperty('-webkit-background-clip', 'text', 'important');
         el.style.setProperty('background-clip', 'text', 'important');
@@ -880,19 +797,13 @@
       }
     }
   
-    /* ==========================================================================
-       Hamburger menu toggle
-       ========================================================================== */
     function initHamburger() {
-      const hamburger = DOM.hamburger,
-        navMenu = DOM.navMenu;
+      const hamburger = DOM.hamburger, navMenu = DOM.navMenu;
       if (!hamburger || !navMenu) return;
-  
       hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('is-active');
         navMenu.classList.toggle('is-active');
       });
-  
       navMenu.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', () => {
           hamburger.classList.remove('is-active');
@@ -901,9 +812,6 @@
       });
     }
   
-    /* ==========================================================================
-       Join buttons that open the popup
-       ========================================================================== */
     function initJoinButtons() {
       const btns = DOM.joinBtns;
       const popup = DOM.popup;
@@ -916,18 +824,13 @@
       });
     }
   
-    /* ==========================================================================
-       FAQ accordion
-       ========================================================================== */
     function initFaqAccordion() {
       const items = DOM.faqItems;
       if (!items || items.length === 0) return;
-  
       items.forEach((item) => {
         const head = item.querySelector('.faq-head');
         const body = item.querySelector('.faq-body');
         if (!head || !body) return;
-  
         head.addEventListener('click', () => {
           const open = item.getAttribute('data-open') === 'true';
           if (open) {
@@ -935,24 +838,17 @@
             head.setAttribute('aria-expanded', 'false');
             body.style.maxHeight = body.scrollHeight + 'px';
             requestAnimationFrame(() => (body.style.maxHeight = '0'));
-            setTimeout(() => {
-              body.hidden = true;
-            }, 360);
+            setTimeout(() => { body.hidden = true; }, 360);
           } else {
             item.setAttribute('data-open', 'true');
             head.setAttribute('aria-expanded', 'true');
             body.hidden = false;
-            requestAnimationFrame(
-              () => (body.style.maxHeight = body.scrollHeight + 'px')
-            );
+            requestAnimationFrame(() => (body.style.maxHeight = body.scrollHeight + 'px'));
           }
         });
       });
     }
   
-    /* ==========================================================================
-       Gear modal (cards -> modal)
-       ========================================================================== */
     function initGearModal() {
       const cards = DOM.gearCards;
       const modal = DOM.gearModal;
@@ -967,7 +863,6 @@
         document.body.style.overflow = 'hidden';
         modalClose.focus();
       }
-  
       function closeModal() {
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
@@ -975,36 +870,22 @@
   
       cards.forEach((card) => {
         card.addEventListener('click', () => {
-          const title =
-            card.dataset.title ||
-            card.querySelector('.card-title')?.textContent ||
-            '';
-          const desc =
-            card.dataset.desc ||
-            card.querySelector('.card-excerpt')?.textContent ||
-            '';
+          const title = card.dataset.title || card.querySelector('.card-title')?.textContent || '';
+          const desc = card.dataset.desc || card.querySelector('.card-excerpt')?.textContent || '';
           const specs = card.dataset.specs || '';
           openModal(title, desc, specs);
         });
       });
   
       modalClose.addEventListener('click', closeModal);
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-      });
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
-      });
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
     }
   
-    /* ==========================================================================
-       Studio modal (optional separate modal)
-       ========================================================================== */
     function initStudioModal() {
       if (!DOM.studioModal) return;
       const cards = Array.from(document.querySelectorAll('#studio-setup .gear-card'));
-      const modal = DOM.studioModal,
-        closeBtn = DOM.studioModalClose;
+      const modal = DOM.studioModal, closeBtn = DOM.studioModalClose;
       if (!cards.length || !modal || !closeBtn) return;
   
       function openModal(title, desc) {
@@ -1014,7 +895,6 @@
         document.body.style.overflow = 'hidden';
         closeBtn.focus();
       }
-  
       function closeModal() {
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
@@ -1025,83 +905,42 @@
         const desc = card.dataset.desc;
         card.addEventListener('click', () => openModal(title, desc));
         card.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            openModal(title, desc);
-          }
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(title, desc); }
         });
         const cta = card.querySelector('.card-cta');
-        if (cta)
-          cta.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openModal(title, desc);
-          });
+        if (cta) cta.addEventListener('click', (e) => { e.stopPropagation(); openModal(title, desc); });
       });
   
       closeBtn.addEventListener('click', closeModal);
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-      });
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
-      });
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
     }
   
-    /* ==========================================================================
-       Why-dropdown (toggle panel under heading)
-       ========================================================================== */
     function initWhyDropdown() {
-      const wd = DOM.whyDropdown;
-      const toggle = DOM.whyDropdownToggle;
-      const panel = DOM.whyDropdownPanel;
+      const wd = DOM.whyDropdown, toggle = DOM.whyDropdownToggle, panel = DOM.whyDropdownPanel;
       if (!wd || !toggle || !panel) return;
   
-      function openPanel() {
-        wd.classList.add('open');
-        toggle.setAttribute('aria-expanded', 'true');
-      }
-      function closePanel() {
-        wd.classList.remove('open');
-        toggle.setAttribute('aria-expanded', 'false');
-      }
-      function togglePanel(e) {
-        e.preventDefault();
-        if (wd.classList.contains('open')) closePanel();
-        else openPanel();
-      }
+      function openPanel() { wd.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
+      function closePanel() { wd.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
+      function togglePanel(e) { e.preventDefault(); if (wd.classList.contains('open')) closePanel(); else openPanel(); }
   
       toggle.addEventListener('click', togglePanel);
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && wd.classList.contains('open')) {
-          closePanel();
-          toggle.focus();
-        }
-      });
-      document.addEventListener('click', (e) => {
-        if (!wd.contains(e.target) && wd.classList.contains('open')) closePanel();
-      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && wd.classList.contains('open')) { closePanel(); toggle.focus(); }});
+      document.addEventListener('click', (e) => { if (!wd.contains(e.target) && wd.classList.contains('open')) closePanel(); });
     }
   
     /* ==========================================================================
-       Event listeners & lifecycle
+       Event lifecycle & bootstrap
        ========================================================================== */
     function bindGlobalListeners() {
       window.addEventListener('scroll', onScrollHandler, { passive: true });
-      window.addEventListener(
-        'resize',
-        () => {
-          // update intro range and re-evaluate
-          state.carouselOneSetWidth = 0; // force carousel width recalculation (if needed later)
-          state.logoSetWidth = 0; // force logo width recalculation
-          state.lastScrollY = window.scrollY || 0;
-        },
-        { passive: true }
-      );
+      window.addEventListener('resize', () => {
+        state.carouselOneSetWidth = 0;
+        state.logoSetWidth = 0;
+        state.lastScrollY = window.scrollY || 0;
+      }, { passive: true });
     }
   
-    /* ==========================================================================
-       Bing UET (unchanged, lazy-load safe)
-       ========================================================================== */
     function initBingUET() {
       (function (w, d, t, r, u) {
         var f, n, i;
@@ -1124,19 +963,14 @@
       })(window, document, 'script', '//bat.bing.com/bat.js', 'uetq');
     }
   
-    /* ==========================================================================
-       Initialization entrypoint
-       ========================================================================== */
     function init() {
-      // Setup initial small things
       ensureAuroraText();
       bindGlobalListeners();
   
-      // Start master loop with initial tick
       state.ticking = true;
       masterAnimationLoop();
   
-      // Init modules
+      // modules
       initCarouselClones();
       bindCarouselHoverPause();
       initTestimonials();
@@ -1153,14 +987,10 @@
       initWhyDropdown();
       initBingUET();
   
-      // Defensive: if DOM ready but some modules rely on cloned content,
-      // ensure carousel init again after short delay
+      // defensive re-run in case layout changed after fonts/images load
       setTimeout(initCarouselClones, CONFIG.CAROUSEL_CLONE_DELAY * 2);
     }
   
-    /* ==========================================================================
-       DOMContentLoaded bootstrap
-       ========================================================================== */
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
