@@ -369,7 +369,7 @@ app.post('/api/popup-form', (req, res) => {
     enqueueJob({
       type: 'user',
       to: email,
-      subject: `Thanks — ${COMPANY_NAME}`,
+      subject: `Thanks  ${COMPANY_NAME}`,
       html: userHtml,
       maxRetries: 2
     });
