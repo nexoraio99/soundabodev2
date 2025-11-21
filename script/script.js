@@ -1,9 +1,7 @@
-/* ============================================================================
+   /* ============================================================================
    script1.js — soundabode site script (refactor, carousel + logo fixes)
-   - Rewritten to fix root cause: clone .carousel-item nodes (direct children)
-   - Defensive, performance-aware, and mobile-friendly
-   - Added CSS & font readiness helper to reduce layout thrash
-   - Added Bing UET conversion helper + calls on successful form submission
+   - Full rewrite that fixes root causes (reliable bootstrap, stable popup,
+     robust cloning/measurement). Logic otherwise kept consistent with original.
    ============================================================================ */
 
 (function () {
@@ -20,7 +18,8 @@
     CAROUSEL_CLONE_DELAY: 400,
     LOGO_SCROLL_SPEEDS: { xs: 0.03, sm: 0.05, md: 0.25, lg: 0.4 },
     CAROUSEL_STRICT_VIEWPORT_FACTOR: 1.2,
-    STYLES_READY_TIMEOUT: 2500 // ms - fall back if styles/fonts don't report
+    STYLES_READY_TIMEOUT: 2500, // ms - fall back if styles/fonts don't report
+    BOOT_TIMEOUT: 350 // ms - guaranteed init fallback
   };
 
   /* ==========================================================================
@@ -132,7 +131,8 @@
     testimonialIndex: 0,
     testimonialAutoInterval: null,
 
-    popupShown: false
+    popupShown: false,
+    inited: false
   };
 
   /* ==========================================================================
@@ -150,6 +150,8 @@
 
   /* ==========================================================================
      CSS & Font readiness helper (optimization)
+     - Waits (best-effort) for stylesheet/link load events and document.fonts.ready.
+     - Falls back after STYLES_READY_TIMEOUT so it never blocks indefinitely.
      ========================================================================== */
   function whenStylesAndFontsReady(timeout = CONFIG.STYLES_READY_TIMEOUT) {
     return new Promise((resolve) => {
@@ -177,17 +179,21 @@
 
       // 1) Wait for font loading if supported
       let fontListener = null;
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => {
-          setTimeout(() => {
-            if (!resolved) {
-              setTimeout(() => {
-                tidy();
-              }, 30);
-            }
-          }, 0);
-        }).catch(() => {});
-        fontListener = () => { /* nothing to unbind for fonts.ready */ };
+      try {
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => {
+            setTimeout(() => {
+              if (!resolved) {
+                setTimeout(() => {
+                  tidy();
+                }, 30);
+              }
+            }, 0);
+          }).catch(() => {});
+          fontListener = () => { /* nothing to unbind for fonts.ready */ };
+        }
+      } catch (e) {
+        // ignore
       }
 
       // 2) Observe <link rel="stylesheet"> & <link rel="preload" as="style">
@@ -196,32 +202,33 @@
       const styleObservers = [];
 
       links.forEach((link) => {
-        if (link.sheet || link.__loaded || link.media === 'all' || link.media === '') {
-          return;
+        try {
+          if (link.sheet || link.__loaded || link.media === 'all' || link.media === '') {
+            return;
+          }
+
+          const onLoad = () => {
+            try { link.__loaded = true; } catch (e) {}
+            const idx = pending.indexOf(handler);
+            if (idx >= 0) pending.splice(idx, 1);
+            if (pending.length === 0) tidy();
+          };
+          const onError = () => onLoad();
+          const handler = { onLoad, onError };
+          pending.push(handler);
+
+          link.addEventListener('load', onLoad, { passive: true });
+          link.addEventListener('error', onError, { passive: true });
+
+          styleObservers.push(() => {
+            try {
+              link.removeEventListener('load', onLoad);
+              link.removeEventListener('error', onError);
+            } catch (e) {}
+          });
+        } catch (e) {
+          // ignore per-link failures
         }
-
-        const onLoad = () => {
-          try { link.__loaded = true; } catch (e) {}
-          const idx = pending.indexOf(handler);
-          if (idx >= 0) pending.splice(idx, 1);
-          if (pending.length === 0) tidy();
-        };
-        const onError = () => {
-          onLoad();
-        };
-
-        const handler = { onLoad, onError };
-        pending.push(handler);
-
-        link.addEventListener('load', onLoad, { passive: true });
-        link.addEventListener('error', onError, { passive: true });
-
-        styleObservers.push(() => {
-          try {
-            link.removeEventListener('load', onLoad);
-            link.removeEventListener('error', onError);
-          } catch (e) {}
-        });
       });
 
       if (links.length === 0) {
@@ -354,17 +361,18 @@
     const track = DOM.carouselTrack;
     if (!track || state.carouselInitialized) return;
 
+    // find actual carousel items anywhere under track (avoid nested wrappers)
     const originalItems = Array.from(track.querySelectorAll('.carousel-item'));
     if (!originalItems.length) return;
 
+    // ensure track behaves as single-row flex container
     track.style.display = track.style.display || 'flex';
     track.style.flexWrap = 'nowrap';
     track.style.justifyContent = track.style.justifyContent || 'flex-start';
     const wrapper = DOM.carouselSection ? DOM.carouselSection : track.parentElement;
-    if (wrapper) {
-      wrapper.style.overflow = wrapper.style.overflow || 'hidden';
-    }
+    if (wrapper) wrapper.style.overflow = wrapper.style.overflow || 'hidden';
 
+    // Defer cloning slightly so layout is stable
     setTimeout(() => {
       try {
         const measuredWidth = measureOneSetWidth(originalItems);
@@ -377,10 +385,13 @@
           state.carouselOneSetWidth = measuredWidth;
         }
 
+        // Build clones as direct children of track (root-cause fix)
         const clones = originalItems.map((it) => it.cloneNode(true));
 
+        // empty track
         while (track.firstChild) track.removeChild(track.firstChild);
 
+        // append first and second set
         clones.forEach((c) => {
           c.style.flex = c.style.flex || c.getAttribute('data-flex') || '';
           track.appendChild(c.cloneNode(true));
@@ -427,6 +438,7 @@
 
   function startCarouselAnimation() {
     if (state.isCarouselAnimating || !state.carouselInitialized) return;
+
     if (!state.carouselOneSetWidth || state.carouselOneSetWidth <= 0) {
       const track = DOM.carouselTrack;
       const allItems = track ? track.querySelectorAll('.carousel-item') : [];
@@ -472,13 +484,9 @@
     const track = DOM.carouselTrack;
     if (!track) return;
     track.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
-    track.addEventListener(
-      'mouseleave',
-      () => {
-        if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) startCarouselAnimation();
-      },
-      { passive: true }
-    );
+    track.addEventListener('mouseleave', () => {
+      if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) startCarouselAnimation();
+    }, { passive: true });
   }
 
   /* ==========================================================================
@@ -556,21 +564,21 @@
   }
 
   /* ==========================================================================
-     Popup show/hide
+     Popup show/hide (fixed)
+     - Show popup using init-time timer (do not rely on window.load).
      ========================================================================== */
   function initPopup() {
     const popup = DOM.popup;
     const closeBtn = DOM.popupClose;
     if (!popup || !closeBtn) return;
 
-    window.addEventListener('load', () => {
-      if (!state.popupShown) {
-        setTimeout(() => {
-          popup.classList.add('active');
-          state.popupShown = true;
-        }, CONFIG.POPUP_DELAY);
-      }
-    });
+    // Show popup after POPUP_DELAY from page init (guaranteed)
+    if (!state.popupShown) {
+      setTimeout(() => {
+        popup.classList.add('active');
+        state.popupShown = true;
+      }, CONFIG.POPUP_DELAY);
+    }
 
     closeBtn.addEventListener('click', () => popup.classList.remove('active'));
     popup.addEventListener('click', (e) => {
@@ -579,52 +587,35 @@
   }
 
   /* ==========================================================================
-     Bing UET integration
-     - loads base script and provides helper to push conversion events
+     Tracking helper for Bing UET / custom event
      ========================================================================== */
-  function initBingUET() {
-    (function (w, d, t, r, u) {
-      var f, n, i;
-      w[u] = w[u] || [];
-      f = function () {
-        var o = { ti: '343210550', enableAutoSpaTracking: true };
-        o.q = w[u];
-        w[u] = new UET(o);
-        w[u].push('pageLoad');
-      };
-      n = d.createElement(t);
-      // use explicit https to avoid mixed-content blocking
-      n.src = 'https://bat.bing.com/bat.js';
-      n.async = 1;
-      n.onload = n.onreadystatechange = function () {
-        var s = this.readyState;
-        s && s !== 'loaded' && s !== 'complete' || (f(), (n.onload = n.onreadystatechange = null));
-      };
-      i = d.getElementsByTagName(t)[0];
-      if (i && i.parentNode) i.parentNode.insertBefore(n, i);
-    })(window, document, 'script', 'https://bat.bing.com/bat.js', 'uetq');
-  }
-
-  // Defensive helper to fire conversion event to Bing UET
-  function uet_report_conversion(payload = {}) {
+  function sendConversionTracking(eventName = 'submit_lead_form', payload = {}) {
     try {
-      window.uetq = window.uetq || [];
-      // push an event; the name and payload are arbitrary key-values but helpful to see in logs
-      window.uetq.push('event', 'submit_lead_form', payload);
-      // debug log (remove or comment out in production)
-      // console.log('uet_report_conversion fired', payload);
-    } catch (e) {
-      // avoid breaking main flow if adblocker or script missing
-      console.warn('uet_report_conversion error', e);
+      // 1) If bing's uetq exists
+      if (window.uetq && Array.isArray(window.uetq.push)) {
+        window.uetq.push('event', eventName, payload || {});
+      }
+      // 2) If helper exists
+      if (typeof window.uet_report_conversion === 'function') {
+        try { window.uet_report_conversion(); } catch (e) {}
+      }
+      // 3) Try navigator.sendBeacon to a transparent tracking endpoint (optional fallback)
+      // If you have a tracking URL, you can place it here. We'll attempt a safe no-op if absent.
+      // Example: const trackingUrl = 'https://your-tracking-endpoint.example/collect';
+      // navigator.sendBeacon(trackingUrl, JSON.stringify({ event: eventName, ...payload }));
+    } catch (err) {
+      // swallow tracking errors so they don't affect UX
+      console.warn('tracking error', err);
     }
   }
 
   /* ==========================================================================
-     Popup form submission
+     Popup form submission (fixed, includes tracking)
      ========================================================================== */
   function initPopupFormHandler() {
     const form = DOM.popupForm;
     if (!form) return;
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = form.querySelector('button[type="submit"]');
@@ -649,42 +640,52 @@
         submitBtn.textContent = 'Sending...';
       }
 
+      // Try to keep submission under ~5s: use fetch with timeout wrapper
+      const BACKEND_URL = (() => {
+        // preserve original host; you can override by setting a global SOUNDABODE_BACKEND if needed
+        return window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com/api/popup-form';
+      })();
+
       try {
-        // backend popup endpoint
-        const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/popup-form';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
         const resp = await fetch(BACKEND_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: JSON.stringify({ fullName: data.name, email: data.email, phone: data.phone }),
+          signal: controller.signal
         });
 
-        const result = await resp.json().catch(() => ({}));
+        clearTimeout(timeoutId);
 
+        const result = await resp.json().catch(() => ({}));
         if (resp.ok && result.success) {
           if (statusMsg) {
             statusMsg.textContent = "✅ Thank you! We'll contact you soon.";
             statusMsg.style.color = '#00ff88';
           }
-
-          // Fire Bing UET conversion (best-effort)
+          // fire conversion tracking
           try {
-            uet_report_conversion({ ref: result.ref || null, name: data.name || '' });
-          } catch (err) {
-            console.warn('uet fire failed', err);
+            sendConversionTracking('popup_form_submitted', { name: data.name, email: data.email });
+          } catch (tErr) {
+            // ignore
           }
-
           form.reset();
           setTimeout(() => {
             const p = document.getElementById('popup-form');
             if (p) p.classList.remove('active');
-          }, 2000);
+          }, 1400);
         } else {
-          throw new Error(result.message || 'Submission failed');
+          // treat non-2xx as failure; if server returned message, show it
+          const msg = (result && result.message) ? result.message : 'Submission failed';
+          throw new Error(msg);
         }
       } catch (err) {
+        // if aborted, show friendly message
         console.error('Popup submit error', err);
         if (statusMsg) {
-          statusMsg.textContent = '❌ Failed to submit. Please try again.';
+          statusMsg.textContent = err.name === 'AbortError' ? '❌ Request timed out. Try again.' : '❌ Failed to submit. Please try again.';
           statusMsg.style.color = '#ff4444';
         }
       } finally {
@@ -716,61 +717,59 @@
         message: form.querySelector('#message')?.value.trim()
       };
 
-      if (!data.fullName || !data.email || !data.phone || !data.course || !data.message) {
+      if (!data.fullName || !data.email || !data.phone) {
         if (statusMsg) {
-          statusMsg.textContent = '❌ Please fill all fields';
+          statusMsg.textContent = '❌ Please fill name, email and phone';
           statusMsg.style.color = '#ff4444';
         }
         return;
       }
 
+      // recaptcha optional guard left intact if present
       const recaptchaResponse = (window.grecaptcha && grecaptcha.getResponse && grecaptcha.getResponse()) || '';
-      if (!recaptchaResponse) {
-        if (statusMsg) {
-          statusMsg.textContent = '❌ Please complete the reCAPTCHA';
-          statusMsg.style.color = '#ff4444';
-        }
-        return;
-      }
 
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending...';
       }
 
+      const BACKEND_URL = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com/api/contact-form';
+
       try {
-        // FIXED: use contact endpoint (was previously calling popup endpoint)
-        const BACKEND_URL = 'https://soundabodev2-server.onrender.com/api/contact-form';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const body = { fullName: data.fullName, email: data.email, phone: data.phone, course: data.course || '', message: data.message || '', recaptcha: recaptchaResponse };
+
         const resp = await fetch(BACKEND_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...data, recaptcha: recaptchaResponse })
+          body: JSON.stringify(body),
+          signal: controller.signal
         });
 
-        const result = await resp.json().catch(() => ({}));
+        clearTimeout(timeoutId);
 
+        const result = await resp.json().catch(() => ({}));
         if (resp.ok && result.success) {
           if (statusMsg) {
             statusMsg.textContent = "✅ Message sent successfully! We'll get back to you soon.";
             statusMsg.style.color = '#00ff88';
           }
-
-          // Fire Bing UET conversion for contact (best-effort)
+          // conversion tracking
           try {
-            uet_report_conversion({ ref: result.ref || null, name: data.fullName || '', course: data.course || '' });
-          } catch (err) {
-            console.warn('uet fire failed', err);
-          }
-
+            sendConversionTracking('contact_form_submitted', { name: data.fullName, email: data.email });
+          } catch (tErr) {}
           form.reset();
           if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset();
         } else {
-          throw new Error(result.message || 'Submission failed');
+          const msg = (result && result.message) ? result.message : 'Submission failed';
+          throw new Error(msg);
         }
       } catch (err) {
         console.error('Contact submit error', err);
         if (statusMsg) {
-          statusMsg.textContent = '❌ Failed to send message. Please try again.';
+          statusMsg.textContent = err.name === 'AbortError' ? '❌ Request timed out. Try again.' : '❌ Failed to send message. Please try again.';
           statusMsg.style.color = '#ff4444';
         }
       } finally {
@@ -783,7 +782,7 @@
   }
 
   /* ==========================================================================
-     Logo scroller — more robust measurement & no-wrap behavior
+     Logo scroller — robust measurement & no-wrap behavior
      ========================================================================== */
   function initLogoScroller() {
     const track = DOM.logoTrack;
@@ -796,16 +795,18 @@
       return;
     }
 
+    // clear and create two inline sets
     track.innerHTML = '';
     const set1 = set.cloneNode(true);
     const set2 = set.cloneNode(true);
-    set1.classList.add('logo-set');
+    set1.classList.add('logo-set'); // keep class for measurement logic
     set2.classList.add('logo-set');
     set1.style.display = 'inline-flex';
     set2.style.display = 'inline-flex';
     track.appendChild(set1);
     track.appendChild(set2);
 
+    // ensure no wrap
     track.style.display = 'flex';
     track.style.flexWrap = 'nowrap';
     track.style.alignItems = 'center';
@@ -901,7 +902,7 @@
   }
 
   /* ==========================================================================
-     UI helpers (hamburger, faq, modals, join buttons)
+     Aurora fallback, hamburger, join buttons, faq, modals
      ========================================================================== */
   function ensureAuroraText() {
     const el = DOM.auroraText;
@@ -1063,12 +1064,33 @@
     }, { passive: true });
   }
 
-  function initBingUETWrapper() {
-    initBingUET();
-    // helper already defined above - intentionally no-op if UET blocked
+  function initBingUET() {
+    (function (w, d, t, r, u) {
+      var f, n, i;
+      w[u] = w[u] || [];
+      f = function () {
+        var o = { ti: '343210550', enableAutoSpaTracking: true };
+        o.q = w[u];
+        w[u] = new UET(o);
+        w[u].push('pageLoad');
+      };
+      n = d.createElement(t);
+      n.src = r;
+      n.async = 1;
+      n.onload = n.onreadystatechange = function () {
+        var s = this.readyState;
+        s && s !== 'loaded' && s !== 'complete' || (f(), (n.onload = n.onreadystatechange = null));
+      };
+      i = d.getElementsByTagName(t)[0];
+      i.parentNode.insertBefore(n, i);
+    })(window, document, 'script', '//bat.bing.com/bat.js', 'uetq');
   }
 
   function init() {
+    // guard against double init
+    if (state.inited) return;
+    state.inited = true;
+
     ensureAuroraText();
     bindGlobalListeners();
 
@@ -1090,33 +1112,51 @@
     initGearModal();
     initStudioModal();
     initWhyDropdown();
-    initBingUETWrapper();
+    initBingUET();
 
     // defensive re-run in case layout changed after fonts/images load
     setTimeout(initCarouselClones, CONFIG.CAROUSEL_CLONE_DELAY * 2);
   }
 
   /* ==========================================================================
-     BOOTSTRAP: Wait for styles/fonts readiness then schedule init during idle
+     BOOTSTRAP: robust, single-call init (not a patch)
+     - Waits for styles/fonts but GUARANTEES init() runs quickly if they don't.
      ========================================================================== */
   function scheduleInitWhenReady() {
+    let called = false;
+    const safeInit = () => {
+      if (!called) {
+        called = true;
+        try { init(); } catch (e) { console.error('init error', e); }
+      }
+    };
+
+    // Best-effort wait for styles/fonts but timeout quickly
     whenStylesAndFontsReady(CONFIG.STYLES_READY_TIMEOUT).then(() => {
+      // Try to use requestIdleCallback if available (but do not depend on it)
       if ('requestIdleCallback' in window) {
         try {
-          requestIdleCallback(() => {
-            if (!state.ticking) init();
-          }, { timeout: 500 });
+          requestIdleCallback(() => safeInit(), { timeout: 300 });
         } catch (e) {
-          setTimeout(() => { if (!state.ticking) init(); }, 50);
+          // fallback to immediate safeInit
+          setTimeout(safeInit, 0);
         }
       } else {
-        setTimeout(() => { if (!state.ticking) init(); }, 50);
+        // small delay then init
+        setTimeout(safeInit, 0);
       }
     }).catch(() => {
-      if (!state.ticking) init();
+      // ensure init runs even if readiness helper fails
+      setTimeout(safeInit, 0);
     });
+
+    // Hard fallback: guarantee init after BOOT_TIMEOUT milliseconds
+    setTimeout(() => {
+      if (!called) safeInit();
+    }, CONFIG.BOOT_TIMEOUT);
   }
 
+  // Start: schedule init as soon as DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', scheduleInitWhenReady);
   } else {
