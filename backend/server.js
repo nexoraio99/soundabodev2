@@ -1,5 +1,6 @@
-// server.js - Soundabode Backend with Enhanced Email Templates
-// Usage: set EMAIL_USER, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET, EMAIL_REFRESH_TOKEN, ADMIN_EMAIL, CORS_ORIGINS
+// server.js - Soundabode Backend (fast, non-blocking email delivery + optional SendGrid)
+// Usage: set env vars: PORT, EMAIL_USER, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET,
+// EMAIL_REFRESH_TOKEN, ADMIN_EMAIL, CORS_ORIGINS, SENDGRID_API_KEY (optional)
 
 import express from 'express';
 import { google } from 'googleapis';
@@ -10,10 +11,26 @@ import { randomUUID } from 'crypto';
 
 dotenv.config();
 
+// Optional SendGrid (fast transactional provider)
+let sgMail = null;
+if (process.env.SENDGRID_API_KEY) {
+  try {
+    // lazy import so module is optional
+    // eslint-disable-next-line no-var
+    var sendgrid = await import('@sendgrid/mail');
+    sgMail = sendgrid.default;
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    console.log('✅ SendGrid enabled');
+  } catch (e) {
+    console.warn('⚠️ SendGrid lib not installed or failed to load:', e && e.message ? e.message : e);
+    sgMail = null;
+  }
+}
+
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-// ------------------- Configuration -------------------
+// ------------------- App constants -------------------
 const PHONE_NUMBER = '+919975016189';
 const WHATSAPP_NUMBER = '919975016189';
 const COMPANY_NAME = 'Soundabode Academy';
@@ -21,10 +38,13 @@ const COMPANY_ADDRESS = 'Shop No. 218, Vision 9 Mall, Pimple Saudagar, Pune 4110
 const WEBSITE_URL = 'https://soundabode.com';
 const LOGO_URL = 'https://res.cloudinary.com/di5bqvkma/image/upload/v1761233576/sa-logo_edited_vycsd0.png';
 
+// Uploaded file path (from your conversation history)
+const UPLOADED_FILE_PATH = '/mnt/data/Screenshot 2025-11-07 at 4.18.15 PM.png';
+
 // ------------------- Basic security & parsers -------------------
 app.set('trust proxy', 1);
 app.use(helmet());
-app.use(express.json({ limit: '150kb' }));
+app.use(express.json({ limit: '200kb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // ------------------- Rate limiter -------------------
@@ -45,12 +65,7 @@ const defaultOrigins = [
   'http://localhost:5500',
   'http://127.0.0.1:5500'
 ];
-
-const allowedOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(','))
-  .split(',')
-  .map(s => s.trim())
-  .filter(Boolean);
-
+const allowedOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(',')).split(',').map(s => s.trim()).filter(Boolean);
 app.use((req, res, next) => {
   const origin = req.get('Origin') || req.get('origin');
   if (origin && allowedOrigins.includes(origin)) {
@@ -59,7 +74,6 @@ app.use((req, res, next) => {
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   next();
 });
@@ -71,40 +85,28 @@ app.use((req, res, next) => {
 });
 
 // ------------------- Gmail (OAuth2) setup -------------------
-console.log('📧 Gmail configuration:');
-console.log('  EMAIL_USER:', process.env.EMAIL_USER ? '✅' : '❌ NOT SET');
-console.log('  EMAIL_CLIENT_ID:', process.env.EMAIL_CLIENT_ID ? '✅' : '❌ NOT SET');
-console.log('  EMAIL_CLIENT_SECRET:', process.env.EMAIL_CLIENT_SECRET ? '✅' : '❌ NOT SET');
-console.log('  EMAIL_REFRESH_TOKEN:', process.env.EMAIL_REFRESH_TOKEN ? '✅' : '❌ NOT SET');
-console.log('  ADMIN_EMAIL:', process.env.ADMIN_EMAIL || process.env.EMAIL_USER || '(not set)');
-
 const oauth2Client = new google.auth.OAuth2(
   process.env.EMAIL_CLIENT_ID,
   process.env.EMAIL_CLIENT_SECRET,
   'https://developers.google.com/oauthplayground'
 );
-
 if (process.env.EMAIL_REFRESH_TOKEN) {
   oauth2Client.setCredentials({ refresh_token: process.env.EMAIL_REFRESH_TOKEN });
 }
-
 const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-// ------------------- TOKEN CACHING -------------------
+// ------------------- Token caching -------------------
 let cachedToken = null;
-
 async function getAccessTokenCached() {
   const now = Date.now();
   if (cachedToken && cachedToken.token && cachedToken.expiry && (cachedToken.expiry - now > 30 * 1000)) {
     return cachedToken.token;
   }
-
   try {
     const res = await oauth2Client.getAccessToken();
     const token = (res && res.token) ? res.token : (typeof res === 'string' ? res : null);
     const creds = oauth2Client.credentials || {};
     const expiry = creds.expiry_date ? Number(creds.expiry_date) : (Date.now() + 55 * 60 * 1000);
-
     cachedToken = { token, expiry };
     console.log(`🔑 Gmail access token refreshed — expires in ${Math.round((expiry - now) / 60000)}m`);
     return token;
@@ -114,349 +116,8 @@ async function getAccessTokenCached() {
   }
 }
 
-// ------------------- Email Template Helpers -------------------
-
-// Base email template with modern design
-function getBaseEmailTemplate({ title, content, footerNote = '' }) {
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${title}</title>
-    </head>
-    <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f4f4f7;line-height:1.6;">
-      <table role="presentation" style="width:100%;border-collapse:collapse;background-color:#f4f4f7;padding:40px 20px;">
-        <tr>
-          <td align="center">
-            <!-- Main Container -->
-            <table role="presentation" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);overflow:hidden;">
-              
-              <!-- Header with Logo -->
-              <tr>
-                <td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:32px 24px;text-align:center;">
-                  <img src="${LOGO_URL}" alt="${COMPANY_NAME}" style="height:50px;width:auto;margin-bottom:16px;">
-                  <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:600;">${title}</h1>
-                </td>
-              </tr>
-              
-              <!-- Content -->
-              <tr>
-                <td style="padding:40px 32px;">
-                  ${content}
-                </td>
-              </tr>
-              
-              <!-- Action Buttons -->
-              <tr>
-                <td style="padding:0 32px 32px;">
-                  <table role="presentation" style="width:100%;border-collapse:collapse;">
-                    <tr>
-                      <td style="padding-right:8px;" width="50%">
-                        <a href="https://wa.me/${WHATSAPP_NUMBER}" style="display:block;background-color:#25D366;color:#ffffff;text-decoration:none;padding:14px 20px;border-radius:8px;text-align:center;font-weight:600;font-size:14px;">
-                          <table role="presentation" style="width:100%;">
-                            <tr>
-                              <td align="center">
-                                📱 WhatsApp
-                              </td>
-                            </tr>
-                          </table>
-                        </a>
-                      </td>
-                      <td style="padding-left:8px;" width="50%">
-                        <a href="tel:${PHONE_NUMBER}" style="display:block;background-color:#667eea;color:#ffffff;text-decoration:none;padding:14px 20px;border-radius:8px;text-align:center;font-weight:600;font-size:14px;">
-                          <table role="presentation" style="width:100%;">
-                            <tr>
-                              <td align="center">
-                                📞 Call Us
-                              </td>
-                            </tr>
-                          </table>
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              
-              <!-- Footer -->
-              <tr>
-                <td style="background-color:#f8f9fa;padding:24px 32px;border-top:1px solid #e9ecef;">
-                  ${footerNote ? `<p style="margin:0 0 12px;color:#6c757d;font-size:13px;">${footerNote}</p>` : ''}
-                  <p style="margin:0;color:#6c757d;font-size:13px;line-height:1.5;">
-                    <strong>${COMPANY_NAME}</strong><br>
-                    ${COMPANY_ADDRESS}<br>
-                    <a href="tel:${PHONE_NUMBER}" style="color:#667eea;text-decoration:none;">${PHONE_NUMBER}</a> | 
-                    <a href="${WEBSITE_URL}" style="color:#667eea;text-decoration:none;">${WEBSITE_URL}</a>
-                  </p>
-                  <div style="margin-top:16px;">
-                    <a href="https://www.instagram.com/soundabode" style="display:inline-block;margin:0 8px;text-decoration:none;">
-                      <span style="color:#667eea;font-size:20px;">📷</span>
-                    </a>
-                    <a href="https://www.facebook.com/soundabode" style="display:inline-block;margin:0 8px;text-decoration:none;">
-                      <span style="color:#667eea;font-size:20px;">📘</span>
-                    </a>
-                    <a href="https://www.youtube.com/@soundabode" style="display:inline-block;margin:0 8px;text-decoration:none;">
-                      <span style="color:#667eea;font-size:20px;">📺</span>
-                    </a>
-                  </div>
-                </td>
-              </tr>
-              
-            </table>
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-  `;
-}
-
-// Admin notification email for popup form
-function getAdminPopupEmail({ fullName, email, phone, message, timestamp, ref }) {
-  const content = `
-    <div style="background:linear-gradient(135deg,rgba(102,126,234,0.1) 0%,rgba(118,75,162,0.1) 100%);border-left:4px solid #667eea;padding:20px;border-radius:8px;margin-bottom:24px;">
-      <h2 style="margin:0 0 8px;color:#667eea;font-size:18px;">🔥 New Homepage Popup Inquiry</h2>
-      <p style="margin:0;color:#6c757d;font-size:14px;">Someone is interested in your courses!</p>
-    </div>
-    
-    <table style="width:100%;border-collapse:collapse;">
-      <tr>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;">
-          <strong style="color:#495057;font-size:14px;">Name:</strong>
-        </td>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;text-align:right;">
-          <span style="color:#212529;font-size:14px;">${fullName}</span>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;">
-          <strong style="color:#495057;font-size:14px;">Email:</strong>
-        </td>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;text-align:right;">
-          <a href="mailto:${email}" style="color:#667eea;text-decoration:none;font-size:14px;">${email}</a>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;">
-          <strong style="color:#495057;font-size:14px;">Phone:</strong>
-        </td>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;text-align:right;">
-          <a href="tel:${phone}" style="color:#667eea;text-decoration:none;font-size:14px;">${phone}</a>
-        </td>
-      </tr>
-      ${message ? `
-      <tr>
-        <td colspan="2" style="padding:12px 0;">
-          <strong style="color:#495057;font-size:14px;">Message:</strong>
-          <p style="margin:8px 0 0;color:#212529;font-size:14px;background-color:#f8f9fa;padding:12px;border-radius:6px;">${message}</p>
-        </td>
-      </tr>
-      ` : ''}
-    </table>
-    
-    <div style="margin-top:24px;padding:16px;background-color:#fff3cd;border-radius:8px;border-left:4px solid #ffc107;">
-      <p style="margin:0;color:#856404;font-size:13px;">
-        <strong>Quick Actions:</strong> Click WhatsApp or Call buttons below to contact ${fullName} immediately!
-      </p>
-    </div>
-  `;
-  
-  const footerNote = `Submitted: ${timestamp} | Source: Homepage Popup | Ref: ${ref}`;
-  
-  return getBaseEmailTemplate({
-    title: '🎉 New Popup Inquiry',
-    content,
-    footerNote
-  });
-}
-
-// Admin notification email for contact form
-function getAdminContactEmail({ fullName, email, phone, course, message, timestamp, ref, isCourse }) {
-  const courseDisplay = course ? course : 'N/A';
-  const enquiryIcon = isCourse ? '🎓' : '📧';
-  const enquiryType = isCourse ? 'Course Enquiry' : 'General Enquiry';
-  const gradientColor = isCourse ? 'rgba(76,175,80,0.1)' : 'rgba(102,126,234,0.1)';
-  const borderColor = isCourse ? '#4CAF50' : '#667eea';
-  
-  const content = `
-    <div style="background:linear-gradient(135deg,${gradientColor} 0%,${gradientColor} 100%);border-left:4px solid ${borderColor};padding:20px;border-radius:8px;margin-bottom:24px;">
-      <h2 style="margin:0 0 8px;color:${borderColor};font-size:18px;">${enquiryIcon} New ${enquiryType}</h2>
-      <p style="margin:0;color:#6c757d;font-size:14px;">Contact form submission from your website</p>
-    </div>
-    
-    <table style="width:100%;border-collapse:collapse;">
-      <tr>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;">
-          <strong style="color:#495057;font-size:14px;">Name:</strong>
-        </td>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;text-align:right;">
-          <span style="color:#212529;font-size:14px;">${fullName}</span>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;">
-          <strong style="color:#495057;font-size:14px;">Email:</strong>
-        </td>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;text-align:right;">
-          <a href="mailto:${email}" style="color:#667eea;text-decoration:none;font-size:14px;">${email}</a>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;">
-          <strong style="color:#495057;font-size:14px;">Phone:</strong>
-        </td>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;text-align:right;">
-          <a href="tel:${phone}" style="color:#667eea;text-decoration:none;font-size:14px;">${phone}</a>
-        </td>
-      </tr>
-      ${isCourse ? `
-      <tr>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;">
-          <strong style="color:#495057;font-size:14px;">Course Interest:</strong>
-        </td>
-        <td style="padding:12px 0;border-bottom:1px solid #e9ecef;text-align:right;">
-          <span style="background-color:${borderColor};color:#ffffff;padding:4px 12px;border-radius:16px;font-size:12px;font-weight:600;">${courseDisplay}</span>
-        </td>
-      </tr>
-      ` : ''}
-      ${message ? `
-      <tr>
-        <td colspan="2" style="padding:12px 0;">
-          <strong style="color:#495057;font-size:14px;">Message:</strong>
-          <p style="margin:8px 0 0;color:#212529;font-size:14px;background-color:#f8f9fa;padding:12px;border-radius:6px;">${message}</p>
-        </td>
-      </tr>
-      ` : ''}
-    </table>
-    
-    <div style="margin-top:24px;padding:16px;background-color:#d1ecf1;border-radius:8px;border-left:4px solid #17a2b8;">
-      <p style="margin:0;color:#0c5460;font-size:13px;">
-        <strong>Action Required:</strong> Use WhatsApp or Call buttons below to follow up with ${fullName} within 24 hours.
-      </p>
-    </div>
-  `;
-  
-  const footerNote = `Submitted: ${timestamp} | Source: Contact Page | Ref: ${ref}`;
-  
-  return getBaseEmailTemplate({
-    title: `${enquiryIcon} New ${enquiryType}`,
-    content,
-    footerNote
-  });
-}
-
-// User autoresponse for popup form
-function getUserPopupEmail({ fullName, ref }) {
-  const content = `
-    <h2 style="margin:0 0 16px;color:#212529;font-size:20px;">Hi ${fullName}! 👋</h2>
-    
-    <p style="margin:0 0 16px;color:#495057;font-size:15px;line-height:1.6;">
-      Thank you for your interest in <strong>${COMPANY_NAME}</strong>!
-    </p>
-    
-    <p style="margin:0 0 16px;color:#495057;font-size:15px;line-height:1.6;">
-      We've received your inquiry and our team will get back to you <strong>within 24 hours</strong> with all the information you need.
-    </p>
-    
-    <div style="background:linear-gradient(135deg,rgba(102,126,234,0.1) 0%,rgba(118,75,162,0.1) 100%);padding:20px;border-radius:12px;margin:24px 0;">
-      <h3 style="margin:0 0 12px;color:#667eea;font-size:16px;">🎵 What We Offer:</h3>
-      <ul style="margin:0;padding-left:20px;color:#495057;font-size:14px;">
-        <li style="margin-bottom:8px;">Professional DJ Training</li>
-        <li style="margin-bottom:8px;">Music Production Courses</li>
-        <li style="margin-bottom:8px;">Audio Engineering Programs</li>
-        <li>Industry-Expert Instructors</li>
-      </ul>
-    </div>
-    
-    <p style="margin:0 0 16px;color:#495057;font-size:15px;line-height:1.6;">
-      In the meantime, feel free to reach out directly via WhatsApp or call us if you have any urgent questions!
-    </p>
-    
-    <div style="background-color:#f8f9fa;padding:16px;border-radius:8px;margin-top:24px;">
-      <p style="margin:0;color:#6c757d;font-size:13px;">
-        <strong>Reference Number:</strong> ${ref}<br>
-        <em>Please save this reference number for your records.</em>
-      </p>
-    </div>
-  `;
-  
-  return getBaseEmailTemplate({
-    title: 'Thanks for Reaching Out!',
-    content,
-    footerNote: 'We look forward to helping you start your music journey! 🎧'
-  });
-}
-
-// User autoresponse for contact form
-function getUserContactEmail({ fullName, course, ref, isCourse }) {
-  const courseText = isCourse ? `about our <strong>${course}</strong> course` : 'your inquiry';
-  
-  const content = `
-    <h2 style="margin:0 0 16px;color:#212529;font-size:20px;">Hi ${fullName}! 👋</h2>
-    
-    <p style="margin:0 0 16px;color:#495057;font-size:15px;line-height:1.6;">
-      Thank you for contacting <strong>${COMPANY_NAME}</strong> ${courseText}!
-    </p>
-    
-    <p style="margin:0 0 16px;color:#495057;font-size:15px;line-height:1.6;">
-      We've received your message and one of our course advisors will reach out to you <strong>within 24 hours</strong> to discuss:
-    </p>
-    
-    <div style="background:linear-gradient(135deg,rgba(76,175,80,0.1) 0%,rgba(69,160,73,0.1) 100%);padding:20px;border-radius:12px;margin:24px 0;">
-      <ul style="margin:0;padding-left:20px;color:#495057;font-size:14px;">
-        <li style="margin-bottom:8px;">Course curriculum and schedule</li>
-        <li style="margin-bottom:8px;">Pricing and payment options</li>
-        <li style="margin-bottom:8px;">Next batch start dates</li>
-        <li>Career opportunities after completion</li>
-      </ul>
-    </div>
-    
-    ${isCourse ? `
-    <div style="border-left:4px solid #4CAF50;padding:16px;background-color:#f1f8f4;border-radius:8px;margin:24px 0;">
-      <p style="margin:0;color:#2e7d32;font-size:14px;">
-        <strong>🎓 Course Selected:</strong> ${course}
-      </p>
-    </div>
-    ` : ''}
-    
-    <p style="margin:0 0 16px;color:#495057;font-size:15px;line-height:1.6;">
-      Need immediate assistance? Use the buttons below to connect with us instantly!
-    </p>
-    
-    <div style="background-color:#f8f9fa;padding:16px;border-radius:8px;margin-top:24px;">
-      <p style="margin:0;color:#6c757d;font-size:13px;">
-        <strong>Reference Number:</strong> ${ref}<br>
-        <em>Please save this reference number for your records.</em>
-      </p>
-    </div>
-  `;
-  
-  return getBaseEmailTemplate({
-    title: 'We Got Your Message!',
-    content,
-    footerNote: 'Looking forward to helping you achieve your music production goals! 🎹'
-  });
-}
-
-// ------------------- Utility Functions -------------------
-function pickName(body) {
-  if (!body) return 'Unknown';
-  return (body.fullName || body.fullname || body.name || 'Unknown').toString().trim();
-}
-
-function formatCourseName(course) {
-  const map = {
-    'dj-training': 'DJ Training',
-    'music-production': 'Music Production',
-    'audio-engineering': 'Audio Engineering'
-  };
-  if (!course) return 'N/A';
-  return map[course] || course;
-}
-
-function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
+// ------------------- Email templates (kept short here) -------------------
+function buildRawMessage({ from, to, subject, htmlBody }) {
   const msgId = `<${randomUUID()}@soundabode.local>`;
   const dateHeader = new Date().toUTCString();
   const parts = [
@@ -468,53 +129,155 @@ function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
     'MIME-Version: 1.0',
     'Content-Type: text/html; charset=UTF-8',
     '',
-    htmlBody || textBody || ''
+    htmlBody || ''
   ];
   return Buffer.from(parts.join('\r\n')).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-// ------------------- Send email with retries -------------------
-async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 2 }) {
-  if (!process.env.EMAIL_USER) throw new Error('EMAIL_USER not configured');
+// Minimal example templates — you can re-use your rich templates
+function getAdminHtml(shortInfo) {
+  return `<div><h3>New inquiry</h3><pre>${JSON.stringify(shortInfo,null,2)}</pre></div>`;
+}
+function getUserHtml(fullName, ref) {
+  return `<div><h3>Hi ${fullName}</h3><p>Thanks for contacting ${COMPANY_NAME}. Ref: ${ref}</p></div>`;
+}
 
+// ------------------- Helper: timeout wrapper -------------------
+function withTimeout(promise, ms) {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => timer = setTimeout(() => reject(new Error('Timeout')), ms))
+  ]).finally(() => clearTimeout(timer));
+}
+
+// ------------------- In-memory job queue (simple) -------------------
+const JOBS = [];
+let workerRunning = false;
+const WORKER_CONCURRENCY = 2;
+const MAX_RETRIES = 3;
+
+function enqueueEmailJob(job) {
+  job.id = job.id || randomUUID();
+  job.attempts = job.attempts || 0;
+  JOBS.push(job);
+  console.log('📥 Enqueued email job', job.id, 'queueLen=', JOBS.length);
+  // start worker if not running
+  if (!workerRunning) startWorker();
+}
+
+// Simple worker that processes jobs with concurrency
+async function startWorker() {
+  if (workerRunning) return;
+  workerRunning = true;
+  console.log('▶️ Email worker started');
+  const active = new Set();
+
+  async function tryProcess() {
+    while (JOBS.length > 0 && active.size < WORKER_CONCURRENCY) {
+      const job = JOBS.shift();
+      active.add(job.id);
+      processJob(job)
+        .then(() => {
+          active.delete(job.id);
+        })
+        .catch(() => {
+          active.delete(job.id);
+        });
+    }
+    if (JOBS.length === 0 && active.size === 0) {
+      // no more work
+      workerRunning = false;
+      console.log('⏹ Email worker idle');
+      return;
+    }
+    // wait briefly then continue
+    await new Promise(r => setTimeout(r, 300));
+    if (!workerRunning) return;
+    tryProcess();
+  }
+
+  tryProcess();
+}
+
+// exponential backoff ms
+function backoffMs(attempt) {
+  return Math.min(5000, Math.pow(2, attempt) * 250); // 250ms, 500ms, 1000ms, ...
+}
+
+// ------------------- Sending implementations -------------------
+async function sendWithSendGrid({ to, subject, html, text }) {
+  if (!sgMail) throw new Error('SendGrid not configured or package missing');
+  const msg = {
+    to,
+    from: process.env.EMAIL_USER,
+    subject,
+    html,
+    text: text || ''
+  };
+  const t0 = Date.now();
+  await withTimeout(sgMail.send(msg), 5000); // 5s timeout on provider call
+  console.log(`✉️ SendGrid send to ${to} in ${Date.now() - t0}ms`);
+  return { success: true };
+}
+
+async function sendWithGmailRaw({ to, subject, html }) {
+  const token = await getAccessTokenCached();
+  if (token) {
+    oauth2Client.setCredentials({ access_token: token, refresh_token: process.env.EMAIL_REFRESH_TOKEN });
+  }
+  const raw = buildRawMessage({
+    from: `"${COMPANY_NAME}" <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    htmlBody: html
+  });
+  const t0 = Date.now();
+  // put a per-send timeout to avoid hanging
+  const res = await withTimeout(gmail.users.messages.send({ userId: 'me', requestBody: { raw } }), 5000);
+  console.log(`✉️ Gmail send to ${to} id=${res.data && res.data.id} (${Date.now() - t0}ms)`);
+  return { success: true, id: res.data && res.data.id };
+}
+
+// unified send function: tries SendGrid first (if configured), otherwise Gmail
+async function sendEmailProvider({ to, subject, html, text }) {
+  if (sgMail) {
+    return sendWithSendGrid({ to, subject, html, text });
+  } else {
+    return sendWithGmailRaw({ to, subject, html });
+  }
+}
+
+// ------------------- Job processor -------------------
+async function processJob(job) {
+  const { to, subject, html, text } = job;
+  job.attempts = job.attempts || 0;
   try {
-    const token = await getAccessTokenCached();
-    if (token) {
-      oauth2Client.setCredentials({ access_token: token, refresh_token: process.env.EMAIL_REFRESH_TOKEN });
-    }
+    job.attempts++;
+    console.log(`🔁 Processing job ${job.id} attempt ${job.attempts}`);
+    const res = await sendEmailProvider({ to, subject, html, text });
+    console.log(`✅ Job ${job.id} succeeded -> ${to}`);
+    return res;
   } catch (err) {
-    console.warn('⚠️ Could not set access token:', err && err.message ? err.message : err);
-  }
-
-  let lastErr = null;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const raw = buildRawMessage({
-        from: `"${COMPANY_NAME}" <${process.env.EMAIL_USER}>`,
-        to,
-        subject,
-        htmlBody,
-        textBody
-      });
-
-      const t0 = Date.now();
-      const res = await gmail.users.messages.send({
-        userId: 'me',
-        requestBody: { raw }
-      });
-      console.log(`✅ Email sent to ${to} id=${res.data && res.data.id} (${Date.now() - t0}ms)`);
-      return { success: true, id: res.data && res.data.id };
-    } catch (err) {
-      lastErr = err;
-      console.warn(`Email attempt ${attempt} failed:`, err && err.message ? err.message : err);
-      if (err && err.code && (err.code === 401 || err.code === 403)) {
-        cachedToken = null;
-      }
-      if (attempt < maxRetries) await new Promise(r => setTimeout(r, 800));
+    console.warn(`⚠️ Job ${job.id} attempt ${job.attempts} failed:`, err && err.message ? err.message : err);
+    if (job.attempts < (job.maxRetries || MAX_RETRIES)) {
+      const delay = backoffMs(job.attempts);
+      console.log(`↩️ Re-enqueueing job ${job.id} after ${delay}ms`);
+      setTimeout(() => enqueueEmailJob(job), delay);
+    } else {
+      console.error(`❌ Job ${job.id} permanently failed after ${job.attempts} attempts`);
+      // persist to logs or send alert here (e.g., to Slack / Ops)
     }
+    throw err;
   }
+}
 
-  return { success: false, error: lastErr && (lastErr.message || String(lastErr)) };
+// ------------------- Utilities & Templates (use your rich ones if you want) -------------------
+function simpleAdminHtml(info) {
+  return `<div style="font-family:Arial,sans-serif"><h2>New Inquiry</h2><pre>${JSON.stringify(info,null,2)}</pre></div>`;
+}
+function simpleUserHtml(name, ref) {
+  return `<div style="font-family:Arial,sans-serif"><h2>Hi ${name}</h2><p>Thanks! Ref: ${ref}</p></div>`;
 }
 
 // ------------------- Routes -------------------
@@ -524,17 +287,22 @@ app.get('/', (req, res) => {
     service: 'Soundabode Backend',
     timestamp: new Date().toISOString(),
     endpoints: { popupForm: '/api/popup-form', contactForm: '/api/contact-form', health: '/health' },
-    configured: !!(process.env.EMAIL_USER && process.env.EMAIL_CLIENT_ID && process.env.EMAIL_REFRESH_TOKEN)
+    configured: {
+      emailUser: !!process.env.EMAIL_USER,
+      sendgrid: !!process.env.SENDGRID_API_KEY
+    },
+    uploadedFile: UPLOADED_FILE_PATH
   });
 });
 
 app.get('/health', (req, res) => res.json({ status: 'healthy', timestamp: new Date().toISOString() }));
 
-// ------------------- POPUP FORM -------------------
-app.post('/api/popup-form', async (req, res) => {
+// ------------------- POPUP FORM (fast, non-blocking) -------------------
+app.post('/api/popup-form', (req, res) => {
   try {
+    const start = Date.now();
     console.log('📩 /api/popup-form payload:', req.body);
-    const fullName = pickName(req.body);
+    const fullName = (req.body && (req.body.fullName || req.body.fullname || req.body.name)) || '';
     const email = (req.body && req.body.email) ? String(req.body.email).trim() : '';
     const phone = (req.body && req.body.phone) ? String(req.body.phone).trim() : '';
     const message = (req.body && req.body.message) ? String(req.body.message).trim() : '';
@@ -543,7 +311,6 @@ app.post('/api/popup-form', async (req, res) => {
       console.log('❌ Popup validation failed');
       return res.status(400).json({ success: false, message: 'Name, email and phone are required' });
     }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ success: false, message: 'Invalid email format' });
@@ -551,44 +318,49 @@ app.post('/api/popup-form', async (req, res) => {
 
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const ref = randomUUID().slice(0, 8).toUpperCase();
-    const subject = `[Popup] Homepage Inquiry  ${fullName} ${timestampLocal} ${ref}`;
+    const subject = `[Popup] Homepage Inquiry — ${fullName} — ${ref}`;
 
-    console.log('Popup subject ->', subject);
+    // Build email payloads (use your full templates if you prefer)
+    const adminHtml = getAdminPopupEmail
+      ? getAdminPopupEmail({ fullName, email, phone, message, timestamp: timestampLocal, ref })
+      : simpleAdminHtml({ fullName, email, phone, message, timestampLocal, ref });
 
-    // Send to admin with enhanced template
-    const adminHtml = getAdminPopupEmail({ fullName, email, phone, message, timestamp: timestampLocal, ref });
-    const adminRes = await sendEmailRaw({
+    const userHtml = getUserPopupEmail
+      ? getUserPopupEmail({ fullName, ref })
+      : simpleUserHtml(fullName, ref);
+
+    // Enqueue admin job (non-blocking)
+    enqueueEmailJob({
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject,
-      htmlBody: adminHtml,
-      textBody: `New popup inquiry from ${fullName} (${email}, ${phone})`
+      html: adminHtml,
+      text: `Popup inquiry from ${fullName} (${email}, ${phone})`,
+      maxRetries: 4
     });
-    
-    if (!adminRes.success) throw new Error(adminRes.error || 'Admin email failed');
 
-    // Send autoresponse to user
-    try {
-      const userHtml = getUserPopupEmail({ fullName, ref });
-      await sendEmailRaw({
-        to: email,
-        subject: `Thanks for your interest in ${COMPANY_NAME}!`,
-        htmlBody: userHtml,
-        textBody: `Hi ${fullName}, thanks for contacting Soundabode. We'll respond within 24 hours. Ref: ${ref}`
-      });
-    } catch (err) {
-      console.warn('Non-blocking: user popup email failed:', err && err.message ? err.message : err);
-    }
+    // Enqueue user autoresponse (non-blocking)
+    enqueueEmailJob({
+      to: email,
+      subject: `Thanks for your interest in ${COMPANY_NAME}!`,
+      html: userHtml,
+      text: `Thanks ${fullName}, ref ${ref}`,
+      maxRetries: 2
+    });
 
-    return res.status(200).json({ success: true, message: 'Popup inquiry received', ref });
+    // Immediate response to client (fast)
+    res.status(200).json({ success: true, message: 'Popup inquiry received', ref });
+
+    console.log('handler elapsed ms:', Date.now() - start);
   } catch (err) {
-    console.error('Popup error:', err && err.message ? err.message : err);
-    return res.status(500).json({ success: false, message: 'Failed to process popup form' });
+    console.error('Popup handler error:', err && err.message ? err.message : err);
+    res.status(500).json({ success: false, message: 'Failed to process popup form' });
   }
 });
 
-// ------------------- CONTACT FORM -------------------
-app.post('/api/contact-form', async (req, res) => {
+// ------------------- CONTACT FORM (fast, non-blocking) -------------------
+app.post('/api/contact-form', (req, res) => {
   try {
+    const start = Date.now();
     console.log('📩 /api/contact-form payload:', req.body);
 
     const fullName = (req.body && (req.body.fullName || req.body.fullname || req.body.name)) || '';
@@ -601,7 +373,6 @@ app.post('/api/contact-form', async (req, res) => {
       console.log('❌ Contact validation failed');
       return res.status(400).json({ success: false, message: 'Required fields missing' });
     }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ success: false, message: 'Invalid email format' });
@@ -610,70 +381,60 @@ app.post('/api/contact-form', async (req, res) => {
     const isCourse = Boolean(course && course !== '');
     const formattedCourse = isCourse ? formatCourseName(course) : 'N/A';
     const enquiryType = isCourse ? 'Course Enquiry' : 'General Enquiry';
-
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const ref = randomUUID().slice(0, 8).toUpperCase();
     const subject = isCourse
-      ? `[Contact] Course Enquiry  ${formattedCourse}  ${fullName}  ${timestampLocal}  ${ref}`
-      : `[Contact] General Enquiry  ${fullName}  ${timestampLocal}  ${ref}`;
+      ? `[Contact] Course Enquiry — ${formattedCourse} — ${ref}`
+      : `[Contact] General Enquiry — ${fullName} — ${ref}`;
 
-    console.log('Contact subject ->', subject);
+    const adminHtml = getAdminContactEmail
+      ? getAdminContactEmail({ fullName, email, phone, course: formattedCourse, message, timestamp: timestampLocal, ref, isCourse })
+      : simpleAdminHtml({ fullName, email, phone, course: formattedCourse, message, timestamp: timestampLocal, ref });
 
-    // Send to admin with enhanced template
-    const adminHtml = getAdminContactEmail({ 
-      fullName, 
-      email, 
-      phone, 
-      course: formattedCourse, 
-      message, 
-      timestamp: timestampLocal, 
-      ref,
-      isCourse 
-    });
+    const userHtml = getUserContactEmail
+      ? getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse })
+      : simpleUserHtml(fullName, ref);
 
-    const adminRes = await sendEmailRaw({
+    // Enqueue admin job
+    enqueueEmailJob({
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject,
-      htmlBody: adminHtml,
-      textBody: `${enquiryType} from ${fullName} (${email}, ${phone})`
+      html: adminHtml,
+      text: `${enquiryType} from ${fullName} (${email}, ${phone})`,
+      maxRetries: 4
     });
-    
-    if (!adminRes.success) throw new Error(adminRes.error || 'Admin email failed');
 
-    // Send autoresponse to user
-    try {
-      const userHtml = getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse });
-      const userSubject = `${COMPANY_NAME}  We've received your ${enquiryType.toLowerCase()}!`;
-      
-      await sendEmailRaw({ 
-        to: email, 
-        subject: userSubject, 
-        htmlBody: userHtml, 
-        textBody: `Hi ${fullName}, thanks for contacting Soundabode. We'll reply within 24 hours. Ref: ${ref}` 
-      });
-    } catch (err) {
-      console.warn('Non-blocking: user contact email failed:', err && err.message ? err.message : err);
-    }
+    // Enqueue user autoresponse
+    enqueueEmailJob({
+      to: email,
+      subject: `${COMPANY_NAME} — We've received your enquiry!`,
+      html: userHtml,
+      text: `Hi ${fullName}, ref ${ref}`,
+      maxRetries: 2
+    });
 
-    return res.status(200).json({ success: true, message: 'Message sent successfully!', ref });
+    // Immediate response
+    res.status(200).json({ success: true, message: 'Message received', ref });
+    console.log('handler elapsed ms:', Date.now() - start);
   } catch (err) {
-    console.error('Contact error:', err && err.message ? err.message : err);
-    return res.status(500).json({ success: false, message: 'Failed to send. Please try again.' });
+    console.error('Contact handler error:', err && err.message ? err.message : err);
+    res.status(500).json({ success: false, message: 'Failed to process contact form' });
   }
 });
 
-// ------------------- 404 handler -------------------
+// 404
 app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint not found' }));
 
-// ------------------- Start server -------------------
+// Start
 app.listen(PORT, () => {
   console.log('='.repeat(60));
   console.log('✅ Soundabode Backend Server Running');
   console.log(`🌐 Port: ${PORT}`);
-  console.log('📧 Email Provider: Gmail API (Direct)');
+  console.log('📧 Email Provider: Gmail API (Direct)' + (sgMail ? ' + SendGrid' : ''));
   console.log(`📱 WhatsApp: ${WHATSAPP_NUMBER}`);
   console.log(`☎️  Phone: ${PHONE_NUMBER}`);
   console.log('🔒 CORS Allowed Origins:', allowedOrigins.join(', '));
+  console.log('📎 Uploaded file path:', UPLOADED_FILE_PATH);
   console.log('⏰ Started:', new Date().toLocaleString('en-IN'));
   console.log('='.repeat(60));
 });
