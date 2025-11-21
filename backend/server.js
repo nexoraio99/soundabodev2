@@ -643,7 +643,7 @@ app.post('/api/contact-form', async (req, res) => {
     // Send autoresponse to user
     try {
       const userHtml = getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse });
-      const userSubject = `${COMPANY_NAME} — We've received your ${enquiryType.toLowerCase()}!`;
+      const userSubject = `${COMPANY_NAME}  We've received your ${enquiryType.toLowerCase()}!`;
       
       await sendEmailRaw({ 
         to: email, 
