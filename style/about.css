@@ -271,33 +271,127 @@ body{
 }
 .cta-btn:hover { transform: translateY(-3px); }
 
+.whatsapp-float {
+  width: clamp(48px, 10vw, 55px);
+  height: clamp(48px, 10vw, 55px);
+  bottom: clamp(15px, 2vw, 20px);
+  right: clamp(15px, 2vw, 20px);
+  }
+
+  .whatsapp-icon {
+  width: clamp(22px, 5vw, 28px);
+  height: clamp(22px, 5vw, 28px);
+  }
+  .whatsapp-float:hover {
+    transform: scale(1.1);
+    background-color: #20ba5a;
+  }
+  
+  .whatsapp-icon {
+    width: clamp(24px, 6vw, 30px);
+    height: clamp(24px, 6vw, 30px);
+    filter: brightness(0) invert(1);
+  }
+  .whatsapp-float {
+    position: fixed;
+    width: clamp(50px, 12vw, 60px);
+    height: clamp(50px, 12vw, 60px);
+    bottom: clamp(15px, 3vw, 25px);
+    right: clamp(15px, 3vw, 25px);
+    background-color: #25D366;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .whatsapp-float:hover {
+    transform: scale(1.1);
+    background-color: #20ba5a;
+  }
+  
+  .whatsapp-icon {
+    width: clamp(24px, 6vw, 30px);
+    height: clamp(24px, 6vw, 30px);
+    filter: brightness(0) invert(1);
+  }
+  
 /* -----------------------------
    Footer
-   ----------------------------- */
-.site-footer{
-  width: 100%;
+   ----------------------------- *//* ============================================================================
+   FOOTER
+   ============================================================================ */
+.site-footer {
   background-color: #000;
+  font-family: 'Roboto Mono', monospace;
   color: #fff;
-  padding: clamp(18px, 3.5vw, 36px);
-  border-top: 1px solid rgba(255,255,255,0.03);
+  padding: clamp(20px, 4vw, 30px) clamp(15px, 5vw, 50px);
+  border-top: 1px solid #2222222e;
+  position: relative;
+  z-index: 10;
+  box-sizing: border-box;
 }
-.footer-container{
-  max-width: var(--maxw);
+
+.footer-container {
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  gap: 32px;
-  align-items: flex-start;
+  align-items: flex-end;
+  gap: clamp(15px, 3vw, 30px);
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+.footer-columns {
+  display: flex;
+  gap: clamp(40px, 8vw, 100px);
   flex-wrap: wrap;
 }
-.footer-columns{ display:flex; gap: clamp(20px,6vw,80px); flex-wrap:wrap; align-items:flex-start; }
-.footer-column h4{ color: #888; font-size: .78rem; font-weight: 500; letter-spacing: 1.6px; text-transform: uppercase; margin:0 0 8px 0; }
-.footer-column ul{ list-style:none; padding:0; margin:0; }
-.footer-column li{ margin-bottom: 8px; }
-.footer-column a, .footer-column p{ color:#fff; text-decoration:none; font-size: .85rem; line-height:1.6; }
-.footer-column a:hover{ opacity:.8; }
-.footer-copy{ color: #888; font-size: .85rem; margin-top: 14px; }
 
+.footer-column h4 {
+  color: #888;
+  font-size: clamp(0.65rem, 1.3vw, 0.8rem);
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin-top: 0;
+  margin-bottom: clamp(8px, 1vw, 12px);
+  text-transform: uppercase;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-column li {
+  margin-bottom: clamp(8px, 1vw, 11px);
+}
+
+.footer-column a,
+.footer-column p {
+  color: #fff;
+  text-decoration: none;
+  font-size: clamp(0.6rem, 1.2vw, 0.7rem);
+  line-height: 1.6;
+  margin: 0;
+  transition: opacity 0.3s;
+}
+
+.footer-column a:hover {
+  opacity: 0.7;
+}
+
+.footer-copyright p {
+  margin: 0;
+  color: #888;
+  font-size: clamp(0.55rem, 1.1vw, 0.6rem);
+}
 /* -----------------------------
    Reveal animations (intersection observer toggles .revealed)
    ----------------------------- */
