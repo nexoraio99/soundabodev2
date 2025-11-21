@@ -1,4 +1,4 @@
-   /* ============================================================================
+/* ============================================================================
    script1.js — soundabode site script (refactor, carousel + logo fixes)
    - Full rewrite that fixes root causes (reliable bootstrap, stable popup,
      robust cloning/measurement). Logic otherwise kept consistent with original.
@@ -295,14 +295,14 @@
       panelLeft.style.transform = `translate3d(0, ${-percent}%, 0)`;
       panelRight.style.transform = `translate3d(0, ${percent}%, 0)`;
     } else {
-      panelLeft.style.transform = `translate3d(${-percent}%, 0, 0)`;
-      panelRight.style.transform = `translate3d(${percent}%, 0, 0)`;
+      panelLeft.style.transform = `translate3d(${ -percent }%, 0, 0)`;
+      panelRight.style.transform = `translate3d(${ percent }%, 0, 0)`;
     }
 
     if (overlayLeft)
-      overlayLeft.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${-progress * 10}px, 0, 0)`;
+      overlayLeft.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${ -progress * 10 }px, 0, 0)`;
     if (overlayRight)
-      overlayRight.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${progress * 10}px, 0, 0)`;
+      overlayRight.style.transform = mobile ? 'translate3d(0,0,0)' : `translate3d(${ progress * 10 }px, 0, 0)`;
 
     const fadeStart = 0.75;
     const fadeOpacity = Math.max(0, 1 - (progress - fadeStart) / (1 - fadeStart));
@@ -600,9 +600,6 @@
         try { window.uet_report_conversion(); } catch (e) {}
       }
       // 3) Try navigator.sendBeacon to a transparent tracking endpoint (optional fallback)
-      // If you have a tracking URL, you can place it here. We'll attempt a safe no-op if absent.
-      // Example: const trackingUrl = 'https://your-tracking-endpoint.example/collect';
-      // navigator.sendBeacon(trackingUrl, JSON.stringify({ event: eventName, ...payload }));
     } catch (err) {
       // swallow tracking errors so they don't affect UX
       console.warn('tracking error', err);
