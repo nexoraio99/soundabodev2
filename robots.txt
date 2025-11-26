@@ -1,9 +1,11 @@
 # =========================================================
-#   SOUNDABODE - robots.txt
-#   Fully optimized for SEO + AI engines + favicon crawling
+#  SOUNDABODE - robots.txt
+#  Open crawl access for search + AI engines
 # =========================================================
 
-# --- AI Crawlers Allowed ---
+############################
+#  AI / LLM CRAWLERS
+############################
 User-agent: GPTBot
 Allow: /
 
@@ -19,23 +21,45 @@ Allow: /
 User-agent: Claude-Web
 Allow: /
 
-# --- General Search Engines ---
-User-agent: *
-Allow: /
-
 User-agent: anthropic-ai
 Allow: /
 
-# Apple Siri & Spotlight
+User-agent: Applebot-Extended
+Allow: /
+
+############################
+#  MAJOR SEARCH ENGINES
+############################
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Video
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
 User-agent: Applebot
 Allow: /
 
-# Amazon Alexa Search
 User-agent: Amazonbot
 Allow: /
 
+# Fallback for ALL other bots
+User-agent: *
+Allow: /
 
-# --- Allow all favicon assets located in /Assets/ ---
+############################
+#  IMPORTANT ASSETS
+############################
+
+# Favicon set
 Allow: /Assets/favicon.ico
 Allow: /Assets/favicon-16x16.png
 Allow: /Assets/favicon-32x32.png
@@ -44,17 +68,21 @@ Allow: /Assets/favicon-64x64.png
 Allow: /Assets/favicon-180x180.png
 Allow: /Assets/favicon-192x192.png
 Allow: /Assets/favicon-512x512.png
+Allow: /Assests/og-soundabode-cover.jpg
 
-# --- Allow important asset folders ---
+# Static assets (CSS / JS / images)
 Allow: /Assets/
 Allow: /style/
 Allow: /script/
 Allow: /images/
 
-# --- Optional: block only if these folders exist or contain private data ---
+############################
+#  OPTIONAL PRIVATE AREAS
+############################
 Disallow: /admin/
 Disallow: /private/
 Disallow: /tmp/
+Disallow: /cgi-bin/
 
 # --- Sitemap & Host (important for SEO indexing) ---
 Sitemap: https://soundabode.com/sitemap.xml
