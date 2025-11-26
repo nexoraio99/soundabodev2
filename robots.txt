@@ -1,5 +1,49 @@
+# =========================================================
+#   SOUNDABODE - robots.txt
+#   Fully optimized for SEO + AI engines + favicon crawling
+# =========================================================
+
+# --- AI Crawlers Allowed ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# --- General Search Engines ---
 User-agent: *
 Allow: /
 
+# --- Allow all favicon assets located in /Assets/ ---
+Allow: /Assets/favicon.ico
+Allow: /Assets/favicon-16x16.png
+Allow: /Assets/favicon-32x32.png
+Allow: /Assets/favicon-48x48.png
+Allow: /Assets/favicon-64x64.png
+Allow: /Assets/favicon-180x180.png
+Allow: /Assets/favicon-192x192.png
+Allow: /Assets/favicon-512x512.png
+
+# --- Allow important asset folders ---
+Allow: /Assets/
+Allow: /style/
+Allow: /script/
+Allow: /images/
+
+# --- Optional: block only if these folders exist or contain private data ---
+Disallow: /admin/
+Disallow: /private/
+Disallow: /tmp/
+
+# --- Sitemap & Host (important for SEO indexing) ---
 Sitemap: https://soundabode.com/sitemap.xml
 Host: soundabode.com
