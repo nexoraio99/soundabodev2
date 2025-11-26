@@ -23,6 +23,18 @@ Allow: /
 User-agent: *
 Allow: /
 
+User-agent: anthropic-ai
+Allow: /
+
+# Apple Siri & Spotlight
+User-agent: Applebot
+Allow: /
+
+# Amazon Alexa Search
+User-agent: Amazonbot
+Allow: /
+
+
 # --- Allow all favicon assets located in /Assets/ ---
 Allow: /Assets/favicon.ico
 Allow: /Assets/favicon-16x16.png
