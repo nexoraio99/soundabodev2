@@ -878,8 +878,5 @@ body {
         transition-duration: 0.01ms !important;
     }
 
-    .cursor,
-    .cursor-follower {
-        display: none !important;
-    }
+
 }
