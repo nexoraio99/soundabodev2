@@ -33,8 +33,8 @@
     body{
       margin:0;
       font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background:#000000;
-      color:#e8eef6;;
+      background: #000;
+      color: #e8eef6;
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
       padding-bottom:80px;
@@ -230,14 +230,44 @@
     /* ------------------------
        Hero
        ------------------------ */
-    .hero{display:grid; grid-template-columns: 1fr; gap:28px; align-items:center; margin-top:80px}
-    @media(min-width:1020px){ .hero{grid-template-columns: 1fr 480px} }
+    .hero{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:28px;
+      align-items:center;
+      margin-top:80px;
+    }
+    @media(min-width:1020px){
+      .hero{grid-template-columns: 1fr 480px}
+    }
     .hero h1{font-size:38px; margin:0; line-height:1.02}
     .gradient-text{background:linear-gradient(90deg,var(--neon-1),var(--neon-2)); -webkit-background-clip:text; background-clip:text; color:transparent}
     .hero p{color:var(--muted); margin-top:12px; max-width:58ch}
-    .hero .cta-row{margin-top:16px; display:flex; gap:12px}
-    .btn-primary{background:linear-gradient(90deg,var(--neon-1),var(--neon-2)); color:#041014; padding:12px 16px; border-radius:12px; font-weight:700; border:none; cursor:pointer}
-    .btn-outline{padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:12px; color:#e8eef6; cursor:pointer}
+    .hero .cta-row{
+      margin-top:16px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .btn-primary,
+    .btn-outline{
+      padding:12px 16px;
+      border-radius:12px;
+      font-weight:700;
+      border:none;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .btn-primary{
+      background:linear-gradient(90deg,var(--neon-1),var(--neon-2));
+      color:#041014;
+    }
+    .btn-outline{
+      padding:10px 14px;
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.04);
+      color:#e8eef6;
+    }
 
     /* stats */
     .stats{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:18px}
@@ -315,6 +345,7 @@
       border:1px solid rgba(0, 0, 0, 0.08);
       object-fit:cover;
       z-index:3;
+      max-width:100%;
     }
     .floating-img.album{left:28px; top:28px; width:160px; height:160px;}
     .floating-img.studio{right:28px; bottom:28px; width:130px; height:130px;}
@@ -327,7 +358,6 @@
       opacity:0.9;
       z-index:3;
     }
-
 
     /* particles layer */
     .hero-visual .particles{
@@ -357,9 +387,27 @@
     /* ------------------------
        Tabs / Courses area
        ------------------------ */
-    .tabs{display:flex; gap:10px; margin-top:28px}
-    .tab-btn{padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); background:rgba(255,255,255,0.02); cursor:pointer; color:#e8eef6}
-    .tab-btn.active{background:linear-gradient(90deg,var(--neon-1),var(--neon-2)); color:#041014; font-weight:700}
+    .tabs{
+      display:flex;
+      gap:10px;
+      margin-top:28px;
+      flex-wrap:wrap;
+    }
+    .tab-btn{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.04);
+      background:rgba(255,255,255,0.02);
+      cursor:pointer;
+      color:#e8eef6;
+      flex:1 1 140px;
+      text-align:center;
+    }
+    .tab-btn.active{
+      background:linear-gradient(90deg,var(--neon-1),var(--neon-2));
+      color:#041014;
+      font-weight:700;
+    }
     .tab-panel{margin-top:16px; transition: all 240ms ease; opacity:1}
 
     .levels-grid{display:grid; grid-template-columns:1fr; gap:12px}
@@ -367,7 +415,7 @@
     .level-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.06); transition:transform .22s ease}
     .level-card:hover{transform:translateY(-6px)}
     .level-card h3{margin:0; font-size:15px}
-    .level-meta{font-size:12px; color:var(--muted); margin-top:8px; display:flex; justify-content:space-between; align-items:center}
+    .level-meta{font-size:12px; color:var(--muted); margin-top:8px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
 
     /* why / tools */
     .why-grid{display:grid; gap:12px; grid-template-columns:1fr; margin-top:18px}
@@ -386,7 +434,7 @@
     /* FAQ */
     .faq{margin-top:18px}
     .faq-item{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:12px; border-radius:10px; margin-top:8px; border:1px solid rgba(255,255,255,0.04)}
-    .faq-question{display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:600}
+    .faq-question{display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:600; gap:10px;}
     .faq-answer{margin-top:8px; color:var(--muted); display:none}
 
     /* Brochures / Contact */
@@ -394,8 +442,24 @@
     .brochures a{padding:10px 12px; background:rgba(255,255,255,0.02); border-radius:10px; border:1px solid rgba(255,255,255,0.04)}
 
     /* enroll CTA bottom */
-    .enroll-bottom{margin-top:22px; padding:18px; border-radius:14px; background:linear-gradient(180deg, rgba(9,17,26,0.6), rgba(8,11,14,0.45)); border:1px solid rgba(255,255,255,0.04); display:flex; justify-content:space-between; align-items:center; gap:12px}
-    .enroll-bottom .actions{display:flex; gap:10px}
+    .enroll-bottom{
+      margin-top:22px;
+      padding:18px;
+      border-radius:14px;
+      background:linear-gradient(180deg, rgba(9,17,26,0.6), rgba(8,11,14,0.45));
+      border:1px solid rgba(255,255,255,0.04);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .enroll-bottom .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
     footer{margin-top:40px; padding:20px 0; border-top:1px solid rgba(255,255,255,0.03); color:var(--muted); font-size:13px}
 
@@ -406,103 +470,103 @@
        FOOTER – CLASS-BASED LAYOUT
        ============================================================================ */
 
-    .site-footer {
-      background-color: #000;
-      font-family: 'Roboto Mono', monospace;
-      color: #fff;
-      padding: clamp(20px, 4vw, 30px) clamp(15px, 5vw, 50px);
-      border-top: 1px solid #2222222e;
-      position: relative;
-      z-index: 2;
-    }
+       .site-footer {
+  background-color: #000;
+  font-family: 'Roboto Mono', monospace;
+  color: #fff;
+  padding: 18px 20px;
+  border-top: 1px solid #2222222e;
+  position: relative;
+  z-index: 2;
+}
 
-    .footer-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: clamp(15px, 3vw, 30px);
-      flex-wrap: wrap;
-    }
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
 
-    .footer-columns {
-      display: flex;
-      gap: clamp(40px, 8vw, 100px);
-      flex-wrap: wrap;
-    }
+.footer-columns {
+  display: flex;
+  gap: 60px;
+  flex-wrap: wrap;
+}
 
-    .footer-column h4 {
-      color: #888;
-      font-size: clamp(0.65rem, 1.5vw, 0.8rem);
-      font-weight: 400;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 8px 1px;
-      margin-bottom: clamp(8px, 1vw, 12px);
-    }
+.footer-column h4 {
+  color: #888;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 1px;
+  margin-bottom: 6px;
+}
 
-    .footer-column ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
-    .footer-column li {
-      margin-bottom: clamp(8px, 1vw, 11px);
-    }
+.footer-column li {
+  margin-bottom: 6px;
+}
 
-    .footer-column a,
-    .footer-column p {
-      color: #fff;
-      text-decoration: none;
-      font-size: clamp(0.6rem, 1.3vw, 0.7rem);
-      line-height: 1.6;
-      margin: 0;
-      transition: opacity 0.3s;
-    }
+.footer-column a,
+.footer-column p {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  margin: 0;
+  transition: opacity 0.3s;
+}
 
-    .footer-column a:hover {
-      opacity: 0.7;
-    }
+.footer-column a:hover {
+  opacity: 0.7;
+}
 
-    .footer-copyright p {
-      margin-right: clamp(20px, 5vw, 100px);
-      color: #888;
-      font-size: clamp(0.55rem, 1.2vw, 0.6rem);
-    }
+.footer-copyright p {
+  margin-right: 40px;
+  color: #888;
+  font-size: 0.6rem;
+}
 
     @media (max-width: 768px) {
-      .footer-container {
-          flex-direction: row !important;
-          justify-content: space-between !important;
-          align-items: flex-start !important;
-          gap: clamp(12px, 3vw, 24px) !important;
-          padding: clamp(12px, 2vw, 20px) clamp(12px, 3vw, 20px) !important;
-          text-align: left !important;
+      .hero{
+        margin-top:72px;
       }
-      
-      .footer-columns {
-          flex-direction: row !important;
-          gap: clamp(20px, 5vw, 60px) !important;
-          flex-wrap: wrap;
-          align-items: flex-start;
+
+      .hero h1{
+        font-size:28px;
       }
-      
-      .footer-column {
-          min-width: 140px;
-          max-width: 33%;
-          text-align: left !important;
-          margin-bottom: 12px;
+
+      .hero .cta-row button{
+        flex:1 1 100%;
+        text-align:center;
       }
-      
-      .footer-column h4 {
-          text-align: left !important;
+
+      .hero-visual{
+        height:300px;
       }
-      
-      .footer-copyright {
-          margin-right: 0;
-          align-self: flex-end;
+
+      .enroll-bottom{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .enroll-bottom .actions{
+        width:100%;
+        flex-direction:column;
+      }
+
+      .enroll-bottom .actions a{
+        width:100%;
+        text-align:center;
       }
     }
 
@@ -735,12 +799,11 @@
         <div style="flex:1">
           <h4>Download Brochures</h4>
           <div class="brochures">
-            <a href="https://www.notion.so/downloads/Soundabode-Level1-Brochure.pdf" target="_blank">Music Production Brochure</a>
+            <a href="https://www.notion.so/downloads/Soundabode-Level1-Brochure.pdf" target="_blank">Music ProductionBrochure</a>
             <a href="https://www.notion.so/downloads/Soundabode-Level2-Brochure.pdf" target="_blank">DJ Training Brochure</a>
-            
           </div>
         </div>
-        <div style="width:320px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.04)">
+        <div style="width:320px; max-width:100%; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.04)">
           <h4>Contact & Location</h4>
           <div class="muted" style="margin-top:8px">Soundabode Academy<br>218, Vision 9 Mall, Pimple Saudagar, Pune – 27<br>Call: 997-501-6189<br>Email: services@soundabode.com</div>
         </div>
