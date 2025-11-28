@@ -181,7 +181,6 @@
       transform: translateY(-7px) rotate(-45deg);
     }
 
-    /* Show hamburger / hide desktop links on mobile */
     @media (max-width: 768px) {
       .hamburger-menu {
         display: block;
@@ -250,13 +249,112 @@
     .stat .label{font-size:12px; color:var(--muted)}
 
     /* hero visual */
-    .hero-visual{position:relative; height:360px; border-radius:20px; overflow:hidden; border:1px solid rgba(0, 0, 0, 0.06); background:rgb(0, 0, 0)}
-    .hero-visual .gradient-layer{position:absolute; inset:0; background: radial-gradient(600px 200px at 10% 20%, rgb(0, 0, 0), transparent 8%), radial-gradient(500px 160px at 90% 80%, rgba(78,231,255,0.04), transparent 16%); animation: shift 9s ease-in-out infinite; }
-    @keyframes shift{0%{filter:hue-rotate(0deg)}50%{filter:hue-rotate(35deg)}100%{filter:hue-rotate(0deg)}}
-    .floating-img{position:absolute; filter:drop-shadow(0 20px 30px rgba(0,0,0,0.6)); border-radius:12px; border:1px solid rgba(0, 0, 0, 0.08); object-fit:cover}
-    .floating-img.album{left:28px; top:28px; width:160px; height:160px; transform:translateZ(0)}
-    .floating-img.studio{right:28px; bottom:28px; width:130px; height:130px; transform:translateZ(0)}
-    .wave-svg{position:absolute; left:50%; transform:translateX(-50%); bottom:8px; width:86%; opacity:0.9}
+    .hero-visual{
+      position:relative;
+      height:360px;
+      border-radius:20px;
+      overflow:hidden;
+      border:1px solid rgba(17, 16, 16, 0.06);
+      background:rgb(0, 0, 0);
+    }
+
+    /* inner glow */
+    .hero-visual::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:20px;
+      box-shadow:
+        inset 0 0 60px rgba(78,231,255,0.06),
+        inset 0 0 120px rgba(0,0,0,0.7);
+      pointer-events:none;
+      z-index:4;
+    }
+
+    .hero-visual .gradient-layer{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(600px 200px at 10% 20%, rgb(0, 0, 0), transparent 8%),
+        radial-gradient(500px 160px at 90% 80%, rgba(78,231,255,0.04), transparent 16%);
+      animation: shift 9s ease-in-out infinite;
+      z-index:0;
+    }
+
+    @keyframes shift{
+      0%{filter:hue-rotate(0deg);}
+      50%{filter:hue-rotate(35deg);}
+      100%{filter:hue-rotate(0deg);}
+    }
+
+    /* hologram ring aura behind album */
+    .hero-visual .ring-aura{
+      position:absolute;
+      left:40px;
+      top:40px;
+      width:190px;
+      height:190px;
+      border-radius:50%;
+      background:radial-gradient(circle at 50% 50%, rgb(0, 0, 0), transparent 60%);
+      filter:blur(14px);
+      opacity:0.9;
+      pointer-events:none;
+      display: none;
+      z-index:1;
+      animation:ringPulse 5s ease-in-out infinite;
+    }
+
+    @keyframes ringPulse{
+      0%{transform:scale(0.96); opacity:0.7;}
+      50%{transform:scale(1.03); opacity:1;}
+      100%{transform:scale(0.96); opacity:0.7;}
+    }
+
+    .floating-img{
+      position:absolute;
+      filter:drop-shadow(0 20px 30px rgba(0,0,0,0.6));
+      border-radius:12px;
+      border:1px solid rgba(0, 0, 0, 0.08);
+      object-fit:cover;
+      z-index:3;
+    }
+    .floating-img.album{left:28px; top:28px; width:160px; height:160px;}
+    .floating-img.studio{right:28px; bottom:28px; width:130px; height:130px;}
+    .wave-svg{
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:8px;
+      width:86%;
+      opacity:0.9;
+      z-index:3;
+    }
+
+
+    /* particles layer */
+    .hero-visual .particles{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:2;
+    }
+
+    .particle{
+      position:absolute;
+      width:6px;
+      height:6px;
+      background:rgba(78,231,255,0.55);
+      border-radius:50%;
+      filter:blur(3px);
+      animation:particleFloat 9s ease-in-out infinite;
+    }
+
+    @keyframes particleFloat{
+      0%{transform:translateY(0px) translateX(0px); opacity:0.3;}
+      50%{transform:translateY(-40px) translateX(14px); opacity:0.9;}
+      100%{transform:translateY(0px) translateX(0px); opacity:0.3;}
+    }
 
     /* ------------------------
        Tabs / Courses area
@@ -441,6 +539,7 @@
     }
   </style>
 </head>
+
 <!-- FAVICONS (LOCAL, CORRECT PATHS) -->
 <link rel="icon" href="/Assets/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="16x16" href="/Assets/favicon-16x16.png">
@@ -450,8 +549,8 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/Assets/favicon-192x192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/Assets/favicon-512x512.png">
 
-<!-- Apple Touch Icon -->
 <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png">
+
 <body>
   <!-- ============================================================================
          NAVBAR
@@ -461,21 +560,18 @@
       <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img">
     </a>
 
-    <!-- Desktop Navigation Links -->
     <div class="nav-links">
       <a href="about.html">About</a>
       <a href="#panel-emp">Courses</a>
       <a href="contact.html">Contact</a>
     </div>
 
-    <!-- Hamburger Menu Button -->
     <button class="hamburger-menu" aria-label="Toggle menu">
       <span class="bar"></span>
       <span class="bar"></span>
       <span class="bar"></span>
     </button>
 
-    <!-- Call Action Button -->
     <div class="nav-actions">
       <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion('call')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -522,21 +618,19 @@
       <div>
         <div class="hero-visual" id="hero-visual" role="img" aria-label="Studio visuals">
           <div class="gradient-layer"></div>
+
+          <!-- hologram aura + particles -->
+          <div class="ring-aura"></div>
+          <div class="particles">
+            <div class="particle" style="top:18%; left:20%; animation-delay:0s;"></div>
+            <div class="particle" style="top:32%; left:70%; animation-delay:2s;"></div>
+            <div class="particle" style="top:58%; left:42%; animation-delay:4s;"></div>
+            <div class="particle" style="top:68%; left:80%; animation-delay:6s;"></div>
+          </div>
+
           <img src="images/album-mock-1.jpg" alt="Album mock" class="floating-img album" id="float-album">
           <img src="images/studio-mock-2.jpg" alt="Studio mock" class="floating-img studio" id="float-studio">
 
-          <!-- animated waveform -->
-          <svg class="wave-svg" viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true">
-            <defs>
-              <linearGradient id="g1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#000000"/></linearGradient>
-            </defs>
-            <path d="M0 10 Q 10 0 20 10 T 40 10 T 60 10 T 80 10 T 100 10" fill="none" stroke="url(#g1)" stroke-width="0.6" stroke-opacity="0.95">
-              <animate attributeName="d" dur="6s" repeatCount="indefinite"
-                values="M0 10 Q 10 0 20 10 T 40 10 T 60 10 T 80 10 T 100 10;
-                        M0 10 Q 10 20 20 10 T 40 10 T 60 10 T 80 10 T 100 10;
-                        M0 10 Q 10 0 20 10 T 40 10 T 60 10 T 80 10 T 100 10" />
-            </path>
-          </svg>
         </div>
       </div>
     </section>
@@ -549,7 +643,6 @@
 
     <!-- EMP Panel -->
     <section class="tab-panel" id="panel-emp" role="tabpanel" aria-labelledby="tab-emp">
-      <!-- Levels -->
       <div class="levels-grid" aria-hidden="true">
         <article class="level-card">
           <div style="display:flex; gap:10px; align-items:center">
@@ -584,7 +677,6 @@
         </article>
       </div>
 
-      <!-- Why / Tools -->
       <div class="why-grid">
         <div>
           <h2 style="margin:0; font-size:20px; margin-top:18px">Why Soundabode</h2>
@@ -608,7 +700,6 @@
         </div>
       </div>
 
-      <!-- Pricing -->
       <div class="pricing">
         <h3 style="margin-top:18px">Course Structure & Fees</h3>
         <table aria-label="Course fees">
@@ -622,7 +713,6 @@
         </table>
       </div>
 
-      <!-- FAQ -->
       <div class="faq" aria-label="Frequently asked questions">
         <h3 style="margin-top:18px">Frequently Asked Questions</h3>
         <div class="faq-item">
@@ -643,7 +733,6 @@
         </div>
       </div>
 
-      <!-- Brochures & Contact -->
       <div style="display:flex; gap:14px; align-items:flex-start; margin-top:18px; flex-wrap:wrap">
         <div style="flex:1">
           <h4>Download Brochures</h4>
@@ -661,9 +750,8 @@
       </div>
     </section>
 
-    <!-- DJ Panel (now matching EMP layout) -->
+    <!-- DJ Panel -->
     <section class="tab-panel hidden" id="panel-dj" role="tabpanel" aria-labelledby="tab-dj">
-      <!-- Levels -->
       <h2 style="margin:0; font-size:20px; margin-top:8px">DJ Training Courses</h2>
       <p class="muted" style="margin-top:8px">From beatmatching to festival-ready performance — learn on Pioneer CDJs, Traktor, and Ableton Live.</p>
 
@@ -711,7 +799,6 @@
         </article>
       </div>
 
-      <!-- Why + Tools (mirroring EMP layout) -->
       <div class="why-grid">
         <div>
           <h2 style="margin:0; font-size:20px; margin-top:18px">Why choose our DJ Academy</h2>
@@ -733,7 +820,6 @@
         </div>
       </div>
 
-      <!-- Pricing -->
       <div class="pricing">
         <h3 style="margin-top:18px">Course Options & Fees</h3>
         <table aria-label="DJ course fees">
@@ -830,7 +916,6 @@
        Vanilla JS interactivity
        ------------------------ -->
   <script>
-    // UET conversion helper (single function used by call + WhatsApp)
     function uet_report_conversion(source) {
       window.uetq = window.uetq || [];
       window.uetq.push('event', 'contact', {
@@ -840,13 +925,11 @@
       });
     }
 
-    // set year safely
     (function () {
       const y = document.getElementById('year');
       if (y) y.textContent = new Date().getFullYear();
     })();
 
-    // Tab switching
     const tabEmp = document.getElementById('tab-emp');
     const tabDj  = document.getElementById('tab-dj');
     const panelEmp = document.getElementById('panel-emp');
@@ -901,7 +984,6 @@
         const ans = item.querySelector('.faq-answer');
         q.addEventListener('click', ()=>{
           const open = ans.style.display === 'block';
-          // close others
           items.forEach(i=> {
             i.querySelector('.faq-answer').style.display = 'none';
             i.querySelector('.faq-question span').textContent = '+';
@@ -917,14 +999,13 @@
       });
     })();
 
-    // Very small lazy-loading fallback: replace hero images if missing with gradient placeholders
+    // Fallback placeholders
     (function(){
       const album = document.getElementById('float-album');
       const studio = document.getElementById('float-studio');
       [album, studio].forEach(img=>{
         if(!img) return;
         if(!img.complete || img.naturalWidth === 0){
-          img.style.background = 'linear-gradient(90deg,#7CFFB2,#4EE7FF)';
           img.style.display = 'block';
           img.alt = '';
           img.src = 'data:image/svg+xml;utf8,' +
@@ -943,7 +1024,6 @@
         menu.classList.toggle('is-active');
       });
 
-      // Close menu when clicking a link
       menu.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
           burger.classList.remove('is-active');
