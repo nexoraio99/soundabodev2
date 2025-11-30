@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Level 3 – Professional DJ / Performance Path | Soundabode</title>
+<meta name="description" content="Soundabode Level 3 DJ Training — Become a performing artist with mentorship, branding, stage exposure, and pro-level performance training." />
+
+<style>
+/* -------------------------------------------
+   GLOBAL THEME
+------------------------------------------- */
+:root {
+  --bg-1: #000;
+  --bg-2: #0a0a0a;
+  --text: #e8eef6;
+  --muted: #9aa6b2;
+  --glass-1: rgba(255, 255, 255, 0.04);
+  --glass-2: rgba(255, 255, 255, 0.06);
+  --gradient: linear-gradient(90deg, #bcbcbc, #777);
+}
+
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  background: var(--bg-1);
+  color: var(--text);
+}
+
+/* Container */
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* -------------------------------------------
+   NAVBAR
+------------------------------------------- */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--glass-2);
+  padding: 10px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 99;
+}
+
+.logo-img {
+  height: 38px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+}
+
+.nav-links a {
+  color: white;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.hamburger-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .hamburger-menu {
+    display: block;
+    background: none;
+    border: none;
+  }
+
+  .hamburger-menu .bar {
+    width: 24px;
+    height: 2px;
+    background: white;
+    margin: 5px 0;
+  }
+
+  .nav-menu {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.92);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: 0.3s ease;
+  }
+
+  .nav-menu.is-active {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .nav-menu a {
+    color: white;
+    font-size: 1.5rem;
+  }
+}
+
+/* -------------------------------------------
+   HERO SECTION
+------------------------------------------- */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-top: 120px;
+  gap: 30px;
+}
+
+@media (min-width: 980px) {
+  .hero {
+    grid-template-columns: 1fr 480px;
+  }
+}
+
+.hero h1 {
+  font-size: 36px;
+  line-height: 1.1;
+}
+
+.gradient-text {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.hero p {
+  color: var(--muted);
+  margin-top: 10px;
+  max-width: 60ch;
+}
+
+.cta-row {
+  margin-top: 15px;
+  display: flex;
+  gap: 12px;
+}
+
+.btn-primary,
+.btn-outline {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--gradient);
+  color: #111;
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: white;
+}
+
+/* -------------------------------------------
+   HERO VISUAL
+------------------------------------------- */
+.hero-visual {
+  background: #000;
+  border-radius: 20px;
+  height: 360px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--glass-2);
+}
+
+.hero-visual .gradient-layer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px 200px at 10% 20%, #000, transparent 8%),
+    radial-gradient(500px 160px at 90% 80%, rgba(78, 231, 255, 0.08), transparent 25%);
+}
+
+/* floating images */
+.floating-img {
+  position: absolute;
+  border-radius: 12px;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.4));
+  z-index: 2;
+}
+
+.floating-img.album {
+  width: 160px;
+  height: 160px;
+  top: 28px;
+  left: 28px;
+}
+
+.floating-img.studio {
+  width: 130px;
+  height: 130px;
+  bottom: 28px;
+  right: 28px;
+}
+
+/* -------------------------------------------
+   CONTENT SECTION CARDS
+------------------------------------------- */
+.section-card {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 18px;
+  margin-top: 22px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.section-card h3 {
+  margin: 0 0 8px 0;
+}
+
+.bullet-list li {
+  margin-bottom: 6px;
+}
+
+/* -------------------------------------------
+   TABLE
+------------------------------------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+td, th {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* -------------------------------------------
+   FAQ
+------------------------------------------- */
+.faq-item {
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.faq-answer {
+  display: none;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+/* -------------------------------------------
+   CTA
+------------------------------------------- */
+.enroll-bottom {
+  margin-top: 30px;
+  padding: 18px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html"><img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" class="logo-img"></a>
+
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="courses.html">Courses</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  <button class="hamburger-menu">
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  </button>
+</nav>
+
+<div class="nav-menu">
+  <a href="about.html">About</a>
+  <a href="courses.html">Courses</a>
+  <a href="contact.html">Contact</a>
+</div>
+
+<!-- MAIN -->
+<main class="container">
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <h1>Level 3 – Professional DJ / Performance Path <br>
+      <span class="gradient-text">Become a Performing Artist</span>
+    </h1>
+
+    <p>This mentorship-based program transforms DJs into full-fledged performing artists with real gigs, branding, and career strategy.</p>
+
+    <div class="cta-row">
+      <a class="btn-primary" href="#content">Explore Level 3</a>
+      <a class="btn-outline" href="contact.html">Book a Demo</a>
+    </div>
+  </div>
+
+  <div>
+    <div class="hero-visual">
+      <div class="gradient-layer"></div>
+
+      <img src="images/album-mock-1.jpg" class="floating-img album">
+      <img src="images/studio-mock-2.jpg" class="floating-img studio">
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section id="content" style="margin-top:40px;">
+
+<!-- Overview -->
+<div class="section-card">
+  <h3>Course Overview</h3>
+  <p class="muted">
+    Level 3 blends performance strategy, artist development, branding, and real gig exposure — shaping you into a professional DJ ready for stages across India.
+  </p>
+</div>
+
+<!-- Objectives -->
+<div class="section-card">
+  <h3>Course Objectives</h3>
+  <ul class="muted bullet-list">
+    <li>Create your professional artist profile & EPK</li>
+    <li>Record multiple mixtapes across genres</li>
+    <li>Learn stage ethics, event flow, and crowd mastery</li>
+    <li>Prepare for residencies & festival gigs</li>
+    <li>Master entrepreneurship, negotiations & branding</li>
+    <li>Grow your social media artist identity</li>
+  </ul>
+</div>
+
+<!-- Learn -->
+<div class="section-card">
+  <h3>What You'll Learn</h3>
+  <ul class="muted bullet-list">
+    <li>Live performance preparation & crowd reading</li>
+    <li>Branding, promo kits & press release creation</li>
+    <li>Networking with event companies & clubs</li>
+    <li>Troubleshooting CDJ/Controller issues live</li>
+    <li>Career management & DJ business systems</li>
+  </ul>
+
+  <a href="https://www.notion.so/downloads/Soundabode-DJ-Training.pdf" target="_blank" class="btn-outline" style="margin-top:12px;display:inline-block;">Download Brochure</a>
+</div>
+
+<!-- Why -->
+<div class="section-card">
+  <h3>Why Choose Soundabode</h3>
+  <ul class="muted bullet-list">
+    <li>Guidance from touring DJs & industry mentors</li>
+    <li>Guaranteed live performance opportunities</li>
+    <li>1-on-1 artist development sessions</li>
+    <li>Professional recording & photoshoots</li>
+    <li>Access to Soundabode Artist Network</li>
+  </ul>
+</div>
+
+<!-- Skills -->
+<div class="section-card">
+  <h3>Skills You'll Master</h3>
+  <ul class="muted bullet-list">
+    <li>Live crowd control & stage performance</li>
+    <li>Artist branding & profile building</li>
+    <li>Social media & booking strategy</li>
+    <li>Technical troubleshooting on stage</li>
+    <li>DJ entrepreneurship</li>
+  </ul>
+</div>
+
+<!-- Career -->
+<div class="section-card">
+  <h3>Career Opportunities</h3>
+  <ul class="muted bullet-list">
+    <li>Club & Festival Performer</li>
+    <li>Resident DJ</li>
+    <li>Touring Artist</li>
+    <li>Mixtape / Podcast Creator</li>
+  </ul>
+</div>
+
+<!-- Course Details -->
+<div class="section-card">
+  <h3>Course Details</h3>
+  <table>
+    <tr><td>Duration</td><td>3–4 months mentorship</td></tr>
+    <tr><td>Fee</td><td>₹60,000</td></tr>
+    <tr><td>Mode</td><td>Personal mentoring + Live gigs</td></tr>
+  </table>
+</div>
+
+<!-- FAQ -->
+<div class="section-card">
+  <h3>Frequently Asked Questions</h3>
+
+  <div class="faq-item">
+    <div class="faq-question">Who is this course for? <span>+</span></div>
+    <div class="faq-answer">Level 2 graduates or intermediate DJs ready for public performance.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Will I perform live? <span>+</span></div>
+    <div class="faq-answer">Yes. Every student performs at partner venues.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Do I get branding support? <span>+</span></div>
+    <div class="faq-answer">Yes — EPK, photoshoots, mixtapes & personal branding.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Does this course guarantee gigs? <span>+</span></div>
+    <div class="faq-answer">Soundabode provides active gig support via its venue network.</div>
+  </div>
+
+</div>
+
+<!-- Contact -->
+<div class="section-card">
+  <h3>Location & Contact</h3>
+  <p class="muted">
+    Soundabode Academy<br>
+    218, Vision 9 Mall, Pimple Saudagar, Pune – 27<br>
+    📞 997-501-6189 · 📧 services@soundabode.com
+  </p>
+</div>
+
+<!-- CTA -->
+<div class="enroll-bottom">
+  <div>
+    <h3>Ready to Become a Performing Artist?</h3>
+    <p class="muted">Join India’s most advanced performance-focused DJ pathway.</p>
+  </div>
+
+  <div class="actions">
+    <a class="btn-primary" href="/enroll">Enroll Now</a>
+    <a class="btn-outline" href="contact.html">Talk to Our Team</a>
+  </div>
+</div>
+
+</section>
+</main>
+
+<!-- FAQ JS -->
+<script>
+document.querySelectorAll(".faq-item").forEach(item => {
+  item.addEventListener("click", () => {
+    const ans = item.querySelector(".faq-answer");
+    const icon = item.querySelector("span");
+    const open = ans.style.display === "block";
+
+    document.querySelectorAll(".faq-answer").forEach(a => a.style.display = "none");
+    document.querySelectorAll(".faq-item span").forEach(i => i.textContent = "+");
+
+    if (!open) {
+      ans.style.display = "block";
+      icon.textContent = "-";
+    }
+  });
+});
+
+/* Mobile Nav */
+const burger = document.querySelector(".hamburger-menu");
+const menu = document.querySelector(".nav-menu");
+
+burger.addEventListener("click", () => {
+  menu.classList.toggle("is-active");
+});
+</script>
+
+</body>
+</html>
