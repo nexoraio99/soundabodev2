@@ -1,5 +1,16 @@
 // about.js - cleaned up
+// MOBILE NAV: hamburger toggle
+document.addEventListener('DOMContentLoaded', function () {
+  const hamburger = document.querySelector('.hamburger-menu');
+  const navMenu = document.querySelector('.nav-menu');
 
+  if (!hamburger || !navMenu) return;
+
+  hamburger.addEventListener('click', function () {
+    hamburger.classList.toggle('is-active');
+    navMenu.classList.toggle('is-active');
+  });
+});
 // Set footer year (safe guard if element missing)
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
