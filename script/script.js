@@ -741,10 +741,10 @@ function initPopup() {
             // ignore
           }
           form.reset();
-          setTimeout(() => {
-            const p = document.getElementById('popup-form');
-            if (p) p.classList.remove('active');
-          }, 1400);
+          //setTimeout(() => {
+           // const p = document.getElementById('popup-form');
+            //if (p) p.classList.remove('active');
+         // }, 1400);
         } else {
           // treat non-2xx as failure; if server returned message, show it
           const msg = (result && result.message) ? result.message : 'Submission failed';
