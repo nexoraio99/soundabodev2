@@ -597,28 +597,61 @@
     startAuto();
   }
 
-  /* ==========================================================================
-     Popup show/hide (fixed)
-     - Show popup using init-time timer (do not rely on window.load).
-     ========================================================================== */
-  function initPopup() {
-    const popup = DOM.popup;
-    const closeBtn = DOM.popupClose;
-    if (!popup || !closeBtn) return;
+/* ==========================================================================
+   Popup show/hide (fixed)
+   - Show popup using init-time timer (do not rely on window.load).
+   - Keep popup visible for 20s after it appears.
+   ========================================================================== */
+function initPopup() {
+  const popup = DOM.popup;
+  const closeBtn = DOM.popupClose;
+  if (!popup || !closeBtn) return;
 
-    // Show popup after POPUP_DELAY from page init (guaranteed)
-    if (!state.popupShown) {
-      setTimeout(() => {
-        popup.classList.add('active');
-        state.popupShown = true;
-      }, CONFIG.POPUP_DELAY);
+  function clearHideTimer() {
+    if (state.popupHideTimer) {
+      clearTimeout(state.popupHideTimer);
+      state.popupHideTimer = null;
     }
-
-    closeBtn.addEventListener('click', () => popup.classList.remove('active'));
-    popup.addEventListener('click', (e) => {
-      if (e.target === popup) popup.classList.remove('active');
-    });
   }
+
+  function startHideTimer() {
+    clearHideTimer();
+    state.popupHideTimer = setTimeout(() => {
+      popup.classList.remove('active');
+      state.popupHideTimer = null;
+    }, CONFIG.POPUP_VISIBLE_DURATION || 20000); // default 20s
+  }
+
+  function showPopup() {
+    popup.classList.add('active');
+    startHideTimer();
+  }
+
+  // Show popup after POPUP_DELAY from page init (guaranteed)
+  if (!state.popupShown) {
+    setTimeout(() => {
+      state.popupShown = true;
+      showPopup();          // ✅ now auto-hides after 20s
+    }, CONFIG.POPUP_DELAY);
+  }
+
+  // Close button
+  closeBtn.addEventListener('click', () => {
+    popup.classList.remove('active');
+    clearHideTimer();
+  });
+
+  // Click on dark overlay to close
+  popup.addEventListener('click', (e) => {
+    if (e.target === popup) {
+      popup.classList.remove('active');
+      clearHideTimer();
+    }
+  });
+
+  // Optional: expose showPopup so JOIN US button uses same logic
+  state.showPopup = showPopup;
+}
 
   /* ==========================================================================
      Tracking helper for Bing UET / custom event
