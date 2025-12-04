@@ -1551,7 +1551,7 @@
               <li>Performance opportunities at <strong>real clubs and partner venues</strong></li>
               <li>Personal guidance on <strong>artist branding, EPKs, and press kits</strong></li>
               <li><strong>Guest masterclasses</strong> from touring DJs and sound engineers</li>
-              <li>Internship and <strong>gig placement support</strong> across India</li>
+              <li><strong>Internship and <strong>gig placement support</strong> across India</strong></li>
             </ul>
           </div>
 
@@ -1719,8 +1719,6 @@
           </div>
         </div>
       </div>
-
-    
     </section>
 
     <!-- ============================================================================
@@ -1797,7 +1795,7 @@
   </footer>
 
   <!-- ============================================================================
-         JS INTERACTIVITY
+         JS INTERACTIVITY (updated with pushState/popstate + routing)
          ============================================================================ -->
   <script>
     function uet_report_conversion(source) {
@@ -1816,13 +1814,23 @@
       if (y) y.textContent = new Date().getFullYear();
     })();
 
-    // Tabs logic
+    /* -------------------------
+       UI element refs
+       ------------------------- */
     const tabEmp = document.getElementById("tab-emp");
     const tabDj = document.getElementById("tab-dj");
     const panelEmp = document.getElementById("panel-emp");
     const panelDj = document.getElementById("panel-dj");
+    const exploreEmp = document.getElementById("explore-emp");
+    const exploreDj = document.getElementById("explore-dj");
 
-    function activate(emp = true) {
+    /* -------------------------
+       Helper: activate correct tab
+       - emp=true => EMP tab visible
+       - emp=false => DJ tab visible
+       ------------------------- */
+    function activate(emp = true, options = {}) {
+      // options: { scroll: boolean, focus: boolean }
       if (emp) {
         tabEmp.classList.add("active");
         tabEmp.setAttribute("aria-selected", "true");
@@ -1830,6 +1838,7 @@
         tabDj.setAttribute("aria-selected", "false");
         panelEmp.classList.remove("hidden");
         panelDj.classList.add("hidden");
+        if (options.focus) tabEmp.focus();
       } else {
         tabDj.classList.add("active");
         tabDj.setAttribute("aria-selected", "true");
@@ -1837,27 +1846,110 @@
         tabEmp.setAttribute("aria-selected", "false");
         panelDj.classList.remove("hidden");
         panelEmp.classList.add("hidden");
+        if (options.focus) tabDj.focus();
+      }
+
+      // optional scroll to panel
+      if (options.scroll) {
+        const target = emp ? panelEmp : panelDj;
+        if (target) {
+          const top = target.getBoundingClientRect().top + window.scrollY - 20;
+          window.scrollTo({ top, behavior: "smooth" });
+        }
       }
     }
 
-    tabEmp.addEventListener("click", () => activate(true));
-    tabDj.addEventListener("click", () => activate(false));
+    /* -------------------------
+       History helpers
+       ------------------------- */
+    function setUrl(path, { replace = false } = {}) {
+      try {
+        if (replace) {
+          history.replaceState({}, "", path);
+        } else {
+          history.pushState({}, "", path);
+        }
+      } catch (e) {
+        // fallback - browsers may throw for invalid URLs in some contexts
+        console.warn("History API failed:", e);
+      }
+    }
 
-    document.getElementById("explore-emp").addEventListener("click", () => {
-      activate(true);
-      window.scrollTo({
-        top: document.getElementById("panel-emp").offsetTop - 20,
-        behavior: "smooth"
+    /* -------------------------
+       Click handlers - use pushState
+       ------------------------- */
+    if (tabEmp && tabDj) {
+      tabEmp.addEventListener("click", (e) => {
+        // prevent scrolling due to hash or anchor default behavior if any
+        e.preventDefault && e.preventDefault();
+        activate(true);
+        setUrl("/music-production");
       });
+
+      tabDj.addEventListener("click", (e) => {
+        e.preventDefault && e.preventDefault();
+        activate(false);
+        setUrl("/dj-training");
+      });
+    }
+
+    if (exploreEmp) {
+      exploreEmp.addEventListener("click", (e) => {
+        e.preventDefault && e.preventDefault();
+        activate(true, { scroll: true });
+        setUrl("/music-production");
+      });
+    }
+
+    if (exploreDj) {
+      exploreDj.addEventListener("click", (e) => {
+        e.preventDefault && e.preventDefault();
+        activate(false, { scroll: true });
+        setUrl("/dj-training");
+      });
+    }
+
+    /* -------------------------
+       Handle back/forward (popstate)
+       - When user presses back/forward, read current path and switch tabs
+       ------------------------- */
+    window.addEventListener("popstate", () => {
+      const path = window.location.pathname.toLowerCase();
+      if (path.startsWith("/music-production")) {
+        activate(true, { scroll: false, focus: true });
+      } else if (path.startsWith("/dj-training")) {
+        activate(false, { scroll: false, focus: true });
+      } else {
+        // default to showing EMP panel for unknown /courses or root path
+        activate(true, { scroll: false, focus: true });
+      }
     });
 
-    document.getElementById("explore-dj").addEventListener("click", () => {
-      activate(false);
-      window.scrollTo({
-        top: document.getElementById("panel-dj").offsetTop - 20,
-        behavior: "smooth"
-      });
-    });
+    /* -------------------------
+       Initial route handling on page load
+       - If user navigated directly to /music-production or /dj-training, show that tab.
+       - If path is other (e.g. /courses or /courses/), keep current and push a normalized state.
+       ------------------------- */
+    (function handleInitialRoute() {
+      const path = window.location.pathname.toLowerCase();
+
+      if (path.startsWith("/music-production")) {
+        activate(true, { scroll: false });
+        // keep URL as-is (user intentionally landed here)
+        // ensure history state exists to enable popstate navigation
+        setUrl("/music-production", { replace: true });
+      } else if (path.startsWith("/dj-training")) {
+        activate(false, { scroll: false });
+        setUrl("/dj-training", { replace: true });
+      } else {
+        // default path (courses)
+        // normalize to current path without reloading (don't override if user expects /courses)
+        // We will replaceState so there's a proper history entry
+        setUrl(window.location.pathname || "/courses", { replace: true });
+        // keep EMP active by default
+        activate(true, { scroll: false });
+      }
+    })();
 
     // Parallax on hero visuals
     (function () {
