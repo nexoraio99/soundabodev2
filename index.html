@@ -19,10 +19,10 @@
     <meta name="msapplication-navbutton-color" content="#000000">
     
     <!-- Preconnect to critical domains for faster loading -->
-    <link rel="dns-prefetch" href="https://res.cloudinary.com" >
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" >
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" >
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com">
     
     <!-- DNS Prefetch for better mobile performance -->
     <link rel="dns-prefetch" href="https://res.cloudinary.com">
@@ -105,10 +105,9 @@
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+    <!-- Google Fonts - Optimized loading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Minimal critical CSS -->
     <style>
@@ -119,7 +118,8 @@
     </style>
 
     <!-- Preload and non-blocking load for stylesheet -->
-    
+    <link rel="preload" href="/style/style.css" as="style">
+    <link rel="stylesheet" href="/style/style.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/style/style.css"></noscript>
     
     <!-- MERGED STRUCTURED DATA (ONE BLOCK, UNIFIED NAME + COURSE IMAGE) -->
