@@ -1889,7 +1889,7 @@
       tabDj.addEventListener("click", (e) => {
         e.preventDefault && e.preventDefault();
         activate(false);
-        setUrl("/dj-training");
+        setUrl("/courses/dj-training");
       });
     }
 
@@ -1897,7 +1897,7 @@
       exploreEmp.addEventListener("click", (e) => {
         e.preventDefault && e.preventDefault();
         activate(true, { scroll: true });
-        setUrl("/music-production");
+        setUrl("/courses/music-production");
       });
     }
 
@@ -1905,7 +1905,7 @@
       exploreDj.addEventListener("click", (e) => {
         e.preventDefault && e.preventDefault();
         activate(false, { scroll: true });
-        setUrl("/dj-training");
+        setUrl("/courses/dj-training");
       });
     }
 
@@ -1915,9 +1915,9 @@
        ------------------------- */
     window.addEventListener("popstate", () => {
       const path = window.location.pathname.toLowerCase();
-      if (path.startsWith("/music-production")) {
+      if (path.startsWith("/courses/music-production")) {
         activate(true, { scroll: false, focus: true });
-      } else if (path.startsWith("/dj-training")) {
+      } else if (path.startsWith("/courses/dj-training")) {
         activate(false, { scroll: false, focus: true });
       } else {
         // default to showing EMP panel for unknown /courses or root path
@@ -1938,9 +1938,9 @@
         // keep URL as-is (user intentionally landed here)
         // ensure history state exists to enable popstate navigation
         setUrl("/music-production", { replace: true });
-      } else if (path.startsWith("/dj-training")) {
+      } else if (path.startsWith("/courses/dj-training")) {
         activate(false, { scroll: false });
-        setUrl("/dj-training", { replace: true });
+        setUrl("/courses/dj-training", { replace: true });
       } else {
         // default path (courses)
         // normalize to current path without reloading (don't override if user expects /courses)
