@@ -46,186 +46,196 @@
     .container { max-width: var(--container); margin: 0 auto; padding: 0 20px; }
     .muted { color: var(--muted); }
 
-    /* NAVBAR (kept as before) */
-    .navbar { position: absolute; top: 0; left: 0; width: 100%; padding: 10px clamp(12px, 5vw, 50px); height: clamp(48px, 12vw, 60px); display:flex; justify-content:space-between; align-items:center; z-index:100; background-color: rgba(10,10,10,0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+    /* NAVBAR */
+    .navbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px clamp(12px, 5vw, 50px);
+      height: clamp(48px, 12vw, 60px);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      z-index:100;
+      background-color: rgba(10,10,10,0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
     .nav-links { display:flex; gap:clamp(20px,5vw,40px); flex:1; justify-content:center; }
     .nav-actions { display:flex; gap:clamp(8px,2vw,15px); align-items:center; }
     .logo-img { height: clamp(20px,5vw,40px); }
 
-    /* ... (your other styles kept from the original) ... */
+    /* small mobile menu (markup added later) */
+    .hamburger-menu { display:none; background:none; border:0; cursor:pointer; padding:0; z-index:101; }
+    .hamburger-menu .bar { display:block; width:25px; height:2px; background:#fff; margin:5px 0; transition:transform .3s, opacity .3s; }
+    @media (max-width:768px){ .hamburger-menu{ display:block } .nav-links{ display:none } }
 
-    /* --- popup modal styles --- */
-    .modal-overlay {
+    .nav-menu {
       position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1200;
-      padding: 20px;
+      top: 0; left: 0;
+      width: 100%; height: 100vh;
+      background: rgba(0,0,0,0.95);
+      display:flex; flex-direction:column; justify-content:center; align-items:center;
+      gap:32px;
+      transform: translateX(100%);
+      transition: transform .35s cubic-bezier(.76,0,.24,1);
+      z-index: 1050;
     }
+    .nav-menu.is-active { transform: translateX(0); }
+    .nav-menu a { color:#fff; font-size:1.4rem; }
 
-    .modal-overlay.is-open { display: flex; }
-
+    /* modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      display: none; align-items:center; justify-content:center; z-index:1200; padding: 20px;
+    }
+    .modal-overlay.is-open { display:flex; }
     .modal {
-      width: 100%;
-      max-width: 720px;
+      width: 100%; max-width: 720px;
       background: linear-gradient(180deg, rgba(15,15,15,0.98), rgba(10,10,12,0.98));
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.04);
-      color: #e8eef6;
+      border-radius: 12px; padding: 20px; box-shadow: 0 14px 40px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.04); color:#e8eef6;
     }
-
     .modal-header { display:flex; justify-content:space-between; align-items:center; gap:8px; }
     .modal-title { margin:0; font-size:18px; }
-    .modal-close {
-      background: transparent;
-      color: #fff;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      padding: 6px;
-      line-height: 1;
+    .modal-close { background:transparent; color:#fff; border:0; font-size:20px; cursor:pointer; padding:6px; }
+    .modal-body { margin-top:12px; }
+    .modal-row { display:grid; gap:8px; grid-template-columns:1fr 1fr; }
+    @media (max-width:560px){ .modal-row{ grid-template-columns:1fr } }
+
+    .input, textarea, select {
+      width:100%; padding:10px 12px; border-radius:8px;
+      background: rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.06); color:#fff; font-size:14px; outline:none;
     }
-
-    .modal-body { margin-top: 12px; }
-    .modal-row { display:grid; gap:8px; grid-template-columns: 1fr 1fr; }
-    @media (max-width: 560px) { .modal-row { grid-template-columns: 1fr; } }
-
-    .input, textarea {
-      width:100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-    }
-
     .label { font-size:12px; color: var(--muted); margin-bottom:6px; display:block; }
 
     .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
     .btn { padding:10px 14px; border-radius:8px; cursor:pointer; border:none; font-weight:600; }
     .btn-primary { background: linear-gradient(90deg,var(--neon-1),var(--neon-2)); color:#041014; }
-    .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06); color:#e8eef6; }
+    .btn-ghost { background:transparent; border:1px solid rgba(255,255,255,0.06); color:#e8eef6; }
 
     .form-note { font-size:13px; color: var(--muted); margin-top:8px; }
-    .form-success { color: #9cedc9; margin-top:8px; font-weight:600; }
+    .form-success { color:#9cedc9; margin-top:8px; font-weight:600; display:none; }
 
-    /* KEEP your original styles below (hero, cards, footer, etc.) */
-    /* ... (truncated in this snippet for brevity) ... */
+    /* Hero / cards / footer — kept minimal representations (your full styles can remain) */
+    .hero { display:grid; grid-template-columns:1fr; gap:28px; align-items:center; margin-top:80px; }
+    @media (min-width:1020px){ .hero{ grid-template-columns:1.2fr 0.9fr } }
+    .hero-kicker{ font-size:13px; color:var(--muted); text-transform:uppercase; }
+    .gradient-text{ background: linear-gradient(90deg,var(--neon-1),var(--neon-2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .cta-row{ margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; }
+    .btn-outline { padding:11px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:#e8eef6; font-weight:700; cursor:pointer; }
 
-    /* Footer styles kept */
-    .site-footer { background-color: #000; font-family: "Roboto Mono", monospace; color: #fff; padding: 18px 20px; border-top: 1px solid #2222222e; position: relative; z-index: 2; margin-top: 40px; }
+    .floating-img { position:absolute; border-radius:12px; object-fit:cover; z-index:3; }
+    .floating-img.album { left:26px; top:26px; width:170px; height:170px; }
+    .floating-img.studio { right:26px; bottom:26px; width:140px; height:140px; }
 
-    /* Responsive tweaks */
-    @media (max-width: 768px) { .hero { margin-top: 72px; } }
+    .site-footer { background-color:#000; font-family:"Roboto Mono",monospace; color:#fff; padding:18px 20px; border-top:1px solid #2222222e; position:relative; z-index:2; margin-top:40px; }
+
+    @media (max-width:768px){ .hero{ margin-top:72px } }
 
   </style>
 </head>
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar">
-    <a href="/index.html" class="logo">
-      <img
-        src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png"
-        alt="SoundAbode Logo"
-        class="logo-img"
-      />
+  <nav class="navbar" role="navigation" aria-label="Main">
+    <a href="/index.html" class="logo" aria-label="Soundabode Home">
+      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img" />
     </a>
 
-    <div class="nav-links">
-      <a href="/about.html">About</a>
-      <a href="/courses.html">Courses</a>
-      <a href="/contact.html">Contact</a>
+    <div class="nav-links" role="menubar">
+      <a href="/about.html" role="menuitem">About</a>
+      <a href="/courses.html" role="menuitem">Courses</a>
+      <a href="/contact.html" role="menuitem">Contact</a>
     </div>
 
+    <button class="hamburger-menu" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+
     <div class="nav-actions">
-      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion('call')">
-        <!-- phone icon svg -->
+      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion('call')" aria-label="Call Soundabode">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor"/></svg>
       </a>
     </div>
   </nav>
 
-  <!-- MAIN CONTENT (kept as your previous content) -->
-  <main class="container" style="margin-top: 6px;">
+  <!-- MOBILE NAV (hidden by default) -->
+  <div id="site-nav" class="nav-menu" aria-hidden="true">
+    <a href="/about.html">About</a>
+    <a href="/courses.html">Courses</a>
+    <a href="/contact.html">Contact</a>
+  </div>
+
+  <!-- MAIN -->
+  <main class="container" style="margin-top:6px;">
     <!-- HERO -->
     <section class="hero" aria-labelledby="hero-heading">
       <div>
         <div class="hero-kicker">Music Production · Level 1</div>
-        <h1 id="hero-heading">
-          Level 1 – Beginner: Music Production / Audio Workstation
+        <h1 id="hero-heading">Level 1 – Beginner: Music Production / Audio Workstation
           <span class="gradient-text">Best Music Production Course in Pune for Beginners</span>
         </h1>
+
         <p class="hero-subtitle">Transform your musical ideas into professional-quality tracks.</p>
 
-        <div class="hero-meta-row">
-          <div class="meta-pill">3 months training + 1 month internship</div>
-          <div class="meta-pill">Ableton Live workflow + studio practice</div>
-          <div class="meta-pill">Beginner-friendly · No prior experience</div>
+        <div class="hero-meta-row" style="display:flex; gap:12px; margin-top:10px;">
+          <div class="meta-pill" style="padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); color:var(--muted);">3 months training + 1 month internship</div>
+          <div class="meta-pill" style="padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); color:var(--muted);">Ableton Live workflow + studio practice</div>
+          <div class="meta-pill" style="padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); color:var(--muted);">Beginner-friendly · No prior experience</div>
         </div>
 
         <div class="cta-row" style="margin-top:18px;">
-          <!-- Book a free demo: uses special href "#popup" in your previous code.
-               JS will intercept href="#popup" and open modal. -->
-          <a class="btn-primary" href="/contact.html" data-open-enroll="demo">Book A Free Demo Class</a>
+          <!-- Book a demo opens modal (data-open-enroll present) -->
+          <a class="btn-primary" href="/contact.html" data-open-enroll="demo" role="button">Book A Free Demo Class</a>
 
-          <!-- Enroll: originally pointed to /enroll — now JS will intercept and open modal -->
-          <a class="btn-outline" href="/enroll" data-open-enroll="enroll">Enroll Now</a>
+          <!-- Enroll opens modal (href /enroll will be intercepted) -->
+          <a class="btn-outline" href="/enroll" data-open-enroll="enroll" role="button">Enroll Now</a>
         </div>
       </div>
 
-      <div>
-        <div class="hero-visual" id="hero-visual" role="img" aria-label="Music producer working in Soundabode studio on Ableton Live">
-          <div class="gradient-layer"></div>
-          <div class="particles">
-            <div class="particle" style="top: 18%; left: 20%; animation-delay: 0s;"></div>
-            <div class="particle" style="top: 32%; left: 70%; animation-delay: 2s;"></div>
-            <div class="particle" style="top: 58%; left: 42%; animation-delay: 4s;"></div>
-            <div class="particle" style="top: 68%; left: 80%; animation-delay: 6s;"></div>
+      <div style="position:relative;">
+        <div class="hero-visual" id="hero-visual" role="img" aria-label="Music producer working in Soundabode studio on Ableton Live" style="position:relative; height:360px; border-radius:20px; overflow:hidden; background:#000;">
+          <div class="gradient-layer" style="position:absolute; inset:0;"></div>
+          <div class="particles" style="position:absolute; inset:0; pointer-events:none;">
+            <div class="particle" style="top:18%; left:20%;"></div>
+            <div class="particle" style="top:32%; left:70%;"></div>
+            <div class="particle" style="top:58%; left:42%;"></div>
+            <div class="particle" style="top:68%; left:80%;"></div>
           </div>
-          <img src="images/emp-album-1.jpg" alt="Ableton Live project on screen" class="floating-img album" id="float-album" />
-          <img src="images/emp-studio-1.jpg" alt="Soundabode music production studio" class="floating-img studio" id="float-studio" />
+
+          <img src="images/emp-album-1.jpg" alt="Ableton Live project on screen" class="floating-img album" id="float-album" onerror="this.style.display='none'"/>
+          <img src="images/emp-studio-1.jpg" alt="Soundabode music production studio" class="floating-img studio" id="float-studio" onerror="this.style.display='none'"/>
         </div>
       </div>
     </section>
 
-    <!-- (rest of the page content: Overview, Objectives, etc.) -->
-    <!-- ... keep everything from your file unchanged ... -->
-
-    <!-- CTA -->
+    <!-- (omitted: rest of your content — keep as in your page) -->
+    <!-- CTA section (bottom) -->
     <section class="enroll-bottom" aria-label="Enroll call to action" style="margin-top:32px;">
       <div>
-        <h3 style="margin: 0;">Ready to start your Music Production journey?</h3>
-        <div class="muted" style="margin-top: 6px;">
-          Join Pune’s fastest-growing community of music producers and audio engineers. Start your journey today with
-          <strong>Soundabode Music Production Level 1</strong>.
-        </div>
+        <h3 style="margin:0;">Ready to start your Music Production journey?</h3>
+        <div class="muted" style="margin-top:6px;">Join Pune’s fastest-growing community of music producers and audio engineers. Start your journey today with <strong>Soundabode Music Production Level 1</strong>.</div>
       </div>
       <div class="actions" style="display:flex; gap:8px;">
-        <!-- ensure these triggers won't navigate away - JS will intercept -->
-        <a class="btn-primary" href="/enroll" data-open-enroll="enroll">Enroll Now</a>
-        <a class="btn-outline" href="/contact.html" data-open-enroll="demo">Talk To Our Team</a>
+        <a class="btn-primary" href="/enroll" data-open-enroll="enroll" role="button">Enroll Now</a>
+        <a class="btn-outline" href="/contact.html" data-open-enroll="demo" role="button">Talk To Our Team</a>
       </div>
     </section>
   </main>
 
-  <!-- ENROLL MODAL (inserted near end of body) -->
+  <!-- ENROLL MODAL -->
   <div id="enroll-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="enroll-modal-title">
-    <div class="modal" role="document" tabindex="-1">
+    <div class="modal" role="document" tabindex="-1" aria-describedby="form-note">
       <div class="modal-header">
         <h3 class="modal-title" id="enroll-modal-title">Enroll / Book Demo — Soundabode Level 1</h3>
-        <button class="modal-close" aria-label="Close" id="modal-close-btn">&times;</button>
+        <button class="modal-close" aria-label="Close modal" id="modal-close-btn">&times;</button>
       </div>
 
       <div class="modal-body">
         <form id="enroll-form" action="#" method="POST" novalidate>
-          <div style="display:grid;gap:10px;">
+          <div style="display:grid; gap:10px;">
             <div>
               <label class="label" for="name">Full name</label>
               <input id="name" name="name" class="input" type="text" required placeholder="Your full name" />
@@ -262,7 +272,7 @@
           </div>
 
           <div class="form-note" id="form-note">We will contact you within 24 hours. This is a demo submission (no backend configured).</div>
-          <div class="form-success" id="form-success" style="display:none;">Thanks — your enquiry has been received. We'll call soon.</div>
+          <div class="form-success" id="form-success">Thanks — your enquiry has been received. We'll call soon.</div>
         </form>
       </div>
     </div>
@@ -272,45 +282,15 @@
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-columns">
-        <div class="footer-column">
-          <h4>ABOUT</h4>
-          <ul>
-            <li><a href="about.html">ABOUT</a></li>
-            <li><a href="courses.html">COURSES</a></li>
-            <li><a href="contact.html">CONTACT</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>LOCATION</h4>
-          <p>
-            VISION 9, 2ND FLOOR,<br />
-            KUNAL ICON RD,<br />
-            PIMPLE SAUDAGAR, PUNE,<br />
-            MAHARASHTRA 411017
-          </p>
-        </div>
-        <div class="footer-column">
-          <h4>SOCIALS</h4>
-          <ul>
-            <li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">INSTAGRAM</a></li>
-            <li><a href="https://www.facebook.com/soundabode/" target="_blank" rel="noopener noreferrer">FACEBOOK</a></li>
-            <li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YOUTUBE</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>PRIVACY POLICY</h4>
-          <ul>
-            <li><a href="privacy.html">PRIVACY POLICY</a></li>
-          </ul>
-        </div>
+        <div class="footer-column"><h4>ABOUT</h4><ul><li><a href="about.html">ABOUT</a></li><li><a href="courses.html">COURSES</a></li><li><a href="contact.html">CONTACT</a></li></ul></div>
+        <div class="footer-column"><h4>LOCATION</h4><p>VISION 9, 2ND FLOOR,<br/>KUNAL ICON RD,<br/>PIMPLE SAUDAGAR, PUNE,<br/>MAHARASHTRA 411017</p></div>
+        <div class="footer-column"><h4>SOCIALS</h4><ul><li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">INSTAGRAM</a></li><li><a href="https://www.facebook.com/soundabode/" target="_blank" rel="noopener noreferrer">FACEBOOK</a></li><li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YOUTUBE</a></li></ul></div>
+        <div class="footer-column"><h4>PRIVACY POLICY</h4><ul><li><a href="privacy.html">PRIVACY POLICY</a></li></ul></div>
       </div>
-      <div class="footer-copyright">
-        <p><span id="year"></span> © SOUNDABODE. All rights reserved.</p>
-      </div>
+      <div class="footer-copyright"><p><span id="year"></span> © SOUNDABODE. All rights reserved.</p></div>
     </div>
   </footer>
 
-  <!-- JS: open/close modal + handle submit -->
   <script>
     // dynamic year
     (function () {
@@ -318,25 +298,28 @@
       if (y) y.textContent = new Date().getFullYear();
     })();
 
-    // open modal helper
+    // small safe helpers - guard for elements that may not exist
     const modalOverlay = document.getElementById('enroll-modal');
-    const modal = modalOverlay && modalOverlay.querySelector('.modal');
+    const modal = modalOverlay ? modalOverlay.querySelector('.modal') : null;
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const modalCancelBtn = document.getElementById('modal-cancel');
     const form = document.getElementById('enroll-form');
     const formSuccess = document.getElementById('form-success');
     const formNote = document.getElementById('form-note');
 
-    function openModal(openOptions = {}) {
+    // Focus trap variables
+    let lastFocusedElementBeforeModal = null;
+
+    function openModal() {
       if (!modalOverlay) return;
+      lastFocusedElementBeforeModal = document.activeElement;
       modalOverlay.classList.add('is-open');
       modalOverlay.setAttribute('aria-hidden', 'false');
 
-      // set focus to first input
+      // focus the first input inside modal
       const first = modalOverlay.querySelector('input, select, textarea, button');
       if (first) first.focus();
 
-      // when modal open, trap focus simply
       document.addEventListener('focus', trapFocus, true);
       document.addEventListener('keydown', handleKeydown);
     }
@@ -345,60 +328,68 @@
       if (!modalOverlay) return;
       modalOverlay.classList.remove('is-open');
       modalOverlay.setAttribute('aria-hidden', 'true');
+
       document.removeEventListener('focus', trapFocus, true);
       document.removeEventListener('keydown', handleKeydown);
-      // reset form UI (not clearing content)
-      formSuccess.style.display = 'none';
-      formNote.style.display = '';
+
+      // hide success message and show note again
+      if (formSuccess) formSuccess.style.display = 'none';
+      if (formNote) formNote.style.display = '';
+
+      // return focus to the element that had it
+      if (lastFocusedElementBeforeModal && typeof lastFocusedElementBeforeModal.focus === 'function') {
+        lastFocusedElementBeforeModal.focus();
+      }
     }
 
     function trapFocus(e) {
-      if (!modalOverlay) return;
-      if (modal && !modal.contains(e.target)) {
+      if (!modal) return;
+      if (!modal.contains(e.target)) {
         e.stopPropagation();
-        // put focus back to modal
         const focusable = modal.querySelector('input,select,textarea,button,a[href],[tabindex]:not([tabindex="-1"])');
         if (focusable) focusable.focus();
       }
     }
 
     function handleKeydown(e) {
-      if (e.key === 'Escape') closeModal();
-      // simple tab trapping
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeModal();
+        return;
+      }
       if (e.key === 'Tab') {
-        const focusable = modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])');
+        if (!modal) return;
+        const focusable = modal.querySelectorAll('a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled])');
         const nodes = Array.prototype.slice.call(focusable);
         if (!nodes.length) return;
         const first = nodes[0], last = nodes[nodes.length - 1];
         if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
+          e.preventDefault(); last.focus();
         } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
+          e.preventDefault(); first.focus();
         }
       }
     }
 
-    // close buttons & overlay click
+    // close modal handlers
     if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
     if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
     if (modalOverlay) {
       modalOverlay.addEventListener('click', function (e) {
-        if (e.target === modalOverlay) closeModal(); // click outside modal to close
+        if (e.target === modalOverlay) closeModal();
       });
     }
 
-    // intercept clicks on any "enroll" or demo links
+    // intercept enroll/demo clicks (delegated)
     document.addEventListener('click', function (e) {
-      const el = e.target.closest('a');
+      const el = e.target.closest ? e.target.closest('a') : null;
       if (!el) return;
       const href = el.getAttribute('href') || '';
       const openAttr = el.getAttribute('data-open-enroll');
 
       // open modal when:
-      // - href is "/enroll" (site pretty url)
-      // - href equals "#popup" (legacy)
+      // - href is "/enroll" (pretty url)
+      // - href equals "#popup"
       // - element has data-open-enroll attribute
       if (href === '/enroll' || href === '#popup' || openAttr) {
         e.preventDefault();
@@ -406,54 +397,52 @@
       }
     });
 
-    // simple form submission: replace this with actual AJAX / POST to your backend
+    // simple form submission (simulated). Replace with fetch() to your endpoint when ready.
     if (form) {
       form.addEventListener('submit', function (e) {
         e.preventDefault();
+        const name = form.querySelector('#name') ? form.querySelector('#name').value.trim() : '';
+        const phone = form.querySelector('#phone') ? form.querySelector('#phone').value.trim() : '';
 
-        // basic validation
-        const name = form.querySelector('#name').value.trim();
-        const phone = form.querySelector('#phone').value.trim();
         if (!name) {
           alert('Please enter your name.');
-          form.querySelector('#name').focus();
+          if (form.querySelector('#name')) form.querySelector('#name').focus();
           return;
         }
         if (!phone) {
           alert('Please enter your phone number.');
-          form.querySelector('#phone').focus();
+          if (form.querySelector('#phone')) form.querySelector('#phone').focus();
           return;
         }
 
-        // simulate sending (showing success)
-        formNote.style.display = 'none';
-        formSuccess.style.display = '';
-        // optionally clear form fields:
-        // form.reset();
+        // show simulated success
+        if (formNote) formNote.style.display = 'none';
+        if (formSuccess) formSuccess.style.display = '';
 
-        // optionally close after 2.5s
-        setTimeout(() => {
-          closeModal();
-        }, 2500);
+        // optionally clear fields: form.reset();
 
-        // TODO: send data to your server:
-        // fetch('/api/enquiry', { method:'POST', body: JSON.stringify({...}) })
-        //  .then(...)
+        // auto-close after short delay
+        setTimeout(closeModal, 2200);
+
+        // TODO: send to backend
+        // fetch('/api/enquiry', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, phone, email: form.querySelector('#email')?.value || '', course: form.querySelector('#course')?.value || '', message: form.querySelector('#message')?.value || ''}) })
       });
     }
 
-    // accessibility: prevent links with href="#" from scrolling to top if any
-    document.querySelectorAll('a[href="#"]').forEach(a => {
-      a.addEventListener('click', (e) => e.preventDefault());
-    });
+    // prevent anchors with href="#" from jumping
+    (function preventHashAnchors(){
+      const anchors = document.querySelectorAll('a[href="#"]');
+      anchors.forEach(a => {
+        a.addEventListener('click', function (ev) { ev.preventDefault(); });
+      });
+    })();
 
-    // other existing JS (parallax, faq, hamburger) can be put below or merged with current scripts
+    // simple parallax (guarded)
     (function () {
       const hero = document.getElementById("hero-visual");
       const album = document.getElementById("float-album");
       const studio = document.getElementById("float-studio");
       if (!hero || !album || !studio) return;
-
       hero.addEventListener("mousemove", (e) => {
         const rect = hero.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -461,51 +450,43 @@
         album.style.transform = `translate(${x * 18}px, ${y * 12}px) rotate(${x * 4}deg)`;
         studio.style.transform = `translate(${x * -12}px, ${y * -8}px) rotate(${x * -3}deg)`;
       });
-
-      hero.addEventListener("mouseleave", () => {
-        album.style.transform = "";
-        studio.style.transform = "";
-      });
+      hero.addEventListener("mouseleave", () => { album.style.transform = ""; studio.style.transform = ""; });
     })();
 
-    // faq accordion
+    // FAQ accordion (guarded)
     (function () {
       const items = document.querySelectorAll(".faq-item");
+      if (!items || !items.length) return;
       items.forEach((item) => {
         const q = item.querySelector(".faq-question");
         const ans = item.querySelector(".faq-answer");
+        if (!q || !ans) return;
         q.addEventListener("click", () => {
           const open = ans.style.display === "block";
-          items.forEach((i) => {
-            i.querySelector(".faq-answer").style.display = "none";
-            i.querySelector(".faq-question span").textContent = "+";
-          });
-          if (!open) {
-            ans.style.display = "block";
-            q.querySelector("span").textContent = "-";
-          } else {
-            ans.style.display = "none";
-            q.querySelector("span").textContent = "+";
-          }
+          items.forEach((i) => { const a = i.querySelector(".faq-answer"); const s = i.querySelector(".faq-question span"); if (a) a.style.display = "none"; if (s) s.textContent = "+"; });
+          if (!open) { ans.style.display = "block"; const s = q.querySelector("span"); if (s) s.textContent = "-"; } else { ans.style.display = "none"; const s = q.querySelector("span"); if (s) s.textContent = "+"; }
         });
       });
     })();
 
-    // hamburger (if present)
+    // hamburger menu toggle (guarded)
     (function () {
       const burger = document.querySelector(".hamburger-menu");
-      const menu = document.querySelector(".nav-menu");
+      const menu = document.getElementById("site-nav");
       if (!burger || !menu) return;
       burger.addEventListener("click", () => {
-        burger.classList.toggle("is-active");
-        menu.classList.toggle("is-active");
+        const open = burger.classList.toggle("is-active");
+        menu.classList.toggle("is-active", open);
+        menu.setAttribute('aria-hidden', open ? 'false' : 'true');
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
-      menu.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          burger.classList.remove("is-active");
-          menu.classList.remove("is-active");
-        });
-      });
+      // close menu when nav link clicked
+      menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+        burger.classList.remove('is-active');
+        menu.classList.remove('is-active');
+        menu.setAttribute('aria-hidden', 'true');
+        burger.setAttribute('aria-expanded', 'false');
+      }));
     })();
   </script>
 </body>
