@@ -235,7 +235,7 @@
 
     <div class="nav-links">
       <a href="/about">About</a>
-      <a href="#panel-emp">Courses</a>
+      <a href="/courses">Courses</a>
       <a href="/contact">Contact</a>
     </div>
 
@@ -257,7 +257,7 @@
   <!-- MOBILE MENU -->
   <div class="nav-menu" role="dialog" aria-hidden="true">
     <a href="/about">About</a>
-    <a href="#panel-emp">Courses</a>
+    <a href="/courses">Courses</a>
     <a href="/contact">Contact</a>
   </div>
 
@@ -548,7 +548,7 @@
           <h4>ABOUT</h4>
           <ul>
             <li><a href="/about">ABOUT</a></li>
-            <li><a href="#panel-emp">COURSES</a></li>
+            <li><a href="/courses">COURSES</a></li>
             <li><a href="/contact">CONTACT</a></li>
           </ul>
         </div>
@@ -576,7 +576,7 @@
     </div>
   </footer>
 
-  <!-- JS INTERACTIVITY (robust routing + UI) -->
+  <!-- JS INTERACTIVITY -->
   <script>
     // analytics helper (kept)
     function uet_report_conversion(source) {
@@ -606,15 +606,20 @@
 
     function activate(emp = true, options = {}) {
       if (!exists(tabEmp) || !exists(tabDj)) return;
+
       if (emp) {
-        tabEmp.classList.add("active"); tabEmp.setAttribute("aria-selected", "true");
-        tabDj.classList.remove("active"); tabDj.setAttribute("aria-selected", "false");
+        tabEmp.classList.add("active");
+        tabEmp.setAttribute("aria-selected", "true");
+        tabDj.classList.remove("active");
+        tabDj.setAttribute("aria-selected", "false");
         if (panelEmp) panelEmp.classList.remove("hidden");
         if (panelDj) panelDj.classList.add("hidden");
         if (options.focus) tabEmp.focus();
       } else {
-        tabDj.classList.add("active"); tabDj.setAttribute("aria-selected", "true");
-        tabEmp.classList.remove("active"); tabEmp.setAttribute("aria-selected", "false");
+        tabDj.classList.add("active");
+        tabDj.setAttribute("aria-selected", "true");
+        tabEmp.classList.remove("active");
+        tabEmp.setAttribute("aria-selected", "false");
         if (panelDj) panelDj.classList.remove("hidden");
         if (panelEmp) panelEmp.classList.add("hidden");
         if (options.focus) tabDj.focus();
@@ -629,17 +634,28 @@
       }
     }
 
+    // simple helper to update URL
     function setUrl(path, { replace = false } = {}) {
       try {
         if (replace) history.replaceState({}, "", path);
         else history.pushState({}, "", path);
       } catch (e) {
-        // ignore history errors in restricted contexts
         console.warn("History API error:", e);
       }
     }
 
-    // click handlers
+    // handle route based on current pathname
+    function handleRoute(options = {}) {
+      const path = (window.location.pathname || "").toLowerCase();
+      if (path.startsWith("/courses/dj-training")) {
+        activate(false, options); // DJ tab
+      } else {
+        // /courses, /courses/music-production, /courses.html -> EMP tab
+        activate(true, options);
+      }
+    }
+
+    // click handlers for tabs
     if (exists(tabEmp) && exists(tabDj)) {
       tabEmp.addEventListener("click", (e) => {
         e.preventDefault && e.preventDefault();
@@ -654,6 +670,7 @@
       });
     }
 
+    // hero CTA buttons
     if (exists(exploreEmp)) {
       exploreEmp.addEventListener("click", (e) => {
         e.preventDefault && e.preventDefault();
@@ -672,35 +689,18 @@
 
     // handle browser back/forward
     window.addEventListener("popstate", () => {
-      const path = (window.location.pathname || "").toLowerCase();
-      if (path.startsWith("/courses/music-production")) {
-        activate(true, { scroll: false, focus: true });
-      } else if (path.startsWith("/courses/dj-training")) {
-        activate(false, { scroll: false, focus: true });
-      } else {
-        activate(true, { scroll: false, focus: true });
-      }
+      handleRoute({ scroll: false, focus: true });
     });
 
     // initial route on page load
     (function handleInitialRoute() {
       const path = (window.location.pathname || "").toLowerCase();
+      handleRoute({ scroll: false });
 
-      // if user arrived at a deep page (server should have served the matching HTML)
-      if (path.startsWith("/courses/music-production")) {
-        activate(true, { scroll: false });
-        setUrl("/courses/music-production", { replace: true });
-        return;
+      // if someone opened /courses.html directly, normalise to /courses
+      if (path === "/courses.html") {
+        setUrl("/courses", { replace: true });
       }
-      if (path.startsWith("/courses/dj-training")) {
-        activate(false, { scroll: false });
-        setUrl("/courses/dj-training", { replace: true });
-        return;
-      }
-
-      // default to courses landing
-      activate(true, { scroll: false });
-      setUrl("/courses", { replace: true });
     })();
 
     // parallax visuals (safe)
@@ -716,7 +716,10 @@
         album.style.transform = `translate(${x * 18}px, ${y * 12}px) rotate(${x * 4}deg)`;
         studio.style.transform = `translate(${x * -12}px, ${y * -8}px) rotate(${x * -3}deg)`;
       });
-      hero.addEventListener("mouseleave", () => { album.style.transform = ""; studio.style.transform = ""; });
+      hero.addEventListener("mouseleave", () => {
+        album.style.transform = "";
+        studio.style.transform = "";
+      });
     })();
 
     // FAQ toggles
@@ -734,8 +737,13 @@
             if (a) a.style.display = "none";
             if (s) s.textContent = "+";
           });
-          if (!open) { ans.style.display = "block"; q.querySelector("span").textContent = "-"; }
-          else { ans.style.display = "none"; q.querySelector("span").textContent = "+"; }
+          if (!open) {
+            ans.style.display = "block";
+            q.querySelector("span").textContent = "-";
+          } else {
+            ans.style.display = "none";
+            q.querySelector("span").textContent = "+";
+          }
         });
       });
     })();
@@ -749,7 +757,11 @@
         if (!img.complete || img.naturalWidth === 0) {
           img.style.display = "block";
           img.alt = "";
-          img.src = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#071328"/></svg>');
+          img.src =
+            "data:image/svg+xml;utf8," +
+            encodeURIComponent(
+              '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#071328"/></svg>'
+            );
         }
       });
     })();
@@ -759,11 +771,17 @@
       const burger = document.querySelector(".hamburger-menu");
       const menu = document.querySelector(".nav-menu");
       if (!burger || !menu) return;
-      burger.addEventListener("click", () => { burger.classList.toggle("is-active"); menu.classList.toggle("is-active"); });
+      burger.addEventListener("click", () => {
+        burger.classList.toggle("is-active");
+        menu.classList.toggle("is-active");
+      });
       menu.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => { burger.classList.remove("is-active"); menu.classList.remove("is-active"); });
+        link.addEventListener("click", () => {
+          burger.classList.remove("is-active");
+          menu.classList.remove("is-active");
+        });
       });
     })();
   </script>
 </body>
-</html> 
+</html>
