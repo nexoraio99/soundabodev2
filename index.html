@@ -11,21 +11,18 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- Disable automatic phone number detection that can cause layout issues -->
+    <!-- Disable automatic phone number detection -->
     <meta name="format-detection" content="telephone=no">
     
     <!-- Android Chrome theme color -->
     <meta name="theme-color" content="#000000">
     <meta name="msapplication-navbutton-color" content="#000000">
     
-    <!-- Preconnect to critical domains for faster loading -->
-    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://www.googletagmanager.com">
-    
-    <!-- DNS Prefetch for better mobile performance -->
+    <!-- DNS Prefetch ONLY (remove preconnect to reduce blocking) -->
     <link rel="dns-prefetch" href="https://res.cloudinary.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://soundabodev2-server.onrender.com">
     
     <link rel="canonical" href="https://soundabode.com/">
@@ -34,7 +31,6 @@
 
     <!-- UPDATED META DESCRIPTION -->
     <meta name="description" content="Learn Music Production, DJing & Audio Engineering in Pune & India. Master Techno, Psytrance, Hip-Hop, Film Scoring & Game Music with industry mentors and pro studio gear.">
-
     <meta name="keywords" content="Music production course Pune India, Audio engineering course India, Sound engineering academy Pune India, Psytrance production India, Techno DJ training India, Hip-Hop beat-making Pune India, Game music composition India, Film background scoring India, Sound design for YouTube, EDM course India, Drum & Bass production India, House music production Pune India, Dubstep mixing India, Club DJ course Pune India, Underground music production India">
 
     <!-- GEO META -->
@@ -47,7 +43,6 @@
     <meta property="og:title" content="Soundabode | India's Leading Music Production, DJ & Audio Engineering Academy">
     <meta property="og:description" content="Learn Electronic, Techno, Psytrance, Hip-Hop, and Game & Film Sound Design at Soundabode Pune — India's top audio engineering academy.">
     <meta property="og:url" content="https://soundabode.com/">
-    <!-- UPDATED OG IMAGE (HERO BANNER, 1200x630) -->
     <meta property="og:image" content="/Assets/og-soundabode-cover.jpg">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_IN">
@@ -56,10 +51,223 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Soundabode | Music Production, DJ & Audio Engineering Academy">
     <meta name="twitter:description" content="Master Electronic, Techno, Psytrance, Hip-Hop, and Film Scoring at India's leading academy for modern sound.">
-    <!-- UPDATED TWITTER IMAGE -->
     <meta name="twitter:image" content="/Assets/og-soundabode-cover.jpg">
     
-    <!-- Google Tag Manager (lazy) -->
+    <!-- ========================================
+         CRITICAL CSS - EXPANDED FOR INSTANT RENDER
+         ======================================== -->
+    <style>
+      /* Reset & Base */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { 
+        scroll-behavior: smooth; 
+        max-width: 100vw; 
+        overflow-x: hidden;
+        background: #000;
+      }
+      body { 
+        margin: 0; 
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        background-color: #000000; 
+        color: #ffffff;
+        overflow-x: hidden;
+        min-height: 100vh;
+        -webkit-text-size-adjust: 100%;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Navbar - Critical for first paint */
+      .navbar { 
+        position: fixed;
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        padding: 10px clamp(12px, 5vw, 50px);
+        height: clamp(48px, 12vw, 60px);
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center;
+        z-index: 100;
+        background-color: rgba(10, 10, 10, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        opacity: 1;
+      }
+
+      /* Intro panels - critical structure */
+      .intro-overlay { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100vh;
+        display: flex; 
+        gap: 5px;
+        z-index: 50;
+        background: #000;
+      }
+      .intro-panel { 
+        width: 50%; 
+        height: 100%; 
+        position: relative; 
+        overflow: hidden;
+        background: #000;
+      }
+      .panel-left video, .panel-right video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+      }
+
+      /* Main content - critical for layout */
+      .main-content { 
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #050505;
+        z-index: 1;
+        opacity: 0;
+        padding: clamp(12px, 3vw, 20px);
+      }
+
+      /* Aurora text - critical for hero */
+      .aurora-text {
+        display: inline-block;
+        font-size: clamp(2.2rem, 8vw, 6rem);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, #ff0080 0%, #7928ca 25%, #0070f3 50%, #38bdf8 75%, #ff0080 100%);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* Popup - critical structure */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(24, 24, 24, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: 1000;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+      }
+      .popup-overlay.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      /* Hide elements until CSS loads */
+      .content-section,
+      .testimonials,
+      .site-footer {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      /* Loading state indicator */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+      }
+      body.loaded::before {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Images lazy load placeholder */
+      img { 
+        max-width: 100%; 
+        height: auto; 
+        display: block;
+        background: #111;
+      }
+    </style>
+
+    <!-- FAVICONS -->
+    <link rel="icon" href="/Assets/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="16x16" href="/Assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/Assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/Assets/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/Assets/favicon-64x64.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/Assets/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/Assets/favicon-512x512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png">
+
+    <!-- ========================================
+         FONT LOADING - OPTIMIZED WITH SWAP
+         ======================================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- ========================================
+         MAIN CSS - BLOCKING LOAD (FIX FOR FOUC)
+         ======================================== -->
+    <link rel="stylesheet" href="/style/style.css">
+    
+    <!-- ========================================
+         INLINE SCRIPT TO HANDLE LOAD STATE
+         ======================================== -->
+    <script>
+      // Mark page as loaded after styles are ready
+      window.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('loaded');
+        // Fade in sections
+        requestAnimationFrame(function() {
+          document.querySelectorAll('.content-section, .testimonials, .site-footer').forEach(function(el) {
+            el.style.opacity = '1';
+            el.style.visibility = 'visible';
+          });
+        });
+      });
+
+      // Fallback if load event takes too long
+      setTimeout(function() {
+        if (!document.body.classList.contains('loaded')) {
+          document.body.classList.add('loaded');
+          document.querySelectorAll('.content-section, .testimonials, .site-footer').forEach(function(el) {
+            el.style.opacity = '1';
+            el.style.visibility = 'visible';
+          });
+        }
+      }, 1500);
+    </script>
+
+    <!-- ANALYTICS - Deferred -->
     <script>
       (function(id){
         function loadGTM(){
@@ -70,59 +278,63 @@
           })(window,document,'script','dataLayer',id);
         }
         if('requestIdleCallback' in window){ requestIdleCallback(loadGTM); }
-        else { window.addEventListener('load', loadGTM); }
+        else { setTimeout(loadGTM, 1500); }
       })('GTM-KVRWZ2DP');
     </script>
 
-    <!-- Meta Pixel Code -->
+    <!-- Meta Pixel Code - Deferred -->
     <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window,document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '2260208107777252'); 
-    fbq('track', 'PageView');
+    setTimeout(function() {
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window,document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '2260208107777252'); 
+      fbq('track', 'PageView');
+    }, 2000);
     </script>
     <noscript>
       <img height="1" width="1" 
       src="https://www.facebook.com/tr?id=2260208107777252&ev=PageView&noscript=1" alt="fb pixel"/>
     </noscript>
-    <!-- End Meta Pixel Code -->
     
-    <!-- FAVICONS (LOCAL, CORRECT PATHS) -->
-    <link rel="icon" href="/Assets/favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="16x16" href="/Assets/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/Assets/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="/Assets/favicon-48x48.png">
-    <link rel="icon" type="image/png" sizes="64x64" href="/Assets/favicon-64x64.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/Assets/favicon-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/Assets/favicon-512x512.png">
-
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png">
-
-    <!-- Google Fonts - Optimized loading -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- CRITICAL: Android performance optimization script -->
+    <script>
+        (function() {
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const isLowEnd = navigator.hardwareConcurrency < 4 || (navigator.deviceMemory && navigator.deviceMemory < 4);
+            
+            if (isAndroid || isLowEnd) {
+                document.addEventListener('DOMContentLoaded', function() {
+                    const videos = document.querySelectorAll('video[autoplay]');
+                    videos.forEach(function(video) {
+                        const poster = video.getAttribute('poster');
+                        if (poster || isLowEnd) {
+                            video.removeAttribute('autoplay');
+                            video.pause();
+                            
+                            if (poster) {
+                                const img = document.createElement('img');
+                                img.src = poster;
+                                img.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;';
+                                img.loading = 'lazy';
+                                video.parentNode.insertBefore(img, video);
+                                video.style.display = 'none';
+                            }
+                        }
+                    });
+                    
+                    console.log('🤖 Android optimizations applied');
+                });
+            }
+        })();
+    </script>
     
-    <!-- Minimal critical CSS -->
-    <style>
-      html { background:#000; color:#fff; }
-      body { margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; min-height:100vh; -webkit-text-size-adjust:100%; }
-      .navbar { opacity:1; }
-      img { max-width:100%; height:auto; display:block; }
-    </style>
-
-    <!-- Preload and non-blocking load for stylesheet -->
-    <link rel="dns-prefetch" href="/style/style.css" as="style">
-    <link rel="stylesheet" href="/style/style.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="/style/style.css"></noscript>
-    
-    <!-- MERGED STRUCTURED DATA (ONE BLOCK, UNIFIED NAME + COURSE IMAGE) -->
+    <!-- MERGED STRUCTURED DATA -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org/",
@@ -155,9 +367,9 @@
             "@type": "ContactPoint",
             "telephone": "+91-9975016189",
             "contactType": "customer service",
-            "email": "mailto:services@soundabode.com",
+            "email": "services@soundabode.com",
             "areaServed": "IN",
-            "availableLanguage": "English"
+            "availableLanguage": "English",
             "url": "https://wa.me/919975016189"
           }
         },
@@ -225,38 +437,6 @@
         }
       ]
     }
-    </script>
-    
-    <!-- CRITICAL: Android performance optimization script -->
-    <script>
-        (function() {
-            const isAndroid = /Android/i.test(navigator.userAgent);
-            const isLowEnd = navigator.hardwareConcurrency < 4 || (navigator.deviceMemory && navigator.deviceMemory < 4);
-            
-            if (isAndroid || isLowEnd) {
-                document.addEventListener('DOMContentLoaded', function() {
-                    const videos = document.querySelectorAll('video[autoplay]');
-                    videos.forEach(function(video) {
-                        const poster = video.getAttribute('poster');
-                        if (poster || isLowEnd) {
-                            video.removeAttribute('autoplay');
-                            video.pause();
-                            
-                            if (poster) {
-                                const img = document.createElement('img');
-                                img.src = poster;
-                                img.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;';
-                                img.loading = 'lazy';
-                                video.parentNode.insertBefore(img, video);
-                                video.style.display = 'none';
-                            }
-                        }
-                    });
-                    
-                    console.log('🤖 Android optimizations applied');
-                });
-            }
-        })();
     </script>
 </head>
 <body>
@@ -362,7 +542,7 @@
             </video>
             <div class="overlay-right">
                 <h2 class="right-font">Create Sounds That Move The World.</h2>
-                <p>Craft your own sonic identity with Soundabode’s Music Production & Audio Engineering Courses in Pune, India. Master sound design, arrangement, and mixing from the first note to your final release. Build, produce, and release music that’s uniquely you.</p>
+                <p>Craft your own sonic identity with Soundabode's Music Production & Audio Engineering Courses in Pune, India. Master sound design, arrangement, and mixing from the first note to your final release. Build, produce, and release music that's uniquely you.</p>
                 <a href="/courses" class="glow-border" style="display:inline-block; margin-top: 12px;">Explore Courses</a>
             </div>
         </div>
@@ -431,8 +611,8 @@
                 <div class="about-container">
                     <div class="content">
                         <h2>Learn. Mix. Perform.</h2>
-                        <p>Turn your passion for music into real-world DJ skills with Soundabode's pro DJ courses from beginner decks to club-ready sets. Hands-on training on industry standard gear. Learn beatmatching, mixing, and live performance. Mentorship from real performing DJs. Flexible batches for creators, students & night owls. Master Pioneer CDJs, Rekordbox & Traktor while performing across genres Techno, Psytrance, House, Hip-Hop & Club music. Learn from India’s touring DJs. Join India's fastest growing DJ community powered by Native Instrument's Traktor + Pioneer DJ. Start your DJ journey today at Soundabode where artists are made, not born. Join our DJ training courses in Pune, India or take an online DJ course.</p>
-                        <a href="contact.html">
+                        <p>Turn your passion for music into real-world DJ skills with Soundabode's pro DJ courses from beginner decks to club-ready sets. Hands-on training on industry standard gear. Learn beatmatching, mixing, and live performance. Mentorship from real performing DJs. Flexible batches for creators, students & night owls. Master Pioneer CDJs, Rekordbox & Traktor while performing across genres Techno, Psytrance, House, Hip-Hop & Club music. Learn from India's touring DJs. Join India's fastest growing DJ community powered by Native Instrument's Traktor + Pioneer DJ. Start your DJ journey today at Soundabode where artists are made, not born. Join our DJ training courses in Pune, India or take an online DJ course.</p>
+                        <a href="/contact">
                             Learn More
                             <svg width="100%" height="1.5em" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M6 12h12.5m0 0l-6-6m6 6l-6 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -466,7 +646,7 @@
                     <div class="content1">
                         <h2>Produce. Create. Release.</h2>
                         <p>Dive into the world of Electronic Music Production with Soundabode where creativity meets technology. Learn Ableton Live from certified mentors. Craft your own sound from scratch. Mix & master like the pros. Build your artist identity and release-ready tracks. From bedroom beats to festival feeds it all starts here. Join Soundabode, India's next-gen music production school built for artists who want more than tutorials — they want results. Learn to produce across styles Electronic, Techno, Psytrance, Hip-Hop, House, Drum & Bass, Dubstep, and EDM using Ableton Live, professional hardware, and real-world studio workflows. Go beyond music production — explore game music composition, background scoring for films, web series, and advertisements, sound design for YouTube creators. Our courses also empower classically trained musicians to start their own independent studio setups and transform their compositions into professional releases. Craft, compose and produce your signature sound through expert-led programs designed for aspiring producers, creators and YouTubers.</p>
-                        <a href="contact.html">
+                        <a href="/contact">
                             Learn More
                             <svg width="100%" height="1.5em" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M6 12h12.5m0 0l-6-6m6 6l-6 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -678,7 +858,7 @@
         </div>
   
         <div class="studio-footer">
-          <a href="/contact.html" class="studio-cta">Book a Studio Tour</a>
+          <a href="/contact" class="studio-cta">Book a Studio Tour</a>
         </div>
       </div>
   
@@ -713,7 +893,7 @@
               <li>Learn on industry-grade hardware and VSTs (Arturia, Moog, Nord, Virus Ti)</li>
               <li>Guest masterclasses by top Indian electronic producers</li>
               <li>Exposure to real-world production environments</li>
-              <li>Collaborate through Soundabode’s producer network & global community</li>
+              <li>Collaborate through Soundabode's producer network & global community</li>
               <li>Free studio access + 1-month internship with real client projects</li>
               <li>Mentorship in career development, branding, and artist growth</li>
             </ul>
@@ -726,7 +906,7 @@
             <h3 class="card-title">Hands-On Studio Training</h3>
             <ul class="card-list">
               <li>100% hands-on studio training</li>
-              <li>Access to India’s most advanced production setups</li>
+              <li>Access to India's most advanced production setups</li>
             </ul>
             <a class="learn-btn" href="/contact">Learn more →</a>
           </article>
@@ -804,7 +984,7 @@
             <span class="faq-toggle">+</span>
           </button>
           <div class="faq-body" hidden>
-            <p>Yes. Soundabode’s DJ training prepares you for real events across India using Pioneer CDJs and Rekordbox workflows.</p>
+            <p>Yes. Soundabode's DJ training prepares you for real events across India using Pioneer CDJs and Rekordbox workflows.</p>
           </div>
         </div>
 
