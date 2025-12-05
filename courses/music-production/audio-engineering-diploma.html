@@ -1323,68 +1323,58 @@
 
   </main>
 
-  <!-- ENROLL MODAL -->
-  <div class="modal-backdrop" id="enrollModal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
-    <div class="modal" role="document" aria-modal="true">
+  <!-- ENROLL MODAL (REPLACED) -->
+  <!-- Replaced the previous modal with the extracted standalone enroll popup form -->
+  <div id="enroll-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="enroll-modal-title">
+    <div class="modal" role="document" tabindex="-1" aria-describedby="form-note">
       <div class="modal-header">
-        <div>
-          <h3 class="modal-title" id="modalTitle">Enroll — Soundabode Level 3</h3>
-          <div class="modal-sub">Fill details below and our team will get back to you shortly.</div>
-        </div>
-        <button class="modal-close" id="modalClose" aria-label="Close enroll form">&times;</button>
+        <h3 class="modal-title" id="enroll-modal-title">Enroll / Book Demo — Soundabode Level 3</h3>
+        <button class="modal-close" id="modal-close-btn" aria-label="Close modal">&times;</button>
       </div>
 
-      <form id="enrollForm" class="enroll-form" autocomplete="on" novalidate>
-        <div class="field">
-          <label for="name">Full name *</label>
-          <input id="name" name="name" type="text" placeholder="Your full name" required />
-        </div>
+      <div class="modal-body">
+        <form id="enroll-form" action="#" method="POST" novalidate>
+          <div style="display:grid; gap:10px;">
+            <div>
+              <label class="label" for="en-name">Full name</label>
+              <input id="en-name" name="name" class="input" type="text" required placeholder="Your full name" />
+            </div>
 
-        <div class="field">
-          <label for="email">Email *</label>
-          <input id="email" name="email" type="email" placeholder="you@example.com" required />
-        </div>
+            <div>
+              <label class="label" for="en-phone">Phone number</label>
+              <input id="en-phone" name="phone" class="input" type="tel" required placeholder="+91 9xxxxxxxxx" />
+            </div>
 
-        <div class="field">
-          <label for="phone">Phone number *</label>
-          <input id="phone" name="phone" type="tel" placeholder="997-501-6189" required />
-        </div>
+            <div>
+              <label class="label" for="en-email">Email address</label>
+              <input id="en-email" name="email" class="input" type="email" placeholder="you@domain.com" />
+            </div>
 
-        <div class="field">
-          <label for="interested">Interested in *</label>
-          <select id="interested" name="interested" required>
-            <option value="">Select course</option>
-            <option value="level1">Level 1 - Beginner (Music Production)</option>
-            <option value="level2">Level 2 - Intermediate</option>
-            <option value="Level3">Level 3 - Expert</option>
-            <option value="level4">Level 4 - Diploma</option>
-          </select>
-        </div>
+            <div>
+              <label class="label" for="en-course">Interested in</label>
+              <select id="en-course" name="course" class="input">
+                <option value="level1">Level 1 - Beginner (Music Production)</option>
+                <option value="level2">Level 2 - Intermediate</option>
+                <option value="Level3">Level 3 - Expert</option>
+                <option value="level4">Level 4 - Diploma</option>
+              </select>
+            </div>
 
-        <div class="field">
-          <label for="batch">Preferred batch (optional)</label>
-          <select id="batch" name="batch">
-            <option value="">No preference</option>
-            <option value="weekday">Weekday</option>
-            <option value="weekend">Weekend</option>
-            <option value="evening">Evening</option>
-          </select>
-        </div>
+            <div>
+              <label class="label" for="en-message">Message (optional)</label>
+              <textarea id="en-message" name="message" class="input" rows="3" placeholder="Any questions?"></textarea>
+            </div>
+          </div>
 
-        <div class="field" style="grid-column:1 / -1;">
-          <label for="message">Message (optional)</label>
-          <textarea id="message" name="message" placeholder="Any additional details (goals, prior experience, etc.)"></textarea>
-        </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="modal-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="modal-submit">Send enquiry</button>
+          </div>
 
-        <div class="form-note">We will never share your information. Required fields are marked *</div>
-
-        <div class="form-status" id="formStatus" aria-live="polite"></div>
-
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" id="modalCancel">Cancel</button>
-          <button type="submit" class="btn-submit" id="submitEnroll">Submit Enquiry</button>
-        </div>
-      </form>
+          <div class="form-note" id="form-note">We will contact you within 24 hours. This is a demo submission (no backend configured).</div>
+          <div class="form-success" id="form-success" role="status" aria-live="polite">Thanks — your enquiry has been received. We'll call soon.</div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -1530,107 +1520,125 @@
     })();
 
     /* ---------------------------
-       Enroll modal behavior
+       Enroll modal behavior (REPLACED)
+       Using the extracted standalone modal logic
        --------------------------- */
     (function () {
-      const modalBackdrop = document.getElementById("enrollModal");
-      const openButtons = document.querySelectorAll(".open-enroll");
-      const modalClose = document.getElementById("modalClose");
-      const modalCancel = document.getElementById("modalCancel");
-      const enrollForm = document.getElementById("enrollForm");
-      const formStatus = document.getElementById("formStatus");
+      const modalOverlay = document.getElementById('enroll-modal');
+      const modal = modalOverlay ? modalOverlay.querySelector('.modal') : null;
+      const closeBtn = document.getElementById('modal-close-btn');
+      const cancelBtn = document.getElementById('modal-cancel');
+      const form = document.getElementById('enroll-form');
+      const formNote = document.getElementById('form-note');
+      const formSuccess = document.getElementById('form-success');
+      let lastFocused = null;
 
-      function openModal(e) {
-        if (e) e.preventDefault();
-        modalBackdrop.classList.add("is-active");
-        modalBackdrop.setAttribute("aria-hidden", "false");
-        // focus first input for accessibility
-        const first = enrollForm.querySelector("input, select, textarea");
+      function openModal() {
+        if (!modalOverlay) return;
+        lastFocused = document.activeElement;
+        modalOverlay.classList.add('is-open');
+        modalOverlay.setAttribute('aria-hidden', 'false');
+        const first = modalOverlay.querySelector('input, select, textarea, button');
         if (first) first.focus();
+        document.addEventListener('focus', trapFocus, true);
+        document.addEventListener('keydown', handleKeydown);
       }
 
       function closeModal() {
-        modalBackdrop.classList.remove("is-active");
-        modalBackdrop.setAttribute("aria-hidden", "true");
-        formStatus.textContent = "";
+        if (!modalOverlay) return;
+        modalOverlay.classList.remove('is-open');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.removeEventListener('focus', trapFocus, true);
+        document.removeEventListener('keydown', handleKeydown);
+        if (formSuccess) formSuccess.style.display = 'none';
+        if (formNote) formNote.style.display = '';
+        if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
       }
 
-      openButtons.forEach((btn) => btn.addEventListener("click", openModal));
-      modalClose.addEventListener("click", closeModal);
-      modalCancel.addEventListener("click", closeModal);
+      function trapFocus(e) {
+        if (!modal) return;
+        if (!modal.contains(e.target)) {
+          e.stopPropagation();
+          const focusable = modal.querySelector('input,select,textarea,button,a[href],[tabindex]:not([tabindex="-1"])');
+          if (focusable) focusable.focus();
+        }
+      }
 
-      // Close on overlay click
-      modalBackdrop.addEventListener("click", (e) => {
-        if (e.target === modalBackdrop) closeModal();
-      });
+      function handleKeydown(e) {
+        if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+        if (e.key === 'Tab' && modal) {
+          const focusables = modal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])');
+          const nodes = Array.from(focusables);
+          if (!nodes.length) return;
+          const first = nodes[0], last = nodes[nodes.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
 
-      // Close on Escape
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && modalBackdrop.classList.contains("is-active")) {
-          closeModal();
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+      if (modalOverlay) {
+        modalOverlay.addEventListener('click', function (e) {
+          if (e.target === modalOverlay) closeModal();
+        });
+      }
+
+      // Intercept clicks on any "enroll" or demo links
+      document.addEventListener('click', function (e) {
+        const el = e.target.closest ? e.target.closest('a') : null;
+        if (!el) return;
+        const href = (el.getAttribute('href') || '').trim();
+        const openAttr = el.getAttribute('data-open-enroll');
+
+        if (href === '/enroll' || href === '#popup' || openAttr !== null) {
+          e.preventDefault();
+          openModal();
         }
       });
 
-      // Submit handler
-      enrollForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        formStatus.textContent = "";
-        const data = {
-          name: enrollForm.name.value.trim(),
-          email: enrollForm.email.value.trim(),
-          phone: enrollForm.phone.value.trim(),
-          interested: enrollForm.interested.value,
-          batch: enrollForm.batch.value,
-          message: enrollForm.message.value.trim(),
-          page: location.pathname
-        };
-
-        // Basic validation
-        if (!data.name || !data.email || !data.phone || !data.interested) {
-          formStatus.style.color = "#ffb4b4";
-          formStatus.textContent = "Please fill all required fields (name, email, phone, course).";
-          return;
-        }
-
-        // show sending
-        formStatus.style.color = "var(--muted)";
-        formStatus.textContent = "Sending...";
-
-        // Try POST to /api/enroll (optional backend). If it fails, fallback to mailto:
-        try {
-          const res = await fetch("/api/enroll", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-          });
-
-          if (res.ok) {
-            formStatus.style.color = "#9fffc1";
-            formStatus.textContent = "Thanks! Your enquiry has been received. We'll contact you shortly.";
-            enrollForm.reset();
-            setTimeout(closeModal, 2000);
+      // Form submit - simulated; replace with real AJAX if needed
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const name = (form.querySelector('#en-name') && form.querySelector('#en-name').value || '').trim();
+          const phone = (form.querySelector('#en-phone') && form.querySelector('#en-phone').value || '').trim();
+          if (!name) {
+            alert('Please enter your name.');
+            if (form.querySelector('#en-name')) form.querySelector('#en-name').focus();
             return;
-          } else {
-            // fallback to mailto
-            throw new Error("server_error");
           }
-        } catch (err) {
-          // fallback -> open mailto prefilled so data reaches you without backend
-          const subject = encodeURIComponent("New enrollment enquiry — Soundabode");
-          const body = encodeURIComponent(
-            `Name: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nInterested: ${data.interested}\nBatch: ${data.batch}\nMessage: ${data.message}\nPage: ${data.page}`
-          );
-          // Use your email here
-          const mail = `mailto:services@soundabode.com?subject=${subject}&body=${body}`;
-          // open mail client
-          window.location.href = mail;
+          if (!phone) {
+            alert('Please enter your phone number.');
+            if (form.querySelector('#en-phone')) form.querySelector('#en-phone').focus();
+            return;
+          }
 
-          formStatus.style.color = "#9fffc1";
-          formStatus.textContent = "Opened mail client as fallback. If you don't have a mail client, please contact services@soundabode.com";
-          enrollForm.reset();
-          setTimeout(closeModal, 1500);
-        }
-      });
+          if (formNote) formNote.style.display = 'none';
+          if (formSuccess) formSuccess.style.display = '';
+
+          // TODO: send to your backend; example:
+          /*
+          const payload = {
+            name,
+            phone,
+            email: form.querySelector('#en-email')?.value || '',
+            course: form.querySelector('#en-course')?.value || '',
+            message: form.querySelector('#en-message')?.value || ''
+          };
+          fetch('/api/enquiry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).then(res => { ... })
+          */
+
+          setTimeout(() => { closeModal(); }, 2000);
+        });
+      }
+
+      // prevent default for anchors with href="#"
+      document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', (ev) => ev.preventDefault()));
     })();
   </script>
 </body>
