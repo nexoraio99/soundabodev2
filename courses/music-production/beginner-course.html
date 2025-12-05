@@ -7,144 +7,87 @@
   <meta name="description" content="Start your music production journey with Soundabode in Pune. Learn Ableton Live, music theory, and sound design in India’s most practical beginner course." />
   <meta name="theme-color" content="#000000" />
 
-  <!-- Favicon / App Icons -->
+  <!-- Favicons -->
   <link rel="icon" href="/Assets/favicon.ico" sizes="any" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/Assets/favicon-16x16.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/Assets/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="48x48" href="/Assets/favicon-48x48.png" />
-  <link rel="icon" type="image/png" sizes="64x64" href="/Assets/favicon-64x64.png" />
-  <link rel="icon" type="image/png" sizes="192x192" href="/Assets/favicon-192x192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="/Assets/favicon-512x512.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png" />
-  <link rel="manifest" href="/site.webmanifest" />
 
   <style>
-    :root {
-      --bg-1: #000000;
-      --bg-2: #080808;
-      --glass: rgba(255, 255, 255, 0.04);
-      --glass-2: rgba(255, 255, 255, 0.06);
-      --neon-1: #bcbcbc;
-      --neon-2: #777777;
-      --muted: #9aa6b2;
-      --card-radius: 16px;
-      --container: 1120px;
+    :root{
+      --bg:#000;
+      --muted:#9aa6b2;
+      --neon-1:#bcbcbc;
+      --neon-2:#777777;
+      --container:1120px;
     }
-
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: #000;
-      color: #e8eef6;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      padding-bottom: 80px;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background:var(--bg);
+      color:#e8eef6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding-bottom:80px;
     }
-    a { color: inherit; text-decoration: none; }
-    .container { max-width: var(--container); margin: 0 auto; padding: 0 20px; }
-    .muted { color: var(--muted); }
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--container);margin:0 auto;padding:0 20px}
+    .muted{color:var(--muted)}
 
-    /* NAVBAR */
-    .navbar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 10px clamp(12px, 5vw, 50px);
-      height: clamp(48px, 12vw, 60px);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      z-index:100;
-      background-color: rgba(10,10,10,0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .nav-links { display:flex; gap:clamp(20px,5vw,40px); flex:1; justify-content:center; }
-    .nav-actions { display:flex; gap:clamp(8px,2vw,15px); align-items:center; }
-    .logo-img { height: clamp(20px,5vw,40px); }
+    /* NAV */
+    .navbar{position:fixed;top:0;left:0;width:100%;padding:10px clamp(12px,5vw,50px);display:flex;align-items:center;gap:10px;justify-content:space-between;background:rgba(8,8,10,0.6);backdrop-filter:blur(8px);z-index:1200;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .logo-img{height:36px}
+    .hamburger-menu{display:none;background:none;border:0;cursor:pointer;padding:6px}
+    .hamburger-menu .bar{width:22px;height:2px;background:#fff;display:block;margin:4px 0;transition:transform .25s,opacity .25s}
+    @media(max-width:768px){ .hamburger-menu{display:block} .nav-links{display:none} }
 
-    /* small mobile menu (markup added later) */
-    .hamburger-menu { display:none; background:none; border:0; cursor:pointer; padding:0; z-index:101; }
-    .hamburger-menu .bar { display:block; width:25px; height:2px; background:#fff; margin:5px 0; transition:transform .3s, opacity .3s; }
-    @media (max-width:768px){ .hamburger-menu{ display:block } .nav-links{ display:none } }
+    .nav-menu{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:26px;transform:translateX(100%);transition:transform .35s;z-index:1199}
+    .nav-menu.is-active{transform:translateX(0)}
+    .nav-menu a{color:#fff;font-size:1.25rem}
 
-    .nav-menu {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100vh;
-      background: rgba(0,0,0,0.95);
-      display:flex; flex-direction:column; justify-content:center; align-items:center;
-      gap:32px;
-      transform: translateX(100%);
-      transition: transform .35s cubic-bezier(.76,0,.24,1);
-      z-index: 1050;
-    }
-    .nav-menu.is-active { transform: translateX(0); }
-    .nav-menu a { color:#fff; font-size:1.4rem; }
+    /* HERO + UI */
+    .hero{display:grid;grid-template-columns:1fr;gap:28px;align-items:center;margin-top:92px}
+    @media(min-width:1020px){ .hero{grid-template-columns:1.2fr 0.9fr} }
+    .hero-kicker{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+    .gradient-text{background:linear-gradient(90deg,var(--neon-1),var(--neon-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+    .btn-primary{background:linear-gradient(90deg,var(--neon-1),var(--neon-2));color:#041014;border:0;padding:10px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+    .btn-outline{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);color:#e8eef6;padding:10px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+
+    .hero-visual{position:relative;height:360px;border-radius:16px;overflow:hidden;background:#020617;border:1px solid rgba(255,255,255,0.02)}
+    .floating-img{position:absolute;border-radius:12px;object-fit:cover;z-index:3}
+    .floating-img.album{left:24px;top:24px;width:170px;height:170px}
+    .floating-img.studio{right:24px;bottom:24px;width:140px;height:140px}
+
+    .meta-pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);color:var(--muted)}
 
     /* modal */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-      display: none; align-items:center; justify-content:center; z-index:1200; padding: 20px;
-    }
-    .modal-overlay.is-open { display:flex; }
-    .modal {
-      width: 100%; max-width: 720px;
-      background: linear-gradient(180deg, rgba(15,15,15,0.98), rgba(10,10,12,0.98));
-      border-radius: 12px; padding: 20px; box-shadow: 0 14px 40px rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.04); color:#e8eef6;
-    }
-    .modal-header { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .modal-title { margin:0; font-size:18px; }
-    .modal-close { background:transparent; color:#fff; border:0; font-size:20px; cursor:pointer; padding:6px; }
-    .modal-body { margin-top:12px; }
-    .modal-row { display:grid; gap:8px; grid-template-columns:1fr 1fr; }
-    @media (max-width:560px){ .modal-row{ grid-template-columns:1fr } }
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:1400}
+    .modal-overlay.is-open{display:flex}
+    .modal{width:100%;max-width:720px;background:linear-gradient(180deg,#0b0b0d,#050507);border-radius:12px;padding:20px;color:#e8eef6;box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center}
+    .modal-title{margin:0;font-size:18px}
+    .modal-close{background:transparent;border:0;color:#fff;font-size:20px;cursor:pointer;padding:6px}
+    .modal-body{margin-top:12px}
+    .label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    .input,textarea,select{width:100%;padding:10px;border-radius:8px;background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.06);color:#fff;font-size:14px;outline:none}
+    .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+    .form-note{font-size:13px;color:var(--muted);margin-top:8px}
+    .form-success{font-size:14px;color:#9cedc9;margin-top:8px;display:none;font-weight:600}
 
-    .input, textarea, select {
-      width:100%; padding:10px 12px; border-radius:8px;
-      background: rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.06); color:#fff; font-size:14px; outline:none;
-    }
-    .label { font-size:12px; color: var(--muted); margin-bottom:6px; display:block; }
-
-    .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
-    .btn { padding:10px 14px; border-radius:8px; cursor:pointer; border:none; font-weight:600; }
-    .btn-primary { background: linear-gradient(90deg,var(--neon-1),var(--neon-2)); color:#041014; }
-    .btn-ghost { background:transparent; border:1px solid rgba(255,255,255,0.06); color:#e8eef6; }
-
-    .form-note { font-size:13px; color: var(--muted); margin-top:8px; }
-    .form-success { color:#9cedc9; margin-top:8px; font-weight:600; display:none; }
-
-    /* Hero / cards / footer — kept minimal representations (your full styles can remain) */
-    .hero { display:grid; grid-template-columns:1fr; gap:28px; align-items:center; margin-top:80px; }
-    @media (min-width:1020px){ .hero{ grid-template-columns:1.2fr 0.9fr } }
-    .hero-kicker{ font-size:13px; color:var(--muted); text-transform:uppercase; }
-    .gradient-text{ background: linear-gradient(90deg,var(--neon-1),var(--neon-2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .cta-row{ margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; }
-    .btn-outline { padding:11px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:#e8eef6; font-weight:700; cursor:pointer; }
-
-    .floating-img { position:absolute; border-radius:12px; object-fit:cover; z-index:3; }
-    .floating-img.album { left:26px; top:26px; width:170px; height:170px; }
-    .floating-img.studio { right:26px; bottom:26px; width:140px; height:140px; }
-
-    .site-footer { background-color:#000; font-family:"Roboto Mono",monospace; color:#fff; padding:18px 20px; border-top:1px solid #2222222e; position:relative; z-index:2; margin-top:40px; }
-
-    @media (max-width:768px){ .hero{ margin-top:72px } }
-
+    /* footer */
+    .site-footer{background:#000;padding:20px;color:#fff;margin-top:40px}
+    .footer-columns{display:flex;gap:40px;flex-wrap:wrap}
+    @media(max-width:720px){ .hero{margin-top:86px} .hero-visual{height:280px} }
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
-  <nav class="navbar" role="navigation" aria-label="Main">
-    <a href="/index.html" class="logo" aria-label="Soundabode Home">
-      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img" />
-    </a>
+  <!-- NAV -->
+  <nav class="navbar" role="navigation" aria-label="Primary">
+    <a href="/index.html" aria-label="Home"><img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="Soundabode" class="logo-img"></a>
 
-    <div class="nav-links" role="menubar">
+    <div class="nav-links" role="menubar" aria-label="Main menu">
       <a href="/about.html" role="menuitem">About</a>
       <a href="/courses.html" role="menuitem">Courses</a>
       <a href="/contact.html" role="menuitem">Contact</a>
@@ -154,14 +97,12 @@
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <div class="nav-actions">
-      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion('call')" aria-label="Call Soundabode">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor"/></svg>
-      </a>
+    <div style="display:flex;gap:10px;align-items:center">
+      <a href="tel:+919975016189" class="action-btn" title="Call us" aria-label="Call">📞</a>
     </div>
   </nav>
 
-  <!-- MOBILE NAV (hidden by default) -->
+  <!-- Mobile menu -->
   <div id="site-nav" class="nav-menu" aria-hidden="true">
     <a href="/about.html">About</a>
     <a href="/courses.html">Courses</a>
@@ -169,58 +110,48 @@
   </div>
 
   <!-- MAIN -->
-  <main class="container" style="margin-top:6px;">
-    <!-- HERO -->
+  <main class="container" style="margin-top:86px;">
     <section class="hero" aria-labelledby="hero-heading">
       <div>
         <div class="hero-kicker">Music Production · Level 1</div>
         <h1 id="hero-heading">Level 1 – Beginner: Music Production / Audio Workstation
           <span class="gradient-text">Best Music Production Course in Pune for Beginners</span>
         </h1>
+        <p class="muted">Transform your musical ideas into professional-quality tracks.</p>
 
-        <p class="hero-subtitle">Transform your musical ideas into professional-quality tracks.</p>
-
-        <div class="hero-meta-row" style="display:flex; gap:12px; margin-top:10px;">
-          <div class="meta-pill" style="padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); color:var(--muted);">3 months training + 1 month internship</div>
-          <div class="meta-pill" style="padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); color:var(--muted);">Ableton Live workflow + studio practice</div>
-          <div class="meta-pill" style="padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); color:var(--muted);">Beginner-friendly · No prior experience</div>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+          <div class="meta-pill">3 months training + 1 month internship</div>
+          <div class="meta-pill">Ableton Live workflow + studio practice</div>
+          <div class="meta-pill">Beginner-friendly · No prior experience</div>
         </div>
 
-        <div class="cta-row" style="margin-top:18px;">
-          <!-- Book a demo opens modal (data-open-enroll present) -->
+        <div class="cta-row" style="margin-top:16px;">
+          <!-- data-open-enroll ensures we open modal and do not navigate -->
           <a class="btn-primary" href="/contact.html" data-open-enroll="demo" role="button">Book A Free Demo Class</a>
-
-          <!-- Enroll opens modal (href /enroll will be intercepted) -->
           <a class="btn-outline" href="/enroll" data-open-enroll="enroll" role="button">Enroll Now</a>
         </div>
       </div>
 
-      <div style="position:relative;">
-        <div class="hero-visual" id="hero-visual" role="img" aria-label="Music producer working in Soundabode studio on Ableton Live" style="position:relative; height:360px; border-radius:20px; overflow:hidden; background:#000;">
-          <div class="gradient-layer" style="position:absolute; inset:0;"></div>
-          <div class="particles" style="position:absolute; inset:0; pointer-events:none;">
-            <div class="particle" style="top:18%; left:20%;"></div>
-            <div class="particle" style="top:32%; left:70%;"></div>
-            <div class="particle" style="top:58%; left:42%;"></div>
-            <div class="particle" style="top:68%; left:80%;"></div>
-          </div>
-
-          <img src="images/emp-album-1.jpg" alt="Ableton Live project on screen" class="floating-img album" id="float-album" onerror="this.style.display='none'"/>
-          <img src="images/emp-studio-1.jpg" alt="Soundabode music production studio" class="floating-img studio" id="float-studio" onerror="this.style.display='none'"/>
+      <div>
+        <div class="hero-visual" id="hero-visual" role="img" aria-label="Studio visuals">
+          <div style="position:absolute;inset:0;pointer-events:none"></div>
+          <img src="images/emp-album-1.jpg" alt="Album mock" class="floating-img album" id="float-album" onerror="this.style.display='none'">
+          <img src="images/emp-studio-1.jpg" alt="Studio mock" class="floating-img studio" id="float-studio" onerror="this.style.display='none'">
         </div>
       </div>
     </section>
 
-    <!-- (omitted: rest of your content — keep as in your page) -->
-    <!-- CTA section (bottom) -->
-    <section class="enroll-bottom" aria-label="Enroll call to action" style="margin-top:32px;">
+    <!-- (rest of your page content omitted for brevity in this snippet — keep your original sections here: overview, curriculum, faq, etc.) -->
+
+    <!-- bottom CTA -->
+    <section class="enroll-bottom" aria-label="Enroll CTA" style="margin-top:32px">
       <div>
-        <h3 style="margin:0;">Ready to start your Music Production journey?</h3>
-        <div class="muted" style="margin-top:6px;">Join Pune’s fastest-growing community of music producers and audio engineers. Start your journey today with <strong>Soundabode Music Production Level 1</strong>.</div>
+        <h3 style="margin:0">Ready to start your Music Production journey?</h3>
+        <div class="muted" style="margin-top:6px">Join Pune’s fastest-growing community of music producers and audio engineers.</div>
       </div>
-      <div class="actions" style="display:flex; gap:8px;">
-        <a class="btn-primary" href="/enroll" data-open-enroll="enroll" role="button">Enroll Now</a>
-        <a class="btn-outline" href="/contact.html" data-open-enroll="demo" role="button">Talk To Our Team</a>
+      <div style="display:flex;gap:8px;align-items:center">
+        <a class="btn-primary" href="/enroll" data-open-enroll="enroll">Enroll Now</a>
+        <a class="btn-outline" href="/contact.html" data-open-enroll="demo">Talk To Our Team</a>
       </div>
     </section>
   </main>
@@ -230,12 +161,12 @@
     <div class="modal" role="document" tabindex="-1" aria-describedby="form-note">
       <div class="modal-header">
         <h3 class="modal-title" id="enroll-modal-title">Enroll / Book Demo — Soundabode Level 1</h3>
-        <button class="modal-close" aria-label="Close modal" id="modal-close-btn">&times;</button>
+        <button class="modal-close" id="modal-close-btn" aria-label="Close">×</button>
       </div>
 
       <div class="modal-body">
-        <form id="enroll-form" action="#" method="POST" novalidate>
-          <div style="display:grid; gap:10px;">
+        <form id="enroll-form" action="#" method="post" novalidate>
+          <div style="display:grid;gap:10px">
             <div>
               <label class="label" for="name">Full name</label>
               <input id="name" name="name" class="input" type="text" required placeholder="Your full name" />
@@ -271,8 +202,8 @@
             <button type="submit" class="btn btn-primary" id="modal-submit">Send enquiry</button>
           </div>
 
-          <div class="form-note" id="form-note">We will contact you within 24 hours. This is a demo submission (no backend configured).</div>
-          <div class="form-success" id="form-success">Thanks — your enquiry has been received. We'll call soon.</div>
+          <div id="form-note" class="form-note">We will contact you within 24 hours. This is a demo submission (no backend configured).</div>
+          <div id="form-success" class="form-success" role="status" aria-live="polite">Thanks — your enquiry has been received. We'll call soon.</div>
         </form>
       </div>
     </div>
@@ -280,25 +211,32 @@
 
   <!-- FOOTER -->
   <footer class="site-footer">
-    <div class="footer-container">
+    <div class="container">
       <div class="footer-columns">
-        <div class="footer-column"><h4>ABOUT</h4><ul><li><a href="about.html">ABOUT</a></li><li><a href="courses.html">COURSES</a></li><li><a href="contact.html">CONTACT</a></li></ul></div>
-        <div class="footer-column"><h4>LOCATION</h4><p>VISION 9, 2ND FLOOR,<br/>KUNAL ICON RD,<br/>PIMPLE SAUDAGAR, PUNE,<br/>MAHARASHTRA 411017</p></div>
-        <div class="footer-column"><h4>SOCIALS</h4><ul><li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">INSTAGRAM</a></li><li><a href="https://www.facebook.com/soundabode/" target="_blank" rel="noopener noreferrer">FACEBOOK</a></li><li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YOUTUBE</a></li></ul></div>
-        <div class="footer-column"><h4>PRIVACY POLICY</h4><ul><li><a href="privacy.html">PRIVACY POLICY</a></li></ul></div>
+        <div>
+          <h4>ABOUT</h4>
+          <ul style="padding:0;margin:0;list-style:none">
+            <li><a href="/about.html">ABOUT</a></li>
+            <li><a href="/courses.html">COURSES</a></li>
+            <li><a href="/contact.html">CONTACT</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>LOCATION</h4>
+          <p class="muted">VISION 9, 2ND FLOOR, KUNAL ICON RD, PIMPLE SAUDAGAR, PUNE 411017</p>
+        </div>
       </div>
-      <div class="footer-copyright"><p><span id="year"></span> © SOUNDABODE. All rights reserved.</p></div>
+
+      <div style="margin-top:12px;color:var(--muted)"><span id="year"></span> © SOUNDABODE. All rights reserved.</div>
     </div>
   </footer>
 
   <script>
     // dynamic year
-    (function () {
-      const y = document.getElementById("year");
-      if (y) y.textContent = new Date().getFullYear();
-    })();
+    (function(){ const y=document.getElementById('year'); if(y) y.textContent = new Date().getFullYear(); })();
 
-    // small safe helpers - guard for elements that may not exist
+    // Elements (guarded)
     const modalOverlay = document.getElementById('enroll-modal');
     const modal = modalOverlay ? modalOverlay.querySelector('.modal') : null;
     const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -307,187 +245,97 @@
     const formSuccess = document.getElementById('form-success');
     const formNote = document.getElementById('form-note');
 
-    // Focus trap variables
-    let lastFocusedElementBeforeModal = null;
+    let lastFocused = null;
 
-    function openModal() {
-      if (!modalOverlay) return;
-      lastFocusedElementBeforeModal = document.activeElement;
+    function openModal(){
+      if(!modalOverlay) return;
+      lastFocused = document.activeElement;
       modalOverlay.classList.add('is-open');
-      modalOverlay.setAttribute('aria-hidden', 'false');
-
-      // focus the first input inside modal
-      const first = modalOverlay.querySelector('input, select, textarea, button');
-      if (first) first.focus();
-
+      modalOverlay.setAttribute('aria-hidden','false');
+      // focus first input
+      const first = modalOverlay.querySelector('input,select,textarea,button');
+      if(first) first.focus();
       document.addEventListener('focus', trapFocus, true);
-      document.addEventListener('keydown', handleKeydown);
+      document.addEventListener('keydown', onKeydown);
     }
 
-    function closeModal() {
-      if (!modalOverlay) return;
+    function closeModal(){
+      if(!modalOverlay) return;
       modalOverlay.classList.remove('is-open');
-      modalOverlay.setAttribute('aria-hidden', 'true');
-
+      modalOverlay.setAttribute('aria-hidden','true');
       document.removeEventListener('focus', trapFocus, true);
-      document.removeEventListener('keydown', handleKeydown);
-
-      // hide success message and show note again
-      if (formSuccess) formSuccess.style.display = 'none';
-      if (formNote) formNote.style.display = '';
-
-      // return focus to the element that had it
-      if (lastFocusedElementBeforeModal && typeof lastFocusedElementBeforeModal.focus === 'function') {
-        lastFocusedElementBeforeModal.focus();
-      }
+      document.removeEventListener('keydown', onKeydown);
+      // reset UI
+      if(formSuccess) formSuccess.style.display = 'none';
+      if(formNote) formNote.style.display = '';
+      if(lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
     }
 
-    function trapFocus(e) {
-      if (!modal) return;
-      if (!modal.contains(e.target)) {
+    function trapFocus(e){
+      if(!modal) return;
+      if(!modal.contains(e.target)){
         e.stopPropagation();
         const focusable = modal.querySelector('input,select,textarea,button,a[href],[tabindex]:not([tabindex="-1"])');
-        if (focusable) focusable.focus();
+        if(focusable) focusable.focus();
       }
     }
 
-    function handleKeydown(e) {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        closeModal();
-        return;
-      }
-      if (e.key === 'Tab') {
-        if (!modal) return;
-        const focusable = modal.querySelectorAll('a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled])');
-        const nodes = Array.prototype.slice.call(focusable);
-        if (!nodes.length) return;
+    function onKeydown(e){
+      if(e.key === 'Escape'){ e.preventDefault(); closeModal(); return; }
+      if(e.key === 'Tab' && modal){
+        const focusables = modal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])');
+        const nodes = Array.prototype.slice.call(focusables);
+        if(!nodes.length) return;
         const first = nodes[0], last = nodes[nodes.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault(); last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault(); first.focus();
-        }
+        if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+        else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
       }
     }
 
-    // close modal handlers
-    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
-    if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
-    if (modalOverlay) {
-      modalOverlay.addEventListener('click', function (e) {
-        if (e.target === modalOverlay) closeModal();
-      });
-    }
+    // Close handlers
+    if(modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+    if(modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+    if(modalOverlay) modalOverlay.addEventListener('click', function(e){ if(e.target === modalOverlay) closeModal(); });
 
-    // intercept enroll/demo clicks (delegated)
-    document.addEventListener('click', function (e) {
-      const el = e.target.closest ? e.target.closest('a') : null;
-      if (!el) return;
-      const href = el.getAttribute('href') || '';
-      const openAttr = el.getAttribute('data-open-enroll');
-
-      // open modal when:
-      // - href is "/enroll" (pretty url)
-      // - href equals "#popup"
-      // - element has data-open-enroll attribute
-      if (href === '/enroll' || href === '#popup' || openAttr) {
+    // Intercept clicks for enroll/demo
+    document.addEventListener('click', function(e){
+      const a = e.target.closest ? e.target.closest('a') : null;
+      if(!a) return;
+      const href = (a.getAttribute('href')||'').trim();
+      const openAttr = a.getAttribute('data-open-enroll');
+      if(href === '/enroll' || href === '#popup' || openAttr){
         e.preventDefault();
         openModal();
       }
     });
 
-    // simple form submission (simulated). Replace with fetch() to your endpoint when ready.
-    if (form) {
-      form.addEventListener('submit', function (e) {
+    // Form submit (simulated). Replace with real fetch() endpoint as needed.
+    if(form){
+      form.addEventListener('submit', function(e){
         e.preventDefault();
-        const name = form.querySelector('#name') ? form.querySelector('#name').value.trim() : '';
-        const phone = form.querySelector('#phone') ? form.querySelector('#phone').value.trim() : '';
+        const name = (form.querySelector('#name') && form.querySelector('#name').value || '').trim();
+        const phone = (form.querySelector('#phone') && form.querySelector('#phone').value || '').trim();
+        if(!name){ alert('Please enter your name'); if(form.querySelector('#name')) form.querySelector('#name').focus(); return; }
+        if(!phone){ alert('Please enter your phone number'); if(form.querySelector('#phone')) form.querySelector('#phone').focus(); return; }
 
-        if (!name) {
-          alert('Please enter your name.');
-          if (form.querySelector('#name')) form.querySelector('#name').focus();
-          return;
-        }
-        if (!phone) {
-          alert('Please enter your phone number.');
-          if (form.querySelector('#phone')) form.querySelector('#phone').focus();
-          return;
-        }
+        if(formNote) formNote.style.display = 'none';
+        if(formSuccess) formSuccess.style.display = '';
 
-        // show simulated success
-        if (formNote) formNote.style.display = 'none';
-        if (formSuccess) formSuccess.style.display = '';
+        // Optionally send to backend here with fetch()
+        // fetch('/api/enquiry', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name,phone,email:form.querySelector('#email')?.value||'',course:form.querySelector('#course')?.value||'',message:form.querySelector('#message')?.value||''}) });
 
-        // optionally clear fields: form.reset();
-
-        // auto-close after short delay
-        setTimeout(closeModal, 2200);
-
-        // TODO: send to backend
-        // fetch('/api/enquiry', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, phone, email: form.querySelector('#email')?.value || '', course: form.querySelector('#course')?.value || '', message: form.querySelector('#message')?.value || ''}) })
+        setTimeout(closeModal, 2000);
       });
     }
 
-    // prevent anchors with href="#" from jumping
-    (function preventHashAnchors(){
-      const anchors = document.querySelectorAll('a[href="#"]');
-      anchors.forEach(a => {
-        a.addEventListener('click', function (ev) { ev.preventDefault(); });
-      });
-    })();
+    // Prevent anchors with href="#" from jumping (safe)
+    Array.prototype.slice.call(document.querySelectorAll('a[href="#"]')).forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); }); });
 
-    // simple parallax (guarded)
-    (function () {
-      const hero = document.getElementById("hero-visual");
-      const album = document.getElementById("float-album");
-      const studio = document.getElementById("float-studio");
-      if (!hero || !album || !studio) return;
-      hero.addEventListener("mousemove", (e) => {
-        const rect = hero.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        album.style.transform = `translate(${x * 18}px, ${y * 12}px) rotate(${x * 4}deg)`;
-        studio.style.transform = `translate(${x * -12}px, ${y * -8}px) rotate(${x * -3}deg)`;
-      });
-      hero.addEventListener("mouseleave", () => { album.style.transform = ""; studio.style.transform = ""; });
-    })();
+    // Parallax guards
+    (function(){ const hero = document.getElementById('hero-visual'); const album = document.getElementById('float-album'); const studio = document.getElementById('float-studio'); if(!hero||!album||!studio) return; hero.addEventListener('mousemove', function(e){ const r=hero.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width-0.5; const y=(e.clientY-r.top)/r.height-0.5; album.style.transform=`translate(${x*18}px,${y*12}px) rotate(${x*4}deg)`; studio.style.transform=`translate(${x*-12}px,${y*-8}px) rotate(${x*-3}deg)` }); hero.addEventListener('mouseleave', function(){ album.style.transform=''; studio.style.transform=''; }); })();
 
-    // FAQ accordion (guarded)
-    (function () {
-      const items = document.querySelectorAll(".faq-item");
-      if (!items || !items.length) return;
-      items.forEach((item) => {
-        const q = item.querySelector(".faq-question");
-        const ans = item.querySelector(".faq-answer");
-        if (!q || !ans) return;
-        q.addEventListener("click", () => {
-          const open = ans.style.display === "block";
-          items.forEach((i) => { const a = i.querySelector(".faq-answer"); const s = i.querySelector(".faq-question span"); if (a) a.style.display = "none"; if (s) s.textContent = "+"; });
-          if (!open) { ans.style.display = "block"; const s = q.querySelector("span"); if (s) s.textContent = "-"; } else { ans.style.display = "none"; const s = q.querySelector("span"); if (s) s.textContent = "+"; }
-        });
-      });
-    })();
-
-    // hamburger menu toggle (guarded)
-    (function () {
-      const burger = document.querySelector(".hamburger-menu");
-      const menu = document.getElementById("site-nav");
-      if (!burger || !menu) return;
-      burger.addEventListener("click", () => {
-        const open = burger.classList.toggle("is-active");
-        menu.classList.toggle("is-active", open);
-        menu.setAttribute('aria-hidden', open ? 'false' : 'true');
-        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-      // close menu when nav link clicked
-      menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-        burger.classList.remove('is-active');
-        menu.classList.remove('is-active');
-        menu.setAttribute('aria-hidden', 'true');
-        burger.setAttribute('aria-expanded', 'false');
-      }));
-    })();
+    // Hamburger toggle
+    (function(){ const burger=document.querySelector('.hamburger-menu'); const menu=document.getElementById('site-nav'); if(!burger||!menu) return; burger.addEventListener('click', function(){ const open = burger.classList.toggle('is-active'); menu.classList.toggle('is-active', open); menu.setAttribute('aria-hidden', open ? 'false' : 'true'); burger.setAttribute('aria-expanded', open ? 'true' : 'false'); }); Array.prototype.slice.call(menu.querySelectorAll('a')).forEach(function(link){ link.addEventListener('click', function(){ burger.classList.remove('is-active'); menu.classList.remove('is-active'); menu.setAttribute('aria-hidden','true'); burger.setAttribute('aria-expanded','false'); }); }); })();
   </script>
 </body>
 </html>
