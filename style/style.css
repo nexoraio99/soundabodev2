@@ -100,6 +100,7 @@ body {
   height: clamp(20px, 5vw, 40px);
   width: auto;
   object-fit: contain;
+  background: transparent;
 }
 
 /* ============================================================================
