@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Soundabode Courses</title>
+  <title>Soundabode Courses </title>
   <meta name="description" content="Soundabode Music Production & DJ courses - futuristic 2025 landing page" />
   <meta name="theme-color" content="#000000" />
 
@@ -34,8 +34,15 @@
       --container: 1120px;
     }
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -46,154 +53,938 @@
       padding-bottom: 80px;
       line-height: 1.6;
     }
-    a { color: inherit; text-decoration: none; }
-    .container { max-width: var(--container); margin: 0 auto; padding: 0 20px; }
-    .muted { color: var(--muted); }
-    .hidden { display: none; }
-    .section { margin-top: 24px; }
-    .section-narrow { max-width: 860px; }
-    .section-title { font-size: 24px; margin: 0 0 8px; }
-    .section-eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin: 0 0 6px; }
-    .section-lead { font-size: 15px; margin: 8px 0 0; }
-    .section-divider { height: 1px; width: 100%; background: radial-gradient(circle, rgba(255,255,255,0.2) 0, transparent 60%); opacity: 0.6; margin: 24px 0 8px; }
 
-    /* NAV */
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-narrow {
+      max-width: 860px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      margin: 0 0 8px;
+    }
+
+    .section-eyebrow {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+
+    .section-lead {
+      font-size: 15px;
+      margin: 8px 0 0;
+    }
+
+    .section-divider {
+      height: 1px;
+      width: 100%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0, transparent 60%);
+      opacity: 0.6;
+      margin: 24px 0 8px;
+    }
+
+    /* ============================================================================
+      NAVBAR
+      ============================================================================ */
+
     .navbar {
-      position: absolute; top: 0; left: 0; width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
       padding: 10px clamp(12px, 5vw, 50px);
       height: clamp(48px, 12vw, 60px);
-      display:flex; justify-content:space-between; align-items:center; z-index:100;
-      background-color: rgba(10,10,10,0.1); backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background-color: rgba(10, 10, 10, 0.1);
+      backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .navbar a { color:#fff; font-weight:200; font-size:clamp(0.65rem,1.5vw,0.8rem); position:relative; }
-    .nav-links { display:flex; gap:clamp(20px,5vw,40px); flex:1; justify-content:center; }
-    .nav-actions { display:flex; gap:clamp(8px,2vw,15px); align-items:center; }
-    .action-btn { width:clamp(32px,8vw,40px); height:clamp(32px,8vw,40px); border-radius:50%; display:flex; align-items:center; justify-content:center; background: rgba(24,24,24,0.1); border:1px solid rgba(255,255,255,0.2); transition:all .3s; padding:0; cursor:pointer; color:#fff; }
-    .action-btn:hover { transform:scale(1.1); background: rgba(255,255,255,0.2); }
-    .call-btn:hover { background: rgba(0,194,255,0.2); border-color:#00c3ff95; }
-    .logo-img { height: clamp(20px,5vw,40px); width:auto; object-fit:contain; }
 
-    /* MOBILE MENU */
-    .hamburger-menu { display:none; background:none; border:none; cursor:pointer; padding:0; z-index:101; }
-    .hamburger-menu .bar { display:block; width:25px; height:2px; background:#fff; margin:5px 0; transition:transform .3s, opacity .3s; }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 200;
+      font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+      position: relative;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: clamp(20px, 5vw, 40px);
+      flex: 1;
+      justify-content: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: clamp(8px, 2vw, 15px);
+      align-items: center;
+    }
+
+    .action-btn {
+      width: clamp(32px, 8vw, 40px);
+      height: clamp(32px, 8vw, 40px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(24, 24, 24, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      padding: 0;
+      cursor: pointer;
+      color: #fff;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .call-btn:hover {
+      background: rgba(0, 194, 255, 0.2);
+      border-color: #00c3ff95;
+    }
+
+    .logo-img {
+      height: clamp(20px, 5vw, 40px);
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* ============================================================================
+      MOBILE MENU
+      ============================================================================ */
+
+    .hamburger-menu {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 101;
+    }
+
+    .hamburger-menu .bar {
+      display: block;
+      width: 25px;
+      height: 2px;
+      background-color: #fff;
+      margin: 5px 0;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
     .nav-menu {
-      position:fixed; top:0; left:0; width:100%; height:100vh; background: rgba(0,0,0,0.9);
-      display:flex; flex-direction:column; justify-content:center; align-items:center; gap:40px;
-      transform: translateX(100%); transition: transform .4s cubic-bezier(.76,0,.24,1); z-index:99;
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+      z-index: 99;
     }
-    .nav-menu.is-active { transform: translateX(0); }
-    .nav-menu a { color:#fff; font-size:clamp(1.2rem,4vw,1.5rem); font-weight:300; }
-    .hamburger-menu.is-active .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .hamburger-menu.is-active .bar:nth-child(2) { opacity:0; }
-    .hamburger-menu.is-active .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-    @media (max-width:768px){ .hamburger-menu{display:block} .nav-links{display:none} }
 
-    /* WHATSAPP FLOAT */
-    .whatsapp-float { position:fixed; width:clamp(50px,12vw,60px); height:clamp(50px,12vw,60px); bottom:clamp(15px,3vw,25px); right:clamp(15px,3vw,25px); background:#25D366; border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:999; transition:all .3s; text-decoration:none; }
-    .whatsapp-float:hover { transform:scale(1.1); background:#20ba5a; }
-    .whatsapp-icon { width:clamp(24px,6vw,30px); height:clamp(24px,6vw,30px); filter:brightness(0) invert(1); }
+    .nav-menu.is-active {
+      transform: translateX(0);
+    }
 
-    /* HERO */
-    .hero { display:grid; grid-template-columns:1fr; gap:28px; align-items:center; margin-top:80px; }
-    @media (min-width:1020px){ .hero { grid-template-columns: minmax(0,1.3fr) minmax(0,1fr); } }
-    .hero h1 { font-size:32px; margin:0; line-height:1.15; }
-    .gradient-text { background: linear-gradient(90deg, var(--neon-1), var(--neon-2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero p { color:var(--muted); margin-top:12px; max-width:40rem; font-size:14px; }
-    .hero .cta-row { margin-top:16px; display:flex; gap:12px; flex-wrap:wrap; }
-    .btn-primary, .btn-outline { padding:10px 16px; border-radius:999px; font-weight:600; border:none; cursor:pointer; white-space:nowrap; font-size:13px; }
-    .btn-primary { background:linear-gradient(90deg,var(--neon-1),var(--neon-2)); color:#041014; }
-    .btn-outline { background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); color:#e8eef6; }
+    .nav-menu a {
+      color: #fff;
+      text-decoration: none;
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
+      font-weight: 300;
+    }
 
-    /* STATS */
-    .stats { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:18px; max-width:420px; }
-    @media (min-width:640px){ .stats { grid-template-columns:repeat(4,1fr); max-width:none } }
-    .stat { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); text-align:left; }
-    .stat .num{ font-weight:700; font-size:15px; } .stat .label{ font-size:11px; color:var(--muted); margin-top:2px; }
+    .hamburger-menu.is-active .bar:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
 
-    /* HERO VISUAL */
-    .hero-visual { position:relative; height:340px; border-radius:20px; overflow:hidden; border:1px solid rgba(17,16,16,0.06); background:#000; }
-    .hero-visual::before{ content:""; position:absolute; inset:0; border-radius:20px; box-shadow: inset 0 0 60px rgba(78,231,255,0.06), inset 0 0 120px rgba(0,0,0,0.7); pointer-events:none; z-index:4; }
-    .hero-visual .gradient-layer{ position:absolute; inset:0; background: radial-gradient(600px 200px at 10% 20%, #000000, transparent 8%), radial-gradient(500px 160px at 90% 80%, rgba(78,231,255,0.04), transparent 16%); animation:shift 9s ease-in-out infinite; z-index:0; }
-    @keyframes shift { 0%{filter:hue-rotate(0deg)} 50%{filter:hue-rotate(35deg)} 100%{filter:hue-rotate(0deg)} }
-    .ring-aura{ position:absolute; left:40px; top:40px; width:190px; height:190px; border-radius:50%; background:radial-gradient(circle at 50% 50%, #000000, transparent 60%); filter:blur(14px); opacity:0.9; pointer-events:none; display:none; z-index:1; animation:ringPulse 5s ease-in-out infinite; }
-    @keyframes ringPulse { 0%{transform:scale(0.96);opacity:0.7}50%{transform:scale(1.03);opacity:1}100%{transform:scale(0.96);opacity:0.7} }
-    .floating-img { position:absolute; filter:drop-shadow(0 20px 30px rgba(0,0,0,0.6)); border-radius:12px; border:1px solid rgba(0,0,0,0.08); object-fit:cover; z-index:3; max-width:100%; }
-    .floating-img.album { left:28px; top:28px; width:160px; height:160px; }
-    .floating-img.studio { right:28px; bottom:28px; width:130px; height:130px; }
-    .particles{ position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:2; }
-    .particle{ position:absolute; width:6px; height:6px; background:rgba(78,231,255,0.55); border-radius:50%; filter:blur(3px); animation:particleFloat 9s ease-in-out infinite; }
-    @keyframes particleFloat { 0%{transform:translateY(0) translateX(0);opacity:0.3}50%{transform:translateY(-40px) translateX(14px);opacity:0.9}100%{transform:translateY(0) translateX(0);opacity:0.3} }
+    .hamburger-menu.is-active .bar:nth-child(2) {
+      opacity: 0;
+    }
 
-    /* TABS / COURSES */
-    .tabs { display:flex; gap:10px; margin-top:28px; flex-wrap:wrap; background:rgba(255,255,255,0.02); padding:4px; border-radius:999px; border:1px solid rgba(255,255,255,0.08); }
-    .tab-btn { padding:8px 18px; border-radius:999px; border:none; background:transparent; cursor:pointer; color:#e8eef6; flex:1 1 160px; text-align:center; font-size:13px; font-weight:500; }
-    .tab-btn.active { background:#111; box-shadow:0 0 0 1px rgba(255,255,255,0.08); color:#fff; }
-    .tab-panel { margin-top:20px; transition:all .24s ease; opacity:1; }
-    .levels-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-    @media (min-width:920px){ .levels-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    .level-card { background:radial-gradient(circle at top left, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); padding:14px 14px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.06); transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; display:flex; gap:12px; }
-    .level-card:hover{ transform:translateY(-4px); box-shadow:0 18px 40px rgba(0,0,0,0.5); border-color:rgba(255,255,255,0.12); }
-    .level-badge{ width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; flex-shrink:0; }
-    .level-content{ flex:1; min-width:0; }
-    .level-title{ margin:0; font-size:14px; line-height:1.4; }
-    .level-subtitle{ font-size:12px; margin-top:4px; }
-    .level-meta-row{ display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:11px; color:var(--muted); gap:8px; flex-wrap:wrap; }
-    .level-link{ font-size:11px; text-transform:uppercase; letter-spacing:0.1em; border-bottom:1px dashed rgba(255,255,255,0.3); padding-bottom:1px; }
+    .hamburger-menu.is-active .bar:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
 
-    /* Cards, footer, responsive - keep as before */
-    .why-grid{ display:grid; gap:16px; grid-template-columns:1.6fr 1.1fr; margin-top:24px; }
-    @media (max-width:920px){ .why-grid{ grid-template-columns:1fr } }
-    .card-block{ background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:16px; border-radius:16px; border:1px solid rgba(255,255,255,0.05); }
-    .tools-list{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:10px; }
-    .tool-item{ padding:8px 9px; border-radius:8px; background:rgba(0,0,0,0.3); font-size:12px; border:1px solid rgba(255,255,255,0.05); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    @media (max-width: 768px) {
+      .hamburger-menu {
+        display: block;
+      }
 
-    .pricing{ margin-top:24px; overflow:auto; }
-    table{ width:100%; border-collapse:collapse; font-size:13px; }
-    th, td{ padding:10px 12px; text-align:left; }
-    thead th{ color:var(--muted); font-weight:500; font-size:12px; border-bottom:1px solid rgba(255,255,255,0.08); }
-    tbody tr{ border-bottom:1px solid rgba(255,255,255,0.04); }
-    tbody tr:nth-child(odd){ background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); }
+      .nav-links {
+        display: none;
+      }
+    }
 
-    .faq{ margin-top:22px; }
-    .faq-item{ background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:10px 12px; border-radius:10px; margin-top:8px; border:1px solid rgba(255,255,255,0.04); font-size:13px; }
-    .faq-question{ display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:500; gap:10px; }
-    .faq-answer{ margin-top:6px; color:var(--muted); display:none; font-size:12px; }
+    /* ============================================================================
+      WHATSAPP FLOAT
+      ============================================================================ */
 
-    .brochures{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .brochures a{ padding:8px 10px; background:rgba(255,255,255,0.02); border-radius:999px; border:1px solid rgba(255,255,255,0.08); font-size:12px; }
+    .whatsapp-float {
+      position: fixed;
+      width: clamp(50px, 12vw, 60px);
+      height: clamp(50px, 12vw, 60px);
+      bottom: clamp(15px, 3vw, 25px);
+      right: clamp(15px, 3vw, 25px);
+      background-color: #25D366;
+      border-radius: 50%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
 
-    .enroll-bottom{ margin-top:26px; padding:16px 18px; border-radius:16px; background: radial-gradient(circle at top left, rgba(255,255,255,0.06), rgba(9,17,26,0.7)); border:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-    .enroll-bottom-title{ margin:0; font-size:16px; }
-    .enroll-bottom .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .whatsapp-float:hover {
+      transform: scale(1.1);
+      background-color: #20ba5a;
+    }
 
-    footer{ margin-top:40px; padding:20px 0; border-top:1px solid rgba(255,255,255,0.03); color:var(--muted); font-size:13px; }
-    .site-footer{ background:#000; font-family:"Roboto Mono", monospace; color:#fff; padding:18px 20px; border-top:1px solid #2222222e; position:relative; z-index:2; }
-    .footer-container{ max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
-    .footer-columns{ display:flex; gap:60px; flex-wrap:wrap; }
-    .footer-column h4{ color:#888; font-size:.75rem; font-weight:400; letter-spacing:2px; text-transform:uppercase; padding:4px 1px; margin-bottom:6px; }
-    .footer-column ul{ list-style:none; padding:0; margin:0; }
-    .footer-column li{ margin-bottom:6px; }
-    .footer-column a, .footer-column p{ color:#fff; text-decoration:none; font-size:.7rem; line-height:1.5; margin:0; transition:opacity .3s; }
-    .footer-column a:hover{ opacity:.7; }
-    .footer-copyright p{ margin-right:40px; color:#888; font-size:.6rem; }
+    .whatsapp-icon {
+      width: clamp(24px, 6vw, 30px);
+      height: clamp(24px, 6vw, 30px);
+      filter: brightness(0) invert(1);
+    }
 
-    @media (max-width:768px){ .hero{ margin-top:72px } .hero h1{ font-size:26px } .hero .cta-row button{ flex:1 1 100%; text-align:center } .hero-visual{ height:280px } .enroll-bottom{ flex-direction:column; align-items:flex-start } .enroll-bottom .actions{ width:100%; flex-direction:column } .enroll-bottom .actions a{ width:100%; text-align:center } }
-    @media (max-width:480px){ .site-footer{ padding:clamp(18px,2vw,25px) clamp(12px,2vw,18px); } .footer-container{ gap:clamp(12px,2vw,18px) } .footer-columns{ gap:clamp(18px,2vw,25px); margin-bottom:clamp(15px,2vw,20px) } .footer-column h4{ font-size:clamp(0.6rem,1.2vw,0.75rem); margin-bottom:clamp(6px,1vw,10px)} .footer-column a, .footer-column p{ font-size:clamp(0.55rem,1vw,0.65rem) } .footer-copyright p{ margin-right:0; font-size:clamp(0.5rem,0.9vw,0.6rem) } }
+    /* ============================================================================
+      HERO
+      ============================================================================ */
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      align-items: center;
+      margin-top: 80px;
+    }
+
+    @media (min-width: 1020px) {
+      .hero {
+        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      }
+    }
+
+    .hero h1 {
+      font-size: 32px;
+      margin: 0;
+      line-height: 1.15;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, var(--neon-1), var(--neon-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      margin-top: 12px;
+      max-width: 40rem;
+      font-size: 14px;
+    }
+
+    .hero .cta-row {
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-outline {
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--neon-1), var(--neon-2));
+      color: #041014;
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #e8eef6;
+    }
+
+    /* ============================================================================
+      STATS
+      ============================================================================ */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+      max-width: 420px;
+    }
+
+    @media (min-width: 640px) {
+      .stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        max-width: none;
+      }
+    }
+
+    .stat {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      padding: 10px 12px;
+      border-radius: 12px;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .stat .num {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .stat .label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ============================================================================
+      HERO VISUAL
+      ============================================================================ */
+
+    .hero-visual {
+      position: relative;
+      height: 340px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(17, 16, 16, 0.06);
+      background: #000000;
+    }
+
+    .hero-visual::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      box-shadow:
+        inset 0 0 60px rgba(78, 231, 255, 0.06),
+        inset 0 0 120px rgba(0, 0, 0, 0.7);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .hero-visual .gradient-layer {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(600px 200px at 10% 20%, #000000, transparent 8%),
+        radial-gradient(500px 160px at 90% 80%, rgba(78, 231, 255, 0.04), transparent 16%);
+      animation: shift 9s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    @keyframes shift {
+      0% {
+        filter: hue-rotate(0deg);
+      }
+      50% {
+        filter: hue-rotate(35deg);
+      }
+      100% {
+        filter: hue-rotate(0deg);
+      }
+    }
+
+    .hero-visual .ring-aura {
+      position: absolute;
+      left: 40px;
+      top: 40px;
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, #000000, transparent 60%);
+      filter: blur(14px);
+      opacity: 0.9;
+      pointer-events: none;
+      display: none;
+      z-index: 1;
+      animation: ringPulse 5s ease-in-out infinite;
+    }
+
+    @keyframes ringPulse {
+      0% {
+        transform: scale(0.96);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.03);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.96);
+        opacity: 0.7;
+      }
+    }
+
+    .floating-img {
+      position: absolute;
+      filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      object-fit: cover;
+      z-index: 3;
+      max-width: 100%;
+    }
+
+    .floating-img.album {
+      left: 28px;
+      top: 28px;
+      width: 160px;
+      height: 160px;
+    }
+
+    .floating-img.studio {
+      right: 28px;
+      bottom: 28px;
+      width: 130px;
+      height: 130px;
+    }
+
+    .hero-visual .particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: rgba(78, 231, 255, 0.55);
+      border-radius: 50%;
+      filter: blur(3px);
+      animation: particleFloat 9s ease-in-out infinite;
+    }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(0px) translateX(0px);
+        opacity: 0.3;
+      }
+      50% {
+        transform: translateY(-40px) translateX(14px);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(0px) translateX(0px);
+        opacity: 0.3;
+      }
+    }
+
+    /* ============================================================================
+      TABS / COURSES AREA
+      ============================================================================ */
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 4px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tab-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #e8eef6;
+      flex: 1 1 160px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .tab-btn.active {
+      background: #111;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+
+    .tab-panel {
+      margin-top: 20px;
+      transition: all 240ms ease;
+      opacity: 1;
+    }
+
+    .levels-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 920px) {
+      .levels-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .level-card {
+      background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+      padding: 14px 14px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      display: flex;
+      gap: 12px;
+    }
+
+    .level-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .level-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .level-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .level-title {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .level-subtitle {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .level-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .level-link {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+      padding-bottom: 1px;
+    }
+
+    /* ============================================================================
+      WHY / TOOLS
+      ============================================================================ */
+
+    .why-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1.6fr 1.1fr;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 920px) {
+      .why-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card-block {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .card-block h3,
+    .card-block h4 {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+
+    .card-block ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 13px;
+    }
+
+    .card-block li {
+      margin-bottom: 6px;
+    }
+
+    .tools-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tool-item {
+      padding: 8px 9px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      font-size: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ============================================================================
+      PRICING TABLE
+      ============================================================================ */
+
+    .pricing {
+      margin-top: 24px;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    thead th {
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    tbody tr:nth-child(odd) {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+    }
+
+    /* ============================================================================
+      FAQ
+      ============================================================================ */
+
+    .faq {
+      margin-top: 22px;
+    }
+
+    .faq-title {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .faq-item {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 13px;
+    }
+
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 500;
+      gap: 10px;
+    }
+
+    .faq-answer {
+      margin-top: 6px;
+      color: var(--muted);
+      display: none;
+      font-size: 12px;
+    }
+
+    /* ============================================================================
+      BROCHURES / CONTACT
+      ============================================================================ */
+
+    .brochures {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .brochures a {
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+    }
+
+    /* ============================================================================
+      ENROLL CTA
+      ============================================================================ */
+
+    .enroll-bottom {
+      margin-top: 26px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), rgba(9, 17, 26, 0.7));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .enroll-bottom-title {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .enroll-bottom .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    /* ============================================================================
+      FOOTER
+      ============================================================================ */
+
+    footer {
+      margin-top: 40px;
+      padding: 20px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .site-footer {
+      background-color: #000;
+      font-family: "Roboto Mono", monospace;
+      color: #fff;
+      padding: 18px 20px;
+      border-top: 1px solid #2222222e;
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-columns {
+      display: flex;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+
+    .footer-column h4 {
+      color: #888;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 1px;
+      margin-bottom: 6px;
+    }
+
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-column li {
+      margin-bottom: 6px;
+    }
+
+    .footer-column a,
+    .footer-column p {
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.7rem;
+      line-height: 1.5;
+      margin: 0;
+      transition: opacity 0.3s;
+    }
+
+    .footer-column a:hover {
+      opacity: 0.7;
+    }
+
+    .footer-copyright p {
+      margin-right: 40px;
+      color: #888;
+      font-size: 0.6rem;
+    }
+
+    /* ============================================================================
+      RESPONSIVE
+      ============================================================================ */
+
+    @media (max-width: 768px) {
+      .hero {
+        margin-top: 72px;
+      }
+
+      .hero h1 {
+        font-size: 26px;
+      }
+
+      .hero .cta-row button {
+        flex: 1 1 100%;
+        text-align: center;
+      }
+
+      .hero-visual {
+        height: 280px;
+      }
+
+      .enroll-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .enroll-bottom .actions {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .enroll-bottom .actions a {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .site-footer {
+        padding: clamp(18px, 2vw, 25px) clamp(12px, 2vw, 18px);
+      }
+
+      .footer-container {
+        gap: clamp(12px, 2vw, 18px);
+      }
+
+      .footer-columns {
+        gap: clamp(18px, 2vw, 25px);
+        margin-bottom: clamp(15px, 2vw, 20px);
+      }
+
+      .footer-column h4 {
+        font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+        margin-bottom: clamp(6px, 1vw, 10px);
+      }
+
+      .footer-column a,
+      .footer-column p {
+        font-size: clamp(0.55rem, 1vw, 0.65rem);
+      }
+
+      .footer-copyright p {
+        margin-right: 0;
+        font-size: clamp(0.5rem, 0.9vw, 0.6rem);
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
+  <!-- ============================================================================
+       NAVBAR
+       ============================================================================ -->
   <nav class="navbar">
     <a href="/index" class="logo">
-      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img" />
+      <img
+        src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png"
+        alt="SoundAbode Logo"
+        class="logo-img"
+      />
     </a>
 
     <div class="nav-links">
       <a href="/about">About</a>
-      <a href="/courses" id="nav-courses">Courses</a>
+      <a href="#panel-emp">Courses</a>
       <a href="/contact">Contact</a>
     </div>
 
@@ -204,31 +995,65 @@
     </button>
 
     <div class="nav-actions">
-      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion('call')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.01 15.38c-1.23 0-2.42-0.2-3.53-0.56a0.977 0.977 0 0 0-1.01 0.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c0.27-0.28 0.35-0.67 0.24-1.02-0.37-1.11-0.56-2.3-0.56-3.53 0-0.54-0.45-0.99-0.99-0.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c0.71 0 0.99-0.63 0.99-1.18v-3.45c0-0.54-0.45-0.99-0.99-0.99z" fill="currentColor"/></svg>
+      <a
+        href="tel:+919975016189"
+        class="action-btn call-btn"
+        title="Call us"
+        onclick="uet_report_conversion('call')"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M20.01 15.38c-1.23 0-2.42-0.2-3.53-0.56a0.977 0.977 0 0 0-1.01 0.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c0.27-0.28 0.35-0.67 0.24-1.02-0.37-1.11-0.56-2.3-0.56-3.53 0-0.54-0.45-0.99-0.99-0.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c0.71 0 0.99-0.63 0.99-1.18v-3.45c0-0.54-0.45-0.99-0.99-0.99z"
+            fill="currentColor"
+          />
+        </svg>
       </a>
     </div>
   </nav>
 
-  <!-- MOBILE MENU -->
+  <!-- ============================================================================
+       MOBILE MENU
+       ============================================================================ -->
   <div class="nav-menu">
     <a href="/about">About</a>
-    <a href="/courses">Courses</a>
+    <a href="#panel-emp">Courses</a>
     <a href="/contact">Contact</a>
   </div>
 
-  <!-- WHATSAPP FLOAT -->
-  <a href="https://wa.me/919975016189" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp" onclick="uet_report_conversion('whatsapp')">
-    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp" class="whatsapp-icon" loading="lazy" />
+  <!-- ============================================================================
+       WHATSAPP FLOAT
+       ============================================================================ -->
+  <a
+    href="https://wa.me/919975016189"
+    class="whatsapp-float"
+    target="_blank"
+    rel="noopener noreferrer"
+    title="Chat on WhatsApp"
+    onclick="uet_report_conversion('whatsapp')"
+  >
+    <img
+      src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg"
+      alt="WhatsApp"
+      class="whatsapp-icon"
+      loading="lazy"
+    />
   </a>
 
-  <main class="container" style="margin-top:6px;">
-    <!-- HERO -->
+  <main class="container" style="margin-top: 6px;">
+    <!-- ============================================================================
+         HERO
+         ============================================================================ -->
     <section class="hero" aria-labelledby="hero-heading">
       <div>
         <p class="section-eyebrow">Soundabode Academy - Pune</p>
-        <h1 id="hero-heading">India’s Most Hands-On Music <span class="gradient-text">Production, Audio Engineering & DJ Courses</span></h1>
-        <p>One Academy, two Power Paths, choose yours with infinite music careers. Become the artist the world remembers</p>
+        <h1 id="hero-heading">
+         India’s Most Hands-On Music 
+          <span class="gradient-text">Production, Audio Engineering & DJ Courses</span>
+        </h1>
+        <p>
+          One Academy, two Power Paths, choose yours with infinite music careers.
+          Become the artist the world remembers
+        </p>
 
         <div class="cta-row">
           <button class="btn-primary" id="explore-emp">Explore EMP</button>
@@ -236,95 +1061,173 @@
         </div>
 
         <div class="stats" aria-hidden="true">
-          <div class="stat"><div class="num">1000+</div><div class="label">Students trained</div></div>
-          <div class="stat"><div class="num">200+</div><div class="label">Industry projects</div></div>
-          <div class="stat"><div class="num">50+</div><div class="label">Partner venues</div></div>
-          <div class="stat"><div class="num">4</div><div class="label">Course levels</div></div>
+          <div class="stat">
+            <div class="num">1000+</div>
+            <div class="label">Students trained</div>
+          </div>
+          <div class="stat">
+            <div class="num">200+</div>
+            <div class="label">Industry projects</div>
+          </div>
+          <div class="stat">
+            <div class="num">50+</div>
+            <div class="label">Partner venues</div>
+          </div>
+          <div class="stat">
+            <div class="num">4</div>
+            <div class="label">Course levels</div>
+          </div>
         </div>
       </div>
 
       <div>
         <div class="hero-visual" id="hero-visual" role="img" aria-label="Studio visuals">
           <div class="gradient-layer"></div>
+
+          <!-- Aura + particles -->
           <div class="ring-aura"></div>
           <div class="particles">
-            <div class="particle" style="top:18%; left:20%; animation-delay:0s;"></div>
-            <div class="particle" style="top:32%; left:70%; animation-delay:2s;"></div>
-            <div class="particle" style="top:58%; left:42%; animation-delay:4s;"></div>
-            <div class="particle" style="top:68%; left:80%; animation-delay:6s;"></div>
+            <div class="particle" style="top: 18%; left: 20%; animation-delay: 0s;"></div>
+            <div class="particle" style="top: 32%; left: 70%; animation-delay: 2s;"></div>
+            <div class="particle" style="top: 58%; left: 42%; animation-delay: 4s;"></div>
+            <div class="particle" style="top: 68%; left: 80%; animation-delay: 6s;"></div>
           </div>
+
           <img src="images/album-mock-1.jpg" alt="Album mock" class="floating-img album" id="float-album" />
           <img src="images/studio-mock-2.jpg" alt="Studio mock" class="floating-img studio" id="float-studio" />
         </div>
       </div>
     </section>
 
-    <!-- TABS -->
+    <!-- ============================================================================
+         TABS
+         ============================================================================ -->
     <div class="tabs" role="tablist" aria-label="Course tabs">
-      <button class="tab-btn active" id="tab-emp" role="tab" aria-selected="true">EMP Music Production</button>
-      <button class="tab-btn" id="tab-dj" role="tab" aria-selected="false">DJ Training</button>
+      <button class="tab-btn active" id="tab-emp" role="tab" aria-selected="true">
+        EMP Music Production
+      </button>
+      <button class="tab-btn" id="tab-dj" role="tab" aria-selected="false">
+        DJ Training
+      </button>
     </div>
 
-    <!-- EMP PANEL -->
+    <!-- ============================================================================
+         EMP PANEL - MORE READABLE LAYOUT
+         ============================================================================ -->
     <section class="tab-panel" id="panel-emp" role="tabpanel" aria-labelledby="tab-emp">
+      <!-- Intro -->
       <div class="section section-narrow">
         <h2 class="section-title">Music Production &amp; Audio Engineering Courses in Pune</h2>
-        <p class="section-lead"><strong>Learn. Create. Mix. Master. - Become a Complete Music Producer at Soundabode.</strong></p>
-        <p class="muted">Welcome to <strong>Soundabode</strong>, Pune's most comprehensive and hands-on academy for <strong>music production and sound engineering</strong>.</p>
-        <p class="muted">Our 4 level program takes you from a beginner who loves music to a fully skilled <strong>producer, sound designer, and mastering engineer</strong>, capable of creating industry-standard audio for music, film, games, and streaming platforms.</p>
-        <p class="muted">Whether you are starting out or upgrading your existing skills, <strong>Soundabode gives you the edge</strong> through professional studio training, advanced technology, and real-world industry exposure.</p>
+        <p class="section-lead">
+          <strong>Learn. Create. Mix. Master. - Become a Complete Music Producer at Soundabode.</strong>
+        </p>
+        <p class="muted">
+          Welcome to <strong>Soundabode</strong>, Pune's most comprehensive and hands-on academy for
+          <strong>music production and sound engineering</strong>.
+        </p>
+        <p class="muted">
+          Our 4 level program takes you from a beginner who loves music to a fully skilled
+          <strong>producer, sound designer, and mastering engineer</strong>, capable of creating
+          industry-standard audio for music, film, games, and streaming platforms.
+        </p>
+        <p class="muted">
+          Whether you are starting out or upgrading your existing skills,
+          <strong>Soundabode gives you the edge</strong> through professional studio training, advanced
+          technology, and real-world industry exposure.
+        </p>
       </div>
 
       <div class="section-divider"></div>
 
+      <!-- Learning Path -->
       <div class="section">
         <h3 class="section-title">The Complete Learning Path</h3>
-        <p class="muted" style="max-width:640px; margin-top:4px;">Four structured levels that take you from absolute beginner to professional producer and audio engineer.</p>
+        <p class="muted" style="max-width: 640px; margin-top: 4px;">
+          Four structured levels that take you from absolute beginner to professional producer and audio engineer.
+        </p>
 
-        <div class="levels-grid" style="margin-top:14px;">
+        <div class="levels-grid" style="margin-top: 14px;">
+          <!-- Level 1 -->
           <article class="level-card">
             <div class="level-badge">1</div>
             <div class="level-content">
               <h4 class="level-title">Level 1 - Beginner: Music Production / Audio Workstation</h4>
-              <p class="level-subtitle muted"><strong>Build your foundation.</strong> Learn Ableton Live 11, music theory, beat-making, sampling, and song structure. Create your first track and understand the full production workflow.</p>
+              <p class="level-subtitle muted">
+                <strong>Build your foundation.</strong> Learn Ableton Live 11, music theory, beat-making,
+                sampling, and song structure. Create your first track and understand the full production workflow.
+              </p>
               <div class="level-meta-row">
-                <a href="/courses/music-production/beginner-course" class="level-link">Explore Level 1</a>
+                <a
+                  href="/music-production/beginner-course"
+                  class="level-link"
+                >
+                  Explore Level 1
+                </a>
                 <span>3 + 1 months internship</span>
               </div>
             </div>
           </article>
 
+          <!-- Level 2 -->
           <article class="level-card">
             <div class="level-badge">2</div>
             <div class="level-content">
               <h4 class="level-title">Level 2 - Intermediate: Pre-Degree in Electronic Music Production</h4>
-              <p class="level-subtitle muted"><strong>Go deeper into sound design and production.</strong> Master advanced arrangement, layering, and creative plug-ins like Serum, Massive, and Arturia. Collaborate globally through LANDR and Splice and shape your artistic sound.</p>
+              <p class="level-subtitle muted">
+                <strong>Go deeper into sound design and production.</strong> Master advanced arrangement, layering,
+                and creative plug-ins like Serum, Massive, and Arturia. Collaborate globally through LANDR and Splice
+                and shape your artistic sound.
+              </p>
               <div class="level-meta-row">
-                <a href="/courses/music-production/intermediate-course" class="level-link">Explore Level 2</a>
+                <a
+                  href="/music-production/intermediate-course"
+                  class="level-link"
+                >
+                  Explore Level 2
+                </a>
                 <span>3 + 1 months internship</span>
               </div>
             </div>
           </article>
 
+          <!-- Level 3 -->
           <article class="level-card">
             <div class="level-badge">3</div>
             <div class="level-content">
               <h4 class="level-title">Level 3 - Expert: Diploma in Audio Engineering</h4>
-              <p class="level-subtitle muted"><strong>Engineer the sound you imagine.</strong> Train on studio-grade synths, modular setups, and Kontakt instruments. Learn professional recording, acoustics, and artist development the Soundabode way.</p>
+              <p class="level-subtitle muted">
+                <strong>Engineer the sound you imagine.</strong> Train on studio-grade synths, modular setups,
+                and Kontakt instruments. Learn professional recording, acoustics, and artist development the
+                Soundabode way.
+              </p>
               <div class="level-meta-row">
-                <a href="/courses/music-production/audio-engineering-diploma" class="level-link">Explore Level 3</a>
+                <a
+                  href="/music-production/audio-engineering-diploma"
+                  class="level-link"
+                >
+                  Explore Level 3
+                </a>
                 <span>4 months</span>
               </div>
             </div>
           </article>
 
+          <!-- Level 4 -->
           <article class="level-card">
             <div class="level-badge">4</div>
             <div class="level-content">
               <h4 class="level-title">Level 4 - Advanced Mixing &amp; Mastering</h4>
-              <p class="level-subtitle muted"><strong>Finish like a professional.</strong> Perfect your tracks with Ozone, Waves, and RX7. Learn how to make your mixes loud, clean, balanced, and ready for streaming platforms.</p>
+              <p class="level-subtitle muted">
+                <strong>Finish like a professional.</strong> Perfect your tracks with Ozone, Waves, and RX7.
+                Learn how to make your mixes loud, clean, balanced, and ready for streaming platforms.
+              </p>
               <div class="level-meta-row">
-                <a href="/courses/music-production/mixing-mastering-course" class="level-link">Explore Level 4</a>
+                <a
+                  href="/music-production/mixing-mastering-course"
+                  class="level-link"
+                >
+                  Explore Level 4
+                </a>
                 <span>3 + 1 months internship</span>
               </div>
             </div>
@@ -334,17 +1237,35 @@
 
       <div class="section-divider"></div>
 
+      <!-- Why + Tools -->
       <div class="section">
         <div class="why-grid">
           <div class="card-block">
             <h3>Why Soundabode is India's Leading Music Production Academy</h3>
             <ul>
-              <li><strong>Professional Studio-Based Training</strong> - Every session takes place in a real, acoustically treated studio with the latest gear and software.</li>
-              <li><strong>Certified Ableton and Industry Trainers</strong> - Learn directly from engineers, producers, and artists who work in the field.</li>
-              <li><strong>Hands-On Curriculum</strong> - Every concept is taught through live demos, assignments, and project-based work.</li>
-              <li><strong>Internships and Industry Projects</strong> - Gain practical experience working with real clients and label projects.</li>
-              <li><strong>Global Exposure</strong> - Collaborate through LANDR, Splice, and our alumni network in top studios worldwide.</li>
-              <li><strong>Free Studio Access and Unlimited Practice Hours</strong> - Because creativity cannot be timed.</li>
+              <li>
+                <strong>Professional Studio-Based Training</strong> - Every session takes place in a real,
+                acoustically treated studio with the latest gear and software.
+              </li>
+              <li>
+                <strong>Certified Ableton and Industry Trainers</strong> - Learn directly from engineers, producers,
+                and artists who work in the field.
+              </li>
+              <li>
+                <strong>Hands-On Curriculum</strong> - Every concept is taught through live demos, assignments,
+                and project-based work.
+              </li>
+              <li>
+                <strong>Internships and Industry Projects</strong> - Gain practical experience working with
+                real clients and label projects.
+              </li>
+              <li>
+                <strong>Global Exposure</strong> - Collaborate through LANDR, Splice, and our alumni network
+                in top studios worldwide.
+              </li>
+              <li>
+                <strong>Free Studio Access and Unlimited Practice Hours</strong> - Because creativity cannot be timed.
+              </li>
             </ul>
           </div>
 
@@ -364,29 +1285,214 @@
         </div>
       </div>
 
-      <!-- pricing, brochures, FAQ omitted for brevity but kept in original file (you already have them) -->
-      <!-- (If you want I can include every section verbatim; kept here to keep file compact while preserving functionality) -->
+      <!-- Who + Career -->
+      <div class="section">
+        <div class="why-grid">
+          <div class="card-block">
+            <h3>Who This Course Is For</h3>
+            <ul>
+              <li>Aspiring <strong>music producers, DJs, and composers</strong></li>
+              <li>Artists looking to <strong>record, mix, and release</strong> their own music</li>
+              <li>Audio enthusiasts passionate about <strong>sound design and synthesis</strong></li>
+              <li>Anyone serious about <strong>a career in music or sound engineering</strong></li>
+            </ul>
+          </div>
+
+          <div class="card-block">
+            <h3>Certification &amp; Career Opportunities</h3>
+            <p class="muted" style="margin-top: 4px;">
+              Complete all four levels and receive the
+              <strong>Soundabode Diploma in Audio Engineering</strong>, recognized by studios, labels,
+              and OTT platforms across India.
+            </p>
+            <ul style="margin-top: 8px;">
+              <li>🎧 Music Producers</li>
+              <li>🎛️ Sound Engineers</li>
+              <li>🎚️ Mixing &amp; Mastering Specialists</li>
+              <li>🎬 Sound Designers for Film, Games &amp; Ads</li>
+              <li>🎵 Independent Artists or Studio Consultants</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing -->
+      <div class="section">
+        <h3 class="section-title">Course Structure &amp; Duration</h3>
+        <p class="muted" style="max-width: 620px; margin-top: 4px;">
+          Each level builds upon the last, creating a clear and complete path from beginner to professional.
+        </p>
+
+        <div class="pricing">
+          <table aria-label="Course fees">
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Course Title</th>
+                <th>Duration</th>
+                <th>Fee</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Beginner - Music Production / Audio Workstation</td>
+                <td>3 + 1 months internship</td>
+                <td>₹60,000</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Intermediate - Pre-Degree in Electronic Music Production</td>
+                <td>3 + 1 months internship</td>
+                <td>₹60,000</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Expert - Diploma in Audio Engineering</td>
+                <td>4 months</td>
+                <td>₹60,000</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Advanced - Mixing &amp; Mastering</td>
+                <td>3 + 1 months internship</td>
+                <td>₹60,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="muted" style="margin-top: 8px;">
+          💳 <em>Flexible installment plans available. Start by paying <strong>₹30,000</strong> to block your seat.</em>
+        </p>
+      </div>
+
+      <!-- Brochures + Location -->
+      <div class="section">
+        <div class="why-grid">
+          <div class="card-block">
+            <h4>Download Course Brochures</h4>
+            <div class="brochures">
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Music Production Brochure
+              </a>
+            </div>
+          </div>
+
+          <div class="card-block">
+            <h4>Location &amp; Contact</h4>
+            <div class="muted" style="margin-top: 6px; font-size: 13px;">
+              <strong>Soundabode Academy</strong><br />
+              218, Vision 9 Mall, Pimple Saudagar, Pune - 27<br />
+              📞 997-501-6189<br />
+              📧 services@soundabode.com
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="section faq" aria-label="Frequently asked questions">
+        <h3 class="faq-title">Frequently Asked Questions</h3>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q1. Which is the best music production course in Pune?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            Soundabode's 4 level program is Pune's most complete pathway from beginner to professional, taught
+            on Ableton Live and industry-standard gear.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q2. Do I need musical background to start?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            No. Level 1 is designed for absolute beginners and will teach you everything step by step.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q3. Do you offer internships?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            Yes. Each level includes an internship with live studio projects and real client work.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q4. What certificate will I receive?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            After completing all levels, you will earn the <strong>Soundabode Diploma in Audio Engineering</strong>.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q5. Can I enroll for only one level?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            Absolutely. You can join at any level depending on your existing skillset.
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- DJ PANEL -->
+    <!-- ============================================================================
+         DJ PANEL (unchanged content structure, just benefits from global styles)
+         ============================================================================ -->
     <section class="tab-panel hidden" id="panel-dj" role="tabpanel" aria-labelledby="tab-dj">
       <div class="section section-narrow">
         <h2 class="section-title">DJ Training Courses in Pune</h2>
-        <p class="section-lead">Learn to mix, perform and master the art of DJing with Soundabode.</p>
-        <p class="muted">Welcome to <strong>Soundabode</strong>, Pune's most advanced and performance driven DJ academy. Our DJ Training Program takes you from complete beginner to professional performer through a carefully designed 3 level system that blends <strong>technique, creativity, and stage confidence</strong>.</p>
+        <p class="section-lead">
+          Learn to mix, perform and master the art of DJing with Soundabode.
+        </p>
+        <p class="muted">
+          Welcome to <strong>Soundabode</strong>, Pune's most advanced and performance driven DJ academy.
+          Our DJ Training Program takes you from complete beginner to professional performer through a carefully
+          designed 3 level system that blends <strong>technique, creativity, and stage confidence</strong>.
+        </p>
+        <p class="muted">
+          Learn on industry-standard <strong>Pioneer CDJs, Traktor, and Ableton Live</strong>, mentored by
+          professional DJs and producers who perform across India's leading venues and festivals.
+        </p>
       </div>
 
       <div class="section-divider"></div>
 
       <div class="section">
-        <div class="levels-grid" style="margin-top:14px;">
+        <h3 class="section-title">The Complete DJ Learning Path</h3>
+
+        <div class="levels-grid" style="margin-top: 14px;">
           <article class="level-card">
             <div class="level-badge">1</div>
             <div class="level-content">
               <h4 class="level-title">Level 1 - Basic DJ Training Course</h4>
-              <p class="level-subtitle muted">Build your foundation in DJing: beatmatching, EQing, track structuring, and your first live set on Pioneer CDJs and controllers.</p>
+              <p class="level-subtitle muted">
+                Build your foundation in DJing: beatmatching, EQing, track structuring, and your first live set
+                on Pioneer CDJs and controllers.
+              </p>
               <div class="level-meta-row">
-                <a href="/courses/dj-training/basic-dj-course" class="level-link">Explore Level 1</a>
+                <a
+                  href="/dj-training/basic-dj-course"
+                  class="level-link"
+                >
+                  Explore Level 1
+                </a>
                 <span>2 months · ₹35,000</span>
               </div>
             </div>
@@ -396,9 +1502,17 @@
             <div class="level-badge">2</div>
             <div class="level-content">
               <h4 class="level-title">Level 2 - Pro DJ Training Course</h4>
-              <p class="level-subtitle muted">Go beyond the basics: advanced mixing, harmonic blending, digital DJ setups, and creative FX workflows with Ableton and Rekordbox.</p>
+              <p class="level-subtitle muted">
+                Go beyond the basics: advanced mixing, harmonic blending, digital DJ setups, and creative FX
+                workflows with Ableton and Rekordbox.
+              </p>
               <div class="level-meta-row">
-                <a href="/courses/dj-training/pro-dj-course" class="level-link">Explore Level 2</a>
+                <a
+                  href="/dj-training/pro-dj-course"
+                  class="level-link"
+                >
+                  Explore Level 2
+                </a>
                 <span>4 months · ₹60,000</span>
               </div>
             </div>
@@ -408,64 +1522,300 @@
             <div class="level-badge">3</div>
             <div class="level-content">
               <h4 class="level-title">Level 3 - Professional DJ / Performance Path</h4>
-              <p class="level-subtitle muted">Take the stage and own it: artist profile, mixtapes, gig strategy, and mentorship from DJs performing at India's top venues.</p>
+              <p class="level-subtitle muted">
+                Take the stage and own it: artist profile, mixtapes, gig strategy, and mentorship from DJs
+                performing at India's top venues.
+              </p>
               <div class="level-meta-row">
-                <a href="/courses/dj-training/advanced-dj-performance" class="level-link">Explore Level 3</a>
+                <a
+                  href="/dj-training/advanced-dj-performance"
+                  class="level-link"
+                >
+                  Explore Level 3
+                </a>
                 <span>Mentored · Included</span>
               </div>
             </div>
           </article>
         </div>
       </div>
+
+      <!-- Why + Tools -->
+      <div class="section">
+        <div class="why-grid">
+          <div class="card-block">
+            <h3>Why Choose Soundabode DJ Academy</h3>
+            <ul>
+              <li>Learn on <strong>Pioneer CDJs, Traktor, and Ableton Live setups</strong></li>
+              <li><strong>Unlimited studio practice time</strong> with one-on-one mentoring</li>
+              <li>Performance opportunities at <strong>real clubs and partner venues</strong></li>
+              <li>Personal guidance on <strong>artist branding, EPKs, and press kits</strong></li>
+              <li><strong>Guest masterclasses</strong> from touring DJs and sound engineers</li>
+              <li><strong>Internship and <strong>gig placement support</strong> across India</strong></li>
+            </ul>
+          </div>
+
+          <div class="card-block">
+            <h4>Tools &amp; Technology You Will Learn</h4>
+            <div class="tools-list">
+              <div class="tool-item">Pioneer CDJ-2000 / XDJ-XZ</div>
+              <div class="tool-item">DJM Mixers</div>
+              <div class="tool-item">Traktor &amp; Rekordbox</div>
+              <div class="tool-item">Ableton Live for performance</div>
+              <div class="tool-item">FX Units &amp; MIDI Controllers</div>
+              <div class="tool-item">HID Mode / Pro DJ setups</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Who + Career -->
+      <div class="section">
+        <div class="why-grid">
+          <div class="card-block">
+            <h3>Who This Course Is For</h3>
+            <ul>
+              <li>Aspiring DJs and performers</li>
+              <li>Music producers who want to perform live</li>
+              <li>Event and club enthusiasts wanting professional DJ skills</li>
+              <li>Artists aiming to release mixes and grow their brand</li>
+            </ul>
+          </div>
+
+          <div class="card-block">
+            <h3>Career Opportunities</h3>
+            <ul>
+              <li>Resident DJ / Club Performer</li>
+              <li>Touring Artist / Festival DJ</li>
+              <li>Corporate Event DJ</li>
+              <li>Music Curator / Streaming Host</li>
+              <li>Live Performance Artist</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing -->
+      <div class="section">
+        <h3 class="section-title">Course Options &amp; Duration</h3>
+        <div class="pricing">
+          <table aria-label="DJ course fees">
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Course Title</th>
+                <th>Duration</th>
+                <th>Fee</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Basic DJ Training Course</td>
+                <td>2 months</td>
+                <td>₹35,000</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Pro DJ Training Course</td>
+                <td>4 months</td>
+                <td>₹60,000</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Professional DJ / Performance Path</td>
+                <td>Mentored, duration varies</td>
+                <td>Included in Pro Course / Mentorship Track</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="muted" style="margin-top: 8px;">
+          Start by paying <strong>₹20,000</strong> to reserve your seat. Easy installment plans available.
+        </p>
+      </div>
+
+      <!-- Location + Brochure -->
+      <div class="section">
+        <div class="why-grid">
+          <div class="card-block">
+            <h4>Download Course Brochure</h4>
+            <div class="brochures">
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                DJ Training Brochure (PDF)
+              </a>
+            </div>
+          </div>
+          <div class="card-block">
+            <h4>Location &amp; Contact</h4>
+            <div class="muted" style="margin-top: 6px; font-size: 13px;">
+              <strong>Soundabode Academy</strong><br />
+              218, Vision 9 Mall, Pimple Saudagar, Pune - 27<br />
+              📞 997-501-6189<br />
+              📧 services@soundabode.com
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DJ FAQ -->
+      <div class="section faq" aria-label="DJ Frequently asked questions">
+        <h3 class="faq-title">Frequently Asked Questions - DJ Training</h3>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q1. What is the best DJ course in Pune?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            Soundabode's multi level DJ program is one of India's most practical and performance driven DJ trainings,
+            focused on real gigs and industry exposure.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q2. Can I enroll without any prior music knowledge?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            Absolutely. Level 1 is perfect for complete beginners. We start from the basics and build your confidence
+            step by step.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q3. Do I get to perform live?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            Yes. Students perform at Soundabode's partner venues and exclusive student nights, with guidance from mentors.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q4. Is the training on Pioneer CDJs?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            Yes, all sessions are conducted on industry-standard Pioneer CDJs and professional DJ mixers.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Q5. Do you provide placement or gigs?
+            <span class="muted">+</span>
+          </div>
+          <div class="faq-answer">
+            Yes. Through our venue network, students get opportunities to perform and gain exposure in Pune's DJ circuit
+            and beyond.
+          </div>
+        </div>
+      </div>
     </section>
 
+    <!-- ============================================================================
+         GLOBAL ENROLL CTA
+         ============================================================================ -->
     <section id="enroll" class="enroll-bottom">
       <div>
         <h3 class="enroll-bottom-title">Ready to start your music career?</h3>
-        <div class="muted" style="margin-top:4px;">Pay ₹30,000 to reserve your seat. Flexible installments available.</div>
+        <div class="muted" style="margin-top: 4px;">
+          Pay ₹30,000 to reserve your seat. Flexible installments available.
+        </div>
       </div>
-      <div class="actions"><a class="btn-primary" href="/enroll">Enroll Now</a> <a class="btn-outline" href="/contact">Contact Us</a></div>
+      <div class="actions">
+        <a class="btn-primary" href="/enroll">Enroll Now</a>
+        <a class="btn-outline" href="/contact">Contact Us</a>
+      </div>
     </section>
   </main>
 
+  <!-- ============================================================================
+         FOOTER
+         ============================================================================ -->
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-columns">
         <div class="footer-column">
           <h4>ABOUT</h4>
-          <ul><li><a href="/about">ABOUT</a></li><li><a href="/courses">COURSES</a></li><li><a href="/contact">CONTACT</a></li></ul>
+          <ul>
+            <li><a href="/about">ABOUT</a></li>
+            <li><a href="#panel-emp">COURSES</a></li>
+            <li><a href="/contact">CONTACT</a></li>
+          </ul>
         </div>
         <div class="footer-column">
           <h4>LOCATION</h4>
-          <p>VISION 9, 2ND FLOOR,<br/>KUNAL ICON RD,<br/>PIMPLE SAUDAGAR, PUNE,<br/>MAHARASHTRA 411017</p>
+          <p>
+            VISION 9, 2ND FLOOR,<br />
+            KUNAL ICON RD,<br />
+            PIMPLE SAUDAGAR, PUNE,<br />
+            MAHARASHTRA 411017
+          </p>
         </div>
         <div class="footer-column">
           <h4>SOCIALS</h4>
-          <ul><li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">INSTAGRAM</a></li><li><a href="https://www.facebook.com/soundabode/" target="_blank" rel="noopener noreferrer">FACEBOOK</a></li><li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YOUTUBE</a></li></ul>
+          <ul>
+            <li>
+              <a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">
+                INSTAGRAM
+              </a>
+            </li>
+            <li>
+              <a href="https://www.facebook.com/soundabode/" target="_blank" rel="noopener noreferrer">
+                FACEBOOK
+              </a>
+            </li>
+            <li>
+              <a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">
+                YOUTUBE
+              </a>
+            </li>
+          </ul>
         </div>
         <div class="footer-column">
           <h4>PRIVACY POLICY</h4>
-          <ul><li><a href="/privacy">PRIVACY POLICY</a></li></ul>
+          <ul>
+            <li><a href="/privacy">PRIVACY POLICY</a></li>
+          </ul>
         </div>
       </div>
-      <div class="footer-copyright"><p><span id="year"></span> © SOUNDABODE. All rights reserved.</p></div>
+      <div class="footer-copyright">
+        <p><span id="year"></span> © SOUNDABODE. All rights reserved.</p>
+      </div>
     </div>
   </footer>
 
+  <!-- ============================================================================
+         JS INTERACTIVITY (updated with pushState/popstate + routing)
+         ============================================================================ -->
   <script>
-    // Analytics stub
     function uet_report_conversion(source) {
       window.uetq = window.uetq || [];
       window.uetq.push("event", "contact", {
-        event_label: source === "whatsapp" ? "961303bb-7e25-4b3a-9ed9-04c288d65ee2" : "5547903c-7e42-4d18-ab6d-4b58e660dafe"
+        event_label:
+          source === "whatsapp"
+            ? "961303bb-7e25-4b3a-9ed9-04c288d65ee2"
+            : "5547903c-7e42-4d18-ab6d-4b58e660dafe"
       });
     }
 
-    // Dynamic year
-    (function () { const y = document.getElementById("year"); if (y) y.textContent = new Date().getFullYear(); })();
+    // Dynamic year in footer
+    (function () {
+      const y = document.getElementById("year");
+      if (y) y.textContent = new Date().getFullYear();
+    })();
 
     /* -------------------------
-       App elements
+       UI element refs
        ------------------------- */
     const tabEmp = document.getElementById("tab-emp");
     const tabDj = document.getElementById("tab-dj");
@@ -473,21 +1823,33 @@
     const panelDj = document.getElementById("panel-dj");
     const exploreEmp = document.getElementById("explore-emp");
     const exploreDj = document.getElementById("explore-dj");
-    const navCourses = document.getElementById("nav-courses");
 
+    /* -------------------------
+       Helper: activate correct tab
+       - emp=true => EMP tab visible
+       - emp=false => DJ tab visible
+       ------------------------- */
     function activate(emp = true, options = {}) {
-      if (!tabEmp || !tabDj || !panelEmp || !panelDj) return;
+      // options: { scroll: boolean, focus: boolean }
       if (emp) {
-        tabEmp.classList.add("active"); tabEmp.setAttribute("aria-selected", "true");
-        tabDj.classList.remove("active"); tabDj.setAttribute("aria-selected", "false");
-        panelEmp.classList.remove("hidden"); panelDj.classList.add("hidden");
+        tabEmp.classList.add("active");
+        tabEmp.setAttribute("aria-selected", "true");
+        tabDj.classList.remove("active");
+        tabDj.setAttribute("aria-selected", "false");
+        panelEmp.classList.remove("hidden");
+        panelDj.classList.add("hidden");
         if (options.focus) tabEmp.focus();
       } else {
-        tabDj.classList.add("active"); tabDj.setAttribute("aria-selected", "true");
-        tabEmp.classList.remove("active"); tabEmp.setAttribute("aria-selected", "false");
-        panelDj.classList.remove("hidden"); panelEmp.classList.add("hidden");
+        tabDj.classList.add("active");
+        tabDj.setAttribute("aria-selected", "true");
+        tabEmp.classList.remove("active");
+        tabEmp.setAttribute("aria-selected", "false");
+        panelDj.classList.remove("hidden");
+        panelEmp.classList.add("hidden");
         if (options.focus) tabDj.focus();
       }
+
+      // optional scroll to panel
       if (options.scroll) {
         const target = emp ? panelEmp : panelDj;
         if (target) {
@@ -497,73 +1859,105 @@
       }
     }
 
+    /* -------------------------
+       History helpers
+       ------------------------- */
     function setUrl(path, { replace = false } = {}) {
-      try { if (replace) history.replaceState({}, "", path); else history.pushState({}, "", path); }
-      catch (e) { console.warn("History API failed:", e); }
-    }
-
-    // resolve route to panel (EMP vs DJ) from pathname
-    function resolveRoute(pathname) {
-      const path = (pathname || "/").toLowerCase();
-      if (path.startsWith("/courses/music-production") || path.startsWith("/music-production")) return { panel: "emp", detail: path };
-      if (path.startsWith("/courses/dj-training") || path.startsWith("/dj-training")) return { panel: "dj", detail: path };
-      if (path === "/courses" || path === "/courses/") return { panel: "emp", detail: null };
-      if (path.startsWith("/courses")) return { panel: "emp", detail: path };
-      return { panel: "emp", detail: null };
-    }
-
-    // Intercept clicks for same-origin /courses*, /music-production*, /dj-training* links
-    document.addEventListener("click", function (e) {
-      const a = e.target.closest && e.target.closest("a");
-      if (!a) return;
-      // allow new tabs, downloads, mail/tel
-      if (a.target === "_blank" || a.hasAttribute("download")) return;
-      const href = a.getAttribute("href");
-      if (!href || href.indexOf("mailto:") === 0 || href.indexOf("tel:") === 0) return;
-      // resolve absolute url
-      let url;
-      try { url = new URL(href, window.location.origin); } catch (err) { return; }
-      if (url.origin === window.location.origin && (url.pathname.startsWith("/courses") || url.pathname.startsWith("/music-production") || url.pathname.startsWith("/dj-training") || url.pathname === "/courses" || url.pathname === "/courses/")) {
-        e.preventDefault();
-        setUrl(url.pathname);
-        const route = resolveRoute(url.pathname);
-        if (route.panel === "emp") activate(true, { scroll: true });
-        else activate(false, { scroll: true });
-        return;
+      try {
+        if (replace) {
+          history.replaceState({}, "", path);
+        } else {
+          history.pushState({}, "", path);
+        }
+      } catch (e) {
+        // fallback - browsers may throw for invalid URLs in some contexts
+        console.warn("History API failed:", e);
       }
-      // otherwise leave navigation alone
-    }, { capture: true });
-
-    // Tab clicks
-    if (tabEmp && tabDj) {
-      tabEmp.addEventListener("click", (e) => { e.preventDefault && e.preventDefault(); activate(true, { scroll: true }); setUrl("/courses/music-production"); });
-      tabDj.addEventListener("click", (e) => { e.preventDefault && e.preventDefault(); activate(false, { scroll: true }); setUrl("/courses/dj-training"); });
     }
-    if (exploreEmp) exploreEmp.addEventListener("click", (e) => { e.preventDefault && e.preventDefault(); activate(true, { scroll: true }); setUrl("/courses/music-production"); });
-    if (exploreDj) exploreDj.addEventListener("click", (e) => { e.preventDefault && e.preventDefault(); activate(false, { scroll: true }); setUrl("/courses/dj-training"); });
-    if (navCourses) navCourses.addEventListener("click", (e) => { e.preventDefault && e.preventDefault(); activate(true, { scroll: true }); setUrl("/courses"); });
 
-    // popstate -> update UI
+    /* -------------------------
+       Click handlers - use pushState
+       ------------------------- */
+    if (tabEmp && tabDj) {
+      tabEmp.addEventListener("click", (e) => {
+        // prevent scrolling due to hash or anchor default behavior if any
+        e.preventDefault && e.preventDefault();
+        activate(true);
+        setUrl("/music-production");
+      });
+
+      tabDj.addEventListener("click", (e) => {
+        e.preventDefault && e.preventDefault();
+        activate(false);
+        setUrl("/dj-training");
+      });
+    }
+
+    if (exploreEmp) {
+      exploreEmp.addEventListener("click", (e) => {
+        e.preventDefault && e.preventDefault();
+        activate(true, { scroll: true });
+        setUrl("/music-production");
+      });
+    }
+
+    if (exploreDj) {
+      exploreDj.addEventListener("click", (e) => {
+        e.preventDefault && e.preventDefault();
+        activate(false, { scroll: true });
+        setUrl("/dj-training");
+      });
+    }
+
+    /* -------------------------
+       Handle back/forward (popstate)
+       - When user presses back/forward, read current path and switch tabs
+       ------------------------- */
     window.addEventListener("popstate", () => {
-      const route = resolveRoute(window.location.pathname);
-      if (route.panel === "emp") activate(true, { scroll: false, focus: true });
-      else activate(false, { scroll: false, focus: true });
+      const path = window.location.pathname.toLowerCase();
+      if (path.startsWith("/music-production")) {
+        activate(true, { scroll: false, focus: true });
+      } else if (path.startsWith("/dj-training")) {
+        activate(false, { scroll: false, focus: true });
+      } else {
+        // default to showing EMP panel for unknown /courses or root path
+        activate(true, { scroll: false, focus: true });
+      }
     });
 
-    // initial route handling (on page load)
+    /* -------------------------
+       Initial route handling on page load
+       - If user navigated directly to /music-production or /dj-training, show that tab.
+       - If path is other (e.g. /courses or /courses/), keep current and push a normalized state.
+       ------------------------- */
     (function handleInitialRoute() {
-      const route = resolveRoute(window.location.pathname);
-      if (route.panel === "emp") activate(true, { scroll: false }); else activate(false, { scroll: false });
-      // replace state so SPA owns the entry
-      setUrl(window.location.pathname || "/courses", { replace: true });
+      const path = window.location.pathname.toLowerCase();
+
+      if (path.startsWith("/music-production")) {
+        activate(true, { scroll: false });
+        // keep URL as-is (user intentionally landed here)
+        // ensure history state exists to enable popstate navigation
+        setUrl("/music-production", { replace: true });
+      } else if (path.startsWith("/dj-training")) {
+        activate(false, { scroll: false });
+        setUrl("/dj-training", { replace: true });
+      } else {
+        // default path (courses)
+        // normalize to current path without reloading (don't override if user expects /courses)
+        // We will replaceState so there's a proper history entry
+        setUrl(window.location.pathname || "/courses", { replace: true });
+        // keep EMP active by default
+        activate(true, { scroll: false });
+      }
     })();
 
-    // Parallax
+    // Parallax on hero visuals
     (function () {
       const hero = document.getElementById("hero-visual");
       const album = document.getElementById("float-album");
       const studio = document.getElementById("float-studio");
       if (!hero || !album || !studio) return;
+
       hero.addEventListener("mousemove", (e) => {
         const rect = hero.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -571,25 +1965,37 @@
         album.style.transform = `translate(${x * 18}px, ${y * 12}px) rotate(${x * 4}deg)`;
         studio.style.transform = `translate(${x * -12}px, ${y * -8}px) rotate(${x * -3}deg)`;
       });
-      hero.addEventListener("mouseleave", () => { album.style.transform = ""; studio.style.transform = ""; });
+
+      hero.addEventListener("mouseleave", () => {
+        album.style.transform = "";
+        studio.style.transform = "";
+      });
     })();
 
-    // FAQ accordion
+    // FAQ accordions (works for both EMP & DJ sections)
     (function () {
       const items = document.querySelectorAll(".faq-item");
       items.forEach((item) => {
         const q = item.querySelector(".faq-question");
         const ans = item.querySelector(".faq-answer");
-        if (!q || !ans) return;
         q.addEventListener("click", () => {
           const open = ans.style.display === "block";
-          items.forEach((i) => { const a = i.querySelector(".faq-answer"); if (a) a.style.display = "none"; const s = i.querySelector(".faq-question span"); if (s) s.textContent = "+"; });
-          if (!open) { ans.style.display = "block"; q.querySelector("span").textContent = "-"; } else { ans.style.display = "none"; q.querySelector("span").textContent = "+"; }
+          items.forEach((i) => {
+            i.querySelector(".faq-answer").style.display = "none";
+            i.querySelector(".faq-question span").textContent = "+";
+          });
+          if (!open) {
+            ans.style.display = "block";
+            q.querySelector("span").textContent = "-";
+          } else {
+            ans.style.display = "none";
+            q.querySelector("span").textContent = "+";
+          }
         });
       });
     })();
 
-    // Image fallbacks
+    // Fallback placeholders for hero images
     (function () {
       const album = document.getElementById("float-album");
       const studio = document.getElementById("float-studio");
@@ -598,7 +2004,11 @@
         if (!img.complete || img.naturalWidth === 0) {
           img.style.display = "block";
           img.alt = "";
-          img.src = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#071328"/></svg>');
+          img.src =
+            "data:image/svg+xml;utf8," +
+            encodeURIComponent(
+              '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#071328"/></svg>'
+            );
         }
       });
     })();
@@ -608,8 +2018,18 @@
       const burger = document.querySelector(".hamburger-menu");
       const menu = document.querySelector(".nav-menu");
       if (!burger || !menu) return;
-      burger.addEventListener("click", () => { burger.classList.toggle("is-active"); menu.classList.toggle("is-active"); });
-      menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => { burger.classList.remove("is-active"); menu.classList.remove("is-active"); }));
+
+      burger.addEventListener("click", () => {
+        burger.classList.toggle("is-active");
+        menu.classList.toggle("is-active");
+      });
+
+      menu.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          burger.classList.remove("is-active");
+          menu.classList.remove("is-active");
+        });
+      });
     })();
   </script>
 </body>
