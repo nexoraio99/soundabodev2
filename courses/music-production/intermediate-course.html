@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Electronic Music Production Course in Pune | Intermediate Level</title>
-<meta name="description" content="Advance your skills in electronic music production at Soundabode Pune. Learn sound design, arrangement, and advanced plug-ins like Serum and Arturia." />
+  <meta name="description" content="Advance your skills in electronic music production at Soundabode Pune. Learn sound design, arrangement, and advanced plug-ins like Serum and Arturia." />
   <meta name="theme-color" content="#000000" />
 
   <!-- Favicon / App Icons -->
@@ -647,6 +647,68 @@
       font-size: 0.6rem;
     }
 
+    /* --- POPUP MODAL STYLES (added) --- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1200;
+      padding: 20px;
+    }
+
+    .modal-overlay.is-open { display: flex; }
+
+    .modal {
+      width: 100%;
+      max-width: 720px;
+      background: linear-gradient(180deg, rgba(15,15,15,0.98), rgba(10,10,12,0.98));
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+      color: #e8eef6;
+    }
+
+    .modal-header { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .modal-title { margin:0; font-size:18px; }
+    .modal-close {
+      background: transparent;
+      color: #fff;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 6px;
+      line-height: 1;
+    }
+
+    .modal-body { margin-top: 12px; }
+    .modal-row { display:grid; gap:8px; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 560px) { .modal-row { grid-template-columns: 1fr; } }
+
+    .input, textarea {
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .label { font-size:12px; color: var(--muted); margin-bottom:6px; display:block; }
+
+    .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+    .btn { padding:10px 14px; border-radius:8px; cursor:pointer; border:none; font-weight:600; }
+    .btn-primary { background: linear-gradient(90deg,var(--neon-1),var(--neon-2)); color:#041014; }
+    .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06); color:#e8eef6; }
+
+    .form-note { font-size:13px; color: var(--muted); margin-top:8px; }
+    .form-success { color: #9cedc9; margin-top:8px; font-weight:600; }
+
     /* RESPONSIVE TWEAKS */
 
     @media (max-width: 768px) {
@@ -793,6 +855,7 @@
 
         <div class="cta-row">
           <a class="btn-primary" href="contact.html#contact">Book A Free Demo Class</a>
+          <!-- This link will open the modal via JS (intercept of /enroll) -->
           <a class="btn-outline" href="/enroll">Enroll Now</a>
         </div>
       </div>
@@ -865,7 +928,7 @@
             </div>
             <div class="detail-item">
               <div class="detail-label">Installment</div>
-              <div class="detail-value">Start with ₹ 30,000</div>
+              <div class="detail-value">Pay ₹ 30,000 to block your seat</div>
             </div>
             <div class="detail-item">
               <div class="detail-label">Eligibility</div>
@@ -1222,6 +1285,59 @@
     </div>
   </footer>
 
+  <!-- ENROLL MODAL (same as Beginner) -->
+  <div id="enroll-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="enroll-modal-title">
+    <div class="modal" role="document" tabindex="-1">
+      <div class="modal-header">
+        <h3 class="modal-title" id="enroll-modal-title">Enroll / Book Demo — Soundabode Level 2</h3>
+        <button class="modal-close" aria-label="Close" id="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="enroll-form" action="#" method="POST" novalidate>
+          <div style="display:grid;gap:10px;">
+            <div>
+              <label class="label" for="name">Full name</label>
+              <input id="name" name="name" class="input" type="text" required placeholder="Your full name" />
+            </div>
+
+            <div>
+              <label class="label" for="phone">Phone number</label>
+              <input id="phone" name="phone" class="input" type="tel" required placeholder="+91 9xxxxxxxxx" />
+            </div>
+
+            <div>
+              <label class="label" for="email">Email address</label>
+              <input id="email" name="email" class="input" type="email" placeholder="you@domain.com" />
+            </div>
+
+            <div>
+              <label class="label" for="course">Interested in</label>
+              <select id="course" name="course" class="input">
+                <option value="level2">Level 2 — Intermediate (Electronic Music Production)</option>
+                <option value="level1">Level 1 — Beginner</option>
+                <option value="dj">DJ Training</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="label" for="message">Message (optional)</label>
+              <textarea id="message" name="message" class="input" rows="3" placeholder="Any questions?"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="modal-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="modal-submit">Send enquiry</button>
+          </div>
+
+          <div class="form-note" id="form-note">We will contact you within 24 hours. This is a demo submission (no backend configured).</div>
+          <div class="form-success" id="form-success" style="display:none;">Thanks — your enquiry has been received. We'll call soon.</div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- JS -->
   <script>
     function uet_report_conversion(source) {
@@ -1320,6 +1436,129 @@
         });
       });
     })();
+
+    /* ========== ENROLL MODAL LOGIC (added) ========== */
+    (function () {
+      const modalOverlay = document.getElementById('enroll-modal');
+      const modal = modalOverlay && modalOverlay.querySelector('.modal');
+      const modalCloseBtn = document.getElementById('modal-close-btn');
+      const modalCancelBtn = document.getElementById('modal-cancel');
+      const form = document.getElementById('enroll-form');
+      const formSuccess = document.getElementById('form-success');
+      const formNote = document.getElementById('form-note');
+
+      function openModal() {
+        if (!modalOverlay) return;
+        modalOverlay.classList.add('is-open');
+        modalOverlay.setAttribute('aria-hidden', 'false');
+
+        // focus first input
+        const first = modalOverlay.querySelector('input, select, textarea, button');
+        if (first) first.focus();
+
+        // trap focus & keydown
+        document.addEventListener('focus', trapFocus, true);
+        document.addEventListener('keydown', handleKeydown);
+      }
+
+      function closeModal() {
+        if (!modalOverlay) return;
+        modalOverlay.classList.remove('is-open');
+        modalOverlay.setAttribute('aria-hidden', 'true');
+        document.removeEventListener('focus', trapFocus, true);
+        document.removeEventListener('keydown', handleKeydown);
+        // reset UI but keep values
+        if (formSuccess) formSuccess.style.display = 'none';
+        if (formNote) formNote.style.display = '';
+      }
+
+      function trapFocus(e) {
+        if (!modalOverlay) return;
+        if (modal && !modal.contains(e.target)) {
+          e.stopPropagation();
+          const focusable = modal.querySelector('input,select,textarea,button,a[href],[tabindex]:not([tabindex="-1"])');
+          if (focusable) focusable.focus();
+        }
+      }
+
+      function handleKeydown(e) {
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'Tab') {
+          if (!modal) return;
+          const focusable = modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])');
+          const nodes = Array.prototype.slice.call(focusable);
+          if (!nodes.length) return;
+          const first = nodes[0], last = nodes[nodes.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+
+      // close handlers
+      if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+      if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+      if (modalOverlay) {
+        modalOverlay.addEventListener('click', function (e) {
+          if (e.target === modalOverlay) closeModal();
+        });
+      }
+
+      // intercept enroll links
+      document.addEventListener('click', function (e) {
+        const el = e.target.closest('a');
+        if (!el) return;
+        const href = el.getAttribute('href') || '';
+        const openAttr = el.getAttribute('data-open-enroll');
+
+        // open modal when:
+        // - href is "/enroll"
+        // - href equals "#popup"
+        // - element has data-open-enroll attribute
+        if (href === '/enroll' || href === '#popup' || openAttr) {
+          e.preventDefault();
+          openModal();
+        }
+      });
+
+      // form submission (demo)
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const name = form.querySelector('#name').value.trim();
+          const phone = form.querySelector('#phone').value.trim();
+          if (!name) {
+            alert('Please enter your name.');
+            form.querySelector('#name').focus();
+            return;
+          }
+          if (!phone) {
+            alert('Please enter your phone number.');
+            form.querySelector('#phone').focus();
+            return;
+          }
+
+          // show success
+          if (formNote) formNote.style.display = 'none';
+          if (formSuccess) formSuccess.style.display = '';
+          // optionally send via fetch here
+          // fetch('/api/enquiry', ...)
+          setTimeout(() => {
+            closeModal();
+          }, 2000);
+        });
+      }
+
+      // prevent default jump for href="#"
+      document.querySelectorAll('a[href="#"]').forEach(a => {
+        a.addEventListener('click', (e) => e.preventDefault());
+      });
+    })();
+    /* ========== END ENROLL MODAL LOGIC ========== */
   </script>
 </body>
 </html>
