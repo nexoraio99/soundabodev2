@@ -18,9 +18,91 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png" />
   <link rel="manifest" href="/site.webmanifest" />
 
+  <!-- ========================
+       Google Tag Manager (deferred non-blocking)
+       Container ID: GTM-KVRWZ2DP
+       ======================== -->
+  <script>
+    (function(w,d,s,l,i){
+      // initialize dataLayer immediately
+      w[l]=w[l]||[];
+      w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+      // defer loading to idle or timeout to avoid blocking first paint
+      function load(){
+        var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      }
+      if ('requestIdleCallback' in w) requestIdleCallback(load);
+      else setTimeout(load, 1200);
+    })(window, document, 'script', 'dataLayer', 'GTM-KVRWZ2DP');
+  </script>
+
+  <!-- ========================
+       Microsoft Bing UET (Bing) Tag (deferred)
+       Replace UET_ID with your numeric UET tag if available
+       Example placeholder used: 12345678
+       ======================== -->
+  <script>
+    (function(uetId){
+      if(!uetId) return;
+      // load bat.js deferred
+      function loadUET(){
+        (function(w,d,t,r,u){
+          var f,n,i;
+          w[u]=w[u]||[],f=function(){var o={ti:uetId};o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")};
+          n=d.createElement(t); n.src=r; n.async=1; n.onload=n.onreadystatechange=function(){var s=this.readyState;s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null);};
+          i=d.getElementsByTagName(t)[0]; i.parentNode.insertBefore(n,i);
+        })(window,document,"script","https://bat.bing.com/bat.js","uetq");
+      }
+      if ('requestIdleCallback' in window) requestIdleCallback(loadUET);
+      else setTimeout(loadUET, 1500);
+    })('12345678');
+  </script>
+
+  <!-- UET noscript fallback -->
+  <noscript>
+    <img src="https://bat.bing.com/action/0?ti=12345678&Ver=2" height="0" width="0" style="display:none;visibility:hidden" alt="uet-ns"/>
+  </noscript>
+
+  <!-- ========================
+       Meta / Facebook Pixel (deferred)
+       Pixel ID: 2260208107777252
+       ======================== -->
+  <script>
+    (function(pixelId){
+      if(!pixelId) return;
+      function initFB(){
+        if (window.fbq) return;
+        !function(f,b,e,v,n,t,s){
+          if(f.fbq) return; n=f.fbq=function(){n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq) f._fbq=n; n.push=n; n.loaded=!0; n.version='2.0'; n.queue=[];
+          t=b.createElement(e); t.async=!0; t.src=v; s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s);
+        }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', pixelId);
+        fbq('track', 'PageView');
+      }
+      // defer init to idle / small timeout
+      if ('requestIdleCallback' in window) requestIdleCallback(initFB);
+      else setTimeout(initFB, 1800);
+    })('2260208107777252');
+  </script>
+
+  <!-- Meta Pixel noscript fallback -->
+  <noscript>
+    <img height="1" width="1"
+      src="https://www.facebook.com/tr?id=2260208107777252&ev=PageView&noscript=1"
+      style="display:none;visibility:hidden" alt="fb-ns"/>
+  </noscript>
+
   <style>
     /* ------------------------
        Base / Utility
+       (kept identical to your provided CSS)
        ------------------------ */
     :root {
       --bg-1: #000000;
@@ -227,6 +309,12 @@
   </style>
 </head>
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KVRWZ2DP"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+
   <!-- NAVBAR -->
   <nav class="navbar">
     <a href="/index" class="logo" aria-label="Soundabode home">
@@ -578,14 +666,40 @@
 
   <!-- JS INTERACTIVITY -->
   <script>
-    // analytics helper (kept)
+    // helper to report conversions into Bing UET queue (uetq) and also useful for GTM/dataLayer pushes
     function uet_report_conversion(source) {
-      window.uetq = window.uetq || [];
-      window.uetq.push("event", "contact", {
-        event_label: source === "whatsapp"
-          ? "961303bb-7e25-4b3a-9ed9-04c288d65ee2"
-          : "5547903c-7e42-4d18-ab6d-4b58e660dafe"
-      });
+      // push to Bing's UET queue if available
+      try {
+        window.uetq = window.uetq || [];
+        window.uetq.push("event", "contact", {
+          event_label: source === "whatsapp"
+            ? "961303bb-7e25-4b3a-9ed9-04c288d65ee2"
+            : "5547903c-7e42-4d18-ab6d-4b58e660dafe"
+        });
+      } catch (e) {
+        // fail silently
+        console.warn("uet_report_conversion error", e);
+      }
+
+      // push to dataLayer for GTM
+      try {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'contact',
+          contact_source: source
+        });
+      } catch (e) {
+        console.warn("dataLayer push failed", e);
+      }
+
+      // fire fbq conversion event if available
+      try {
+        if (window.fbq) {
+          fbq('track', 'Contact', { source: source });
+        }
+      } catch (e) {
+        // ignore
+      }
     }
 
     // dynamic year
@@ -703,7 +817,7 @@
       }
     })();
 
-    // parallax visuals (safe)
+    // parallax visuals
     (function () {
       const hero = document.getElementById("hero-visual");
       const album = document.getElementById("float-album");
