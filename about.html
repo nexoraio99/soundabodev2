@@ -121,8 +121,93 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="style/about.css" />
+
+  <!-- ========================
+       Google Tag Manager (non-blocking)
+       Container ID: GTM-KVRWZ2DP (replace with your container ID if different)
+       ======================== -->
+  <script>
+    (function(w,d,s,l,i){
+      w[l]=w[l]||[];
+      w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+      function load(){
+        var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      }
+      if ('requestIdleCallback' in w) requestIdleCallback(load);
+      else setTimeout(load, 1200);
+    })(window, document, 'script', 'dataLayer', 'GTM-KVRWZ2DP');
+  </script>
+
+  <!-- ========================
+       Bing UET (deferred)
+       Replace '12345678' with your real UET tag ID
+       ======================== -->
+  <script>
+    (function(uetId){
+      if(!uetId) return;
+      function loadUET(){
+        (function(w,d,t,r,u){
+          var f,n,i;
+          w[u]=w[u]||[],f=function(){var o={ti:uetId};o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")};
+          n=d.createElement(t); n.src=r; n.async=1;
+          n.onload=n.onreadystatechange=function(){var s=this.readyState;s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null);};
+          i=d.getElementsByTagName(t)[0]; i.parentNode.insertBefore(n,i);
+        })(window,document,"script","https://bat.bing.com/bat.js","uetq");
+      }
+      if ('requestIdleCallback' in window) requestIdleCallback(loadUET);
+      else setTimeout(loadUET, 1500);
+    })('12345678');
+  </script>
+
+  <!-- Bing noscript fallback -->
+  <noscript>
+    <img src="https://bat.bing.com/action/0?ti=12345678&Ver=2" height="0" width="0" style="display:none;visibility:hidden" alt="bing-uet-noscript"/>
+  </noscript>
+
+  <!-- ========================
+       Meta / Facebook Pixel (deferred)
+       Pixel ID: 2260208107777252 (replace if needed)
+       ======================== -->
+  <script>
+    (function(pixelId){
+      if(!pixelId) return;
+      function initPixel(){
+        if (window.fbq) return;
+        !function(f,b,e,v,n,t,s){
+          if(f.fbq) return; n=f.fbq=function(){n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq) f._fbq=n; n.push=n; n.loaded=!0; n.version='2.0'; n.queue=[];
+          t=b.createElement(e); t.async=!0; t.src=v; s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s);
+        }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', pixelId);
+        fbq('track','PageView');
+      }
+      if ('requestIdleCallback' in window) requestIdleCallback(initPixel);
+      else setTimeout(initPixel, 1800);
+    })('2260208107777252');
+  </script>
+
+  <!-- Meta Pixel noscript fallback -->
+  <noscript>
+    <img height="1" width="1"
+      src="https://www.facebook.com/tr?id=2260208107777252&ev=PageView&noscript=1"
+      style="display:none;visibility:hidden" alt="fb-pixel-noscript"/>
+  </noscript>
+
+  <!-- End head -->
 </head>
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KVRWZ2DP"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+
   <nav class="navbar">
     <a href="/index" class="logo">
       <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img">
@@ -144,22 +229,16 @@
 
     <!-- Call Action Button -->
     <div class="nav-actions">
-      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion()">
+      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion('call')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor"/>
         </svg>
       </a>
     </div>
-    <script>
-      function uet_report_conversion() {
-        window.uetq = window.uetq || [];
-        window.uetq.push('event', 'contact', {"event_label":"5547903c-7e42-4d18-ab6d-4b58e660dafe"});
-      }
-    </script>
   </nav>
-  
+
   <!-- MOBILE MENU -->
-  <div class="nav-menu">
+  <div class="nav-menu" aria-hidden="true">
     <a href="/about">About</a>
     <a href="/courses">Courses</a>
     <a href="/contact">Contact</a>
@@ -171,22 +250,14 @@
       ABOUT
       <span>ABOUT</span>
       <span>ABOUT</span>
-      <span>SOUNDABODE</span> 
+      <span>SOUNDABODE</span>
     </h2>
 
-    <!-- ============================================================================
-         WHATSApp FLOATING BUTTON
-         ============================================================================ -->
-    <a href="https://wa.me/919975016189" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp" onclick="uet_report_conversion()">
+    <!-- WHATSApp FLOATING BUTTON -->
+    <a href="https://wa.me/919975016189" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp" onclick="uet_report_conversion('whatsapp')">
       <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp" class="whatsapp-icon" loading="lazy">
     </a>
-    <script>
-      function uet_report_conversion() {
-        window.uetq = window.uetq || [];
-        window.uetq.push('event', 'contact', {"event_label":"961303bb-7e25-4b3a-9ed9-04c288d65ee2"});
-      }
-    </script>
-      
+
     <!-- INTRO BLOCK -->
     <section class="container section">
       <div class="grid-two">
@@ -210,12 +281,12 @@
         <div class="img-card fade-in-right">
           <img
             src="https://res.cloudinary.com/do9qsxvig/image/upload/v1764249813/What_Does_an_Audio_Engineer_Do_ilvcca.webp"
+            alt="What Does an Audio Engineer Do"
           />
           <div class="img-gradient" aria-hidden="true"></div>
         </div>
       </div>
     </section>
-    
 
     <!-- DIVIDER -->
     <div class="container">
@@ -228,7 +299,7 @@
         <h3 class="h3 mb-8">But wait… we don't stop at teaching.</h3>
         <p class="p-xl mb-16">Our students are already killing it on the global and Indian stage:</p>
         <div class="achievements-grid">
-          <!-- cards -->
+          <!-- cards (kept as in your source) -->
           <article class="card" style="--delay:0.1s">
             <div class="card-img">
               <img src="https://res.cloudinary.com/dgwedjftx/image/upload/v1763737687/photo-1649437881547-0f8e365831e0_xq2tsf.avif" alt="OTT scoring" />
@@ -343,9 +414,7 @@
     </section>
   </div>
 
-  <!-- ============================================================================
-       FOOTER
-       ============================================================================ -->
+  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-columns">
@@ -387,6 +456,47 @@
     </div>
   </footer>
 
+  <!-- ======================
+       Global tracking helper
+       Centralized so there are no duplicate functions and it fails gracefully.
+       Usage: uet_report_conversion('call' | 'whatsapp' | 'cta' | customString)
+       ====================== -->
+  <script>
+    (function() {
+      window.uet_report_conversion = function(source) {
+        try {
+          // Bing UET
+          window.uetq = window.uetq || [];
+          window.uetq.push('event', 'contact', { event_label: source || 'contact' });
+        } catch (e) {
+          // swallow errors to avoid breaking UI
+          console.warn('uetq push failed', e);
+        }
+
+        try {
+          // GTM dataLayer
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'contact',
+            contact_source: source || 'contact'
+          });
+        } catch (e) {
+          console.warn('dataLayer push failed', e);
+        }
+
+        try {
+          // Facebook Pixel
+          if (window.fbq) {
+            window.fbq('track', 'Contact', { source: source || 'contact' });
+          }
+        } catch (e) {
+          // ignore
+        }
+      };
+    })();
+  </script>
+
+  <!-- Site JS (your interactive logic) -->
   <script src="script/about.js"></script>
 </body>
 </html>
