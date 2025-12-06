@@ -896,6 +896,25 @@
         });
       });
     })();
+    /* ==========================================================================
+     Tracking helper for Bing UET / custom event
+     ========================================================================== */
+  function sendConversionTracking(eventName = 'submit_lead_form', payload = {}) {
+    try {
+      // 1) If bing's uetq exists
+      if (window.uetq && Array.isArray(window.uetq.push)) {
+        window.uetq.push('event', eventName, payload || {});
+      }
+      // 2) If helper exists
+      if (typeof window.uet_report_conversion === 'function') {
+        try { window.uet_report_conversion(); } catch (e) {}
+      }
+      // 3) Try navigator.sendBeacon to a transparent tracking endpoint (optional fallback)
+    } catch (err) {
+      // swallow tracking errors so they don't affect UX
+      console.warn('tracking error', err);
+    }
+  }
   </script>
 </body>
 </html>
