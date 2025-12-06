@@ -57,36 +57,18 @@
       "status": 301
     },
 
-    "/courses/dj-training": {
-      "url": "/courses/dj-training/basic-dj-course.html",
-      "status": 301
-    },
-    "/courses/dj-training/": {
-      "url": "/courses/dj-training/basic-dj-course.html",
-      "status": 301
-    },
-    "/courses/dj-training/basic": {
-      "url": "/courses/dj-training/basic-dj-course.html",
-      "status": 301
-    },
-    "/courses/dj-training/pro": {
-      "url": "/courses/dj-training/pro-dj-course.html",
-      "status": 301
-    },
-    "/courses/dj-training/advanced": {
-      "url": "/courses/dj-training/advanced-dj-performance.html",
-      "status": 301
-    },
+    /* ---- SHORT ALIASES FOR COURSES ---- */
 
     "/dj": {
-      "url": "/courses/dj-training/basic-dj-course.html",
+      "url": "/courses/dj-training",
       "status": 301
     },
 
     "/music-production": {
-      "url": "/courses/music-production/beginner-course.html",
+      "url": "/courses/music-production",
       "status": 301
     },
+
     "/music-production/beginner-course": {
       "url": "/courses/music-production/beginner-course.html",
       "status": 301
