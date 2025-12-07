@@ -632,7 +632,7 @@ body {
 
   .client-logo-banner {
     position: absolute;
-    bottom: clamp(20px, 3vh, 60px);
+    bottom: clamp(30px, 3vh, 60px);
     left: 50%;
     transform: translateX(-50%);
     width: clamp(280px, 90vw, 800px);
@@ -2331,7 +2331,7 @@ color: #00ff99;
   }
 
   .client-logo-banner {
-  bottom: clamp(20px, 3vw, 30px);
+  bottom: clamp(50px, 3vw, 30px);
   width: 95%;
   }
 
@@ -2590,7 +2590,7 @@ color: #00ff99;
   }
 
   .client-logo-banner {
-  bottom: clamp(15px, 2vw, 25px);
+  bottom: clamp(150px, 2vw, 25px);
   width: 92%;
   }
 
