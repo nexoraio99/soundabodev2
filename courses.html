@@ -235,7 +235,7 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; opacity: 0; pointer-events: none;
       transition: opacity .45s ease, transform .45s cubic-bezier(.2,.9,.2,1);
-      display:flex; flex-direction: column; justify-content:center; gap:8px; text-align:left;
+      display:flex; flex-direction: column; justify-content:center; gap:8px; text-align:center;
     }
     .testimonial.active { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
 
@@ -1006,7 +1006,7 @@
       let current = slides.findIndex(s => s.classList.contains('active'));
       if(current < 0) current = 0;
       const total = slides.length;
-      const AUTOPLAY_MS = 6000;
+      const AUTOPLAY_MS = 3000;
       let interval = null;
 
       // build dots if none
