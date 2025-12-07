@@ -211,7 +211,51 @@
     .stat { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:10px 12px; border-radius:12px; text-align:left; border:1px solid rgba(255,255,255,0.04); }
     .stat .num { font-weight:700; font-size:15px; }
     .stat .label { font-size:11px; color:var(--muted); margin-top:2px; }
+    
+        /* ============================================================================
+       TESTIMONIALS (Carousel) - styles added
+       ============================================================================ */
+    .testimonials {
+      background: var(--bg-1);
+      color: #fff;
+      padding: clamp(28px,6vw,56px) clamp(12px,4vw,40px);
+      text-align: center;
+      position: relative;
+      border-top: 1px solid rgba(255,255,255,0.03);
+    }
+    .testimonials .section-title { margin-bottom: 18px; font-weight:300; }
 
+    .testimonial-container {
+      width: 100%; max-width: 920px; margin: 0 auto; position: relative; --card-h: clamp(170px, 20vh, 240px);
+      height: var(--card-h); min-height: var(--card-h);
+    }
+    .testimonial {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.98);
+      width: min(88%, 820px); padding: clamp(12px,2.2vw,20px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; opacity: 0; pointer-events: none;
+      transition: opacity .45s ease, transform .45s cubic-bezier(.2,.9,.2,1);
+      display:flex; flex-direction: column; justify-content:center; gap:8px; text-align:left;
+    }
+    .testimonial.active { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
+
+    .quote { color: rgba(230,230,230,0.95); margin: 0; font-size: clamp(.9rem, 1.8vw, 1.02rem); line-height:1.5; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+    .author { margin: 0; font-weight:700; font-size: clamp(.86rem,1.6vw,1rem); color:#fff; }
+    .role { margin: 0; color: rgba(200,200,200,0.7); font-size: clamp(.72rem,1.1vw,.84rem); }
+
+    .controls { display:flex; justify-content:center; align-items:center; gap:clamp(8px,2vw,20px); margin-top:18px; }
+    .controls button.prev, .controls button.next { background:#111; color:#fff; border:none; border-radius:50%; width:clamp(36px,7vw,44px); height:clamp(36px,7vw,44px); cursor:pointer; }
+    .dots { display:flex; gap:clamp(6px,1.6vw,10px); align-items:center; }
+    .dots button { width:clamp(8px,1.4vw,10px); height:clamp(8px,1.4vw,10px); border-radius:50%; border:0; background:rgba(255,255,255,0.16); cursor:pointer; transition:transform .12s,background .18s; }
+    .dots button.active { background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); transform: scale(1.16); box-shadow:0 6px 18px rgba(0,0,0,0.6); }
+
+    .sr-status { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; left:-9999px; }
+
+    @media (max-width:520px) {
+      .testimonial-container { --card-h: 210px; }
+      .quote { -webkit-line-clamp: 3; font-size: .98rem; }
+      .testimonial { padding: 12px; border-radius: 10px; }
+    }
     /* HERO VISUAL */
     .hero-visual { position:relative; height:340px; border-radius:20px; overflow:hidden; border:1px solid rgba(17,16,16,0.06); background:#000000; }
     .hero-visual::before { content:""; position:absolute; inset:0; border-radius:20px; box-shadow: inset 0 0 60px rgba(78,231,255,0.06), inset 0 0 120px rgba(0,0,0,0.7); pointer-events:none; z-index:4; }
@@ -467,6 +511,41 @@
           </article>
         </div>
       </div>
+
+                <!-- =======================================================================
+           TESTIMONIALS SECTION (auto-advancing carousel)
+           ======================================================================= -->
+           <section class="testimonials" aria-label="Student testimonials">
+            <h2 class="section-title">WHAT THEY SAID</h2>
+    
+            <div class="testimonial-container" aria-live="polite">
+              <div class="testimonial active" role="group" aria-roledescription="slide" aria-label="1 of 3">
+                <p class="quote">"I've had an incredible experience at Soundabode. The instructors here are not just passionate, they're deeply experienced and truly know what they're teaching. From understanding the basics of beat matching to mastering bar-to-bar flow, every session is packed with knowledge that comes from real world experience. I can safely say if you're here to learn production or mixing and you're serious about music, rhythm and the art of mixing, this is the place to be. What truly sets them apart from the rest is, the fact that they emphasise on different genres of music, which allows one to try genres out of their comfort zone's and not feel restricted to just try one style of music."</p>
+                <h3 class="author">Tanisha Railkar</h3>
+                <p class="role">Tech House Producer</p>
+              </div>
+    
+              <div class="testimonial" role="group" aria-roledescription="slide" aria-label="2 of 3">
+                <p class="quote">"I recently completed a DJ course and I couldn't be happier with my experience. The course was well-structured and covered all the basics of DJing, from beatmatching to EQing to reading the crowd. The instructor was knowledgeable, patient, and always willing to answer my questions. By the end of the course, I felt confident enough to start playing gigs and experimenting with my own style. I highly recommend this course to anyone who wants to learn how to DJ or improve their skills. SOUNDABODE - THE BEST 💥💥💥"</p>
+                <h3 class="author">Anmol Bhat</h3>
+                <p class="role">DJ Student</p>
+              </div>
+    
+              <div class="testimonial" role="group" aria-roledescription="slide" aria-label="3 of 3">
+                <p class="quote">"I recently completed my level course with Sound Abode, and I couldn't be happier with my experience. I must highlight the instructor, Mr. Harsh who is exceptionally knowledgeable and passionate about music production. His personalized attention really supports your growth as an artist. The curriculum is well-organized, covering everything from basic to advanced techniques making it suitable for all ages. The hands-on projects are especially valuable, and the community is both welcoming and supportive."</p>
+                <h3 class="author">Sudarsan Venkata Chilakalapalli</h3>
+                <p class="role">Art Director Creative House</p>
+              </div>
+            </div>
+    
+            <div class="controls" aria-hidden="false">
+              <button class="prev" aria-label="Previous testimonial">&#10094;</button>
+              <div class="dots" role="tablist" aria-label="Testimonial controls"></div>
+              <button class="next" aria-label="Next testimonial">&#10095;</button>
+            </div>
+    
+            <div class="sr-status" aria-live="polite" role="status"></div>
+          </section>
 
       <div class="section-divider"></div>
 
@@ -915,6 +994,78 @@
       console.warn('tracking error', err);
     }
   }
+  (function(){
+      const container = document.querySelector('.testimonial-container');
+      if(!container) return;
+      const slides = Array.from(container.querySelectorAll('.testimonial'));
+      const prevBtn = document.querySelector('.controls .prev');
+      const nextBtn = document.querySelector('.controls .next');
+      const dotsWrap = document.querySelector('.controls .dots');
+      let srStatus = document.querySelector('.sr-status');
+
+      let current = slides.findIndex(s => s.classList.contains('active'));
+      if(current < 0) current = 0;
+      const total = slides.length;
+      const AUTOPLAY_MS = 6000;
+      let interval = null;
+
+      // build dots if none
+      if(dotsWrap && dotsWrap.children.length === 0){
+        slides.forEach((_, i) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.setAttribute('aria-label', 'Show testimonial ' + (i+1));
+          btn.dataset.index = String(i);
+          dotsWrap.appendChild(btn);
+        });
+      }
+      const dots = dotsWrap ? Array.from(dotsWrap.children) : [];
+
+      function updateUI(index){
+        slides.forEach((s,i) => {
+          const active = i === index;
+          s.classList.toggle('active', active);
+          s.setAttribute('aria-hidden', active ? 'false' : 'true');
+        });
+        dots.forEach((d,i) => d.classList.toggle('active', i===index));
+        const author = slides[index].querySelector('.author')?.textContent || `Testimonial ${index+1}`;
+        if(srStatus) srStatus.textContent = `Showing ${index+1} of ${total}: ${author}`;
+      }
+
+      function go(idx){
+        current = (idx + total) % total;
+        updateUI(current);
+      }
+      function next(){ go(current+1); }
+      function prev(){ go(current-1); }
+
+      nextBtn && nextBtn.addEventListener('click', ()=>{ next(); resetAutoplay(); });
+      prevBtn && prevBtn.addEventListener('click', ()=>{ prev(); resetAutoplay(); });
+      dots.forEach(d => d.addEventListener('click', e => { const i = parseInt(e.currentTarget.dataset.index,10); if(!isNaN(i)){ go(i); resetAutoplay(); } }));
+
+      document.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowLeft') { prev(); resetAutoplay(); }
+        if(e.key === 'ArrowRight') { next(); resetAutoplay(); }
+      });
+
+      function startAutoplay(){ if(interval) return; interval = setInterval(next, AUTOPLAY_MS); }
+      function stopAutoplay(){ if(interval){ clearInterval(interval); interval = null; } }
+      function resetAutoplay(){ stopAutoplay(); setTimeout(startAutoplay, 1200); }
+
+      const testimonialsEl = document.querySelector('.testimonials');
+      if(testimonialsEl){
+        testimonialsEl.addEventListener('mouseenter', stopAutoplay, {passive:true});
+        testimonialsEl.addEventListener('mouseleave', startAutoplay, {passive:true});
+        testimonialsEl.addEventListener('focusin', stopAutoplay);
+        testimonialsEl.addEventListener('focusout', startAutoplay);
+        testimonialsEl.addEventListener('touchstart', stopAutoplay, {passive:true});
+        testimonialsEl.addEventListener('touchend', ()=> setTimeout(startAutoplay,900), {passive:true});
+      }
+
+      slides.forEach((s,i) => { s.setAttribute('role','group'); s.setAttribute('aria-roledescription','slide'); s.setAttribute('aria-label', `${i+1} of ${total}`); });
+      go(current);
+      startAutoplay();
+    })();
   </script>
 </body>
 </html>
