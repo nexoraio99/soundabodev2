@@ -1,3 +1,10 @@
+/* ============================================================================
+   Full fixed CSS for Soundabode (replace style1.css)
+   - Includes responsive client logo banner fixes
+   - Preserves original styles & responsive rules
+   ============================================================================ */
+
+/* Global reset + box-sizing */
 * {
   margin: 0;
   padding: 0;
@@ -10,6 +17,7 @@ html {
   overflow-x: hidden;
 }
 
+/* Root variables */
 :root {
   --clr-1: #00c2ff;
   --clr-2: #33ff8c;
@@ -22,6 +30,7 @@ html {
   --section-content-max: 1200px;
 }
 
+/* Page base */
 body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: #000000;
@@ -106,9 +115,12 @@ body {
 /* ============================================================================
   INTRO OVERLAY
   ============================================================================ */
-.text-container{border:1px solid red; background-color: #000000;
 
+.text-container {
+  border: 1px solid red;
+  background-color: #000000;
 }
+
 .intro-overlay {
   position: fixed;
   top: 0;
@@ -221,23 +233,23 @@ body {
 
 @keyframes slideInLeft {
   from {
-  opacity: 0;
-  transform: translateX(-30px);
+    opacity: 0;
+    transform: translateX(-30px);
   }
   to {
-  opacity: 1;
-  transform: translateX(0);
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
 @keyframes slideInRight {
   from {
-  opacity: 0;
-  transform: translateX(30px);
+    opacity: 0;
+    transform: translateX(30px);
   }
   to {
-  opacity: 1;
-  transform: translateX(0);
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -247,62 +259,62 @@ body {
 @media (max-width: 1024px) {
   .overlay-left,
   .overlay-right {
-  justify-content: center;
-  align-items: center !important;
-  text-align: center !important;
-  padding: 2rem;
+    justify-content: center;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 2rem;
   }
 
   .left-font,
   .right-font {
-  text-align: center !important;
-  font-size: clamp(18px, 3vw, 24px);
+    text-align: center !important;
+    font-size: clamp(18px, 3vw, 24px);
   }
 
   .overlay-left p,
   .overlay-right p {
-  text-align: center !important;
-  font-size: clamp(14px, 2.2vw, 18px);
-  max-width: 90%;
+    text-align: center !important;
+    font-size: clamp(14px, 2.2vw, 18px);
+    max-width: 90%;
   }
 }
 
 /* Mobile: Stack panels vertically and keep centered */
 @media (max-width: 768px) {
   .intro-overlay {
-  flex-direction: column;
+    flex-direction: column;
   }
 
   .intro-panel {
-  width: 100%;
-  height: 50vh;
+    width: 100%;
+    height: 50vh;
   }
 
   .overlay-left,
   .overlay-right {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) !important;
-  width: 90%;
-  max-width: 90%;
-  justify-content: center;
-  align-items: center !important;
-  text-align: center !important;
-  padding: 1.5rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+    width: 90%;
+    max-width: 90%;
+    justify-content: center;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 1.5rem;
   }
 
   .left-font,
   .right-font {
-  text-align: center !important;
-  font-size: clamp(16px, 3.5vw, 20px);
-  margin-bottom: 15px;
+    text-align: center !important;
+    font-size: clamp(16px, 3.5vw, 20px);
+    margin-bottom: 15px;
   }
 
   .overlay-left p,
   .overlay-right p {
-  text-align: center !important;
-  font-size: clamp(12px, 3vw, 16px);
+    text-align: center !important;
+    font-size: clamp(12px, 3vw, 16px);
   }
 
   /* Override animations for mobile to maintain centering */
@@ -310,51 +322,51 @@ body {
   .overlay-left p,
   .overlay-right .right-font,
   .overlay-right p {
-  animation: fadeInMobile 2s ease-out forwards !important;
+    animation: fadeInMobile 2s ease-out forwards !important;
   }
 }
 
 /* Small mobile (480px and below) */
 @media (max-width: 480px) {
   .intro-overlay {
-  flex-direction: column;
+    flex-direction: column;
   }
 
   .intro-panel {
-  width: 100%;
-  height: 50vh;
+    width: 100%;
+    height: 50vh;
   }
 
   .overlay-left,
   .overlay-right {
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 95% !important;
-  max-width: 95% !important;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center !important;
-  padding: 1rem !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 95% !important;
+    max-width: 95% !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 1rem !important;
   }
 
   .left-font,
   .right-font {
-  text-align: center !important;
-  font-size: clamp(14px, 5vw, 18px) !important;
-  margin-bottom: 10px !important;
-  width: 100%;
-  display: block;
+    text-align: center !important;
+    font-size: clamp(14px, 5vw, 18px) !important;
+    margin-bottom: 10px !important;
+    width: 100%;
+    display: block;
   }
 
   .overlay-left p,
   .overlay-right p {
-  text-align: center !important;
-  font-size: clamp(12px, 4vw, 14px) !important;
-  line-height: 1.5 !important;
-  width: 100%;
-  display: block;
+    text-align: center !important;
+    font-size: clamp(12px, 4vw, 14px) !important;
+    line-height: 1.5 !important;
+    width: 100%;
+    display: block;
   }
 
   /* Force mobile animation */
@@ -362,54 +374,54 @@ body {
   .overlay-left p,
   .overlay-right .right-font,
   .overlay-right p {
-  animation: fadeInMobile 1.5s ease-out forwards !important;
+    animation: fadeInMobile 1.5s ease-out forwards !important;
   }
 }
 
 /* Extra small mobile (360px and below) */
 @media (max-width: 360px) {
   .intro-overlay {
-  flex-direction: column;
+    flex-direction: column;
   }
 
   .intro-panel {
-  width: 100%;
-  height: 50vh;
+    width: 100%;
+    height: 50vh;
   }
 
   .overlay-left,
   .overlay-right {
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 98% !important;
-  max-width: 98% !important;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center !important;
-  padding: 0.75rem !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 98% !important;
+    max-width: 98% !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 0.75rem !important;
   }
 
   .left-font,
   .right-font {
-  text-align: center !important;
-  font-size: 14px !important;
-  margin-bottom: 8px !important;
-  line-height: 1.3 !important;
-  width: 100%;
-  display: block;
-  font-weight: 600;
+    text-align: center !important;
+    font-size: 14px !important;
+    margin-bottom: 8px !important;
+    line-height: 1.3 !important;
+    width: 100%;
+    display: block;
+    font-weight: 600;
   }
 
   .overlay-left p,
   .overlay-right p {
-  text-align: center !important;
-  font-size: 11px !important;
-  line-height: 1.4 !important;
-  font-weight: 300 !important;
-  width: 100%;
-  display: block;
+    text-align: center !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+    font-weight: 300 !important;
+    width: 100%;
+    display: block;
   }
 
   /* Maintain mobile animation */
@@ -417,17 +429,17 @@ body {
   .overlay-left p,
   .overlay-right .right-font,
   .overlay-right p {
-  animation: fadeInMobile 1.5s ease-out forwards !important;
+    animation: fadeInMobile 1.5s ease-out forwards !important;
   }
 }
 
 /* New animation for mobile that doesn't shift position */
 @keyframes fadeInMobile {
   from {
-  opacity: 0;
+    opacity: 0;
   }
   to {
-  opacity: 1;
+    opacity: 1;
   }
 }
 
@@ -490,12 +502,12 @@ body {
 
 @keyframes fadeIn {
   from {
-  opacity: 0;
-  transform: translateY(20px);
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
-  opacity: 1;
-  transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -508,12 +520,12 @@ body {
   letter-spacing: -0.02em;
   text-transform: uppercase;
   background-image: linear-gradient(
-  135deg,
-  #ff0080 0%,
-  #7928ca 25%,
-  #0070f3 50%,
-  #38bdf8 75%,
-  #ff0080 100%
+    135deg,
+    #ff0080 0%,
+    #7928ca 25%,
+    #0070f3 50%,
+    #38bdf8 75%,
+    #ff0080 100%
   );
   background-size: 200% 200%;
   background-repeat: no-repeat;
@@ -529,24 +541,24 @@ body {
 
 @keyframes aurora-move {
   0% {
-  background-position: 0% 50%;
-  transform: rotate(-2deg) scale(0.96);
+    background-position: 0% 50%;
+    transform: rotate(-2deg) scale(0.96);
   }
   25% {
-  background-position: 50% 100%;
-  transform: rotate(3deg) scale(1.04);
+    background-position: 50% 100%;
+    transform: rotate(3deg) scale(1.04);
   }
   50% {
-  background-position: 100% 50%;
-  transform: rotate(-1deg) scale(0.99);
+    background-position: 100% 50%;
+    transform: rotate(-1deg) scale(0.99);
   }
   75% {
-  background-position: 50% 0%;
-  transform: rotate(2deg) scale(1.02);
+    background-position: 50% 0%;
+    transform: rotate(2deg) scale(1.02);
   }
   100% {
-  background-position: 0% 50%;
-  transform: rotate(-2deg) scale(0.96);
+    background-position: 0% 50%;
+    transform: rotate(-2deg) scale(0.96);
   }
 }
 
@@ -588,7 +600,7 @@ body {
   font-weight: 500;
   letter-spacing: 1px;
   border: none;
-  text-decoration:none;
+  text-decoration: none;
   border-radius: 8px 10px;
   padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 28px);
   cursor: pointer;
@@ -616,93 +628,130 @@ body {
 
 @keyframes glowing {
   0% {
-  background-position: 0% 50%;
+    background-position: 0% 50%;
   }
   50% {
-  background-position: 100% 50%;
+    background-position: 100% 50%;
   }
   100% {
-  background-position: 0% 50%;
+    background-position: 0% 50%;
   }
 }
 
 /* ============================================================================
-  CLIENT LOGO BANNER
+  CLIENT LOGO BANNER (FULL FIXED)
+  - Rewritten to avoid wrap + vertical push on mobile
   ============================================================================ */
 
-  .client-logo-banner {
-    position: absolute;
-    bottom: clamp(20px, 3vh, 60px);
-    left: 50%;
-    transform: translateX(-50%);
-    width: clamp(280px, 90vw, 800px);
-    overflow: hidden;
-    padding: 0;
-    z-index: 7;
-  }
+.client-logo-banner {
+  /* keep centered, but allow full-width on small screens */
+  position: absolute;
+  bottom: clamp(15px, 3vh, 60px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(95%, clamp(280px, 90vw, 900px));
+  max-width: 100%;
+  padding: 8px 6px;
+  overflow: visible; /* allow visual masks at edges but we handle track overflow */
+  z-index: 7;
+  -webkit-tap-highlight-color: transparent;
+}
 
-  .logo-track {
-    display: flex;
-    gap: clamp(20px, 3vw, 80px);
-    width: fit-content;
-    will-change: transform;
-  }
+/* Make track a single non-wrapping row and allow horizontal scrolling on small screens */
+.logo-track {
+  display: flex;
+  gap: clamp(12px, 3vw, 48px);
+  flex-wrap: nowrap;               /* prevent wrapping to next line */
+  align-items: center;
+  width: 100%;
+  overflow-x: auto;                /* allow horizontal scroll instead of wrapping */
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;   /* optional: nice snapping on touch devices */
+  padding-bottom: 6px;             /* spare room for scrollbars on some UIs */
+  will-change: transform;
+}
 
-  .logo-set {
-    display: flex;
-    gap: clamp(20px, 3vw, 80px);
-  }
+/* Keep sets inline and not shrink */
+.logo-set {
+  display: inline-flex;
+  gap: inherit;
+  align-items: center;
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+}
 
-  .logo-item {
-    width: clamp(40px, 10vw, 100px);
-    height: clamp(40px, 10vw, 100px);
-    min-width: 40px;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    background: rgba(101, 101, 101, 0.05);
-    border-radius: clamp(8px, 1vw, 16px);
-    padding: clamp(8px, 1.5vw, 18px);
-    transition: transform 0.3s ease;
-  }
+/* Make each logo item stable size, do not rely on height:100% + heavy padding */
+.logo-item {
+  flex: 0 0 auto; /* do not grow/shrink */
+  width: clamp(56px, 14vw, 120px);   /* responsive width */
+  height: auto;                      /* let image define height */
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(101,101,101,0.03);
+  border-radius: clamp(8px, 1vw, 14px);
+  padding: clamp(6px, 1.5vw, 12px);
+  transition: transform .22s ease;
+  scroll-snap-align: center;
+  box-sizing: border-box;
+}
 
-  .logo-item:hover {
-    transform: scale(1.1);
-  }
+/* Keep hover effect but reduce transform for mobile */
+.logo-item:hover { transform: scale(1.06); }
 
-  .logo-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    filter: brightness(0.9);
-  }
+/* Logo image: preserve aspect ratio, constrain max-height (visual alignment) */
+.logo-item img {
+  display: block;
+  width: auto;                /* don't force full width */
+  max-width: 100%;
+  height: auto;
+  max-height: 48px;          /* keeps all logos visually aligned; tweak if needed */
+  object-fit: contain;
+  filter: brightness(0.95);
+}
 
-  .client-logo-banner::before,
-  .client-logo-banner::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    width: clamp(60px, 20vw, 200px);
-    height: 100%;
-    pointer-events: none;
-    z-index: 10;
-  }
+/* Edge fade overlays (keeps your existing visual effect) */
+.client-logo-banner::before,
+.client-logo-banner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: clamp(60px, 20vw, 200px);
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
 
-  .client-logo-banner::before {
-    left: 0;
-    background: linear-gradient(to right, #050505 0%, transparent 100%);
-  }
+.client-logo-banner::before {
+  left: 0;
+  background: linear-gradient(to right, #050505 0%, transparent 100%);
+}
 
-  .client-logo-banner::after {
-    right: 0;
-    background: linear-gradient(to left, #050505 0%, transparent 100%);
-  }
+.client-logo-banner::after {
+  right: 0;
+  background: linear-gradient(to left, #050505 0%, transparent 100%);
+}
 
-  .client-logo-banner:hover .logo-track {
-    animation-play-state: paused;
-  }
+/* Pause any animation on hover */
+.client-logo-banner:hover .logo-track {
+  animation-play-state: paused;
+}
+
+/* Tighten on very small screens */
+@media (max-width: 520px) {
+  .client-logo-banner { bottom: clamp(12px, 3vh, 28px); width: 94%; padding: 6px; }
+  .logo-track { gap: 12px; }
+  .logo-item { width: clamp(44px, 12vw, 64px); padding: 6px; }
+  .logo-item img { max-height: 36px; }
+}
+
+/* Desktop: center visually and allow visible overflow (no scroll) */
+@media (min-width: 1000px) {
+  .logo-track { overflow-x: visible; justify-content: center; }
+  .client-logo-banner { width: clamp(420px, 66vw, 1100px); }
+  .logo-item img { max-height: 56px; }
+}
 
 /* ============================================================================
   SPACER
@@ -853,12 +902,12 @@ body {
 
 @keyframes fadeInUp {
   from {
-  opacity: 0;
-  transform: translateY(30px);
+    opacity: 0;
+    transform: translateY(30px);
   }
   to {
-  opacity: 1;
-  transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -1103,147 +1152,143 @@ body {
 /* ============================================================================
   TESTIMONIALS SECTION
   ============================================================================ */
-  /* ==========================
-Testimonials — fixed-size responsive cards
-Replace the old testimonials CSS with this block
-========================== */
 
 .testimonials {
-background: #000;
-color: #fff;
-padding: clamp(40px, 8vw, 100px) clamp(15px, 3vw, 20px);
-text-align: center;
-font-family: "Inter", sans-serif;
-position: relative;
-z-index: 2;
-overflow: hidden; /* ensure no stray overflow from cards */
+  background: #000;
+  color: #fff;
+  padding: clamp(40px, 8vw, 100px) clamp(15px, 3vw, 20px);
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  position: relative;
+  z-index: 2;
+  overflow: hidden; /* ensure no stray overflow from cards */
 }
 
 /* Section title */
 .section-title {
-font-size: clamp(1.5rem, 5vw, 3rem);
-letter-spacing: clamp(0.5px, 1vw, 2px);
-margin-bottom: clamp(30px, 5vw, 60px);
-font-weight: 300;
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  letter-spacing: clamp(0.5px, 1vw, 2px);
+  margin-bottom: clamp(30px, 5vw, 60px);
+  font-weight: 300;
 }
 
 /* Center container that acts as the fixed viewport for cards */
 .testimonial-container {
-width: 100%;
-max-width: 880px;
-margin: 0 auto;
-position: relative;
-/* fixed viewport height prevents jumps when different reviews show */
---card-w: min(720px, 92%);       /* desktop max width for card */
---card-h: clamp(180px, 22vh, 240px); /* fixed-ish height but responsive */
-height: var(--card-h);
-min-height: var(--card-h);
-display: flex;
-align-items: center;
-justify-content: center;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  position: relative;
+  /* fixed viewport height prevents jumps when different reviews show */
+  --card-w: min(720px, 92%);       /* desktop max width for card */
+  --card-h: clamp(180px, 22vh, 240px); /* fixed-ish height but responsive */
+  height: var(--card-h);
+  min-height: var(--card-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Individual testimonial - stacked absolutely inside container */
 .testimonial {
-position: absolute;
-left: 50%;
-top: 50%;
-transform: translate(-50%, -50%);
-width: var(--card-w);
-max-width: 100%;
-height: var(--card-h);
-min-height: var(--card-h);
-box-sizing: border-box;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--card-w);
+  max-width: 100%;
+  height: var(--card-h);
+  min-height: var(--card-h);
+  box-sizing: border-box;
 
-background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-border: 1px solid rgba(255,255,255,0.04);
-border-radius: 12px;
-padding: clamp(14px, 2.4vw, 20px);
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-overflow: hidden;             /* clip long content */
-opacity: 0;
-pointer-events: none;
-transition: opacity 0.45s ease, transform 0.45s ease;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 12px;
+  padding: clamp(14px, 2.4vw, 20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;             /* clip long content */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease;
 }
 
 /* Visible testimonial */
 .testimonial.active {
-opacity: 1;
-pointer-events: auto;
-transform: translate(-50%, -50%); /* same position, prevents jump */
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%); /* same position, prevents jump */
 }
 
 /* Quote text: limit number of visible lines */
 .quote {
-font-size: clamp(0.9rem, 2vw, 1.05rem);
-line-height: 1.45;
-margin: 0 0 clamp(8px, 1vw, 10px) 0;
-color: #ddd;
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  line-height: 1.45;
+  margin: 0 0 clamp(8px, 1vw, 10px) 0;
+  color: #ddd;
 
-/* line-clamp: show consistent number of lines and ellipsis */
-display: -webkit-box;
--webkit-box-orient: vertical;
--webkit-line-clamp: 4; /* adjust lines shown */
-overflow: hidden;
-max-height: calc(1.45em * 4); /* fallback for non-webkit */
+  /* line-clamp: show consistent number of lines and ellipsis */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4; /* adjust lines shown */
+  overflow: hidden;
+  max-height: calc(1.45em * 4); /* fallback for non-webkit */
 }
 
 /* Author/role fixed at bottom area */
 .author {
-font-weight: 700;
-letter-spacing: 1px;
-font-size: clamp(0.82rem, 1.5vw, 0.95rem);
-color: #fff;
-margin: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: clamp(0.82rem, 1.5vw, 0.95rem);
+  color: #fff;
+  margin: 0;
 }
 .role {
-font-size: clamp(0.7rem, 1.2vw, 0.82rem);
-letter-spacing: 1px;
-color: #bdbdbd;
-margin: 4px 0 0 0;
+  font-size: clamp(0.7rem, 1.2vw, 0.82rem);
+  letter-spacing: 1px;
+  color: #bdbdbd;
+  margin: 4px 0 0 0;
 }
 
 /* Controls stay under the testimonial container, won't shift cards */
 .controls {
-display: flex;
-justify-content: center;
-align-items: center;
-margin-top: clamp(16px, 2vw, 22px);
-gap: clamp(12px, 2vw, 20px);
-flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: clamp(16px, 2vw, 22px);
+  gap: clamp(12px, 2vw, 20px);
+  flex-wrap: wrap;
 }
 
 /* Prev/Next buttons */
 button.prev,
 button.next {
-background: #111;
-color: #fff;
-border: none;
-border-radius: 50%;
-width: clamp(36px, 7vw, 40px);
-height: clamp(36px, 7vw, 40px);
-font-size: clamp(14px, 2vw, 18px);
-cursor: pointer;
-transition: background 0.25s;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: clamp(36px, 7vw, 40px);
+  height: clamp(36px, 7vw, 40px);
+  font-size: clamp(14px, 2vw, 18px);
+  cursor: pointer;
+  transition: background 0.25s;
 }
 button.prev:hover,
 button.next:hover { background: #222; }
 
 /* Dots row */
 .dots {
-display: flex;
-gap: clamp(6px, 1vw, 10px);
+  display: flex;
+  gap: clamp(6px, 1vw, 10px);
 }
 .dots span {
-width: clamp(8px, 1.5vw, 10px);
-height: clamp(8px, 1.5vw, 10px);
-background: #555;
-border-radius: 50%;
-cursor: pointer;
-display: inline-block;
-transition: transform .18s, background .18s;
+  width: clamp(8px, 1.5vw, 10px);
+  height: clamp(8px, 1.5vw, 10px);
+  background: #555;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-block;
+  transition: transform .18s, background .18s;
 }
 .dots span.active { background: #fff; transform: scale(1.14); }
 
@@ -1253,16 +1298,16 @@ transition: transform .18s, background .18s;
 
 /* SMALL DEVICES: adjust card height/line clamp */
 @media (max-width: 520px) {
-.testimonial-container { --card-h: 200px; height: var(--card-h); min-height: var(--card-h); }
-.testimonial { padding: 12px; border-radius:10px; }
-.quote { -webkit-line-clamp: 3; max-height: calc(1.45em * 3); font-size: .95rem; }
-.author { font-size: .9rem; }
+  .testimonial-container { --card-h: 200px; height: var(--card-h); min-height: var(--card-h); }
+  .testimonial { padding: 12px; border-radius:10px; }
+  .quote { -webkit-line-clamp: 3; max-height: calc(1.45em * 3); font-size: .95rem; }
+  .author { font-size: .9rem; }
 }
 
 /* VERY SMALL PHONES: slightly narrower card width */
 @media (max-width: 360px) {
-.testimonial-container { --card-w: 92%; --card-h: 180px; height: var(--card-h); min-height: var(--card-h); }
-.quote { -webkit-line-clamp: 3; max-height: calc(1.45em * 3); }
+  .testimonial-container { --card-w: 92%; --card-h: 180px; height: var(--card-h); min-height: var(--card-h); }
+  .quote { -webkit-line-clamp: 3; max-height: calc(1.45em * 3); }
 }
 
 /* Safety: ensure no horizontal scroll from testimonials */
@@ -1316,12 +1361,12 @@ html, body { overflow-x: hidden; }
 
 @keyframes popIn {
   from {
-  transform: scale(0.7) translateY(-20px);
-  opacity: 0;
+    transform: scale(0.7) translateY(-20px);
+    opacity: 0;
   }
   to {
-  transform: scale(1) translateY(0);
-  opacity: 1;
+    transform: scale(1) translateY(0);
+    opacity: 1;
   }
 }
 
@@ -1423,21 +1468,21 @@ html, body { overflow-x: hidden; }
 /* Mobile Responsive */
 @media (max-width: 480px) {
   .popup-content {
-  width: 95%;
-  padding: 1.5rem 1.2rem;
+    width: 95%;
+    padding: 1.5rem 1.2rem;
   }
 
   .close-btn {
-  top: 0.7rem;
-  right: 0.7rem;
-  width: 32px;
-  height: 32px;
-  font-size: 1.3rem;
+    top: 0.7rem;
+    right: 0.7rem;
+    width: 32px;
+    height: 32px;
+    font-size: 1.3rem;
   }
 
   .popup-content h2 {
-  font-size: 1.2rem;
-  margin-bottom: 0.3rem;
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
   }
 }
 
@@ -1473,9 +1518,8 @@ html, body { overflow-x: hidden; }
   filter: brightness(0) invert(1);
 }
 
-  /* ============================
+/* ============================
 Studio Setup — Responsive CSS
-Paste this into style1.css
 ============================ */
 
 /* Box-sizing safety */
@@ -1485,194 +1529,188 @@ Paste this into style1.css
 
 /* CSS variables to tweak sizing from one place */
 :root{
---studio-max-width:1200px;
---studio-gap:16px;
---card-radius:12px;
---card-padding:14px;
---card-bg: linear-gradient(180deg, rgba(131, 129, 129, 0.136), rgba(32, 32, 32, 0.01));
---section-padding-vertical:48px;
---text-muted: rgba(234,234,234,0.82);
+  --studio-max-width:1200px;
+  --studio-gap:16px;
+  --card-radius:12px;
+  --card-padding:14px;
+  --card-bg: linear-gradient(180deg, rgba(131, 129, 129, 0.136), rgba(32, 32, 32, 0.01));
+  --section-padding-vertical:48px;
+  --text-muted: rgba(234,234,234,0.82);
 }
 
 /* Section wrapper */
 .studio-setup-enhanced{
-background: #000;
-color: #eaeaea;
-padding: var(--section-padding-vertical) 0;
-overflow-x: hidden; /* prevent accidental horizontal scroll */
+  background: #000;
+  color: #eaeaea;
+  padding: var(--section-padding-vertical) 0;
+  overflow-x: hidden; /* prevent accidental horizontal scroll */
 }
 
 /* Inner container: centers content and adds horizontal padding */
 .studio-inner{
-max-width: var(--studio-max-width);
-margin: 0 auto;
-padding: 0 18px;
+  max-width: var(--studio-max-width);
+  margin: 0 auto;
+  padding: 0 18px;
 }
 
 /* Header text */
 .studio-header { text-align: center; margin-bottom: 10px; }
 .studio-header .section-title {
-font-weight: 700;
-letter-spacing: 0.4px;
-margin: 0;
-font-size: clamp(1.45rem, 3.2vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  margin: 0;
+  font-size: clamp(1.45rem, 3.2vw, 2rem);
 }
 .studio-sub { color: var(--text-muted); margin-top:8px; font-size: clamp(.95rem,1.6vw,1.05rem); }
 
-/* -------------------------------------------------------
-The responsive grid
-- auto-fit with fluid min width using clamp()
-- avoids fixed large min widths that break mobile
-------------------------------------------------------- */
+/* Responsive grid */
 .gear-grid {
-display: grid;
-gap: var(--studio-gap);
-margin-top: 20px;
-
-/* fluid "min" for minmax using clamp: browser picks appropriate column count */
-grid-template-columns: repeat(auto-fit, minmax(clamp(130px, 22vw, 240px), 1fr));
-align-items: stretch;
+  display: grid;
+  gap: var(--studio-gap);
+  margin-top: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(130px, 22vw, 240px), 1fr));
+  align-items: stretch;
 }
 
 /* Desktop override: 3 columns wide when plenty of space */
 @media (min-width: 1100px) {
-.gear-grid {
-grid-template-columns: repeat(3, 1fr);
-gap: 22px;
-}
+  .gear-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
 }
 
 /* Slightly wider columns on medium widths */
 @media (min-width: 760px) and (max-width: 1099px) {
-.gear-grid {
-grid-template-columns: repeat(auto-fit, minmax(clamp(150px, 20vw, 260px), 1fr));
-}
+  .gear-grid {
+    grid-template-columns: repeat(auto-fit, minmax(clamp(150px, 20vw, 260px), 1fr));
+  }
 }
 
 /* Card appearance & layout */
 .gear-card{
-background: var(--card-bg);
-border: 1px solid rgba(255,255,255,0.04);
-padding: var(--card-padding);
-border-radius: var(--card-radius);
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-min-height: 110px;
-transition: transform .22s ease, box-shadow .22s ease, border-color .22s;
-overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: var(--card-padding);
+  border-radius: var(--card-radius);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 110px;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s;
+  overflow: hidden;
 }
 
 /* Reduced hover transform for touch friendliness */
 .gear-card:hover{
-transform: translateY(-6px);
-box-shadow: 0 16px 36px rgba(0,0,0,0.5);
-border-color: rgba(255,255,255,0.06);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.5);
+  border-color: rgba(255,255,255,0.06);
 }
 
 /* Card media (icon/thumbnail) */
 .card-media{
-height: 78px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size: 36px; /* swap with image if you have thumbnails */
-margin-bottom: 6px;
+  height: 78px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 36px; /* swap with image if you have thumbnails */
+  margin-bottom: 6px;
 }
 
 /* Text within the card */
 .card-title{
-font-weight: 700;
-color: #ffffff;
-font-size: clamp(1rem, 2.2vw, 1.06rem);
-margin: 6px 0;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: clamp(1rem, 2.2vw, 1.06rem);
+  margin: 6px 0;
 }
 .card-excerpt{
-color: rgba(234,234,234,0.92);
-font-size: clamp(.86rem, 1.8vw, .96rem);
-line-height: 1.4;
-margin: 0;
+  color: rgba(234,234,234,0.92);
+  font-size: clamp(.86rem, 1.8vw, .96rem);
+  line-height: 1.4;
+  margin: 0;
 }
 
 /* CTA at card bottom */
 .card-cta{
-align-self: flex-end;
-margin-top: 10px;
-background: transparent;
-border: 0;
-color: #fff;
-font-weight: 600;
-cursor: pointer;
-font-size: .95rem;
+  align-self: flex-end;
+  margin-top: 10px;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: .95rem;
 }
 
 /* Studio footer & CTA button */
 .studio-footer{ text-align:center; margin-top:18px; }
 .studio-cta{
-display:inline-block;
-padding: 10px 18px;
-border-radius: 10px;
-background: linear-gradient(90deg,#120d0d,#3c3c3b);
-color:#fff;
-font-weight:700;
-text-decoration:none;
+  display:inline-block;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#120d0d,#3c3c3b);
+  color:#fff;
+  font-weight:700;
+  text-decoration:none;
 }
 
 /* Modal styles (responsive) */
 .gear-modal{
-position: fixed;
-inset: 0;
-display: flex;
-align-items: center;
-justify-content: center;
-background: rgba(2,2,2,0.6);
-visibility: hidden;
-opacity: 0;
-transition: opacity .18s ease, visibility .18s ease;
-padding: 18px;
-z-index: 1200;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2,2,2,0.6);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .18s ease, visibility .18s ease;
+  padding: 18px;
+  z-index: 1200;
 }
 .gear-modal[aria-hidden="false"]{ visibility: visible; opacity: 1; }
 .modal-inner{
-background: #0f0f10;
-border-radius: 12px;
-padding: 18px;
-max-width: 720px;
-width: 100%;
-box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-border: 1px solid rgba(255,255,255,0.03);
-position: relative;
+  background: #0f0f10;
+  border-radius: 12px;
+  padding: 18px;
+  max-width: 720px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.03);
+  position: relative;
 }
 .modal-close{
-position: absolute;
-right: 12px;
-top: 10px;
-background: transparent;
-border: 0;
-color: #fff;
-font-size: 18px;
-cursor: pointer;
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
 }
 .modal-content h3{ margin: 4px 0 8px; font-size: 1.15rem; }
 .modal-specs{ margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.04); color: rgba(234,234,234,0.9); }
 
 /* Mobile specific tweaks */
 @media (max-width: 420px){
-:root { --section-padding-vertical: 30px; }
-.studio-inner{ padding: 0 12px; }
-.card-media{ height: 64px; font-size: 32px; }
-.gear-card{ padding: 12px; min-height: 88px; }
-.studio-cta{ padding: 9px 14px; }
-.modal-inner{ padding: 14px; }
+  :root { --section-padding-vertical: 30px; }
+  .studio-inner{ padding: 0 12px; }
+  .card-media{ height: 64px; font-size: 32px; }
+  .gear-card{ padding: 12px; min-height: 88px; }
+  .studio-cta{ padding: 9px 14px; }
+  .modal-inner{ padding: 14px; }
 }
 
 /* Safety: prevent page-level horizontal overflow from rogue elements */
 html, body { width: 100%; overflow-x: hidden; }
 
 /* ============================================================================
-  FAQS
+  WHY CHOOSE SOUNDABODE & FAQS
   ============================================================================ */
-  /* WHY CHOOSE SOUNDABODE - card layout (desktop + mobile) */
+
 .why-soundabode {
   background:#000;
   padding: clamp(48px, 8vw, 96px) clamp(18px, 4vw, 80px);
@@ -1691,85 +1729,87 @@ html, body { width: 100%; overflow-x: hidden; }
   font-weight: 700;
   color: #fff;
 }
-  /* WHY dropdown (inline under heading) */
+
+/* WHY dropdown (inline under heading) */
 .why-dropdown {
-width: 100%;
-margin-top: 14px;
-display: flex;
-flex-direction: column;
-align-items: stretch;
-gap: 8px;
-z-index: 10;
+  width: 100%;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  z-index: 10;
 }
 
 /* Toggle button */
 .why-dropdown-toggle {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-gap: 10px;
-background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-color: #ffffff;
-border: 1px solid rgba(255,255,255,0.06);
-padding: 10px 14px;
-border-radius: 10px;
-cursor: pointer;
-font-weight: 600;
-width: clamp(220px, 48%, 420px);
-backdrop-filter: blur(4px);
--webkit-backdrop-filter: blur(4px);
-transition: transform .18s ease, box-shadow .18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  width: clamp(220px, 48%, 420px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: transform .18s ease, box-shadow .18s ease;
 }
 
 /* small arrow rotation when open */
 .why-dropdown-toggle .why-arrow {
-transition: transform .22s ease;
-font-size: 0.95rem;
-opacity: 0.9;
+  transition: transform .22s ease;
+  font-size: 0.95rem;
+  opacity: 0.9;
 }
 
 /* Panel: collapsed by default */
 .why-dropdown-panel {
-overflow: hidden;
-max-height: 0;
-opacity: 0;
-transform: translateY(-6px);
-transition: max-height .36s cubic-bezier(.2,.9,.2,1), opacity .28s ease, transform .28s ease;
-background: rgba(6,6,6,0.9);
-border-radius: 10px;
-padding: 0 14px;
-border: 1px solid rgba(255,255,255,0.04);
-box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: max-height .36s cubic-bezier(.2,.9,.2,1), opacity .28s ease, transform .28s ease;
+  background: rgba(6,6,6,0.9);
+  border-radius: 10px;
+  padding: 0 14px;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.45);
 }
 
 /* List styling */
 .why-dropdown-list {
-list-style: disc;
-margin: 12px 0 14px 18px;
-padding: 0;
-color: #e8e8e8;
-line-height: 1.6;
-font-size: 0.97rem;
+  list-style: disc;
+  margin: 12px 0 14px 18px;
+  padding: 0;
+  color: #e8e8e8;
+  line-height: 1.6;
+  font-size: 0.97rem;
 }
 
 /* OPEN state */
 .why-dropdown.open .why-dropdown-panel {
-max-height: 420px; /* expand room */
-opacity: 1;
-transform: translateY(0);
-padding-top: 12px;
+  max-height: 420px; /* expand room */
+  opacity: 1;
+  transform: translateY(0);
+  padding-top: 12px;
 }
 
 /* rotate arrow when open */
 .why-dropdown.open .why-dropdown-toggle .why-arrow {
-transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 /* small-screen tweaks */
 @media (max-width: 720px) {
-.why-dropdown-toggle { width: 100%; font-size: .98rem; padding: 10px; }
-.why-dropdown-list { margin-left: 14px; font-size: .95rem; }
+  .why-dropdown-toggle { width: 100%; font-size: .98rem; padding: 10px; }
+  .why-dropdown-list { margin-left: 14px; font-size: .95rem; }
 }
+
 /* cards grid */
 .why-cards {
   display: grid;
@@ -1860,86 +1900,87 @@ transform: rotate(180deg);
   .learn-btn { align-self: stretch; text-align: center; }
   .why-title { font-size: clamp(1.3rem, 6vw, 1.8rem); }
 }
+
 /* ============================================================================
   FAQS
   ============================================================================ */
-  /* Simple dark FAQ cards to match your site */
+
 .faq-list { width: 100%; max-width: 760px; margin: 0 auto; display: grid; gap: 18px; }
 
 .faq-item { background: rgba(255,255,255,0.02); border-radius: 14px; padding: 1px; overflow: visible; }
 
 .faq-head {
-display: flex;
-align-items: center;
-gap: 18px;
-width: 100%;
-padding: 20px;
-background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.15));
-border-radius: 12px;
-border: 1px solid rgba(255,255,255,0.04);
-color: #fff;
-font-weight: 700;
-cursor: pointer;
-text-align: left;
-justify-content: space-between;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.15));
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  justify-content: space-between;
 }
 
 /* left part */
 .faq-head .faq-number {
-color: rgba(130,130,200,0.95);
-font-weight: 800;
-margin-right: 8px;
-min-width: 36px;
-text-align: center;
+  color: rgba(130,130,200,0.95);
+  font-weight: 800;
+  margin-right: 8px;
+  min-width: 36px;
+  text-align: center;
 }
 
 /* center title */
 .faq-head .faq-title {
-flex: 1;
-text-align: left;
-font-weight: 700;
+  flex: 1;
+  text-align: left;
+  font-weight: 700;
 }
 
 /* toggle plus/minus */
 .faq-head .faq-toggle {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-width: 36px;
-height: 36px;
-border-radius: 50%;
-background: rgba(255,255,255,0.04);
-color: #fff;
-font-size: 1.1rem;
-transition: transform .2s ease, background .2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  font-size: 1.1rem;
+  transition: transform .2s ease, background .2s ease;
 }
 
 /* body (hidden by default via attribute) */
 .faq-body {
-padding: 14px 20px 22px 20px;
-color: rgba(235,235,235,0.9);
-font-weight: 300;
-line-height: 1.6;
-border-radius: 0 0 12px 12px;
-background: rgba(0,0,0,0.06);
-overflow: hidden;
-max-height: 0;
-transition: max-height 350ms cubic-bezier(.2,.8,.2,1), padding 250ms ease;
+  padding: 14px 20px 22px 20px;
+  color: rgba(235,235,235,0.9);
+  font-weight: 300;
+  line-height: 1.6;
+  border-radius: 0 0 12px 12px;
+  background: rgba(0,0,0,0.06);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 350ms cubic-bezier(.2,.8,.2,1), padding 250ms ease;
 }
 
 /* when expanded */
 .faq-item[data-open="true"] .faq-body {
-/* large max-height ensures content fits; JS sets exact height for smoother animation */
-max-height: 600px;
-padding-top: 12px;
-padding-bottom: 20px;
+  /* large max-height ensures content fits; JS sets exact height for smoother animation */
+  max-height: 600px;
+  padding-top: 12px;
+  padding-bottom: 20px;
 }
 
 /* rotate toggle to show close state */
 .faq-item[data-open="true"] .faq-head .faq-toggle {
-transform: rotate(45deg);
-background: rgba(0,200,120,0.12);
-color: #00ff99;
+  transform: rotate(45deg);
+  background: rgba(0,200,120,0.12);
+  color: #00ff99;
 }
 
 .faq-heading {
@@ -1952,6 +1993,7 @@ color: #00ff99;
   color: #ffffff;
   text-transform: none;
 }
+
 /* ============================================================================
   FOOTER
   ============================================================================ */
@@ -2101,615 +2143,616 @@ color: #00ff99;
 @media (max-width: 1200px) {
   .about-container,
   .about-container1 {
-  grid-template-columns: 1fr;
-  gap: clamp(30px, 4vw, 40px);
-  padding: clamp(40px, 6vw, 60px) clamp(20px, 4vw, 40px);
-  height: auto;
+    grid-template-columns: 1fr;
+    gap: clamp(30px, 4vw, 40px);
+    padding: clamp(40px, 6vw, 60px) clamp(20px, 4vw, 40px);
+    height: auto;
   }
 
   .images-grid,
   .images-grid1 {
-  grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .footer-columns {
-  gap: clamp(40px, 6vw, 70px);
+    gap: clamp(40px, 6vw, 70px);
   }
 }
 
 @media (max-width: 1024px) {
   .navbar {
-  padding: 10px clamp(15px, 4vw, 30px);
+    padding: 10px clamp(15px, 4vw, 30px);
   }
 
   .nav-links {
-  gap: clamp(20px, 4vw, 35px);
+    gap: clamp(20px, 4vw, 35px);
   }
 
   .about-container,
   .about-container1 {
-  grid-template-columns: 1fr;
-  gap: clamp(25px, 4vw, 40px);
-  padding: clamp(40px, 6vw, 60px) clamp(20px, 3vw, 30px);
+    grid-template-columns: 1fr;
+    gap: clamp(25px, 4vw, 40px);
+    padding: clamp(40px, 6vw, 60px) clamp(20px, 3vw, 30px);
   }
 
   .carousel-track {
-  padding: 0 20px;
-  gap: 20px;
+    padding: 0 20px;
+    gap: 20px;
   }
 
   .site-footer {
-  padding: clamp(20px, 3vw, 30px) clamp(15px, 4vw, 30px);
+    padding: clamp(20px, 3vw, 30px) clamp(15px, 4vw, 30px);
   }
 
   .footer-columns {
-  gap: clamp(40px, 6vw, 60px);
+    gap: clamp(40px, 6vw, 60px);
   }
 }
 
 @media (max-width: 900px) {
   :root {
-  --fs: clamp(2rem, 6vw, 5rem);
+    --fs: clamp(2rem, 6vw, 5rem);
   }
 
   .about-container,
   .about-container1 {
-  padding: clamp(35px, 5vw, 50px) clamp(20px, 3vw, 30px);
-  gap: clamp(25px, 3vw, 30px);
+    padding: clamp(35px, 5vw, 50px) clamp(20px, 3vw, 30px);
+    gap: clamp(25px, 3vw, 30px);
   }
 
   .images-grid,
   .images-grid1 {
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(12px, 2vw, 18px);
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(12px, 2vw, 18px);
   }
 
   .image-block,
   .image-block1 {
-  min-height: clamp(180px, 25vw, 250px);
+    min-height: clamp(180px, 25vw, 250px);
   }
 
   .carousel-item {
-  flex: 0 0 clamp(140px, 40vw, 280px);
+    flex: 0 0 clamp(140px, 40vw, 280px);
   }
 }
 
 @media (max-width: 768px) {
   .hamburger-menu {
-  display: block;
+    display: block;
   }
 
   .logo-img {
-  height: clamp(24px, 4vw, 30px);
+    height: clamp(24px, 4vw, 30px);
   }
 
   .nav-links {
-  display: none;
+    display: none;
   }
 
   .nav-actions {
-  gap: clamp(8px, 1.5vw, 12px);
+    gap: clamp(8px, 1.5vw, 12px);
   }
 
   .action-btn {
-  width: clamp(32px, 6vw, 38px);
-  height: clamp(32px, 6vw, 38px);
+    width: clamp(32px, 6vw, 38px);
+    height: clamp(32px, 6vw, 38px);
   }
 
   .intro-panel {
-  width: 100%;
-  height: 50vh;
+    width: 100%;
+    height: 50vh;
   }
 
   .intro-overlay {
-  flex-direction: column;
+    flex-direction: column;
   }
 
   .overlay-left,
   .overlay-right {
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
-  text-align: center;
-  max-width: 85%;
-  bottom: 20%;
-  font-size: clamp(12px, 2vw, 14px);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    text-align: center;
+    max-width: 85%;
+    bottom: 20%;
+    font-size: clamp(12px, 2vw, 14px);
   }
 
   .left-font,
   .right-font {
-  font-size: clamp(13px, 2.5vw, 16px);
-  margin-bottom: clamp(8px, 1vw, 12px);
+    font-size: clamp(13px, 2.5vw, 16px);
+    margin-bottom: clamp(8px, 1vw, 12px);
   }
 
   .main-content {
-  padding: clamp(12px, 2vw, 18px);
+    padding: clamp(12px, 2vw, 18px);
   }
 
   .subtext-container {
-  width: 95%;
-  flex-direction: column;
-  align-items: center;
+    width: 95%;
+    flex-direction: column;
+    align-items: center;
   }
 
   .font {
-  width: 100%;
-  text-align: center;
+    width: 100%;
+    text-align: center;
   }
 
   .about-container,
   .about-container1 {
-  grid-template-columns: 1fr;
-  gap: clamp(25px, 3vw, 35px);
-  padding: clamp(35px, 5vw, 50px) clamp(15px, 3vw, 25px);
-  height: auto;
+    grid-template-columns: 1fr;
+    gap: clamp(25px, 3vw, 35px);
+    padding: clamp(35px, 5vw, 50px) clamp(15px, 3vw, 25px);
+    height: auto;
   }
 
   .images-grid,
   .images-grid1 {
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(10px, 2vw, 15px);
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(10px, 2vw, 15px);
   }
 
   .image-block,
   .image-block1 {
-  min-height: clamp(160px, 25vw, 220px);
-  grid-row: auto;
+    min-height: clamp(160px, 25vw, 220px);
+    grid-row: auto;
   }
 
   .carousel-track {
-  padding: 0 15px;
-  gap: 15px;
+    padding: 0 15px;
+    gap: 15px;
   }
 
   .carousel-title {
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin-bottom: 40px;
-  padding: 0 15px;
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 40px;
+    padding: 0 15px;
   }
 
   .carousel-wrapper {
-  height: 300px;
-  margin-bottom: 40px;
+    height: 300px;
+    margin-bottom: 40px;
   }
 
   .carousel-item {
-  flex: 0 0 250px;
-  height: 300px;
+    flex: 0 0 250px;
+    height: 300px;
   }
 
   .testimonials {
-  padding: clamp(40px, 6vw, 60px) clamp(15px, 2vw, 20px);
+    padding: clamp(40px, 6vw, 60px) clamp(15px, 2vw, 20px);
   }
 
   .section-title {
-  font-size: clamp(1.3rem, 4vw, 2.2rem);
-  margin-bottom: clamp(25px, 4vw, 45px);
-  color: #fff;
+    font-size: clamp(1.3rem, 4vw, 2.2rem);
+    margin-bottom: clamp(25px, 4vw, 45px);
+    color: #fff;
   }
 
   .quote {
-  font-size: clamp(0.85rem, 2vw, 1rem);
-  color: #fff;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    color: #fff;
   }
 
   .site-footer {
-  padding: clamp(20px, 3vw, 25px) clamp(15px, 2vw, 20px);
+    padding: clamp(20px, 3vw, 25px) clamp(15px, 3vw, 25px);
   }
 
   .footer-container {
-      flex-direction: row !important;       /* keep columns side-by-side */
-      justify-content: space-between !important;
-      align-items: flex-start !important;
-      gap: clamp(12px, 3vw, 24px) !important;
-      padding: clamp(12px, 2vw, 20px) clamp(12px, 3vw, 20px) !important;
-      text-align: left !important;
+    flex-direction: row !important;       /* keep columns side-by-side */
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: clamp(12px, 3vw, 24px) !important;
+    padding: clamp(12px, 2vw, 20px) clamp(12px, 3vw, 20px) !important;
+    text-align: left !important;
   }
-  
+
   .footer-columns {
-      flex-direction: row !important;
-      gap: clamp(20px, 5vw, 60px) !important;
-      flex-wrap: wrap;                      /* allow wrapping if needed */
-      align-items: flex-start;
+    flex-direction: row !important;
+    gap: clamp(20px, 5vw, 60px) !important;
+    flex-wrap: wrap;                      /* allow wrapping if needed */
+    align-items: flex-start;
   }
-  
+
   .footer-column {
-      min-width: 140px;                     /* column width control */
-      max-width: 33%;                       /* at most three columns per row */
-      text-align: left !important;          /* override center alignment */
-      margin-bottom: 12px;
+    min-width: 140px;                     /* column width control */
+    max-width: 33%;                       /* at most three columns per row */
+    text-align: left !important;          /* override center alignment */
+    margin-bottom: 12px;
   }
-  
+
   .footer-column h4 {
-      text-align: left !important;
+    text-align: left !important;
   }
-  
+
   /* Keep copyright on same visual row if possible */
   .footer-copyright {
-      margin-right: 0;
-      align-self: flex-end;
+    margin-right: 0;
+    align-self: flex-end;
   }
 
   .client-logo-banner {
-  bottom: clamp(20px, 3vw, 30px);
-  width: 95%;
+    bottom: clamp(20px, 3vw, 30px);
+    width: 95%;
   }
 
   .logo-item {
-  width: clamp(40px, 8vw, 50px);
-  height: clamp(40px, 8vw, 50px);
+    width: clamp(40px, 8vw, 50px);
+    height: clamp(40px, 8vw, 50px);
   }
 }
 
 @media (max-width: 600px) {
   .about-container,
   .about-container1 {
-  padding: clamp(30px, 4vw, 40px) clamp(15px, 2vw, 20px);
-  gap: clamp(20px, 3vw, 25px);
+    padding: clamp(30px, 4vw, 40px) clamp(15px, 2vw, 20px);
+    gap: clamp(20px, 3vw, 25px);
   }
 
   .content h2,
   .content1 h2 {
-  font-size: clamp(1rem, 3.5vw, 1.4rem);
-  margin-bottom: clamp(15px, 2vw, 20px);
+    font-size: clamp(1rem, 3.5vw, 1.4rem);
+    margin-bottom: clamp(15px, 2vw, 20px);
   }
 
   .content p,
   .content1 p {
-  font-size: clamp(0.75rem, 1.8vw, 0.9rem);
-  margin-bottom: clamp(20px, 2vw, 30px);
+    font-size: clamp(0.75rem, 1.8vw, 0.9rem);
+    margin-bottom: clamp(20px, 2vw, 30px);
   }
 
   .content a,
   .content1 a {
-  padding: clamp(8px, 1.5vw, 10px) clamp(16px, 2.5vw, 20px);
-  font-size: clamp(0.7rem, 1.3vw, 0.85rem);
+    padding: clamp(8px, 1.5vw, 10px) clamp(16px, 2.5vw, 20px);
+    font-size: clamp(0.7rem, 1.3vw, 0.85rem);
   }
 
   .images-grid,
   .images-grid1 {
-  grid-template-columns: 1fr;
-  gap: clamp(10px, 1.5vw, 12px);
+    grid-template-columns: 1fr;
+    gap: clamp(10px, 1.5vw, 12px);
   }
 
   .image-block,
   .image-block1 {
-  min-height: clamp(200px, 40vw, 260px);
+    min-height: clamp(200px, 40vw, 260px);
   }
 
   .carousel-title {
-  font-size: clamp(1.3rem, 3.5vw, 2.5rem);
-  margin-bottom: clamp(20px, 3vw, 35px);
+    font-size: clamp(1.3rem, 3.5vw, 2.5rem);
+    margin-bottom: clamp(20px, 3vw, 35px);
   }
 
   .carousel-wrapper {
-  height: clamp(180px, 30vh, 280px);
+    height: clamp(180px, 30vh, 280px);
   }
 
   .carousel-item {
-  flex: 0 0 clamp(120px, 35vw, 200px);
+    flex: 0 0 clamp(120px, 35vw, 200px);
   }
 
   .testimonial-container {
-  min-height: 150px;
+    min-height: 150px;
   }
 
   .quote {
-  font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+    font-size: clamp(0.8rem, 1.8vw, 0.95rem);
   }
 }
 
 @media (max-width: 480px) {
   :root {
-  --fs: clamp(1.5rem, 5vw, 3rem);
-  --ls: clamp(-2px, -0.15vw, -3px);
+    --fs: clamp(1.5rem, 5vw, 3rem);
+    --ls: clamp(-2px, -0.15vw, -3px);
   }
 
   .navbar {
-  padding: 8px clamp(10px, 2vw, 15px);
-  height: clamp(45px, 10vw, 50px);
+    padding: 8px clamp(10px, 2vw, 15px);
+    height: clamp(45px, 10vw, 50px);
   }
 
   .logo-img {
-  height: clamp(20px, 3vw, 25px);
+    height: clamp(20px, 3vw, 25px);
   }
 
   .action-btn {
-  width: clamp(28px, 5vw, 32px);
-  height: clamp(28px, 5vw, 32px);
+    width: clamp(28px, 5vw, 32px);
+    height: clamp(28px, 5vw, 32px);
   }
 
   .title-container h2 {
-  font-size: clamp(0.9rem, 2vw, 1.2rem);
-  margin-bottom: clamp(8px, 1vw, 12px);
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    margin-bottom: clamp(8px, 1vw, 12px);
   }
 
   @media (max-width: 480px) {
-  .overlay-left {
+    .overlay-left {
       top: 5%;
       left: 3%;
       width: 95%;
       padding: 0.5rem;
-  }
+    }
 
-  .overlay-left p {
+    .overlay-left p {
       font-size: 14px;
-  }
+    }
   }
 
   .main-content {
-  padding: clamp(10px, 2vw, 15px);
+    padding: clamp(10px, 2vw, 15px);
   }
 
   .subtext-container {
-  width: 95%;
-  gap: clamp(12px, 1.5vw, 15px);
-  margin-top: clamp(12px, 2vw, 18px);
+    width: 95%;
+    gap: clamp(12px, 1.5vw, 15px);
+    margin-top: clamp(12px, 2vw, 18px);
   }
 
   .font {
-  width: 100%;
-  font-size: clamp(8px, 1.3vw, 10px);
-  text-align: center;
+    width: 100%;
+    font-size: clamp(8px, 1.3vw, 10px);
+    text-align: center;
   }
 
   .glow-border {
-  padding: clamp(9px, 1.5vw, 11px) clamp(18px, 3vw, 24px);
-  font-size: clamp(0.7rem, 1.5vw, 0.85rem);
-  margin-top: clamp(10px, 1.5vw, 15px);
+    padding: clamp(9px, 1.5vw, 11px) clamp(18px, 3vw, 24px);
+    font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+    margin-top: clamp(10px, 1.5vw, 15px);
   }
 
   .about-container,
   .about-container1 {
-  padding: clamp(25px, 3vw, 35px) clamp(12px, 2vw, 18px);
-  gap: clamp(18px, 2.5vw, 25px);
-  height: auto;
+    padding: clamp(25px, 3vw, 35px) clamp(12px, 2vw, 18px);
+    gap: clamp(18px, 2.5vw, 25px);
+    height: auto;
   }
 
   .content h2,
   .content1 h2 {
-  font-size: clamp(1rem, 3.5vw, 1.3rem);
-  margin-bottom: clamp(12px, 1.5vw, 18px);
+    font-size: clamp(1rem, 3.5vw, 1.3rem);
+    margin-bottom: clamp(12px, 1.5vw, 18px);
   }
 
   .content p,
   .content1 p {
-  font-size: clamp(0.75rem, 1.8vw, 0.9rem);
-  margin-bottom: clamp(18px, 2vw, 25px);
+    font-size: clamp(0.75rem, 1.8vw, 0.9rem);
+    margin-bottom: clamp(18px, 2vw, 25px);
   }
 
   .content a,
   .content1 a {
-  padding: clamp(7px, 1.2vw, 9px) clamp(14px, 2vw, 20px);
-  font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+    padding: clamp(7px, 1.2vw, 9px) clamp(14px, 2vw, 20px);
+    font-size: clamp(0.65rem, 1.2vw, 0.8rem);
   }
 
   .images-grid,
   .images-grid1 {
-  grid-template-columns: 1fr;
-  gap: clamp(8px, 1.5vw, 10px);
+    grid-template-columns: 1fr;
+    gap: clamp(8px, 1.5vw, 10px);
   }
 
   .image-block,
   .image-block1 {
-  min-height: clamp(180px, 35vw, 240px);
+    min-height: clamp(180px, 35vw, 240px);
   }
 
   .carousel-title {
-  font-size: clamp(1.2rem, 3vw, 2rem);
-  margin-bottom: clamp(18px, 3vw, 30px);
-  padding: 0 clamp(8px, 1.5vw, 12px);
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    margin-bottom: clamp(18px, 3vw, 30px);
+    padding: 0 clamp(8px, 1.5vw, 12px);
   }
 
   .carousel-wrapper {
-  height: clamp(160px, 28vh, 240px);
-  margin-bottom: clamp(20px, 3vw, 30px);
+    height: clamp(160px, 28vh, 240px);
+    margin-bottom: clamp(20px, 3vw, 30px);
   }
 
   .carousel-track {
-  padding: 0 clamp(8px, 1.5vw, 12px);
-  gap: clamp(10px, 1.5vw, 12px);
+    padding: 0 clamp(8px, 1.5vw, 12px);
+    gap: clamp(10px, 1.5vw, 12px);
   }
 
   .carousel-item {
-  flex: 0 0 clamp(110px, 30vw, 170px);
-  height: 100%;
+    flex: 0 0 clamp(110px, 30vw, 170px);
+    height: 100%;
   }
 
   .carousel-info {
-  padding: clamp(8px, 1vw, 12px);
-  font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+    padding: clamp(8px, 1vw, 12px);
+    font-size: clamp(0.7rem, 1.2vw, 0.85rem);
   }
 
   .testimonials {
-  padding: clamp(30px, 4vw, 45px) clamp(12px, 2vw, 18px);
+    padding: clamp(30px, 4vw, 45px) clamp(12px, 2vw, 18px);
   }
 
   .section-title {
-  font-size: clamp(1.2rem, 3.5vw, 1.8rem);
-  letter-spacing: clamp(0.3px, 0.8vw, 1px);
-  margin-bottom: clamp(20px, 3vw, 35px);
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+    letter-spacing: clamp(0.3px, 0.8vw, 1px);
+    margin-bottom: clamp(20px, 3vw, 35px);
   }
 
   .testimonial-container {
-  min-height: 140px;
+    min-height: 140px;
   }
 
   .quote {
-  font-size: clamp(0.8rem, 1.7vw, 0.95rem);
-  margin-bottom: clamp(6px, 1vw, 8px);
+    font-size: clamp(0.8rem, 1.7vw, 0.95rem);
+    margin-bottom: clamp(6px, 1vw, 8px);
   }
 
   .author {
-  font-size: clamp(0.75rem, 1.3vw, 0.85rem);
+    font-size: clamp(0.75rem, 1.3vw, 0.85rem);
   }
 
   .role {
-  font-size: clamp(0.65rem, 1.2vw, 0.75rem);
+    font-size: clamp(0.65rem, 1.2vw, 0.75rem);
   }
 
   button.prev,
   button.next {
-  width: clamp(32px, 6vw, 36px);
-  height: clamp(32px, 6vw, 36px);
-  font-size: clamp(13px, 1.5vw, 16px);
+    width: clamp(32px, 6vw, 36px);
+    height: clamp(32px, 6vw, 36px);
+    font-size: clamp(13px, 1.5vw, 16px);
   }
 
   .dots span {
-  width: clamp(7px, 1.2vw, 9px);
-  height: clamp(7px, 1.2vw, 9px);
-  gap: clamp(4px, 1vw, 6px);
+    width: clamp(7px, 1.2vw, 9px);
+    height: clamp(7px, 1.2vw, 9px);
+    gap: clamp(4px, 1vw, 6px);
   }
 
   .site-footer {
-  padding: clamp(18px, 2vw, 25px) clamp(12px, 2vw, 18px);
+    padding: clamp(18px, 2vw, 25px) clamp(12px, 2vw, 18px);
   }
 
   .footer-container {
-  gap: clamp(12px, 2vw, 18px);
+    gap: clamp(12px, 2vw, 18px);
   }
 
   .footer-columns {
-  gap: clamp(18px, 2vw, 25px);
-  margin-bottom: clamp(15px, 2vw, 20px);
+    gap: clamp(18px, 2vw, 25px);
+    margin-bottom: clamp(15px, 2vw, 20px);
   }
 
   .footer-column h4 {
-  font-size: clamp(0.6rem, 1.2vw, 0.75rem);
-  margin-bottom: clamp(6px, 1vw, 10px);
+    font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+    margin-bottom: clamp(6px, 1vw, 10px);
   }
 
   .footer-column a,
   .footer-column p {
-  font-size: clamp(0.55rem, 1vw, 0.65rem);
+    font-size: clamp(0.55rem, 1vw, 0.65rem);
   }
 
   .footer-copyright p {
-  margin-right: 0;
-  font-size: clamp(0.5rem, 0.9vw, 0.6rem);
+    margin-right: 0;
+    font-size: clamp(0.5rem, 0.9vw, 0.6rem);
   }
 
   .client-logo-banner {
-  bottom: clamp(15px, 2vw, 25px);
-  width: 92%;
+    bottom: clamp(15px, 2vw, 25px);
+    width: 92%;
   }
 
   .logo-item {
-  width: clamp(36px, 7vw, 45px);
-  height: clamp(36px, 7vw, 45px);
+    width: clamp(36px, 7vw, 45px);
+    height: clamp(36px, 7vw, 45px);
   }
 
   .whatsapp-float {
-  width: clamp(48px, 10vw, 55px);
-  height: clamp(48px, 10vw, 55px);
-  bottom: clamp(15px, 2vw, 20px);
-  right: clamp(15px, 2vw, 20px);
+    width: clamp(48px, 10vw, 55px);
+    height: clamp(48px, 10vw, 55px);
+    bottom: clamp(15px, 2vw, 20px);
+    right: clamp(15px, 2vw, 20px);
   }
 
   .whatsapp-icon {
-  width: clamp(22px, 5vw, 28px);
-  height: clamp(22px, 5vw, 28px);
+    width: clamp(22px, 5vw, 28px);
+    height: clamp(22px, 5vw, 28px);
   }
 
   .popup-content {
-  width: 92%;
-  padding: clamp(1.2rem, 2.5vw, 1.8rem);
+    width: 92%;
+    padding: clamp(1.2rem, 2.5vw, 1.8rem);
   }
 
   #leadForm input,
   #leadForm textarea {
-  padding: clamp(0.6rem, 1.2vw, 0.7rem) clamp(0.8rem, 1.5vw, 1rem);
-  font-size: clamp(0.75rem, 1.3vw, 0.9rem);
+    padding: clamp(0.6rem, 1.2vw, 0.7rem) clamp(0.8rem, 1.5vw, 1rem);
+    font-size: clamp(0.75rem, 1.3vw, 0.9rem);
   }
 
   #leadForm button {
-  padding: clamp(0.6rem, 1.2vw, 0.75rem);
-  font-size: clamp(0.75rem, 1.3vw, 0.9rem);
+    padding: clamp(0.6rem, 1.2vw, 0.75rem);
+    font-size: clamp(0.75rem, 1.3vw, 0.9rem);
   }
 }
 
 @media (max-width: 360px) {
   .navbar {
-  padding: 6px clamp(8px, 1.5vw, 12px);
-  height: clamp(42px, 9vw, 48px);
+    padding: 6px clamp(8px, 1.5vw, 12px);
+    height: clamp(42px, 9vw, 48px);
   }
 
   .title-container h1 {
-  font-size: clamp(1.3rem, 4vw, 2.5rem);
+    font-size: clamp(1.3rem, 4vw, 2.5rem);
   }
 
   .carousel-title {
-  font-size: clamp(1rem, 2.8vw, 1.8rem);
-  margin-bottom: clamp(15px, 2.5vw, 25px);
+    font-size: clamp(1rem, 2.8vw, 1.8rem);
+    margin-bottom: clamp(15px, 2.5vw, 25px);
   }
 
   .section-title {
-  font-size: clamp(1rem, 3vw, 1.5rem);
+    font-size: clamp(1rem, 3vw, 1.5rem);
   }
 
   .carousel-wrapper {
-  height: clamp(140px, 25vh, 200px);
+    height: clamp(140px, 25vh, 200px);
   }
 
   .carousel-item {
-  flex: 0 0 clamp(100px, 28vw, 150px);
+    flex: 0 0 clamp(100px, 28vw, 150px);
   }
 
   .about-container,
   .about-container1 {
-  padding: clamp(20px, 2.5vw, 30px) clamp(10px, 1.5vw, 15px);
+    padding: clamp(20px, 2.5vw, 30px) clamp(10px, 1.5vw, 15px);
   }
 }
+
 /* Fade shadow overlays */
 .fade-mask {
-position: relative;
-overflow: hidden;
+  position: relative;
+  overflow: hidden;
 }
 
 .fade-left,
 .fade-right {
-position: absolute;
-top: 0;
-width: 200px;              /* control shadow width */
-height: 100%;
-pointer-events: none;      /* doesn't block mouse */
-z-index: 5;
+  position: absolute;
+  top: 0;
+  width: 200px;              /* control shadow width */
+  height: 100%;
+  pointer-events: none;      /* doesn't block mouse */
+  z-index: 5;
 }
 
 .fade-left {
-left: 0;
-background: linear-gradient(to right, #000000 0%, transparent 100%);
+  left: 0;
+  background: linear-gradient(to right, #000000 0%, transparent 100%);
 }
 
 .fade-right {
-right: 0;
-background: linear-gradient(to left, #000000 0%, transparent 100%);
+  right: 0;
+  background: linear-gradient(to left, #000000 0%, transparent 100%);
 }
 
 /* Silver divider used across sections — paste into style1.css */
 /* TEMP debug / fix — paste at end of style1.css */
 .divider-container {
-background: #000 !important;        /* solid black band */
-position: relative !important;
-z-index: 9999 !important;           /* force above overlays */
-min-height: 28px !important;        /* makes band visible while debugging */
-padding: 8px 0 !important;
+  background: #000 !important;        /* solid black band */
+  position: relative !important;
+  z-index: 9999 !important;           /* force above overlays */
+  min-height: 28px !important;        /* makes band visible while debugging */
+  padding: 8px 0 !important;
 }
 
 .divider-silver {
-width: 100% !important;
-max-width: none !important;
-height: 1px !important;
-margin: 0 auto !important;
-background: linear-gradient(
-90deg,
-rgb(0, 0, 0) 0%,
-rgb(196, 196, 196) 40%,
-rgb(230, 230, 230) 50%,
-rgb(196, 196, 196) 60%,
-rgb(0, 0, 0) 100%
-) !important;
-position: relative !important;
-z-index: 10000 !important;
-box-shadow: none !important;       /* remove shadow if it creates blur over band */
-} 
+  width: 100% !important;
+  max-width: none !important;
+  height: 1px !important;
+  margin: 0 auto !important;
+  background: linear-gradient(
+    90deg,
+    rgb(0, 0, 0) 0%,
+    rgb(196, 196, 196) 40%,
+    rgb(230, 230, 230) 50%,
+    rgb(196, 196, 196) 60%,
+    rgb(0, 0, 0) 100%
+  ) !important;
+  position: relative !important;
+  z-index: 10000 !important;
+  box-shadow: none !important;       /* remove shadow if it creates blur over band */
+}
