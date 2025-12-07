@@ -2605,7 +2605,7 @@ color: #00ff99;
   }
 
   .client-logo-banner {
-  bottom: clamp(10px, 2vw, 25px);
+  bottom: clamp(120px, 2vw, 25px);
   width: 92%;
   }
 
