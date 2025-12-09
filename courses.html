@@ -115,7 +115,10 @@
       --card-radius: 16px;
       --container: 1120px;
     }
-
+ /* Add this to your CSS */
+a[href$=".html"]::after {
+  content: none; /* This won't actually remove .html from URL, just a visual trick */
+}
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
