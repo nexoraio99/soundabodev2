@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Level 3 – Professional DJ / Performance Path | Soundabode</title>
 <meta name="description" content="Soundabode Level 3 DJ Training — Become a performing artist with mentorship, branding, stage exposure, and pro-level performance training." />
+  <script>
+    (function() {
+      var path = window.location.pathname;
+      if (path.indexOf('.html') !== -1) {
+        var cleanPath = path.replace('.html', '');
+        var cleanUrl = window.location.origin + cleanPath + window.location.search + window.location.hash;
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', cleanUrl);
+        }
+      }
+    })();
+  </script>
 
 <style>
 /* -------------------------------------------
