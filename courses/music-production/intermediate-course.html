@@ -17,7 +17,8 @@
   <link rel="icon" type="image/png" sizes="512x512" href="/Assets/favicon-512x512.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png" />
   <link rel="manifest" href="/site.webmanifest" />
-    <script>
+
+  <script>
     (function() {
       var path = window.location.pathname;
       if (path.indexOf('.html') !== -1) {
@@ -363,6 +364,8 @@
         radial-gradient(500px 160px at 90% 80%, rgba(78, 231, 255, 0.06), transparent 18%);
       animation: shift 9s ease-in-out infinite;
       z-index: 0;
+      /* make decorative layer non-interactive */
+      pointer-events: none;
     }
 
     @keyframes shift {
@@ -719,7 +722,7 @@
     .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06); color:#e8eef6; }
 
     .form-note { font-size:13px; color: var(--muted); margin-top:8px; }
-    .form-success { color: #9cedc9; margin-top:8px; font-weight:600; }
+    .form-success { color: #9cedc9; margin-top:8px; font-weight:600; display:none; }
 
     /* RESPONSIVE TWEAKS */
 
@@ -866,9 +869,9 @@
         </div>
 
         <div class="cta-row">
-          <a class="btn-primary" href="contact.html#contact">Book A Free Demo Class</a>
-          <!-- This link will open the modal via JS (intercept of /enroll) -->
-          <a class="btn-outline" href="/enroll">Enroll Now</a>
+          <a class="btn-primary" href="/contact.html#contact">Book A Free Demo Class</a>
+          <!-- Marked to open modal -->
+          <a class="btn-outline" href="/enroll" data-open-enroll>Enroll Now</a>
         </div>
       </div>
 
@@ -1249,8 +1252,8 @@
         </div>
       </div>
       <div class="actions">
-        <a class="btn-primary" href="/enroll">Enroll Now</a>
-        <a class="btn-outline" href="contact.html#contact">Talk To Our Team</a>
+        <a class="btn-primary" href="/enroll" data-open-enroll>Enroll Now</a>
+        <a class="btn-outline" href="/contact.html#contact">Talk To Our Team</a>
       </div>
     </section>
   </main>
@@ -1262,9 +1265,9 @@
         <div class="footer-column">
           <h4>ABOUT</h4>
           <ul>
-            <li><a href="about.html">ABOUT</a></li>
-            <li><a href="courses.html">COURSES</a></li>
-            <li><a href="contact.html">CONTACT</a></li>
+            <li><a href="/about.html">ABOUT</a></li>
+            <li><a href="/courses.html">COURSES</a></li>
+            <li><a href="/contact.html">CONTACT</a></li>
           </ul>
         </div>
         <div class="footer-column">
@@ -1287,7 +1290,7 @@
         <div class="footer-column">
           <h4>PRIVACY POLICY</h4>
           <ul>
-            <li><a href="privacy.html">PRIVACY POLICY</a></li>
+            <li><a href="/privacy.html">PRIVACY POLICY</a></li>
           </ul>
         </div>
       </div>
@@ -1297,9 +1300,9 @@
     </div>
   </footer>
 
-  <!-- ENROLL MODAL (same as Beginner) -->
+  <!-- ENROLL MODAL (same as Beginner but tuned) -->
   <div id="enroll-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="enroll-modal-title">
-    <div class="modal" role="document" tabindex="-1">
+    <div class="modal" role="document" tabindex="-1" aria-describedby="form-note">
       <div class="modal-header">
         <h3 class="modal-title" id="enroll-modal-title">Enroll / Book Demo — Soundabode Level 2</h3>
         <button class="modal-close" aria-label="Close" id="modal-close-btn">&times;</button>
@@ -1327,8 +1330,8 @@
               <label class="label" for="course">Interested in</label>
               <select id="course" name="course" class="input">
                 <option value="level1">Level 1 - Beginner (Music Production)</option>
-                <option value="level2">Level 2 - Intermediate</option>
-                <option value="Level3">Level 3 - Expert</option>
+                <option value="level2" selected>Level 2 - Intermediate</option>
+                <option value="level3">Level 3 - Expert</option>
                 <option value="level4">Level 4 - Diploma</option>
               </select>
             </div>
@@ -1345,7 +1348,7 @@
           </div>
 
           <div class="form-note" id="form-note">We will contact you within 24 hours. This is a demo submission (no backend configured).</div>
-          <div class="form-success" id="form-success" style="display:none;">Thanks — your enquiry has been received. We'll call soon.</div>
+          <div class="form-success" id="form-success" role="status" aria-live="polite">Thanks — your enquiry has been received. We'll call soon.</div>
         </form>
       </div>
     </div>
@@ -1396,18 +1399,23 @@
       items.forEach((item) => {
         const q = item.querySelector(".faq-question");
         const ans = item.querySelector(".faq-answer");
+        if (!q || !ans) return;
         q.addEventListener("click", () => {
           const open = ans.style.display === "block";
           items.forEach((i) => {
-            i.querySelector(".faq-answer").style.display = "none";
-            i.querySelector(".faq-question span").textContent = "+";
+            const a = i.querySelector(".faq-answer");
+            const qq = i.querySelector(".faq-question span");
+            if (a) a.style.display = "none";
+            if (qq) qq.textContent = "+";
           });
           if (!open) {
             ans.style.display = "block";
-            q.querySelector("span").textContent = "-";
+            const span = q.querySelector("span");
+            if (span) span.textContent = "-";
           } else {
             ans.style.display = "none";
-            q.querySelector("span").textContent = "+";
+            const span = q.querySelector("span");
+            if (span) span.textContent = "+";
           }
         });
       });
@@ -1450,26 +1458,24 @@
       });
     })();
 
-    /* ========== ENROLL MODAL LOGIC (added) ========== */
+    /* ===== Hardened ENROLL MODAL LOGIC ===== */
     (function () {
       const modalOverlay = document.getElementById('enroll-modal');
-      const modal = modalOverlay && modalOverlay.querySelector('.modal');
-      const modalCloseBtn = document.getElementById('modal-close-btn');
-      const modalCancelBtn = document.getElementById('modal-cancel');
+      const modal = modalOverlay ? modalOverlay.querySelector('.modal') : null;
+      const closeBtn = document.getElementById('modal-close-btn');
+      const cancelBtn = document.getElementById('modal-cancel');
       const form = document.getElementById('enroll-form');
-      const formSuccess = document.getElementById('form-success');
       const formNote = document.getElementById('form-note');
+      const formSuccess = document.getElementById('form-success');
+      let lastFocused = null;
 
       function openModal() {
         if (!modalOverlay) return;
+        lastFocused = document.activeElement;
         modalOverlay.classList.add('is-open');
         modalOverlay.setAttribute('aria-hidden', 'false');
-
-        // focus first input
         const first = modalOverlay.querySelector('input, select, textarea, button');
         if (first) first.focus();
-
-        // trap focus & keydown
         document.addEventListener('focus', trapFocus, true);
         document.addEventListener('keydown', handleKeydown);
       }
@@ -1480,14 +1486,14 @@
         modalOverlay.setAttribute('aria-hidden', 'true');
         document.removeEventListener('focus', trapFocus, true);
         document.removeEventListener('keydown', handleKeydown);
-        // reset UI but keep values
         if (formSuccess) formSuccess.style.display = 'none';
         if (formNote) formNote.style.display = '';
+        if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
       }
 
       function trapFocus(e) {
-        if (!modalOverlay) return;
-        if (modal && !modal.contains(e.target)) {
+        if (!modal) return;
+        if (!modal.contains(e.target)) {
           e.stopPropagation();
           const focusable = modal.querySelector('input,select,textarea,button,a[href],[tabindex]:not([tabindex="-1"])');
           if (focusable) focusable.focus();
@@ -1495,83 +1501,103 @@
       }
 
       function handleKeydown(e) {
-        if (e.key === 'Escape') closeModal();
-        if (e.key === 'Tab') {
-          if (!modal) return;
-          const focusable = modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])');
-          const nodes = Array.prototype.slice.call(focusable);
+        if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+        if (e.key === 'Tab' && modal) {
+          const focusables = modal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])');
+          const nodes = Array.from(focusables);
           if (!nodes.length) return;
           const first = nodes[0], last = nodes[nodes.length - 1];
-          if (e.shiftKey && document.activeElement === first) {
-            e.preventDefault();
-            last.focus();
-          } else if (!e.shiftKey && document.activeElement === last) {
-            e.preventDefault();
-            first.focus();
-          }
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
         }
       }
 
-      // close handlers
-      if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
-      if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
       if (modalOverlay) {
         modalOverlay.addEventListener('click', function (e) {
           if (e.target === modalOverlay) closeModal();
         });
       }
 
-      // intercept enroll links
+      // Intercept clicks only when intention is explicit:
+      // - element has data-open-enroll attribute OR
+      // - resolved pathname === '/enroll'
       document.addEventListener('click', function (e) {
-        const el = e.target.closest('a');
-        if (!el) return;
-        const href = el.getAttribute('href') || '';
-        const openAttr = el.getAttribute('data-open-enroll');
+        try {
+          const el = e.target.closest ? e.target.closest('a') : null;
+          if (!el) return;
+          const href = (el.getAttribute('href') || '').trim();
+          const hasOpenAttr = el.hasAttribute('data-open-enroll') || el.dataset.openEnroll !== undefined;
 
-        // open modal when:
-        // - href is "/enroll"
-        // - href equals "#popup"
-        // - element has data-open-enroll attribute
-        if (href === '/enroll' || href === '#popup' || openAttr) {
-          e.preventDefault();
-          openModal();
+          if (hasOpenAttr) {
+            e.preventDefault();
+            openModal();
+            return;
+          }
+
+          if (href) {
+            try {
+              const resolved = new URL(href, location.href);
+              const pathname = resolved.pathname.replace(/\/+$/, '');
+              if (pathname === '/enroll') {
+                e.preventDefault();
+                openModal();
+                return;
+              }
+            } catch (err) {
+              // ignore non-URL hrefs (mailto:, tel:, javascript:, anchors)
+            }
+          }
+        } catch (err) {
+          console.error('Modal click handler error', err);
         }
       });
 
-      // form submission (demo)
+      // Form submit - simulated; replace with real AJAX if needed
       if (form) {
         form.addEventListener('submit', function (e) {
           e.preventDefault();
-          const name = form.querySelector('#name').value.trim();
-          const phone = form.querySelector('#phone').value.trim();
+          const name = (form.querySelector('#name') && form.querySelector('#name').value || '').trim();
+          const phone = (form.querySelector('#phone') && form.querySelector('#phone').value || '').trim();
           if (!name) {
             alert('Please enter your name.');
-            form.querySelector('#name').focus();
+            if (form.querySelector('#name')) form.querySelector('#name').focus();
             return;
           }
           if (!phone) {
             alert('Please enter your phone number.');
-            form.querySelector('#phone').focus();
+            if (form.querySelector('#phone')) form.querySelector('#phone').focus();
             return;
           }
 
-          // show success
           if (formNote) formNote.style.display = 'none';
           if (formSuccess) formSuccess.style.display = '';
-          // optionally send via fetch here
-          // fetch('/api/enquiry', ...)
-          setTimeout(() => {
-            closeModal();
-          }, 2000);
+
+          // TODO: send to your backend; example:
+          /*
+          const payload = {
+            name,
+            phone,
+            email: form.querySelector('#email')?.value || '',
+            course: form.querySelector('#course')?.value || '',
+            message: form.querySelector('#message')?.value || ''
+          };
+          fetch('/api/enquiry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).then(res => { ... })
+          */
+
+          setTimeout(() => { closeModal(); }, 2000);
         });
       }
 
-      // prevent default jump for href="#"
-      document.querySelectorAll('a[href="#"]').forEach(a => {
-        a.addEventListener('click', (e) => e.preventDefault());
-      });
+      // prevent default for anchors with href="#"
+      document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', (ev) => ev.preventDefault()));
     })();
-    /* ========== END ENROLL MODAL LOGIC ========== */
+    /* ===== End modal logic ===== */
   </script>
 </body>
 </html>
