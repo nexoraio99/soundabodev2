@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mixing &amp; Mastering Course in Pune | Professional Audio Training</title>
-<meta name="description" content="Learn professional mixing and mastering at Soundabode Pune. Master Ozone, Waves &amp; RX7, and make your music label-ready with expert studio guidance." />
+  <meta name="description" content="Learn professional mixing and mastering at Soundabode Pune. Master Ozone, Waves &amp; RX7, and make your music label-ready with expert studio guidance." />
   <meta name="theme-color" content="#000000" />
 
   <!-- Favicon / App Icons -->
@@ -17,7 +17,8 @@
   <link rel="icon" type="image/png" sizes="512x512" href="/Assets/favicon-512x512.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png" />
   <link rel="manifest" href="/site.webmanifest" />
-    <script>
+
+  <script>
     (function() {
       var path = window.location.pathname;
       if (path.indexOf('.html') !== -1) {
@@ -363,6 +364,8 @@
         radial-gradient(500px 160px at 90% 80%, rgba(78, 231, 255, 0.06), transparent 18%);
       animation: shift 9s ease-in-out infinite;
       z-index: 0;
+      /* Make decorative layer non-interactive so it doesn't block clicks */
+      pointer-events: none;
     }
 
     @keyframes shift {
@@ -843,7 +846,7 @@
 
         <div class="cta-row">
           <a class="btn-primary" href="/contact.html">Book a Free Demo Class</a>
-          <a class="btn-outline" href="/enroll">Enroll Now</a>
+          <a class="btn-outline" href="/enroll" data-open-enroll>Enroll Now</a>
         </div>
       </div>
 
@@ -1226,8 +1229,8 @@
         </div>
       </div>
       <div class="actions">
-        <a class="btn-primary" href="contact.html#contact">Book a Free Demo Class</a>
-        <a class="btn-outline" href="/enroll">Enroll Now</a>
+        <a class="btn-primary" href="/contact.html#contact">Book a Free Demo Class</a>
+        <a class="btn-outline" href="/enroll" data-open-enroll>Enroll Now</a>
       </div>
     </section>
   </main>
@@ -1293,9 +1296,9 @@
         <div class="footer-column">
           <h4>ABOUT</h4>
           <ul>
-            <li><a href="about.html">ABOUT</a></li>
-            <li><a href="courses.html">COURSES</a></li>
-            <li><a href="contact.html">CONTACT</a></li>
+            <li><a href="/about.html">ABOUT</a></li>
+            <li><a href="/courses.html">COURSES</a></li>
+            <li><a href="/contact.html">CONTACT</a></li>
           </ul>
         </div>
         <div class="footer-column">
@@ -1318,7 +1321,7 @@
         <div class="footer-column">
           <h4>PRIVACY POLICY</h4>
           <ul>
-            <li><a href="privacy.html">PRIVACY POLICY</a></li>
+            <li><a href="/privacy.html">PRIVACY POLICY</a></li>
           </ul>
         </div>
       </div>
@@ -1373,18 +1376,23 @@
       items.forEach((item) => {
         const q = item.querySelector(".faq-question");
         const ans = item.querySelector(".faq-answer");
+        if (!q || !ans) return;
         q.addEventListener("click", () => {
           const open = ans.style.display === "block";
           items.forEach((i) => {
-            i.querySelector(".faq-answer").style.display = "none";
-            i.querySelector(".faq-question span").textContent = "+";
+            const a = i.querySelector(".faq-answer");
+            const qq = i.querySelector(".faq-question span");
+            if (a) a.style.display = "none";
+            if (qq) qq.textContent = "+";
           });
           if (!open) {
             ans.style.display = "block";
-            q.querySelector("span").textContent = "-";
+            const span = q.querySelector("span");
+            if (span) span.textContent = "-";
           } else {
             ans.style.display = "none";
-            q.querySelector("span").textContent = "+";
+            const span = q.querySelector("span");
+            if (span) span.textContent = "+";
           }
         });
       });
@@ -1427,7 +1435,7 @@
       });
     })();
 
-    /* ===== Modal logic (added) ===== */
+    /* ===== Modal logic (added and hardened) ===== */
     (function () {
       const modalOverlay = document.getElementById('enroll-modal');
       const modal = modalOverlay ? modalOverlay.querySelector('.modal') : null;
@@ -1489,16 +1497,40 @@
         });
       }
 
-      // Intercept clicks on any "enroll" or demo links
+      // Intercept clicks on anchors intentionally meant to open enroll modal.
+      // Criteria:
+      // - anchor has data-open-enroll attribute (recommended), OR
+      // - resolved absolute pathname === '/enroll'
       document.addEventListener('click', function (e) {
-        const el = e.target.closest ? e.target.closest('a') : null;
-        if (!el) return;
-        const href = (el.getAttribute('href') || '').trim();
-        const openAttr = el.getAttribute('data-open-enroll');
+        try {
+          const el = e.target.closest ? e.target.closest('a') : null;
+          if (!el) return;
+          const href = (el.getAttribute('href') || '').trim();
+          const hasOpenAttr = el.hasAttribute('data-open-enroll') || el.dataset.openEnroll !== undefined;
 
-        if (href === '/enroll' || href === '#popup' || openAttr) {
-          e.preventDefault();
-          openModal();
+          if (hasOpenAttr) {
+            e.preventDefault();
+            openModal();
+            return;
+          }
+
+          if (href) {
+            // Normalize and compare pathname
+            try {
+              const resolved = new URL(href, location.href);
+              const pathname = resolved.pathname.replace(/\/+$/, '');
+              if (pathname === '/enroll') {
+                e.preventDefault();
+                openModal();
+                return;
+              }
+            } catch (err) {
+              // ignore invalid URLs (like mailto:, tel:, javascript:)
+            }
+          }
+        } catch (err) {
+          // Swallow unexpected errors to avoid breaking other click behavior
+          console.error('Modal click handler error', err);
         }
       });
 
