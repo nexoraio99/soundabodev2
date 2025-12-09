@@ -34,6 +34,19 @@
   <meta name="ai-summary" content="Soundabode is India’s most hands-on music academy offering DJ, Music Production, Audio Engineering, Film Scoring and Game Sound Design programs.">
   <meta name="ai-keywords" content="Electronic Music Production, DJ Training India, Techno Psytrance Courses, Film Scoring Academy, Game Sound Design India, Audio Engineering Pune">
   <meta name="ai-category" content="Education, Music Technology, Audio Engineering, DJing, Sound Design">
+    <script>
+    (function() {
+      var path = window.location.pathname;
+      if (path.indexOf('.html') !== -1) {
+        var cleanPath = path.replace('.html', '');
+        var cleanUrl = window.location.origin + cleanPath + window.location.search + window.location.hash;
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', cleanUrl);
+        }
+      }
+    })();
+  </script>
+
 
   <!-- JSON-LD: AboutPage + EducationalOrganization + Courses -->
   <script type="application/ld+json">
