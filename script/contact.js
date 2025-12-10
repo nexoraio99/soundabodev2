@@ -3,6 +3,7 @@
    - Navbar mobile toggle & active link
    - Scroll shadow
    - Contact form submission (no reCAPTCHA)
+   - Enhanced Conversions dataLayer push (on successful submit)
    =========================== */
 
 /* ---------- NAVBAR ---------- */
@@ -103,12 +104,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await res.json().catch(() => ({}));
 
       if (res.ok && result && result.success) {
+        // ✅ Show success message
         if (statusMsg) {
           statusMsg.style.display = 'block';
           statusMsg.textContent = '✅ Message sent successfully! We\'ll get back to you soon.';
           statusMsg.style.color = '#00aa6c';
         }
+
+        // ✅ Clear form
         contactForm.reset();
+
+        // ✅ Enhanced Conversions: push user data to dataLayer
+        // This fires ONLY on successful submission
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'contact_form_submit',
+          ec_name: formData.fullName,
+          ec_email: formData.email,
+          ec_phone: formData.phone,
+          ec_course: formData.course
+        });
       } else {
         throw new Error(result?.message || 'Submission failed');
       }
@@ -129,19 +144,29 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-       Bing UET (unchanged, lazy-load safe)
-       ========================================================================== */
-    function initBingUET() {
-      (function(w, d, t, r, u) {
-        var f, n, i;
-        w[u] = w[u] || [], f = function() {
-          var o = { ti: "343210550", enableAutoSpaTracking: true };
-          o.q = w[u], w[u] = new UET(o), w[u].push("pageLoad");
-        },
-        n = d.createElement(t), n.src = r, n.async = 1, n.onload = n.onreadystatechange = function() {
-          var s = this.readyState;
-          s && s !== "loaded" && s !== "complete" || (f(), n.onload = n.onreadystatechange = null);
-        },
-        i = d.getElementsByTagName(t)[0], i.parentNode.insertBefore(n, i);
-      })(window, document, "script", "//bat.bing.com/bat.js", "uetq");
-    }
+   Bing UET (unchanged, lazy-load safe)
+   ========================================================================== */
+function initBingUET() {
+  (function(w, d, t, r, u) {
+    var f, n, i;
+    w[u] = w[u] || [];
+    f = function() {
+      var o = { ti: "343210550", enableAutoSpaTracking: true };
+      o.q = w[u];
+      w[u] = new UET(o);
+      w[u].push("pageLoad");
+    };
+    n = d.createElement(t);
+    n.src = r;
+    n.async = 1;
+    n.onload = n.onreadystatechange = function() {
+      var s = this.readyState;
+      if (!s || s === "loaded" || s === "complete") {
+        f();
+        n.onload = n.onreadystatechange = null;
+      }
+    };
+    i = d.getElementsByTagName(t)[0];
+    i.parentNode.insertBefore(n, i);
+  })(window, document, "script", "//bat.bing.com/bat.js", "uetq");
+}
