@@ -1,6 +1,6 @@
 # =========================================================
 #  SOUNDABODE - robots.txt
-#  Open crawl access for search + AI engines
+#  Open crawl access for search engines + AI crawlers
 # =========================================================
 
 ############################
@@ -68,7 +68,7 @@ Allow: /Assets/favicon-64x64.png
 Allow: /Assets/favicon-180x180.png
 Allow: /Assets/favicon-192x192.png
 Allow: /Assets/favicon-512x512.png
-Allow: /Assests/og-soundabode-cover.jpg
+Allow: /Assets/og-soundabode-cover.jpg
 
 # Static assets (CSS / JS / images)
 Allow: /Assets/
