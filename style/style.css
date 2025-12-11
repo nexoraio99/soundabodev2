@@ -2224,9 +2224,9 @@ color: #00ff99;
   }
 
   .sa-col p {
-    text-align: center
-    ;
+    text-align: center;
     font-size: 0.5rem;
+    font-weight: 100;
   }
 
   .about-container,
