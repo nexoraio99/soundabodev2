@@ -1163,7 +1163,7 @@ transition: opacity 0.45s ease, transform 0.45s ease;
 .testimonial.active {
 opacity: 1;
 pointer-events: auto;
-transform: translate(-50%, -50%); /* same position, prevents jump */
+transform: translate(-50%, -50%); /* me position, prevents jump */
 }
 
 /* Quote text: limit number of visible lines */
@@ -2224,7 +2224,9 @@ color: #00ff99;
   }
 
   .sa-col p {
-    text-align: center;
+    text-align: center
+    ;
+    font-size: 0.5rem;
   }
 
   .about-container,
