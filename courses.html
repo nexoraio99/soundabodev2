@@ -1,4 +1,4 @@
- <!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -375,7 +375,8 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <a href="/index" class="logo" aria-label="Soundabode home">
-      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img" />
+      <!-- switched from cloudinary to local asset -->
+      <img src="/Assets/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img" />
     </a>
 
     <div class="nav-links">
@@ -449,12 +450,12 @@
           <img src="/Assets/game-soundtrack.jpg"
      alt="Album mock"
      class="floating-img album"
-     id="float-album">
+     id="float-album" loading="lazy">
 
 <img src="/Assets/game-soundtrack.jpg"
      alt="Studio mock"
      class="floating-img studio"
-     id="float-studio">
+     id="float-studio" loading="lazy">
         </div>
       </div>
     </section>
@@ -772,7 +773,7 @@
         window.uetq = window.uetq || [];
         window.uetq.push("event", "contact", {
           event_label: source === "whatsapp"
-            ? "961303bb-7e25-4b3a-9ed9-04c288d65ee2"
+            ? "961303bb-7e25-4b3a-9ed9-04c288d65ee"
             : "5547903c-7e42-4d18-ab6d-4b58e660dafe"
         });
       } catch (e) {
@@ -961,21 +962,18 @@
       });
     })();
 
-    // image fallback placeholders
+    // SAFE image fallback: only set placeholder if real image fails to load
     (function () {
       const album = document.getElementById("float-album");
       const studio = document.getElementById("float-studio");
       [album, studio].forEach((img) => {
         if (!img) return;
-        if (!img.complete || img.naturalWidth === 0) {
-          img.style.display = "block";
-          img.alt = "";
-          img.src =
-            "data:image/svg+xml;utf8," +
-            encodeURIComponent(
-              '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#071328"/></svg>'
-            );
-        }
+        // if the image naturally fails, replace with placeholder
+        img.addEventListener('error', function () {
+          // use local placeholder asset; ensure /Assets/placeholder.png exists in your repo
+          this.alt = 'placeholder';
+          this.src = '/Assets/placeholder.png';
+        }, { once: true });
       });
     })();
 
