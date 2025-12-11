@@ -498,7 +498,63 @@ body {
   transform: translateY(0);
   }
 }
+/* ---------------------- Exact 360px Mobile Layout ---------------------- */
+@media (max-width: 360px) {
 
+  /* Reduce hero text for small phones */
+  .main-content .title-container h2 {
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .aurora-text {
+    font-size: 1.9rem !important;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  /* Perfect paragraph measure (short readable lines) */
+  .sa-description {
+    max-width: 300px !important;  /* 300px inside a 360px screen */
+    margin: 0 auto 14px;
+    padding: 0;
+  }
+
+  .sa-description .sa-col {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .sa-description .sa-col p {
+    max-width: 300px !important;
+    margin: 0 auto;
+    font-size: 0.84rem;
+    line-height: 1.55;
+    letter-spacing: 0.013em;
+    color: rgba(255,255,255,0.85);
+    text-align: left;
+  }
+
+  /* CTA spacing */
+  .glow-border {
+    margin: 20px auto 24px;
+    font-size: 0.9rem;
+  }
+
+  /* Logo banner spacing */
+  .client-logo-banner {
+    margin-top: 14px;
+  }
+
+  /* WhatsApp floating button fix */
+  .whatsapp-float {
+    right: 10px !important;
+    bottom: 14px !important;
+    transform: scale(0.9);
+  }
+}
 /* Aurora animated gradient text */
 .aurora-text {
   display: inline-block;
