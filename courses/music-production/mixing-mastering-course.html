@@ -22,7 +22,7 @@
       --container:1120px;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg);color:#e8eef6;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,-apple-system; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
+    html,body{height:100%;margin:0;background:var(--bg);color:#e8eef6;font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,-apple-system; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
     a{color:inherit;text-decoration:none}
     .container{max-width:var(--container);margin:0 auto;padding:0 20px}
 
@@ -157,7 +157,7 @@
 
   <!-- WhatsApp quick chat -->
   <a class="whatsapp" href="https://wa.me/919975016189" aria-label="Chat on WhatsApp" target="_blank" rel="noopener noreferrer">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 1.2 11.9 11.9 0 0 0 3.5 3.5 11.9 11.9 0 0 0 1.2 12c0 2  .5 3.9 1.5 5.6L1 23l5.6-1.5A11.9 11.9 0 0 0 12 22.8c6.3 0 11.5-5.2 11.5-11.8 0-3.2-1.3-6.2-3-8.5z" fill="currentColor"/></svg>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 1.2 11.9 11.9 0 0 0 3.5 3.5 11.9 11.9 0 0 0 1.2 12c0 2 .5 3.9 1.5 5.6L1 23l5.6-1.5A11.9 11.9 0 0 0 12 22.8c6.3 0 11.5-5.2 11.5-11.8 0-3.2-1.3-6.2-3-8.5z" fill="currentColor"/></svg>
   </a>
 
   <main class="container" style="margin-top:92px;">
@@ -292,9 +292,6 @@
       </div>
     </section>
 
-    <!-- MORE SECTIONS OMITTED? - KEEP FULL CONTENT -->
-    <!-- WHAT YOU WILL LEARN, WHY CHOOSE, CAREER PATH, DETAILS, LOCATION, FAQ, CTA (kept intact) -->
-    <!-- For brevity within production-ready file kept entire content structure consistent with original. -->
     <!-- WHAT YOU WILL LEARN -->
     <section class="section" aria-labelledby="curriculum-heading">
       <div class="section-header">
@@ -518,7 +515,7 @@
   <!-- FOOTER -->
   <footer class="site-footer" role="contentinfo">
     <div class="container" style="max-width:1200px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap">
-      <div class="footer-columns">
+      <div class="footer-columns" style="align-items:flex-start">
         <div class="footer-column">
           <h4>ABOUT</h4>
           <a href="/about.html">ABOUT</a>
@@ -548,81 +545,78 @@
   <!-- Production-ready JS (concise & robust) -->
   <script>
     (function () {
-      /* Utility helpers */
-      const $ = (sel, ctx = document) => ctx.querySelector(sel);
-      const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+      // small DOM helpers
+      const $ = (s, ctx = document) => ctx.querySelector(s);
+      const $$ = (s, ctx = document) => Array.from(ctx.querySelectorAll(s));
 
-      /* Year */
+      // Year
       const yearEl = $('#year');
       if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-      /* Mobile menu: toggle aria and visibility */
+      // Mobile menu
       const burger = document.querySelector('.hamburger');
       const mobileMenu = document.getElementById('mobile-menu');
       if (burger && mobileMenu) {
-        burger.addEventListener('click', () => {
+        burger.addEventListener('click', function () {
           const expanded = burger.getAttribute('aria-expanded') === 'true';
-          burger.setAttribute('aria-expanded', String(!expanded));
           const open = !expanded;
+          burger.setAttribute('aria-expanded', String(open));
           mobileMenu.style.display = open ? 'block' : 'none';
           mobileMenu.setAttribute('aria-hidden', String(!open));
         });
 
-        // Close menu when a link is clicked
-        $$('a', mobileMenu).forEach(a => a.addEventListener('click', () => {
+        // close menu on link click
+        $$('a', mobileMenu).forEach(a => a.addEventListener('click', function () {
           mobileMenu.style.display = 'none';
           mobileMenu.setAttribute('aria-hidden', 'true');
           burger.setAttribute('aria-expanded', 'false');
         }));
       }
 
-      /* Hero subtle parallax (non-blocking, safe) */
+      // Parallax for hero visuals (non-blocking)
       (function () {
-        const hero = document.getElementById('hero-visual');
-        const album = document.getElementById('float-album');
-        const studio = document.getElementById('float-studio');
+        const hero = $('#hero-visual');
+        const album = $('#float-album');
+        const studio = $('#float-studio');
         if (!hero || !album || !studio) return;
 
-        let rafId = null;
-        let state = { x: 0, y: 0 };
-
-        hero.addEventListener('mousemove', (e) => {
+        let raf = null;
+        const state = { x: 0, y: 0 };
+        hero.addEventListener('mousemove', function (e) {
           const rect = hero.getBoundingClientRect();
-          const nx = ((e.clientX - rect.left) / rect.width - 0.5);
-          const ny = ((e.clientY - rect.top) / rect.height - 0.5);
-          state.x = nx;
-          state.y = ny;
-          if (!rafId) {
-            rafId = requestAnimationFrame(() => {
+          state.x = ((e.clientX - rect.left) / rect.width) - 0.5;
+          state.y = ((e.clientY - rect.top) / rect.height) - 0.5;
+          if (!raf) {
+            raf = requestAnimationFrame(function () {
               album.style.transform = `translate(${state.x * 14}px, ${state.y * 10}px) rotate(${state.x * 3}deg)`;
               studio.style.transform = `translate(${state.x * -10}px, ${state.y * -6}px) rotate(${state.x * -2}deg)`;
-              rafId = null;
+              raf = null;
             });
           }
         });
-
-        hero.addEventListener('mouseleave', () => {
+        hero.addEventListener('mouseleave', function () {
           album.style.transform = '';
           studio.style.transform = '';
         });
       })();
 
-      /* FAQ accordion (progressive enhancement) */
+      // FAQ accordion (accessible)
       (function () {
         const items = $$('.faq-item');
         items.forEach(item => {
           const q = item.querySelector('.faq-question');
           const a = item.querySelector('.faq-answer');
           if (!q || !a) return;
-          q.addEventListener('click', () => {
-            const open = a.style.display === 'block';
+          q.addEventListener('click', function () {
+            const isOpen = a.style.display === 'block';
             // close all
-            items.forEach(i => i.querySelector('.faq-answer').style.display = 'none');
-            if (!open) a.style.display = 'block';
+            items.forEach(i => {
+              const ans = i.querySelector('.faq-answer');
+              if (ans) ans.style.display = 'none';
+            });
+            if (!isOpen) a.style.display = 'block';
           });
-
-          // keyboard support
-          q.addEventListener('keydown', (ev) => {
+          q.addEventListener('keydown', function (ev) {
             if (ev.key === 'Enter' || ev.key === ' ') {
               ev.preventDefault();
               q.click();
@@ -631,10 +625,9 @@
         });
       })();
 
-      /* Modal: clean, accessible, no diagnostics */
+      // Modal logic
       (function () {
         const overlay = document.getElementById('enroll-modal');
-        const modal = overlay ? overlay.querySelector('.modal') : null;
         const openSelectors = 'a[data-open-enroll], a[href$="/enroll"], a[href="/enroll"]';
         const openers = Array.from(document.querySelectorAll(openSelectors));
         const closeBtn = $('#modal-close-btn');
@@ -642,33 +635,32 @@
         const form = $('#enroll-form');
         let lastFocused = null;
 
-        function open() {
+        function openModal() {
           if (!overlay) return;
           lastFocused = document.activeElement;
           overlay.classList.add('is-open');
-          overlay.setAttribute('aria-hidden','false');
-          // focus first input
+          overlay.setAttribute('aria-hidden', 'false');
           const first = overlay.querySelector('input,select,textarea,button');
           if (first) first.focus();
           document.addEventListener('keydown', onKey);
         }
 
-        function close() {
+        function closeModal() {
           if (!overlay) return;
           overlay.classList.remove('is-open');
-          overlay.setAttribute('aria-hidden','true');
-          if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+          overlay.setAttribute('aria-hidden', 'true');
           document.removeEventListener('keydown', onKey);
+          if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
         }
 
         function onKey(e) {
-          if (e.key === 'Escape') close();
+          if (e.key === 'Escape') closeModal();
         }
 
-        // Attach open handlers (progressive: anchors remain navigable if JS is off)
+        // Attach open handlers (progressive enhancement)
         openers.forEach(el => {
-          el.addEventListener('click', (ev) => {
-            // only intercept if link targets /enroll or has data-open-enroll
+          el.addEventListener('click', function (ev) {
+            // If element intends to open modal intercept, else let it navigate
             const isData = el.hasAttribute('data-open-enroll');
             let isEnrollHref = false;
             try {
@@ -677,45 +669,41 @@
                 const resolved = new URL(href, location.href);
                 isEnrollHref = resolved.pathname.replace(/\/+$/, '') === '/enroll';
               }
-            } catch (err) { /* ignore */ }
-
+            } catch (err) {
+              // ignore URL parse errors (shouldn't happen)
+            }
             if (isData || isEnrollHref) {
               ev.preventDefault();
-              open();
+              openModal();
             }
           });
         });
 
         if (overlay) {
-          overlay.addEventListener('click', (ev) => {
-            if (ev.target === overlay) close();
+          overlay.addEventListener('click', function (ev) {
+            if (ev.target === overlay) closeModal();
           });
         }
-        if (closeBtn) closeBtn.addEventListener('click', close);
-        if (cancelBtn) cancelBtn.addEventListener('click', close);
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
 
-        // form submit: client-side validation only, then simulate success
+        // Form submit handling (client-side only)
         if (form) {
-          form.addEventListener('submit', (ev) => {
+          form.addEventListener('submit', function (ev) {
             ev.preventDefault();
             const name = (form.querySelector('#name') || {}).value || '';
             const phone = (form.querySelector('#phone') || {}).value || '';
-            if (!name.trim()) { alert('Please enter your name'); form.querySelector('#name').focus(); return; }
-            if (!phone.trim()) { alert('Please enter your phone number'); form.querySelector('#phone').focus(); return; }
-
-            // show success UI (replace with real POST in production)
-            const note = $('#form-note'), success = $('#form-success');
+            const note = $('#form-note');
+            const success = $('#form-success');
+            if (!name.trim()) { alert('Please enter your name'); (form.querySelector('#name') || {}).focus && form.querySelector('#name').focus(); return; }
+            if (!phone.trim()) { alert('Please enter your phone number'); (form.querySelector('#phone') || {}).focus && form.querySelector('#phone').focus(); return; }
             if (note) note.style.display = 'none';
             if (success) success.style.display = 'block';
-
-            // simulate short delay then close
-            setTimeout(() => close(), 1400);
+            // TODO: replace with real backend call
+            setTimeout(function () { closeModal(); }, 1300);
           });
         }
       })();
-
-      /* Image best-practices: encourage browser caching & responsive serving (no inline fallbacks here).
-         Production note: ensure assets exist at the provided URLs and set HTTP cache headers (CDN). */
     })();
   </script>
 </body>
