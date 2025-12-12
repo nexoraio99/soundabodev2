@@ -20,13 +20,18 @@
 
   <script>
     (function() {
-      var path = window.location.pathname;
-      if (path.indexOf('.html') !== -1) {
-        var cleanPath = path.replace('.html', '');
-        var cleanUrl = window.location.origin + cleanPath + window.location.search + window.location.hash;
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, '', cleanUrl);
+      // clean url removal of .html for prettier URLs (non-destructive)
+      try {
+        var path = window.location.pathname;
+        if (path.indexOf('.html') !== -1) {
+          var cleanPath = path.replace('.html', '');
+          var cleanUrl = window.location.origin + cleanPath + window.location.search + window.location.hash;
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', cleanUrl);
+          }
         }
+      } catch (e) {
+        // silent fail - not critical
       }
     })();
   </script>
@@ -58,21 +63,13 @@
       padding-bottom: 80px;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    a { color: inherit; text-decoration: none; }
 
-    .container {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 0 20px;
-    }
+    .container { max-width: var(--container); margin: 0 auto; padding: 0 20px; }
 
     .muted { color: var(--muted); }
 
     /* NAVBAR */
-
     .navbar {
       position: absolute;
       top: 0;
@@ -90,12 +87,7 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .navbar a {
-      color: #fff;
-      font-weight: 200;
-      font-size: clamp(0.65rem, 1.5vw, 0.8rem);
-      position: relative;
-    }
+    .navbar a { color: #fff; font-weight: 200; font-size: clamp(0.65rem, 1.5vw, 0.8rem); position: relative; }
 
     .nav-links {
       display: flex;
@@ -104,11 +96,7 @@
       justify-content: center;
     }
 
-    .nav-actions {
-      display: flex;
-      gap: clamp(8px, 2vw, 15px);
-      align-items: center;
-    }
+    .nav-actions { display: flex; gap: clamp(8px, 2vw, 15px); align-items: center; }
 
     .action-btn {
       width: clamp(32px, 8vw, 40px);
@@ -125,80 +113,27 @@
       color: #fff;
     }
 
-    .action-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: scale(1.1);
-    }
+    .action-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
 
-    .call-btn:hover {
-      background: rgba(0, 194, 255, 0.2);
-      border-color: #00c3ff95;
-    }
+    .call-btn:hover { background: rgba(0, 194, 255, 0.2); border-color: #00c3ff95; }
 
-    .logo-img {
-      height: clamp(20px, 5vw, 40px);
-      width: auto;
-      object-fit: contain;
-    }
+    .logo-img { height: clamp(20px, 5vw, 40px); width: auto; object-fit: contain; }
 
     /* MOBILE MENU */
-
-    .hamburger-menu {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      z-index: 101;
-    }
-
-    .hamburger-menu .bar {
-      display: block;
-      width: 25px;
-      height: 2px;
-      background-color: #fff;
-      margin: 5px 0;
-      transition: transform 0.3s, opacity 0.3s;
-    }
-
+    .hamburger-menu { display: none; background: none; border: none; cursor: pointer; padding: 0; z-index: 101; }
+    .hamburger-menu .bar { display: block; width: 25px; height: 2px; background-color: #fff; margin: 5px 0; transition: transform 0.3s, opacity 0.3s; }
     .nav-menu {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 40px;
-      transform: translateX(100%);
-      transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
-      z-index: 99;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: rgba(0,0,0,0.9);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 40px;
+      transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.76,0,0.24,1); z-index: 99;
     }
-
     .nav-menu.is-active { transform: translateX(0); }
+    .nav-menu a { color: #fff; font-size: clamp(1.2rem, 4vw, 1.5rem); font-weight: 300; }
 
-    .nav-menu a {
-      color: #fff;
-      font-size: clamp(1.2rem, 4vw, 1.5rem);
-      font-weight: 300;
-    }
-
-    .hamburger-menu.is-active .bar:nth-child(1) {
-      transform: translateY(7px) rotate(45deg);
-    }
-
-    .hamburger-menu.is-active .bar:nth-child(2) {
-      opacity: 0;
-    }
-
-    .hamburger-menu.is-active .bar:nth-child(3) {
-      transform: translateY(-7px) rotate(-45deg);
-    }
+    .hamburger-menu.is-active .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger-menu.is-active .bar:nth-child(2) { opacity: 0; }
+    .hamburger-menu.is-active .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     @media (max-width: 768px) {
       .hamburger-menu { display: block; }
@@ -206,638 +141,159 @@
     }
 
     /* WHATSAPP FLOAT */
-
     .whatsapp-float {
-      position: fixed;
-      width: clamp(50px, 12vw, 60px);
-      height: clamp(50px, 12vw, 60px);
-      bottom: clamp(15px, 3vw, 25px);
-      right: clamp(15px, 3vw, 25px);
-      background-color: #25d366;
-      border-radius: 50%;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-      transition: all 0.3s ease;
-      text-decoration: none;
+      position: fixed; width: clamp(50px, 12vw, 60px); height: clamp(50px,12vw,60px);
+      bottom: clamp(15px, 3vw, 25px); right: clamp(15px,3vw,25px);
+      background-color: #25d366; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      display:flex; align-items:center; justify-content:center; z-index:999; transition: all .3s; text-decoration:none;
     }
-
-    .whatsapp-float:hover {
-      transform: scale(1.1);
-      background-color: #20ba5a;
-    }
-
-    .whatsapp-icon {
-      width: clamp(24px, 6vw, 30px);
-      height: clamp(24px, 6vw, 30px);
-      filter: brightness(0) invert(1);
-    }
+    .whatsapp-float:hover { transform: scale(1.1); background-color: #20ba5a; }
+    .whatsapp-icon { width: clamp(24px, 6vw, 30px); height: clamp(24px,6vw,30px); filter: brightness(0) invert(1); }
 
     /* HERO */
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 28px;
-      align-items: center;
-      margin-top: 80px;
-    }
-
-    @media (min-width: 1020px) {
-      .hero { grid-template-columns: 1.2fr 0.9fr; }
-    }
-
-    .hero-kicker {
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .hero h1 {
-      font-size: 32px;
-      margin: 0;
-      line-height: 1.15;
-    }
-
-    @media (min-width: 960px) {
-      .hero h1 { font-size: 38px; }
-    }
-
-    .gradient-text {
-      background: linear-gradient(90deg, var(--neon-1), var(--neon-2));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      display: block;
-      margin-top: 4px;
-    }
-
-    .hero-subtitle {
-      font-size: 16px;
-      font-weight: 600;
-      margin-top: 10px;
-    }
-
-    .hero p {
-      color: var(--muted);
-      margin-top: 10px;
-      max-width: 70ch;
-    }
-
-    .hero .cta-row {
-      margin-top: 18px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .btn-primary,
-    .btn-outline {
-      padding: 11px 16px;
-      border-radius: 12px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      white-space: nowrap;
-      font-size: 14px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(90deg, var(--neon-1), var(--neon-2));
-      color: #041014;
-    }
-
-    .btn-outline {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: #e8eef6;
-    }
-
-    .hero-meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 18px;
-      margin-top: 16px;
-      font-size: 13px;
-    }
-
-    .meta-pill {
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: var(--muted);
-    }
+    .hero { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: center; margin-top: 80px; }
+    @media (min-width: 1020px) { .hero { grid-template-columns: 1.2fr 0.9fr; } }
+    .hero-kicker { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .hero h1 { font-size: 32px; margin: 0; line-height: 1.15; }
+    @media (min-width: 960px) { .hero h1 { font-size: 38px; } }
+    .gradient-text { background: linear-gradient(90deg, var(--neon-1), var(--neon-2)); -webkit-background-clip: text; background-clip: text; color: transparent; display:block; margin-top:4px; }
+    .hero-subtitle { font-size: 16px; font-weight: 600; margin-top: 10px; }
+    .hero p { color: var(--muted); margin-top: 10px; max-width: 70ch; }
+    .hero .cta-row { margin-top: 18px; display:flex; flex-wrap:wrap; gap:12px; }
+    .btn-primary, .btn-outline { padding: 11px 16px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; white-space: nowrap; font-size:14px; }
+    .btn-primary { background: linear-gradient(90deg, var(--neon-1), var(--neon-2)); color: #041014; }
+    .btn-outline { background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); color:#e8eef6; }
+    .hero-meta-row { display:flex; flex-wrap:wrap; gap: 10px 18px; margin-top:16px; font-size:13px; }
+    .meta-pill { padding:6px 10px; border-radius:999px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); color:var(--muted); }
 
     /* HERO VISUAL */
+    .hero-visual { position: relative; height: 360px; border-radius: 20px; overflow: hidden; border:1px solid rgba(17,16,16,0.06); background:#000000; }
+    .hero-visual::before { content:""; position:absolute; inset:0; border-radius:20px; box-shadow: inset 0 0 60px rgba(78,231,255,0.06), inset 0 0 120px rgba(0,0,0,0.7); pointer-events:none; z-index:4; }
+    .gradient-layer { position:absolute; inset:0; background: radial-gradient(600px 200px at 10% 20%, #000000, transparent 8%), radial-gradient(500px 160px at 90% 80%, rgba(78,231,255,0.06), transparent 18%); animation: shift 9s ease-in-out infinite; z-index:0; pointer-events:none; }
+    @keyframes shift { 0% { filter: hue-rotate(0deg); } 50% { filter: hue-rotate(35deg); } 100% { filter: hue-rotate(0deg); } }
+    .floating-img { position: absolute; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); border-radius: 12px; border:1px solid rgba(0,0,0,0.08); object-fit: cover; z-index:3; max-width:100%; }
+    .floating-img.album { left:26px; top:26px; width:170px; height:170px; }
+    .floating-img.studio { right:26px; bottom:26px; width:140px; height:140px; }
+    .particles { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:2; }
+    .particle { position:absolute; width:6px; height:6px; background: rgba(78,231,255,0.55); border-radius:50%; filter: blur(3px); animation: particleFloat 9s ease-in-out infinite; }
+    @keyframes particleFloat { 0% { transform: translateY(0) translateX(0); opacity:0.3 } 50% { transform: translateY(-40px) translateX(14px); opacity:0.9 } 100% { transform: translateY(0) translateX(0); opacity:0.3 } }
 
-    .hero-visual {
-      position: relative;
-      height: 360px;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid rgba(17, 16, 16, 0.06);
-      background: #000000;
-    }
+    /* LAYOUT / CARDS / DETAILS */
+    .section { margin-top: 36px; }
+    .section-header { margin-bottom:10px; }
+    .section-title { font-size: 20px; margin: 0; }
+    .section-subtitle { margin:4px 0 0; font-size:14px; color:var(--muted); max-width:72ch; }
+    .two-column { display:grid; grid-template-columns: minmax(0,2fr) minmax(0,1.3fr); gap:16px; align-items:flex-start; margin-top:16px; }
+    @media (max-width:880px) { .two-column { grid-template-columns: 1fr; } }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px; border:1px solid rgba(255,255,255,0.06); padding:16px 16px 14px; }
+    .pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .pill { font-size:12px; padding:6px 10px; border-radius:999px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); color:var(--muted); }
+    .bullets { margin:8px 0 0; padding-left:18px; color:var(--muted); font-size:14px; }
+    .bullets li { margin-bottom:6px; }
+    .grid-2 { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:14px; }
+    @media (max-width:780px) { .grid-2 { grid-template-columns: 1fr; } }
+    .details-grid { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; margin-top:12px; }
+    @media (max-width:720px) { .details-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    .detail-item { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; border:1px solid rgba(255,255,255,0.05); padding:10px 12px; font-size:13px; }
+    .detail-label { font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); }
+    .detail-value { margin-top:4px; font-weight:600; }
+    .faq { margin-top:16px; }
+    .faq-item { background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:12px; border-radius:10px; margin-top:8px; border:1px solid rgba(255,255,255,0.04); }
+    .faq-question { display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:600; gap:10px; font-size:14px; }
+    .faq-question span { font-size:18px; }
+    .faq-answer { margin-top:8px; color:var(--muted); display:none; font-size:14px; }
 
-    .hero-visual::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 20px;
-      box-shadow:
-        inset 0 0 60px rgba(78, 231, 255, 0.06),
-        inset 0 0 120px rgba(0, 0, 0, 0.7);
-      pointer-events: none;
-      z-index: 4;
-    }
+    /* ENROLL CTA + FOOTER */
+    .enroll-bottom { margin-top:32px; padding:18px; border-radius:14px; background: linear-gradient(180deg, rgba(9,17,26,0.6), rgba(8,11,14,0.45)); border:1px solid rgba(255,255,255,0.04); display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    .enroll-bottom .actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .site-footer { background-color:#000; font-family:"Roboto Mono", monospace; color:#fff; padding:18px 20px; border-top:1px solid #2222222e; position:relative; z-index:2; margin-top:40px; }
+    .footer-container { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
+    .footer-columns { display:flex; gap:60px; flex-wrap:wrap; }
+    .footer-column h4 { color:#888; font-size:0.75rem; font-weight:400; letter-spacing:2px; text-transform:uppercase; padding:4px 1px; margin-bottom:6px; }
+    .footer-column ul { list-style:none; padding:0; margin:0; }
+    .footer-column li { margin-bottom:6px; }
+    .footer-column a, .footer-column p { color:#fff; font-size:0.7rem; line-height:1.5; margin:0; transition: opacity 0.3s; }
+    .footer-column a:hover { opacity:0.7; }
+    .footer-copyright p { margin-right:40px; color:#888; font-size:0.6rem; }
 
-    .gradient-layer {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(600px 200px at 10% 20%, #000000, transparent 8%),
-        radial-gradient(500px 160px at 90% 80%, rgba(78, 231, 255, 0.06), transparent 18%);
-      animation: shift 9s ease-in-out infinite;
-      z-index: 0;
-      /* make decorative layer non-interactive */
-      pointer-events: none;
-    }
-
-    @keyframes shift {
-      0% { filter: hue-rotate(0deg); }
-      50% { filter: hue-rotate(35deg); }
-      100% { filter: hue-rotate(0deg); }
-    }
-
-    .floating-img {
-      position: absolute;
-      filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
-      border-radius: 12px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      object-fit: cover;
-      z-index: 3;
-      max-width: 100%;
-    }
-
-    .floating-img.album {
-      left: 26px;
-      top: 26px;
-      width: 170px;
-      height: 170px;
-    }
-
-    .floating-img.studio {
-      right: 26px;
-      bottom: 26px;
-      width: 140px;
-      height: 140px;
-    }
-
-    .particles {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 2;
-    }
-
-    .particle {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: rgba(78, 231, 255, 0.55);
-      border-radius: 50%;
-      filter: blur(3px);
-      animation: particleFloat 9s ease-in-out infinite;
-    }
-
-    @keyframes particleFloat {
-      0%   { transform: translateY(0) translateX(0); opacity: 0.3; }
-      50%  { transform: translateY(-40px) translateX(14px); opacity: 0.9; }
-      100% { transform: translateY(0) translateX(0); opacity: 0.3; }
-    }
-
-    /* LAYOUT SECTIONS */
-
-    .section {
-      margin-top: 36px;
-    }
-
-    .section-header {
-      margin-bottom: 10px;
-    }
-
-    .section-title {
-      font-size: 20px;
-      margin: 0;
-    }
-
-    .section-subtitle {
-      margin: 4px 0 0;
-      font-size: 14px;
-      color: var(--muted);
-      max-width: 72ch;
-    }
-
-    .two-column {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
-      gap: 16px;
-      align-items: flex-start;
-      margin-top: 16px;
-    }
-
-    @media (max-width: 880px) {
-      .two-column {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 16px 16px 14px;
-    }
-
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .pill {
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      color: var(--muted);
-    }
-
-    /* BULLET LISTS */
-
-    .bullets {
-      margin: 8px 0 0;
-      padding-left: 18px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .bullets li {
-      margin-bottom: 6px;
-    }
-
-    /* GRID CARDS */
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 14px;
-    }
-
-    @media (max-width: 780px) {
-      .grid-2 { grid-template-columns: 1fr; }
-    }
-
-    /* COURSE DETAILS */
-
-    .details-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    @media (max-width: 720px) {
-      .details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    .detail-item {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 10px 12px;
-      font-size: 13px;
-    }
-
-    .detail-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-    }
-
-    .detail-value {
-      margin-top: 4px;
-      font-weight: 600;
-    }
-
-    /* FAQ */
-
-    .faq {
-      margin-top: 16px;
-    }
-
-    .faq-item {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    .faq-question {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      font-weight: 600;
-      gap: 10px;
-      font-size: 14px;
-    }
-
-    .faq-question span {
-      font-size: 18px;
-    }
-
-    .faq-answer {
-      margin-top: 8px;
-      color: var(--muted);
-      display: none;
-      font-size: 14px;
-    }
-
-    /* ENROLL CTA */
-
-    .enroll-bottom {
-      margin-top: 32px;
-      padding: 18px;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(9, 17, 26, 0.6), rgba(8, 11, 14, 0.45));
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .enroll-bottom .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    /* FOOTER */
-
-    .site-footer {
-      background-color: #000;
-      font-family: "Roboto Mono", monospace;
-      color: #fff;
-      padding: 18px 20px;
-      border-top: 1px solid #2222222e;
-      position: relative;
-      z-index: 2;
-      margin-top: 40px;
-    }
-
-    .footer-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .footer-columns {
-      display: flex;
-      gap: 60px;
-      flex-wrap: wrap;
-    }
-
-    .footer-column h4 {
-      color: #888;
-      font-size: 0.75rem;
-      font-weight: 400;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 4px 1px;
-      margin-bottom: 6px;
-    }
-
-    .footer-column ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .footer-column li {
-      margin-bottom: 6px;
-    }
-
-    .footer-column a,
-    .footer-column p {
-      color: #fff;
-      font-size: 0.7rem;
-      line-height: 1.5;
-      margin: 0;
-      transition: opacity 0.3s;
-    }
-
-    .footer-column a:hover { opacity: 0.7; }
-
-    .footer-copyright p {
-      margin-right: 40px;
-      color: #888;
-      font-size: 0.6rem;
-    }
-
-    /* --- POPUP MODAL STYLES (added) --- */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1200;
-      padding: 20px;
-    }
-
-    .modal-overlay.is-open { display: flex; }
-
-    .modal {
-      width: 100%;
-      max-width: 720px;
-      background: linear-gradient(180deg, rgba(15,15,15,0.98), rgba(10,10,12,0.98));
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.04);
-      color: #e8eef6;
-    }
-
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:1200; padding:20px; }
+    .modal-overlay.is-open { display:flex; }
+    .modal { width:100%; max-width:720px; background: linear-gradient(180deg, rgba(15,15,15,0.98), rgba(10,10,12,0.98)); border-radius:12px; padding:20px; box-shadow: 0 14px 40px rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.04); color:#e8eef6; }
     .modal-header { display:flex; justify-content:space-between; align-items:center; gap:8px; }
     .modal-title { margin:0; font-size:18px; }
-    .modal-close {
-      background: transparent;
-      color: #fff;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      padding: 6px;
-      line-height: 1;
-    }
-
-    .modal-body { margin-top: 12px; }
+    .modal-close { background:transparent; color:#fff; border:none; font-size:20px; cursor:pointer; padding:6px; line-height:1; }
+    .modal-body { margin-top:12px; }
     .modal-row { display:grid; gap:8px; grid-template-columns: 1fr 1fr; }
-    @media (max-width: 560px) { .modal-row { grid-template-columns: 1fr; } }
-
-    .input, textarea {
-      width:100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .label { font-size:12px; color: var(--muted); margin-bottom:6px; display:block; }
-
+    @media (max-width:560px) { .modal-row { grid-template-columns: 1fr; } }
+    .input, textarea { width:100%; padding:10px 12px; border-radius:8px; background: rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.06); color:#fff; font-size:14px; outline:none; }
+    .label { font-size:12px; color:var(--muted); margin-bottom:6px; display:block; }
     .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
     .btn { padding:10px 14px; border-radius:8px; cursor:pointer; border:none; font-weight:600; }
     .btn-primary { background: linear-gradient(90deg,var(--neon-1),var(--neon-2)); color:#041014; }
-    .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06); color:#e8eef6; }
-
+    .btn-ghost { background: transparent; border:1px solid rgba(255,255,255,0.06); color:#e8eef6; }
     .form-note { font-size:13px; color: var(--muted); margin-top:8px; }
-    .form-success { color: #9cedc9; margin-top:8px; font-weight:600; display:none; }
+    .form-success { color:#9cedc9; margin-top:8px; font-weight:600; display:none; }
 
-    /* RESPONSIVE TWEAKS */
-
-    @media (max-width: 768px) {
+    /* small tweaks */
+    @media (max-width:768px) {
       .hero { margin-top: 72px; }
       .hero h1 { font-size: 28px; }
       .hero-visual { height: 300px; }
-
-      .enroll-bottom {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .enroll-bottom .actions {
-        width: 100%;
-        flex-direction: column;
-      }
-
-      .enroll-bottom .actions a {
-        width: 100%;
-        text-align: center;
-      }
+      .enroll-bottom { flex-direction: column; align-items: flex-start; }
+      .enroll-bottom .actions { width:100%; flex-direction:column; }
+      .enroll-bottom .actions a { width:100%; text-align:center; }
     }
 
-    @media (max-width: 480px) {
-      .site-footer {
-        padding: clamp(18px, 2vw, 25px) clamp(12px, 2vw, 18px);
-      }
-
-      .footer-container { gap: clamp(12px, 2vw, 18px); }
-
-      .footer-columns {
-        gap: clamp(18px, 2vw, 25px);
-        margin-bottom: clamp(15px, 2vw, 20px);
-      }
-
-      .footer-column h4 {
-        font-size: clamp(0.6rem, 1.2vw, 0.75rem);
-        margin-bottom: clamp(6px, 1vw, 10px);
-      }
-
-      .footer-column a,
-      .footer-column p {
-        font-size: clamp(0.55rem, 1vw, 0.65rem);
-      }
-
-      .footer-copyright p {
-        margin-right: 0;
-        font-size: clamp(0.5rem, 0.9vw, 0.6rem);
-      }
+    @media (max-width:480px) {
+      .site-footer { padding: clamp(18px, 2vw, 25px) clamp(12px,2vw,18px); }
+      .footer-container { gap: clamp(12px,2vw,18px); }
+      .footer-columns { gap: clamp(18px,2vw,25px); margin-bottom: clamp(15px,2vw,20px); }
+      .footer-column h4 { font-size: clamp(0.6rem,1.2vw,0.75rem); margin-bottom: clamp(6px,1vw,10px); }
+      .footer-column a, .footer-column p { font-size: clamp(0.55rem,1vw,0.65rem); }
+      .footer-copyright p { margin-right:0; font-size: clamp(0.5rem,0.9vw,0.6rem); }
     }
   </style>
 </head>
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar">
-    <a href="/index.html" class="logo">
-      <img
-        src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png"
-        alt="SoundAbode Logo"
-        class="logo-img"
-      />
+  <nav class="navbar" role="navigation" aria-label="Primary navigation">
+    <a href="/index.html" class="logo" aria-label="Soundabode home">
+      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode" class="logo-img">
     </a>
 
-    <div class="nav-links">
-      <a href="/about.html">About</a>
-      <a href="/courses.html">Courses</a>
-      <a href="/contact.html">Contact</a>
+    <div class="nav-links" role="menu" aria-label="Main links">
+      <a href="/about.html" role="menuitem">About</a>
+      <a href="/courses.html" role="menuitem">Courses</a>
+      <a href="/contact.html" role="menuitem">Contact</a>
     </div>
 
-    <button class="hamburger-menu" aria-label="Toggle menu">
+    <button class="hamburger-menu" aria-label="Toggle menu" aria-expanded="false">
       <span class="bar"></span>
       <span class="bar"></span>
       <span class="bar"></span>
     </button>
 
-    <div class="nav-actions">
-      <a
-        href="tel:+919975016189"
-        class="action-btn call-btn"
-        title="Call us"
-        onclick="uet_report_conversion('call')"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"
-            fill="currentColor"
-          />
+    <div class="nav-actions" aria-hidden="false">
+      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" aria-label="Call Soundabode">
+        <!-- phone icon -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor"></path>
         </svg>
       </a>
     </div>
   </nav>
 
   <!-- MOBILE MENU -->
-  <div class="nav-menu">
+  <div class="nav-menu" aria-hidden="true">
     <a href="/about.html">About</a>
     <a href="/courses.html">Courses</a>
     <a href="/contact.html">Contact</a>
   </div>
 
   <!-- WHATSAPP FLOAT -->
-  <a
-    href="https://wa.me/919975016189"
-    class="whatsapp-float"
-    target="_blank"
-    rel="noopener noreferrer"
-    title="Chat on WhatsApp"
-    onclick="uet_report_conversion('whatsapp')"
-  >
-    <img
-      src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg"
-      alt="WhatsApp"
-      class="whatsapp-icon"
-      loading="lazy"
-    />
+  <a href="https://wa.me/919975016189" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp">
+    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp" class="whatsapp-icon" loading="lazy">
   </a>
 
   <main class="container" style="margin-top: 6px;">
@@ -845,20 +301,18 @@
     <section class="hero" aria-labelledby="hero-heading">
       <div>
         <div class="hero-kicker">Electronic Music Production · Level 2</div>
-        <h1 id="hero-heading">
-          Level 2 – Intermediate: Pre-Degree in Electronic Music Production
+        <h1 id="hero-heading">Level 2 – Intermediate: Pre-Degree in Electronic Music Production
           <span class="gradient-text">Advanced Electronic Music Production Course in Pune</span>
         </h1>
-        <p class="hero-subtitle">
-          Go beyond beats — start producing like a pro.
-        </p>
-        <p>
-          Level 2 at <strong>Soundabode</strong> is where aspiring producers turn into confident creators.
+
+        <p class="hero-subtitle">Go beyond beats — start producing like a pro.</p>
+
+        <p>Level 2 at <strong>Soundabode</strong> is where aspiring producers turn into confident creators.
           This intermediate-level <strong>Electronic Music Production course in Pune</strong> is designed for students
           who’ve completed Level 1 or already know the basics of music production.
         </p>
-        <p>
-          You’ll explore advanced sound design, mixing, arrangement, and dynamic control while mastering both hardware
+
+        <p>You’ll explore advanced sound design, mixing, arrangement, and dynamic control while mastering both hardware
           and virtual studio technologies — all under expert guidance.
         </p>
 
@@ -870,46 +324,41 @@
 
         <div class="cta-row">
           <a class="btn-primary" href="/contact.html#contact">Book A Free Demo Class</a>
-          <!-- Marked to open modal -->
           <a class="btn-outline" href="/enroll" data-open-enroll>Enroll Now</a>
         </div>
       </div>
 
       <div>
-        <div
-          class="hero-visual"
-          id="hero-visual"
-          role="img"
-          aria-label="Producer working with synthesizers and electronic music production setup"
-        >
+        <div class="hero-visual" id="hero-visual" role="img" aria-label="Producer working with synthesizers and electronic music production setup">
           <div class="gradient-layer"></div>
-          <div class="particles">
+
+          <div class="particles" aria-hidden="true">
             <div class="particle" style="top: 18%; left: 20%; animation-delay: 0s;"></div>
             <div class="particle" style="top: 32%; left: 70%; animation-delay: 2s;"></div>
             <div class="particle" style="top: 58%; left: 42%; animation-delay: 4s;"></div>
             <div class="particle" style="top: 68%; left: 80%; animation-delay: 6s;"></div>
           </div>
-          <!-- Replace with your Level 2 EMP visual assets -->
+
+          <!-- Floating images with onerror fallback -->
           <img
-  id="float-album"
-  class="floating-img album"
-  src="https://ik.imagekit.io/Nex1ora2/electronic-music-production.webp?updatedAt=1765353842866"
-  alt="Advanced Ableton Live project on screen"
-  crossorigin="anonymous"
-  loading="lazy"
-  onerror="(function(i){ console.error('float-album failed to load:', i.src); i.src='/Assets/placeholder.png'; i.classList.add('img-fallback'); })(this);"
-/>
+            id="float-album"
+            class="floating-img album"
+            src="https://ik.imagekit.io/Nex1ora2/electronic-music-production.webp?updatedAt=1765353842866"
+            alt="Advanced Ableton Live project on screen"
+            crossorigin="anonymous"
+            loading="lazy"
+            onerror="(function(i){ console.error('float-album failed to load:', i.src); i.src='/Assets/placeholder.png'; i.classList.add('img-fallback'); })(this);"
+          />
 
-<img
-  id="float-studio"
-  class="floating-img studio"
-  src="https://ik.imagekit.io/Nex1ora2/music-production-intermediate-serum-sound-design-lessons.jpg?updatedAt=1765478480543"
-  alt="Soundabode studio with synths and controllers"
-  crossorigin="anonymous"
-  loading="lazy"
-  onerror="(function(i){ console.error('float-studio failed to load:', i.src); i.src='/Assets/placeholder.png'; i.classList.add('img-fallback'); })(this);"
-/>
-
+          <img
+            id="float-studio"
+            class="floating-img studio"
+            src="https://ik.imagekit.io/Nex1ora2/music-production-intermediate-serum-sound-design-lessons.jpg?updatedAt=1765478480543"
+            alt="Soundabode studio with synths and controllers"
+            crossorigin="anonymous"
+            loading="lazy"
+            onerror="(function(i){ console.error('float-studio failed to load:', i.src); i.src='/Assets/placeholder.png'; i.classList.add('img-fallback'); })(this);"
+          />
         </div>
       </div>
     </section>
@@ -918,19 +367,13 @@
     <section class="section" aria-labelledby="overview-heading">
       <div class="section-header">
         <h2 class="section-title" id="overview-heading">Course Overview</h2>
-        <p class="section-subtitle">
-          This <strong>Pre-Degree Course in Electronic Music Production</strong> helps you develop your creative identity
-          as a music producer, with a strong focus on sound design, dynamics and advanced arrangement.
-        </p>
+        <p class="section-subtitle">This <strong>Pre-Degree Course in Electronic Music Production</strong> helps you develop your creative identity as a music producer, with a strong focus on sound design, dynamics and advanced arrangement.</p>
       </div>
 
       <div class="two-column">
         <div class="card">
-          <p class="muted" style="margin-top:0;">
-            Learn to build strong musical ideas, layer sounds, manipulate dynamics, and structure complete songs with
-            professional polish. Through immersive projects, collaborations, and real-world workflows, you’ll evolve
-            from a learner to a <strong>self-reliant artist and audio engineer</strong> ready for the global stage.
-          </p>
+          <p class="muted" style="margin-top:0;">Learn to build strong musical ideas, layer sounds, manipulate dynamics, and structure complete songs with professional polish. Through immersive projects, collaborations, and real-world workflows, you’ll evolve from a learner to a <strong>self-reliant artist and audio engineer</strong> ready for the global stage.</p>
+
           <ul class="bullets">
             <li>Project-based learning with full track production and remixes.</li>
             <li>Guided collaborations and feedback-driven workflow refinement.</li>
@@ -941,31 +384,13 @@
         <div class="card">
           <h3 style="margin: 0 0 8px;">Quick Facts</h3>
           <div class="details-grid">
-            <div class="detail-item">
-              <div class="detail-label">Duration</div>
-              <div class="detail-value">3 months + 1 month internship</div>
-            </div>
-            <div class="detail-item">
-              <div class="detail-label">Fee</div>
-              <div class="detail-value">₹ 60,000</div>
-            </div>
-            <div class="detail-item">
-              <div class="detail-label">Installment</div>
-              <div class="detail-value">Pay ₹ 30,000 to block your seat</div>
-            </div>
-            <div class="detail-item">
-              <div class="detail-label">Eligibility</div>
-              <div class="detail-value">Level 1 or equivalent basic production knowledge</div>
-            </div>
+            <div class="detail-item"><div class="detail-label">Duration</div><div class="detail-value">3 months + 1 month internship</div></div>
+            <div class="detail-item"><div class="detail-label">Fee</div><div class="detail-value">₹ 60,000</div></div>
+            <div class="detail-item"><div class="detail-label">Installment</div><div class="detail-value">Pay ₹ 30,000 to block your seat</div></div>
+            <div class="detail-item"><div class="detail-label">Eligibility</div><div class="detail-value">Level 1 or equivalent basic production knowledge</div></div>
           </div>
-          <a
-            href="https://www.notion.so/downloads/Soundabode-Level2-Brochure.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            style="display:inline-block;margin-top:12px;font-size:13px;text-decoration:underline;"
-          >
-            Download Complete Level 2 Course Brochure (PDF)
-          </a>
+
+          <a href="https://www.notion.so/downloads/Soundabode-Level2-Brochure.pdf" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:12px;font-size:13px;text-decoration:underline;">Download Complete Level 2 Course Brochure (PDF)</a>
         </div>
       </div>
     </section>
@@ -974,10 +399,9 @@
     <section class="section" aria-labelledby="objectives-heading">
       <div class="section-header">
         <h2 class="section-title" id="objectives-heading">Course Objectives</h2>
-        <p class="section-subtitle">
-          Build a deep, creative and technical foundation so you can produce electronic music at a professional level.
-        </p>
+        <p class="section-subtitle">Build a deep, creative and technical foundation so you can produce electronic music at a professional level.</p>
       </div>
+
       <div class="grid-2">
         <div class="card">
           <ul class="bullets">
@@ -1008,10 +432,7 @@
     <section class="section" aria-labelledby="curriculum-heading">
       <div class="section-header">
         <h2 class="section-title" id="curriculum-heading">What You’ll Learn (Condensed Overview)</h2>
-        <p class="section-subtitle">
-          A snapshot of the core topics you’ll cover across sound processing, arrangement, theory, synthesis and
-          professional workflows.
-        </p>
+        <p class="section-subtitle">A snapshot of the core topics you’ll cover across sound processing, arrangement, theory, synthesis and professional workflows.</p>
       </div>
 
       <div class="grid-2">
@@ -1053,9 +474,7 @@
     <section class="section" aria-labelledby="why-heading">
       <div class="section-header">
         <h2 class="section-title" id="why-heading">Why Choose Soundabode</h2>
-        <p class="section-subtitle">
-          Train inside a real electronic music production ecosystem — with hardware, VSTs, community and career support.
-        </p>
+        <p class="section-subtitle">Train inside a real electronic music production ecosystem — with hardware, VSTs, community and career support.</p>
       </div>
 
       <div class="two-column">
@@ -1090,9 +509,7 @@
     <section class="section" aria-labelledby="career-heading">
       <div class="section-header">
         <h2 class="section-title" id="career-heading">Career Path After Level 2</h2>
-        <p class="section-subtitle">
-          Use Level 2 to step confidently into the world of professional electronic music production and audio work.
-        </p>
+        <p class="section-subtitle">Use Level 2 to step confidently into the world of professional electronic music production and audio work.</p>
       </div>
 
       <div class="grid-2">
@@ -1108,16 +525,12 @@
         </div>
         <div class="card">
           <h3 style="margin-top:0;font-size:15px;">Next Step: Level 3</h3>
-          <p class="muted" style="font-size:14px;margin-top:6px;">
-            Or, continue your journey with <strong>Level 3 – Expert: Diploma in Audio Engineering</strong>, where you
-            dive deeper into recording, advanced mixing, signal flow, and high-end studio workflows for commercial
-            audio projects.
-          </p>
+          <p class="muted" style="font-size:14px;margin-top:6px;">Or, continue your journey with <strong>Level 3 – Expert: Diploma in Audio Engineering</strong>, where you dive deeper into recording, advanced mixing, signal flow, and high-end studio workflows for commercial audio projects.</p>
         </div>
       </div>
     </section>
 
-    <!-- COURSE DETAILS (RECAP) -->
+    <!-- COURSE DETAILS -->
     <section class="section" aria-labelledby="details-heading">
       <div class="section-header">
         <h2 class="section-title" id="details-heading">Course Details</h2>
@@ -1125,22 +538,10 @@
 
       <div class="card">
         <div class="details-grid">
-          <div class="detail-item">
-            <div class="detail-label">Duration</div>
-            <div class="detail-value">3 months + 1 month internship</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">Fee</div>
-            <div class="detail-value">₹ 60,000</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">Installment</div>
-            <div class="detail-value">Pay ₹ 30,000 to block your seat</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">Eligibility</div>
-            <div class="detail-value">Level 1 completion or equivalent experience</div>
-          </div>
+          <div class="detail-item"><div class="detail-label">Duration</div><div class="detail-value">3 months + 1 month internship</div></div>
+          <div class="detail-item"><div class="detail-label">Fee</div><div class="detail-value">₹ 60,000</div></div>
+          <div class="detail-item"><div class="detail-label">Installment</div><div class="detail-value">Pay ₹ 30,000 to block your seat</div></div>
+          <div class="detail-item"><div class="detail-label">Eligibility</div><div class="detail-value">Level 1 completion or equivalent experience</div></div>
         </div>
       </div>
     </section>
@@ -1151,36 +552,20 @@
         <div>
           <div class="section-header">
             <h2 class="section-title" id="location-heading">Location & Contact</h2>
-            <p class="section-subtitle">
-              Visit the studio, sit in for a session or book a demo class with our team.
-            </p>
+            <p class="section-subtitle">Visit the studio, sit in for a session or book a demo class with our team.</p>
           </div>
           <div class="card">
-            <p class="muted" style="margin-top:0;">
-              <strong>Soundabode Academy</strong><br />
-              218, Vision 9 Mall, Pimple Saudagar, Pune – 27<br />
-              📞 997-501-6189<br />
-              📧 services@soundabode.com
-            </p>
+            <p class="muted" style="margin-top:0;"><strong>Soundabode Academy</strong><br>218, Vision 9 Mall, Pimple Saudagar, Pune – 27<br>📞 997-501-6189<br>📧 services@soundabode.com</p>
           </div>
         </div>
+
         <div>
           <div class="section-header">
             <h2 class="section-title">Brochure Download</h2>
-            <p class="section-subtitle">
-              Get the complete Level 2 Electronic Music Production curriculum and module-wise breakdown in PDF format.
-            </p>
+            <p class="section-subtitle">Get the complete Level 2 Electronic Music Production curriculum and module-wise breakdown in PDF format.</p>
           </div>
           <div class="card">
-            <a
-              href="https://www.notion.so/downloads/Soundabode-Level2-Brochure.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn-outline"
-              style="display:inline-block;text-align:center;"
-            >
-              Download Level 2 EMP Brochure (PDF)
-            </a>
+            <a href="https://www.notion.so/downloads/Soundabode-Level2-Brochure.pdf" target="_blank" rel="noopener noreferrer" class="btn-outline" style="display:inline-block;text-align:center;">Download Level 2 EMP Brochure (PDF)</a>
           </div>
         </div>
       </div>
@@ -1194,58 +579,28 @@
 
       <div class="faq">
         <div class="faq-item">
-          <div class="faq-question">
-            Q1. Is this an advanced Ableton Live course in Pune?
-            <span class="muted">+</span>
-          </div>
-          <div class="faq-answer">
-            Yes — Level 2 covers advanced Ableton Live techniques, VST integration, and professional workflow
-            development tailored for electronic music producers.
-          </div>
+          <div class="faq-question" tabindex="0">Q1. Is this an advanced Ableton Live course in Pune?<span class="muted">+</span></div>
+          <div class="faq-answer">Yes — Level 2 covers advanced Ableton Live techniques, VST integration, and professional workflow development tailored for electronic music producers.</div>
         </div>
 
         <div class="faq-item">
-          <div class="faq-question">
-            Q2. Do I need to complete Level 1 before enrolling?
-            <span class="muted">+</span>
-          </div>
-          <div class="faq-answer">
-            Ideally yes, but if you have prior production experience, you can take a short assessment and join directly
-            into Level 2 based on your skill level.
-          </div>
+          <div class="faq-question" tabindex="0">Q2. Do I need to complete Level 1 before enrolling?<span class="muted">+</span></div>
+          <div class="faq-answer">Ideally yes, but if you have prior production experience, you can take a short assessment and join directly into Level 2 based on your skill level.</div>
         </div>
 
         <div class="faq-item">
-          <div class="faq-question">
-            Q3. Will I get hands-on time with professional synths and plug-ins?
-            <span class="muted">+</span>
-          </div>
-          <div class="faq-answer">
-            Absolutely. You’ll learn with industry-grade VSTs like Serum, Massive, Diva and Arturia, along with
-            Soundabode’s hardware including Moog, Nord, Virus Ti and more.
-          </div>
+          <div class="faq-question" tabindex="0">Q3. Will I get hands-on time with professional synths and plug-ins?<span class="muted">+</span></div>
+          <div class="faq-answer">Absolutely. You’ll learn with industry-grade VSTs like Serum, Massive, Diva and Arturia, along with Soundabode’s hardware including Moog, Nord, Virus Ti and more.</div>
         </div>
 
         <div class="faq-item">
-          <div class="faq-question">
-            Q4. Is an internship included?
-            <span class="muted">+</span>
-          </div>
-          <div class="faq-answer">
-            Yes, a 1-month industry internship is included after your course completion, where you’ll work on real
-            client projects and collaborative sessions.
-          </div>
+          <div class="faq-question" tabindex="0">Q4. Is an internship included?<span class="muted">+</span></div>
+          <div class="faq-answer">Yes, a 1-month industry internship is included after your course completion, where you’ll work on real client projects and collaborative sessions.</div>
         </div>
 
         <div class="faq-item">
-          <div class="faq-question">
-            Q5. What kind of projects will I make?
-            <span class="muted">+</span>
-          </div>
-          <div class="faq-answer">
-            You’ll produce full-length tracks, remixes and collaborative projects, ready for streaming platforms or
-            label submission — along with stems and pre-mix files for mastering engineers.
-          </div>
+          <div class="faq-question" tabindex="0">Q5. What kind of projects will I make?<span class="muted">+</span></div>
+          <div class="faq-answer">You’ll produce full-length tracks, remixes and collaborative projects, ready for streaming platforms or label submission — along with stems and pre-mix files for mastering engineers.</div>
         </div>
       </div>
     </section>
@@ -1253,11 +608,8 @@
     <!-- CTA -->
     <section class="enroll-bottom" aria-label="Enroll call to action">
       <div>
-        <h3 style="margin: 0;">Ready to advance your Electronic Music Production skills?</h3>
-        <div class="muted" style="margin-top: 6px;">
-          Advance your skills and create music that moves people.
-          Join <strong>Soundabode’s Level 2 – Pre-Degree in Electronic Music Production</strong> today.
-        </div>
+        <h3 style="margin:0;">Ready to advance your Electronic Music Production skills?</h3>
+        <div class="muted" style="margin-top:6px;">Advance your skills and create music that moves people. Join <strong>Soundabode’s Level 2 – Pre-Degree in Electronic Music Production</strong> today.</div>
       </div>
       <div class="actions">
         <a class="btn-primary" href="/enroll" data-open-enroll>Enroll Now</a>
@@ -1267,7 +619,7 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="site-footer">
+  <footer class="site-footer" role="contentinfo">
     <div class="footer-container">
       <div class="footer-columns">
         <div class="footer-column">
@@ -1278,15 +630,12 @@
             <li><a href="/contact.html">CONTACT</a></li>
           </ul>
         </div>
+
         <div class="footer-column">
           <h4>LOCATION</h4>
-          <p>
-            VISION 9, 2ND FLOOR,<br />
-            KUNAL ICON RD,<br />
-            PIMPLE SAUDAGAR, PUNE,<br />
-            MAHARASHTRA 411017
-          </p>
+          <p>VISION 9, 2ND FLOOR,<br>KUNAL ICON RD,<br>PIMPLE SAUDAGAR, PUNE,<br>MAHARASHTRA 411017</p>
         </div>
+
         <div class="footer-column">
           <h4>SOCIALS</h4>
           <ul>
@@ -1295,20 +644,20 @@
             <li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YOUTUBE</a></li>
           </ul>
         </div>
+
         <div class="footer-column">
           <h4>PRIVACY POLICY</h4>
-          <ul>
-            <li><a href="/privacy.html">PRIVACY POLICY</a></li>
-          </ul>
+          <ul><li><a href="/privacy.html">PRIVACY POLICY</a></li></ul>
         </div>
       </div>
+
       <div class="footer-copyright">
         <p><span id="year"></span> © SOUNDABODE. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- ENROLL MODAL (same as Beginner but tuned) -->
+  <!-- ENROLL MODAL (complete & accessible) -->
   <div id="enroll-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="enroll-modal-title">
     <div class="modal" role="document" tabindex="-1" aria-describedby="form-note">
       <div class="modal-header">
@@ -1362,253 +711,277 @@
     </div>
   </div>
 
-  <!-- JS -->
+  <!-- JS (DOMContentLoaded wrapped) -->
   <script>
-    function uet_report_conversion(source) {
-      window.uetq = window.uetq || [];
-      window.uetq.push("event", "contact", {
-        event_label:
-          source === "whatsapp"
-            ? "961303bb-7e25-4b3a-9ed9-04c288d65ee2"
-            : "5547903c-7e42-4d18-ab6d-4b58e660dafe"
-      });
-    }
-
-    // Year
     (function () {
-      const y = document.getElementById("year");
-      if (y) y.textContent = new Date().getFullYear();
-    })();
+      function uet_report_conversion(source) {
+        window.uetq = window.uetq || [];
+        window.uetq.push("event", "contact", {
+          event_label:
+            source === "whatsapp"
+              ? "961303bb-7e25-4b3a-9ed9-04c288d65ee2"
+              : "5547903c-7e42-4d18-ab6d-4b58e660dafe"
+        });
+      }
 
-    // Parallax
-    (function () {
-      const hero = document.getElementById("hero-visual");
-      const album = document.getElementById("float-album");
-      const studio = document.getElementById("float-studio");
-      if (!hero || !album || !studio) return;
+      document.addEventListener('DOMContentLoaded', function () {
+        // Year
+        (function () {
+          const y = document.getElementById("year");
+          if (y) y.textContent = new Date().getFullYear();
+        })();
 
-      hero.addEventListener("mousemove", (e) => {
-        const rect = hero.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        album.style.transform = `translate(${x * 18}px, ${y * 12}px) rotate(${x * 4}deg)`;
-        studio.style.transform = `translate(${x * -12}px, ${y * -8}px) rotate(${x * -3}deg)`;
-      });
+        // Parallax (safe)
+        (function () {
+          const hero = document.getElementById("hero-visual");
+          const album = document.getElementById("float-album");
+          const studio = document.getElementById("float-studio");
+          if (!hero || !album || !studio) return;
 
-      hero.addEventListener("mouseleave", () => {
-        album.style.transform = "";
-        studio.style.transform = "";
-      });
-    })();
-
-    // FAQ accordion
-    (function () {
-      const items = document.querySelectorAll(".faq-item");
-      items.forEach((item) => {
-        const q = item.querySelector(".faq-question");
-        const ans = item.querySelector(".faq-answer");
-        if (!q || !ans) return;
-        q.addEventListener("click", () => {
-          const open = ans.style.display === "block";
-          items.forEach((i) => {
-            const a = i.querySelector(".faq-answer");
-            const qq = i.querySelector(".faq-question span");
-            if (a) a.style.display = "none";
-            if (qq) qq.textContent = "+";
+          let raf = null;
+          let state = { x: 0, y: 0 };
+          hero.addEventListener('mousemove', function (e) {
+            const rect = hero.getBoundingClientRect();
+            state.x = ((e.clientX - rect.left) / rect.width) - 0.5;
+            state.y = ((e.clientY - rect.top) / rect.height) - 0.5;
+            if (!raf) {
+              raf = requestAnimationFrame(function () {
+                album.style.transform = `translate(${state.x * 18}px, ${state.y * 12}px) rotate(${state.x * 4}deg)`;
+                studio.style.transform = `translate(${state.x * -12}px, ${state.y * -8}px) rotate(${state.x * -3}deg)`;
+                raf = null;
+              });
+            }
           });
-          if (!open) {
-            ans.style.display = "block";
-            const span = q.querySelector("span");
-            if (span) span.textContent = "-";
-          } else {
-            ans.style.display = "none";
-            const span = q.querySelector("span");
-            if (span) span.textContent = "+";
-          }
-        });
-      });
-    })();
+          hero.addEventListener('mouseleave', function () {
+            album.style.transform = '';
+            studio.style.transform = '';
+          });
+        })();
 
-    // Fallback images
-    ((function(){
-    ['float-album','float-studio'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('load', () => console.info(id + ' loaded OK:', el.src));
-      el.addEventListener('error', (ev) => {
-        console.warn(id + ' errored. Check network tab for HTTP status. src=', el.src);
-        // Try removing query cache-bust if it failed with 404/403
-        try {
-          const url = new URL(el.src, location.href);
-          if (url.search) {
-            const noQuery = url.origin + url.pathname;
-            console.info('Trying fallback without query:', noQuery);
-            el.src = noQuery;
-          }
-        } catch(e){}
-      });
-    });
-  })();
+        // FAQ accordion (accessible)
+        (function () {
+          const items = document.querySelectorAll(".faq-item");
+          items.forEach((item) => {
+            const q = item.querySelector(".faq-question");
+            const ans = item.querySelector(".faq-answer");
+            if (!q || !ans) return;
+            q.addEventListener("click", () => {
+              const open = ans.style.display === "block";
+              items.forEach((i) => {
+                const a = i.querySelector(".faq-answer");
+                if (a) a.style.display = "none";
+                const s = i.querySelector(".faq-question .muted, .faq-question span");
+                if (s) {
+                  // reset to plus symbol if present
+                  if (s.tagName && s.tagName.toLowerCase() === 'span') s.textContent = '+';
+                }
+              });
+              if (!open) {
+                ans.style.display = "block";
+                const span = q.querySelector("span");
+                if (span) span.textContent = '-';
+              } else {
+                ans.style.display = "none";
+                const span = q.querySelector("span");
+                if (span) span.textContent = '+';
+              }
+            });
 
-    // Hamburger
-    (function () {
-      const burger = document.querySelector(".hamburger-menu");
-      const menu = document.querySelector(".nav-menu");
-      if (!burger || !menu) return;
+            // keyboard support for Enter / Space
+            q.addEventListener('keydown', function (ev) {
+              if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault();
+                q.click();
+              }
+            });
+          });
+        })();
 
-      burger.addEventListener("click", () => {
-        burger.classList.toggle("is-active");
-        menu.classList.toggle("is-active");
-      });
+        // Image fallback: try removing query param on error
+        (function () {
+          ['float-album','float-studio'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('error', function () {
+              try {
+                const url = new URL(el.src, location.href);
+                if (url.search) {
+                  const noQuery = url.origin + url.pathname;
+                  if (noQuery !== el.src) {
+                    el.src = noQuery;
+                    return;
+                  }
+                }
+              } catch (e) {
+                // ignore
+              }
+              // final fallback handled by inline onerror on the element itself (placeholder)
+            });
+          });
+        })();
 
-      menu.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          burger.classList.remove("is-active");
-          menu.classList.remove("is-active");
-        });
-      });
-    })();
+        // Hamburger / mobile menu
+        (function () {
+          const burger = document.querySelector(".hamburger-menu");
+          const menu = document.querySelector(".nav-menu");
+          if (!burger || !menu) return;
 
-    /* ===== Hardened ENROLL MODAL LOGIC ===== */
-    (function () {
-      const modalOverlay = document.getElementById('enroll-modal');
-      const modal = modalOverlay ? modalOverlay.querySelector('.modal') : null;
-      const closeBtn = document.getElementById('modal-close-btn');
-      const cancelBtn = document.getElementById('modal-cancel');
-      const form = document.getElementById('enroll-form');
-      const formNote = document.getElementById('form-note');
-      const formSuccess = document.getElementById('form-success');
-      let lastFocused = null;
+          burger.addEventListener("click", function () {
+            const isActive = burger.classList.toggle("is-active");
+            menu.classList.toggle("is-active");
+            burger.setAttribute('aria-expanded', String(isActive));
+            menu.setAttribute('aria-hidden', String(!isActive));
+          });
 
-      function openModal() {
-        if (!modalOverlay) return;
-        lastFocused = document.activeElement;
-        modalOverlay.classList.add('is-open');
-        modalOverlay.setAttribute('aria-hidden', 'false');
-        const first = modalOverlay.querySelector('input, select, textarea, button');
-        if (first) first.focus();
-        document.addEventListener('focus', trapFocus, true);
-        document.addEventListener('keydown', handleKeydown);
-      }
+          menu.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+              burger.classList.remove("is-active");
+              menu.classList.remove("is-active");
+              burger.setAttribute('aria-expanded', 'false');
+              menu.setAttribute('aria-hidden', 'true');
+            });
+          });
+        })();
 
-      function closeModal() {
-        if (!modalOverlay) return;
-        modalOverlay.classList.remove('is-open');
-        modalOverlay.setAttribute('aria-hidden', 'true');
-        document.removeEventListener('focus', trapFocus, true);
-        document.removeEventListener('keydown', handleKeydown);
-        if (formSuccess) formSuccess.style.display = 'none';
-        if (formNote) formNote.style.display = '';
-        if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
-      }
+        /* ===== Hardened ENROLL MODAL LOGIC ===== */
+        (function () {
+          const modalOverlay = document.getElementById('enroll-modal');
+          const modal = modalOverlay ? modalOverlay.querySelector('.modal') : null;
+          const closeBtn = document.getElementById('modal-close-btn'); // exists
+          const cancelBtn = document.getElementById('modal-cancel');   // exists
+          const form = document.getElementById('enroll-form');
+          const formNote = document.getElementById('form-note');
+          const formSuccess = document.getElementById('form-success');
+          const submitBtn = document.getElementById('modal-submit');
+          let lastFocused = null;
 
-      function trapFocus(e) {
-        if (!modal) return;
-        if (!modal.contains(e.target)) {
-          e.stopPropagation();
-          const focusable = modal.querySelector('input,select,textarea,button,a[href],[tabindex]:not([tabindex="-1"])');
-          if (focusable) focusable.focus();
-        }
-      }
-
-      function handleKeydown(e) {
-        if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
-        if (e.key === 'Tab' && modal) {
-          const focusables = modal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])');
-          const nodes = Array.from(focusables);
-          if (!nodes.length) return;
-          const first = nodes[0], last = nodes[nodes.length - 1];
-          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-        }
-      }
-
-      if (closeBtn) closeBtn.addEventListener('click', closeModal);
-      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-      if (modalOverlay) {
-        modalOverlay.addEventListener('click', function (e) {
-          if (e.target === modalOverlay) closeModal();
-        });
-      }
-
-      // Intercept clicks only when intention is explicit:
-      // - element has data-open-enroll attribute OR
-      // - resolved pathname === '/enroll'
-      document.addEventListener('click', function (e) {
-        try {
-          const el = e.target.closest ? e.target.closest('a') : null;
-          if (!el) return;
-          const href = (el.getAttribute('href') || '').trim();
-          const hasOpenAttr = el.hasAttribute('data-open-enroll') || el.dataset.openEnroll !== undefined;
-
-          if (hasOpenAttr) {
-            e.preventDefault();
-            openModal();
-            return;
+          function openModal() {
+            if (!modalOverlay) return;
+            lastFocused = document.activeElement;
+            modalOverlay.classList.add('is-open');
+            modalOverlay.setAttribute('aria-hidden', 'false');
+            // focus first input
+            const first = modalOverlay.querySelector('input, select, textarea, button');
+            if (first) first.focus();
+            document.addEventListener('focus', trapFocus, true);
+            document.addEventListener('keydown', handleKeydown);
           }
 
-          if (href) {
+          function closeModal() {
+            if (!modalOverlay) return;
+            modalOverlay.classList.remove('is-open');
+            modalOverlay.setAttribute('aria-hidden', 'true');
+            document.removeEventListener('focus', trapFocus, true);
+            document.removeEventListener('keydown', handleKeydown);
+            if (formSuccess) formSuccess.style.display = 'none';
+            if (formNote) formNote.style.display = '';
+            if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+          }
+
+          function trapFocus(e) {
+            if (!modal) return;
+            if (!modal.contains(e.target)) {
+              e.stopPropagation();
+              const focusable = modal.querySelector('input,select,textarea,button,a[href],[tabindex]:not([tabindex="-1"])');
+              if (focusable) focusable.focus();
+            }
+          }
+
+          function handleKeydown(e) {
+            if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+            if (e.key === 'Tab' && modal) {
+              const focusables = modal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])');
+              const nodes = Array.from(focusables);
+              if (!nodes.length) return;
+              const first = nodes[0], last = nodes[nodes.length - 1];
+              if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+              else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+          }
+
+          if (closeBtn) closeBtn.addEventListener('click', closeModal);
+          if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+          if (modalOverlay) {
+            modalOverlay.addEventListener('click', function (e) {
+              if (e.target === modalOverlay) closeModal();
+            });
+          }
+
+          // Intercept clicks only when intention is explicit:
+          // - element has data-open-enroll attribute OR
+          // - resolved pathname === '/enroll'
+          document.addEventListener('click', function (e) {
             try {
-              const resolved = new URL(href, location.href);
-              const pathname = resolved.pathname.replace(/\/+$/, '');
-              if (pathname === '/enroll') {
+              const el = e.target.closest ? e.target.closest('a') : null;
+              if (!el) return;
+              const href = (el.getAttribute('href') || '').trim();
+              const hasOpenAttr = el.hasAttribute('data-open-enroll') || el.dataset.openEnroll !== undefined;
+
+              if (hasOpenAttr) {
                 e.preventDefault();
                 openModal();
                 return;
               }
+
+              if (href) {
+                // avoid intercepting tel:, mailto:, javascript:, anchors
+                if (href.startsWith('tel:') || href.startsWith('mailto:') || href.startsWith('javascript:') || href.startsWith('#')) {
+                  return;
+                }
+                try {
+                  const resolved = new URL(href, location.href);
+                  const pathname = resolved.pathname.replace(/\/+$/, '');
+                  if (pathname === '/enroll') {
+                    e.preventDefault();
+                    openModal();
+                    return;
+                  }
+                } catch (err) {
+                  // ignore non-URL hrefs
+                }
+              }
             } catch (err) {
-              // ignore non-URL hrefs (mailto:, tel:, javascript:, anchors)
+              console.error('Modal click handler error', err);
             }
+          });
+
+          // Form submit - simulated; replace with real AJAX if needed
+          if (form) {
+            form.addEventListener('submit', function (e) {
+              e.preventDefault();
+              const name = (form.querySelector('#name') && form.querySelector('#name').value || '').trim();
+              const phone = (form.querySelector('#phone') && form.querySelector('#phone').value || '').trim();
+              if (!name) {
+                alert('Please enter your name.');
+                if (form.querySelector('#name')) form.querySelector('#name').focus();
+                return;
+              }
+              if (!phone) {
+                alert('Please enter your phone number.');
+                if (form.querySelector('#phone')) form.querySelector('#phone').focus();
+                return;
+              }
+
+              if (formNote) formNote.style.display = 'none';
+              if (formSuccess) formSuccess.style.display = '';
+
+              // TODO: replace with a real backend POST if desired
+              // Example:
+              // fetch('/api/enquiry', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, phone, ...}) })
+
+              setTimeout(function () {
+                closeModal();
+              }, 1800);
+            });
           }
-        } catch (err) {
-          console.error('Modal click handler error', err);
-        }
-      });
 
-      // Form submit - simulated; replace with real AJAX if needed
-      if (form) {
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
-          const name = (form.querySelector('#name') && form.querySelector('#name').value || '').trim();
-          const phone = (form.querySelector('#phone') && form.querySelector('#phone').value || '').trim();
-          if (!name) {
-            alert('Please enter your name.');
-            if (form.querySelector('#name')) form.querySelector('#name').focus();
-            return;
-          }
-          if (!phone) {
-            alert('Please enter your phone number.');
-            if (form.querySelector('#phone')) form.querySelector('#phone').focus();
-            return;
-          }
+          // prevent default for anchors with href="#"
+          document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', (ev) => ev.preventDefault()));
+        })();
+        /* ===== End modal logic ===== */
 
-          if (formNote) formNote.style.display = 'none';
-          if (formSuccess) formSuccess.style.display = '';
-
-          // TODO: send to your backend; example:
-          /*
-          const payload = {
-            name,
-            phone,
-            email: form.querySelector('#email')?.value || '',
-            course: form.querySelector('#course')?.value || '',
-            message: form.querySelector('#message')?.value || ''
-          };
-          fetch('/api/enquiry', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          }).then(res => { ... })
-          */
-
-          setTimeout(() => { closeModal(); }, 2000);
-        });
-      }
-
-      // prevent default for anchors with href="#"
-      document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', (ev) => ev.preventDefault()));
+      }); // DOMContentLoaded end
     })();
-    /* ===== End modal logic ===== */
   </script>
 </body>
 </html>
