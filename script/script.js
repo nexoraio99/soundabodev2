@@ -1,11 +1,6 @@
 /* ============================================================================
-   script1.fixed.js — Soundabode site script (robust, single-file, zero-errors)
-   - Full rewrite with defensive guards, clear popup targeting (does NOT hijack
-     generic links such as "Explore Courses"), stable carousel cloning,
-     logo scroller, testimonials, modals, and backend wiring.
-   - To open popup from a control, add attribute `data-open-popup="true"` on
-     the element (or `data-open-popup="<optional-target>"` for redirect)
-   - Place this file as `script1.fixed.js` and include with `defer`.
+   SOUNDABODE SITE SCRIPT - MOBILE VIDEO FIX
+   Fixed video autoplay for Android and mobile browsers
    ============================================================================ */
 
 (function () {
@@ -23,8 +18,10 @@
     CAROUSEL_CLONE_DELAY: 400,
     LOGO_SCROLL_SPEEDS: { xs: 0.03, sm: 0.05, md: 0.25, lg: 0.4 },
     CAROUSEL_STRICT_VIEWPORT_FACTOR: 1.2,
-    STYLES_READY_TIMEOUT: 2500, // ms - fall back if styles/fonts don't report
-    BOOT_TIMEOUT: 350 // ms - guaranteed init fallback
+    STYLES_READY_TIMEOUT: 2500,
+    BOOT_TIMEOUT: 350,
+    VIDEO_RETRY_ATTEMPTS: 3,
+    VIDEO_RETRY_DELAY: 1000
   };
 
   /* ==========================================================================
@@ -41,7 +38,10 @@
      Device helpers
      ========================================================================== */
   const isMobile = () => window.innerWidth < 768;
+  const isAndroid = () => /Android/i.test(navigator.userAgent);
+  const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent);
   const isLowEndDevice = () => (navigator.deviceMemory && navigator.deviceMemory < 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 3);
+  const supportsIntersectionObserver = () => 'IntersectionObserver' in window;
 
   /* ==========================================================================
      DOM cache (defensive)
@@ -102,7 +102,6 @@
     hamburger: q('.hamburger-menu'),
     navMenu: q('.nav-menu'),
 
-    // IMPORTANT: join controls must use attribute data-open-popup to open the popup.
     joinControls: qAll('[data-open-popup]'),
 
     auroraText: q('.aurora-text'),
@@ -131,7 +130,6 @@
     rafId: null,
     rafStopTimer: null,
 
-    // carousel
     carouselInView: false,
     isCarouselAnimating: false,
     carouselOneSetWidth: 0,
@@ -140,19 +138,19 @@
     carouselAnimationId: null,
     carouselSpeed: isMobile() ? 0.8 : 1.0,
 
-    // logos
     logoAnimationId: null,
     logoCurrentPosition: 0,
     logoScrollSpeed: CONFIG.LOGO_SCROLL_SPEEDS.md,
     logoSetWidth: 0,
     logoIsPaused: false,
 
-    // testimonials
     testimonialAutoInterval: null,
 
-    // popup
     popupShown: false,
     popupHideTimer: null,
+
+    videosInitialized: false,
+    videoRetryCount: {},
 
     inited: false
   };
@@ -166,6 +164,150 @@
   const safe = (fn) => { try { fn(); } catch (e) { console.error(e); } };
 
   /* ==========================================================================
+     VIDEO HANDLING - MOBILE FIX
+     ========================================================================== */
+  function initIntroVideos() {
+    const videos = qAll('.intro-panel video');
+    if (!videos || videos.length === 0) return;
+
+    console.log('[Video Init] Found', videos.length, 'videos');
+    console.log('[Video Init] isMobile:', isMobile(), 'isAndroid:', isAndroid(), 'isIOS:', isIOS());
+
+    videos.forEach((video, index) => {
+      // Initialize retry counter
+      state.videoRetryCount[index] = 0;
+
+      // Set up video element
+      const source = video.querySelector('source');
+      const videoSrc = video.getAttribute('data-src') || (source && source.getAttribute('data-src'));
+      
+      if (!videoSrc) {
+        console.warn('[Video Init] No data-src found for video', index);
+        return;
+      }
+
+      // Load video source
+      if (source) {
+        source.src = videoSrc;
+      } else {
+        video.src = videoSrc;
+      }
+
+      // Mobile-specific attributes
+      video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('x-webkit-airplay', 'allow');
+      video.playsInline = true;
+      video.muted = true;
+      video.loop = true;
+      video.autoplay = false; // Start as false, we'll trigger manually
+
+      // Get poster element
+      const panel = video.closest('.intro-panel');
+      const poster = panel ? panel.querySelector('.video-poster') : null;
+
+      // Attempt to play video with retry logic
+      function attemptPlay(retryCount = 0) {
+        if (retryCount >= CONFIG.VIDEO_RETRY_ATTEMPTS) {
+          console.warn('[Video] Max retry attempts reached for video', index);
+          // Show poster as fallback
+          if (poster) {
+            poster.style.opacity = '1';
+            poster.style.zIndex = '2';
+          }
+          return;
+        }
+
+        video.load();
+        
+        const playPromise = video.play();
+        
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log('[Video] Successfully playing video', index);
+              video.classList.add('playing');
+              // Hide poster once video is playing
+              if (poster) {
+                setTimeout(() => {
+                  poster.style.opacity = '0';
+                  poster.style.zIndex = '0';
+                }, 300);
+              }
+            })
+            .catch(err => {
+              console.warn('[Video] Play attempt', retryCount + 1, 'failed for video', index, ':', err.message);
+              
+              // Retry after delay
+              setTimeout(() => {
+                attemptPlay(retryCount + 1);
+              }, CONFIG.VIDEO_RETRY_DELAY);
+            });
+        }
+      }
+
+      // Event listeners
+      video.addEventListener('loadedmetadata', () => {
+        console.log('[Video] Metadata loaded for video', index);
+      });
+
+      video.addEventListener('canplay', () => {
+        console.log('[Video] Can play video', index);
+        if (!video.classList.contains('playing')) {
+          attemptPlay(0);
+        }
+      });
+
+      video.addEventListener('playing', () => {
+        console.log('[Video] Video is playing', index);
+      });
+
+      video.addEventListener('error', (e) => {
+        console.error('[Video] Error loading video', index, ':', e);
+        // Show poster on error
+        if (poster) {
+          poster.style.opacity = '1';
+          poster.style.zIndex = '2';
+        }
+      });
+
+      // For iOS: try to start on user interaction
+      if (isIOS()) {
+        const startOnInteraction = () => {
+          attemptPlay(0);
+          document.removeEventListener('touchstart', startOnInteraction);
+        };
+        document.addEventListener('touchstart', startOnInteraction, { once: true, passive: true });
+      }
+
+      // Start loading immediately
+      attemptPlay(0);
+    });
+
+    // Use Intersection Observer for better mobile performance
+    if (supportsIntersectionObserver()) {
+      const videoObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const video = entry.target;
+          if (entry.isIntersecting) {
+            if (video.paused && video.readyState >= 2) {
+              video.play().catch(e => console.log('[Video] Observer play failed:', e.message));
+            }
+          } else {
+            if (!video.paused && !isLowEndDevice()) {
+              // Don't pause on low-end devices to avoid re-loading issues
+              video.pause();
+            }
+          }
+        });
+      }, { threshold: 0.25 });
+
+      videos.forEach(video => videoObserver.observe(video));
+    }
+
+    state.videosInitialized = true;
+  }
+
+  /* ==========================================================================
      Wait for fonts & styles (best-effort)
      ========================================================================== */
   function whenStylesAndFontsReady(timeout = CONFIG.STYLES_READY_TIMEOUT) {
@@ -173,14 +315,12 @@
       let resolved = false;
       const tidy = () => { if (!resolved) { resolved = true; resolve(); } };
 
-      // fonts
       try {
         if (document.fonts && document.fonts.ready) {
           document.fonts.ready.then(() => setTimeout(tidy, 20)).catch(tidy);
         }
-      } catch (e) { /* ignore */ }
+      } catch (e) {}
 
-      // stylesheets
       const links = Array.from(document.querySelectorAll('link[rel="stylesheet"], link[rel="preload"][as="style"]'));
       if (links.length === 0) return setTimeout(tidy, 30);
 
@@ -257,7 +397,7 @@
 
       if (fadeOpacity < 0.05) { introOverlay.style.pointerEvents = 'none'; introOverlay.style.zIndex = '1'; }
       else { introOverlay.style.pointerEvents = 'auto'; introOverlay.style.zIndex = '50'; }
-    } catch (e) { /* defensive */ }
+    } catch (e) {}
   }
 
   function updateMainContent() {
@@ -300,7 +440,6 @@
         const measuredWidth = measureOneSetWidth(originalItems);
         state.carouselOneSetWidth = measuredWidth > 0 ? measuredWidth : Math.round((track.scrollWidth || track.offsetWidth || 0) / 2);
 
-        // Build clones (two sets)
         const clones = originalItems.map((it) => it.cloneNode(true));
         while (track.firstChild) track.removeChild(track.firstChild);
 
@@ -384,15 +523,11 @@
   }
 
   /* ==========================================================================
-     Popup (fixed behavior) — NOTE: only controls with attribute data-open-popup
-     will open the popup. Generic anchor links (like "Explore Courses") will NOT be
-     hijacked. If you want an anchor to open the popup and then navigate, use
-     data-open-popup="/target-url" (the value will be used as redirect after submit).
+     Popup
      ========================================================================== */
   function initPopup() {
     const popup = DOM.popup; const closeBtn = DOM.popupClose; if (!popup || !closeBtn) return;
 
-    // ensure overlay style is friendly (in case CSS missing)
     safe(() => {
       popup.style.zIndex = popup.style.zIndex || '2000';
       popup.style.display = popup.style.display || 'flex';
@@ -402,37 +537,29 @@
     function startHideTimer() { clearHideTimer(); state.popupHideTimer = setTimeout(() => { popup.classList.remove('active'); state.popupHideTimer = null; }, CONFIG.POPUP_VISIBLE_DURATION); }
 
     function showPopup(sourceEl) {
-      // store opener on popup for focus return
       popup.__opener = sourceEl || null;
       popup.classList.add('active');
-      // focus management: focus first input or close button
       const firstInput = popup.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
       (firstInput || closeBtn).focus();
       startHideTimer();
-      // prevent background scroll
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
     }
 
     function hidePopup() {
       popup.classList.remove('active'); clearHideTimer(); document.documentElement.style.overflow = ''; document.body.style.overflow = '';
-      // return focus to opener if present
       try { if (popup.__opener && typeof popup.__opener.focus === 'function') popup.__opener.focus(); } catch (e) {}
       popup.__opener = null;
     }
 
-    // initial show (delay) — only show automatically once
     if (!state.popupShown) {
       setTimeout(() => { state.popupShown = true; showPopup(null); }, CONFIG.POPUP_DELAY);
     }
 
     closeBtn.addEventListener('click', hidePopup);
-    // click overlay to close
     popup.addEventListener('click', (e) => { if (e.target === popup) hidePopup(); });
-    // ESC to close
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && popup.classList.contains('active')) hidePopup(); });
 
-    // expose for other modules
     state.showPopup = showPopup; state.hidePopup = hidePopup;
   }
 
@@ -475,7 +602,6 @@
           if (statusMsg) { statusMsg.textContent = "✅ Thank you! We'll contact you soon."; statusMsg.style.color = '#00ff88'; }
           try { sendConversionTracking('popup_form_submitted', { name: name, email: email }); } catch (e) {}
           form.reset();
-          // optionally close popup after short delay
           setTimeout(() => { if (state.hidePopup) state.hidePopup(); }, 900);
         } else {
           const msg = (result && result.message) ? result.message : 'Submission failed'; throw new Error(msg);
@@ -490,7 +616,7 @@
   }
 
   /* ==========================================================================
-     Contact form handler (defensive)
+     Contact form handler
      ========================================================================== */
   function initContactFormHandler() {
     const form = DOM.contactForm; const statusMsg = DOM.contactStatus; if (!form) return;
@@ -528,7 +654,7 @@
   }
 
   /* ==========================================================================
-     Logo scroller (robust)
+     Logo scroller
      ========================================================================== */
   function initLogoScroller() {
     const track = DOM.logoTrack; const set = DOM.logoSet; const banner = DOM.clientLogoBanner; if (!track || !set || !banner) return;
@@ -561,27 +687,22 @@
   }
 
   /* ==========================================================================
-     UI helpers: aurora text, hamburger, join controls, FAQ, gear modals
+     UI helpers
      ========================================================================== */
   function ensureAuroraText() { const el = DOM.auroraText; if (!el) return; const cs = getComputedStyle(el); const clip = cs.getPropertyValue('background-clip'); const webkitFill = cs.getPropertyValue('-webkit-text-fill-color'); if (!/text/.test(clip) || webkitFill !== 'transparent') { el.style.setProperty('background-image', 'linear-gradient(135deg,#ff0080 0%,#7928ca 25%,#0070f3 50%,#38bdf8 75%,#ff0080 100%)', 'important'); el.style.setProperty('background-size', '200% 200%', 'important'); el.style.setProperty('-webkit-background-clip', 'text', 'important'); el.style.setProperty('background-clip', 'text', 'important'); el.style.setProperty('-webkit-text-fill-color', 'transparent', 'important'); el.style.setProperty('color', 'transparent', 'important'); } }
 
   function initHamburger() { const hamburger = DOM.hamburger, navMenu = DOM.navMenu; if (!hamburger || !navMenu) return; hamburger.addEventListener('click', () => { hamburger.classList.toggle('is-active'); navMenu.classList.toggle('is-active'); }); navMenu.querySelectorAll('a').forEach((link) => { link.addEventListener('click', () => { hamburger.classList.remove('is-active'); navMenu.classList.remove('is-active'); }); }); }
 
-  // IMPORTANT: joinControls are elements with attribute data-open-popup. This avoids hijacking regular links.
   function initJoinControls() {
     const controls = DOM.joinControls; if (!controls || !controls.length) return;
     controls.forEach((el) => {
       el.addEventListener('click', (ev) => {
-        // If element is a real navigation link without explicit intent to open popup (data-open-popup value empty), allow navigation
         const target = el.getAttribute('data-open-popup');
-        // If target is empty string or explicit 'true', open popup and prevent navigation
         if (typeof target === 'string') {
-          ev.preventDefault(); // trusted: developer explicitly added attribute
+          ev.preventDefault();
           if (state.showPopup) state.showPopup(el);
-          // Store redirect if provided (non-empty and not 'true')
           if (target && target !== 'true') {
             el.__redirectAfterSubmit = target;
-            // attach redirect info to popup form so submission handler may use it if needed
             if (DOM.popup) DOM.popup.__pendingRedirect = target;
           }
         }
@@ -612,10 +733,32 @@
   function init() {
     if (state.inited) return; state.inited = true;
     console.log('[Soundabode] Using backend base:', API.base);
-    ensureAuroraText(); bindGlobalListeners(); state.ticking = true; masterAnimationLoop();
+    console.log('[Soundabode] Initializing mobile video support...');
+    
+    ensureAuroraText(); 
+    bindGlobalListeners(); 
+    state.ticking = true; 
+    masterAnimationLoop();
 
-    // modules
-    initCarouselClones(); bindCarouselHoverPause(); initTestimonials(); initPopup(); initPopupFormHandler(); initContactFormHandler(); initLogoScroller(); setupRevealObserver(); initHamburger(); initJoinControls(); initFaqAccordion(); initGearModal(); initStudioModal(); initWhyDropdown(); initBingUET();
+    // Initialize video handling FIRST
+    initIntroVideos();
+
+    // Then other modules
+    initCarouselClones(); 
+    bindCarouselHoverPause(); 
+    initTestimonials(); 
+    initPopup(); 
+    initPopupFormHandler(); 
+    initContactFormHandler(); 
+    initLogoScroller(); 
+    setupRevealObserver(); 
+    initHamburger(); 
+    initJoinControls(); 
+    initFaqAccordion(); 
+    initGearModal(); 
+    initStudioModal(); 
+    initWhyDropdown(); 
+    initBingUET();
 
     setTimeout(initCarouselClones, CONFIG.CAROUSEL_CLONE_DELAY * 2);
   }
