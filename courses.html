@@ -229,13 +229,7 @@
        TESTIMONIALS (Carousel) - styles added
        ============================================================================ */
     .testimonials {
-      margin-top: 60px;
-      background:
-        linear-gradient(
-          rgba(0,0,0,0.75),
-          rgba(0,0,0,0.85)
-        ),
-        url("https://ik.imagekit.io/Nex1ora2/dj-performance-training.jpg?updatedAt=1765352486546") center / cover no-repeat;
+      background: var(--bg-1);
       color: #fff;
       padding: clamp(28px,6vw,56px) clamp(12px,4vw,40px);
       text-align: center;
@@ -247,16 +241,11 @@
     .testimonial-container {
       width: 100%; max-width: 920px; margin: 0 auto; position: relative; --card-h: clamp(170px, 20vh, 240px);
       height: var(--card-h); min-height: var(--card-h);
-      background: transparent;
     }
     .testimonial {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.98);
       width: min(88%, 820px); padding: clamp(12px,2.2vw,20px);
-      background: linear-gradient(
-        180deg,
-        rgba(255,255,255,0.06),
-        rgba(255,255,255,0.02)
-      );
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; opacity: 0; pointer-events: none;
       transition: opacity .45s ease, transform .45s cubic-bezier(.2,.9,.2,1);
       display:flex; flex-direction: column; justify-content:center; gap:8px; text-align:center;
