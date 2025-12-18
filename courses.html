@@ -374,6 +374,79 @@
       .footer-column a, .footer-column p { font-size: clamp(0.55rem,1vw,0.65rem); }
       .footer-copyright p { margin-right:0; font-size: clamp(0.5rem,0.9vw,0.6rem); }
     }
+    /* MODAL (aligned with DJ Level pages) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1400;
+  padding: 20px;
+}
+.modal-overlay.is-open { display: flex; }
+.modal {
+  width: 100%;
+  max-width: 720px;
+  background: linear-gradient(180deg, rgba(15,15,15,0.98), rgba(10,10,12,0.98));
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #e8eef6;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-title { margin: 0; font-size: 18px; }
+.modal-close {
+  background: transparent;
+  color: #fff;
+  border: 0;
+  font-size: 20px;
+  cursor: pointer;
+}
+.modal-body { margin-top: 12px; }
+.label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  display: block;
+}
+.input, textarea, select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #fff;
+  font-size: 14px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #e8eef6;
+}
+.form-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.form-success {
+  display: none;
+  margin-top: 8px;
+  color: #9cedc9;
+  font-weight: 600;
+}
   </style>
 </head>
 <body>
@@ -711,6 +784,17 @@
         </div>
       </div>
     </section>
+    
+    <section id="enroll" class="enroll-bottom">
+      <div>
+        <h3 class="enroll-bottom-title">Ready to start your music career?</h3>
+        <div class="muted" style="margin-top:4px;">Pay ₹30,000 to reserve your seat. Flexible installments available.</div>
+      </div>
+      <div class="actions">
+        <a class="btn-primary" href="/enroll">Enroll Now</a>
+        <a class="btn-outline" href="/contact">Contact Us</a>
+      </div>
+    </section>
 
     <!-- DJ PANEL -->
     <section class="tab-panel hidden" id="panel-dj" role="tabpanel" aria-labelledby="tab-dj">
@@ -951,6 +1035,43 @@
       </div>
     </section>
   </main>
+
+  <!-- ENROLL MODAL -->
+<div id="enroll-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Enroll / Book Demo — Soundabode</h3>
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <form id="enroll-form" novalidate>
+        <label class="label">Full Name</label>
+        <input class="input" id="enroll-name" required />
+
+        <label class="label">Phone Number</label>
+        <input class="input" id="enroll-phone" required />
+
+        <label class="label">Email (optional)</label>
+        <input class="input" />
+
+        <label class="label">Interested In</label>
+        <select class="input">
+          <option>Music Production</option>
+          <option>DJ Training</option>
+        </select>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Send enquiry</button>
+        </div>
+
+        <div class="form-note">We will contact you within 24 hours.</div>
+        <div class="form-success" id="enroll-success">Thanks — we’ll call you shortly.</div>
+      </form>
+    </div>
+  </div>
+</div>
 
   <!-- FOOTER -->
   <footer class="site-footer">
@@ -1308,6 +1429,51 @@
       go(current);
       startAutoplay();
     })();
+
+    // ENROLL MODAL (aligned with DJ Level pages)
+(function () {
+  const overlay = document.getElementById('enroll-modal');
+  const openBtns = document.querySelectorAll('[data-open-enroll], a[href="/enroll"], a[href="#enroll"]');
+  const closeBtn = document.getElementById('modal-close-btn');
+  const cancelBtn = document.getElementById('modal-cancel');
+  const form = document.getElementById('enroll-form');
+  const success = document.getElementById('enroll-success');
+
+  function openModal() {
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeModal() {
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    if (success) success.style.display = 'none';
+  }
+
+  openBtns.forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      openModal();
+    });
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+  if (overlay) {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) closeModal();
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      if (success) success.style.display = 'block';
+      setTimeout(closeModal, 1200);
+    });
+  }
+})();
   </script>
 </body>
 </html>
