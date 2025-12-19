@@ -17,9 +17,6 @@
   <link rel="icon" type="image/png" sizes="512x512" href="/Assets/favicon-512x512.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png" />
   <link rel="manifest" href="/site.webmanifest" />
-  <link rel="canonical" href="https://soundabode.com/courses/dj-training/basic-dj-course">
-  <link rel="canonical" href="https://soundabode.com/courses/dj-training/pro-dj-course">
-  <link rel="canonical" href="https://soundabode.com/courses/dj-training/advanced-dj-performance">
 
 <meta property="og:title" content="Pro DJ Course in Pune | Soundabode Academy" />
 <meta property="og:description" content="Train like a professional DJ with advanced mixing, FX and live performance techniques at Soundabode Pune." />
@@ -49,7 +46,24 @@
   "educationalCredentialAwarded": "Pro DJ Certificate"
 }
 </script>
-  
+  <!-- Remove ".html" from URL (non-blocking) -->
+  <script>
+    (function() {
+      try {
+        var path = window.location.pathname;
+        if (path && path.indexOf('.html') !== -1) {
+          var cleanPath = path.replace(/\.html$/, '');
+          var cleanUrl = window.location.origin + cleanPath + window.location.search + window.location.hash;
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', cleanUrl);
+          }
+        }
+      } catch (e) {
+        // Fail silently
+        console.warn('URL cleanup failed', e);
+      }
+    })();
+  </script>
 
   <style>
     /* --------- Design tokens & base reset --------- */
@@ -366,8 +380,8 @@
 
         <div class="cta-row" role="region" aria-label="Call to action">
           <a class="btn-primary" href="/contact#contact">Book A Free Demo Class</a>
-          <a class="btn-outline" href="/dj-training/basic-dj-course">Level 1</a>
-           <a class="btn-outline" href="/dj-training/advanced-dj-performance">Level 3</a>
+          <a class="btn-outline" href="/dj-training/basic-dj-course.html">Level 1</a>
+           <a class="btn-outline" href="/dj-training/advanced-dj-performance.html">Level 3</a>
           
         </div>
       </div>
@@ -874,6 +888,14 @@
         // re-apply on resize (debounced)
         var t = null;
         window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(applyOffset, 120); });
+      })();
+
+      // Make sure links with ".html" still work if rewrite removed .html
+      (function () {
+        var links = document.querySelectorAll('a[href$=".html"]');
+        Array.prototype.slice.call(links).forEach(function (lnk) {
+          lnk.setAttribute('href', lnk.getAttribute('href').replace(/\.html$/, ''));
+        });
       })();
 
     })();
