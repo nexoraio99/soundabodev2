@@ -28,9 +28,12 @@ body {
   color: #000000;
   overflow-x: hidden;
 }
-.icon {
-  font-size: 24px;   /* size */
-  color: #ffffff;   /* color */
+.fi {
+  font-family: 'uicons-regular-straight' !important;
+  font-style: normal;
+  font-weight: normal;
+  display: inline-block;
+  line-height: 1;
 }
 /* ============================================================================
   NAVBAR
