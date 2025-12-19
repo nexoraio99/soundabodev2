@@ -696,7 +696,14 @@ app.post('/api/contact-form', async (req, res) => {
   }
 });
 
-// Clean URL handler - must be after API routes, before 404
+// Serve static files from root
+app.use(express.static(__dirname));
+
+// Serve specific directories
+app.use('/courses', express.static(path.join(__dirname, 'courses')));
+app.use('/Assets', express.static(path.join(__dirname, 'Assets')));
+
+// Now your clean URL handler
 app.get('*', async (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
   if (path.extname(req.path)) return next();
