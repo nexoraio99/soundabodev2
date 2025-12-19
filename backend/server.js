@@ -78,6 +78,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// ------------------- Static files (MUST be before clean URL handler) -------------------
+app.use(express.static(__dirname));
+
 // ------------------- Gmail (OAuth2) setup -------------------
 console.log('📧 Gmail configuration:');
 console.log('  EMAIL_USER:', process.env.EMAIL_USER ? '✅' : '❌ NOT SET');
@@ -696,12 +699,6 @@ app.post('/api/contact-form', async (req, res) => {
   }
 });
 
-// Serve static files from root
-app.use(express.static(__dirname));
-
-// Serve specific directories
-app.use('/courses', express.static(path.join(__dirname, 'courses')));
-app.use('/Assets', express.static(path.join(__dirname, 'Assets')));
 
 // Now your clean URL handler
 app.get('*', async (req, res, next) => {
