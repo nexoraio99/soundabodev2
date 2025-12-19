@@ -28,14 +28,7 @@ body {
   color: #eaeaea;
   overflow-x: hidden;
 }
-.fi {
-  font-family: 'uicons-regular-straight' !important;
-  font-style: normal;
-  font-weight: normal;
-  display: inline-block;
-  line-height: 1;
-  color:#ffffff;
-}
+
 /* ============================================================================
   NAVBAR
   ============================================================================ */
@@ -1643,7 +1636,10 @@ justify-content:center;
 font-size: 36px; /* swap with image if you have thumbnails */
 margin-bottom: 6px;
 }
-
+.card-medi .fi{
+  font-size:36px;
+  color:#fff;
+}
 /* Text within the card */
 .card-title{
 font-weight: 700;
