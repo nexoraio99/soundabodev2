@@ -7,8 +7,16 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { randomUUID } from 'crypto';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { promises as fs } from 'fs';
+
 
 dotenv.config();
+
+// After dotenv.config()
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -685,6 +693,31 @@ app.post('/api/contact-form', async (req, res) => {
   } catch (err) {
     console.error('Contact error:', err && err.message ? err.message : err);
     return res.status(500).json({ success: false, message: 'Failed to send. Please try again.' });
+  }
+});
+
+// Clean URL handler - must be after API routes, before 404
+app.get('*', async (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  if (path.extname(req.path)) return next();
+
+  try {
+    let filePath = path.join(__dirname, req.path + '.html');
+    
+    try {
+      await fs.access(filePath);
+      return res.sendFile(filePath);
+    } catch {
+      filePath = path.join(__dirname, req.path, 'index.html');
+      try {
+        await fs.access(filePath);
+        return res.sendFile(filePath);
+      } catch {
+        return next();
+      }
+    }
+  } catch (err) {
+    return next();
   }
 });
 
