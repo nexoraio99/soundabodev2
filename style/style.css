@@ -1161,7 +1161,12 @@ Replace the old testimonials CSS with this block
 ========================== */
 
 .testimonials {
-background: #000;
+background:
+        linear-gradient(
+          rgba(0,0,0,0.75),
+          rgba(0,0,0,0.85)
+        ),
+        url("https://ik.imagekit.io/Nex1ora2/dj-performance-training.jpg?updatedAt=1765352486546") center / cover no-repeat;
 color: #fff;
 padding: clamp(40px, 8vw, 100px) clamp(15px, 3vw, 20px);
 text-align: center;
