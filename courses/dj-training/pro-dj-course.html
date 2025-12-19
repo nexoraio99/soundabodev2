@@ -890,13 +890,7 @@
         window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(applyOffset, 120); });
       })();
 
-      // Make sure links with ".html" still work if rewrite removed .html
-      (function () {
-        var links = document.querySelectorAll('a[href$=".html"]');
-        Array.prototype.slice.call(links).forEach(function (lnk) {
-          lnk.setAttribute('href', lnk.getAttribute('href').replace(/\.html$/, ''));
-        });
-      })();
+      
 
     })();
   </script>
