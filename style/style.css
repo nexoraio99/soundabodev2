@@ -1002,6 +1002,7 @@
         url("https://ik.imagekit.io/Nex1ora2/dj-performance-training.jpg?updatedAt=1765352486546") center / cover no-repeat;
   font-family: "Inter", sans-serif;
   position: relative;
+   text-align: center;
   z-index: 2;
   overflow: hidden;
 }
