@@ -665,7 +665,16 @@
     margin: clamp(6px, 1.2vw, 10px) 0;
     line-height: 1.6;
   }
-  
+  .content-block {
+  max-width: 520px;
+}
+
+.content-block.secondary {
+  margin-top: 2rem;
+  opacity: 0.85;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
   
   /* ============================================================================
      ABOUT SECTION (Left Image)
