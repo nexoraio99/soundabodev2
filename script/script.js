@@ -772,3 +772,387 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scheduleInitWhenReady); else scheduleInitWhenReady();
 
 })();
+
+
+
+/* ============================================================================
+   SMOOTH SCROLL EFFECTS MODULE
+   Add this to the end of your script.js file
+   ============================================================================ */
+
+(function() {
+  'use strict';
+
+  // ============================================================================
+  // SCROLL PROGRESS BAR
+  // ============================================================================
+  
+  function initScrollProgress() {
+    let progressBar = document.querySelector('.scroll-progress');
+    if (!progressBar) {
+      progressBar = document.createElement('div');
+      progressBar.className = 'scroll-progress';
+      progressBar.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(90deg, #00c2ff 0%, #7928ca 50%, #ff0080 100%);
+        z-index: 10000;
+        box-shadow: 0 0 10px rgba(0, 194, 255, 0.5);
+        transition: width 0.1s ease-out;
+      `;
+      document.body.appendChild(progressBar);
+    }
+
+    function updateScrollProgress() {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      progressBar.style.width = scrolled + '%';
+    }
+
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+    updateScrollProgress();
+  }
+
+  // ============================================================================
+  // SCROLL REVEAL ANIMATIONS
+  // ============================================================================
+  
+  function initScrollReveal() {
+    // Add reveal classes to elements
+    const selectors = [
+      '#about-section h2',
+      '#about-section .content',
+      '#about-section .images-container',
+      '#carousel-section .carousel-title',
+      '.testimonials .section-title',
+      '#studio-setup .section-title',
+      '#studio-setup .gear-card',
+      '#why-soundabode .why-title',
+      '#why-soundabode .why-card',
+      '#faq .faq-heading',
+      '#faq .faq-item'
+    ];
+
+    selectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(el => {
+        if (!el.classList.contains('scroll-reveal')) {
+          el.classList.add('scroll-reveal');
+        }
+      });
+    });
+
+    const revealElements = document.querySelectorAll('.scroll-reveal');
+    if (revealElements.length === 0) return;
+
+    const observerOptions = {
+      threshold: 0.15,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+        }
+      });
+    }, observerOptions);
+
+    revealElements.forEach(el => revealObserver.observe(el));
+  }
+
+  // ============================================================================
+  // STAGGER ANIMATION FOR CARDS
+  // ============================================================================
+  
+  function initStaggerAnimation() {
+    const staggerContainers = document.querySelectorAll('.gear-grid, .why-cards, .images-grid, .images-grid1');
+    
+    if (staggerContainers.length === 0) return;
+
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px'
+    };
+
+    const staggerObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.classList.contains('staggered')) {
+          entry.target.classList.add('staggered');
+          const children = Array.from(entry.target.children);
+          children.forEach((child, index) => {
+            setTimeout(() => {
+              child.classList.add('revealed');
+            }, index * 100);
+          });
+        }
+      });
+    }, observerOptions);
+
+    staggerContainers.forEach(container => staggerObserver.observe(container));
+  }
+
+  // ============================================================================
+  // SMOOTH NAVBAR BEHAVIOR
+  // ============================================================================
+  
+  function initNavbarScroll() {
+    const navbar = document.querySelector('.navbar');
+    if (!navbar) return;
+
+    let lastScroll = 0;
+    let ticking = false;
+
+    function updateNavbar() {
+      const currentScroll = window.scrollY || window.pageYOffset;
+
+      if (currentScroll > 100) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+
+      // Hide on scroll down, show on scroll up (but keep it visible on mobile)
+      if (window.innerWidth > 768) {
+        if (currentScroll > lastScroll && currentScroll > 500) {
+          navbar.style.transform = 'translateY(-100%)';
+        } else {
+          navbar.style.transform = 'translateY(0)';
+        }
+      }
+
+      lastScroll = currentScroll;
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateNavbar);
+        ticking = true;
+      }
+    }, { passive: true });
+  }
+
+  // ============================================================================
+  // PARALLAX EFFECT FOR SECTIONS
+  // ============================================================================
+  
+  function initParallaxElements() {
+    const parallaxSections = document.querySelectorAll('.testimonials');
+    
+    if (parallaxSections.length === 0) return;
+
+    function updateParallax() {
+      parallaxSections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const scrolled = window.pageYOffset;
+        
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          const speed = 0.5;
+          const yPos = -(rect.top * speed);
+          section.style.backgroundPosition = `center ${yPos}px`;
+        }
+      });
+    }
+
+    window.addEventListener('scroll', updateParallax, { passive: true });
+    updateParallax();
+  }
+
+  // ============================================================================
+  // ZOOM EFFECT FOR IMAGES
+  // ============================================================================
+  
+  function initImageZoom() {
+    const images = document.querySelectorAll('.image-block, .image-block1, .carousel-item');
+    
+    if (images.length === 0) return;
+
+    images.forEach(img => {
+      if (!img.classList.contains('zoom-on-scroll')) {
+        img.classList.add('zoom-on-scroll');
+      }
+    });
+
+    const observerOptions = {
+      threshold: 0.3,
+      rootMargin: '0px'
+    };
+
+    const zoomObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('zoomed');
+        }
+      });
+    }, observerOptions);
+
+    images.forEach(img => zoomObserver.observe(img));
+  }
+
+  // ============================================================================
+  // SMOOTH SCROLL TO ANCHOR LINKS
+  // ============================================================================
+  
+  function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        
+        if (!href || href === '#') return;
+        
+        const target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          
+          const offsetTop = target.offsetTop - 80;
+          
+          window.scrollTo({
+            top: offsetTop,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  }
+
+  // ============================================================================
+  // ADD CSS FOR SCROLL EFFECTS
+  // ============================================================================
+  
+  function addScrollStyles() {
+    const styleId = 'scroll-effects-styles';
+    if (document.getElementById(styleId)) return;
+
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      /* Scroll Reveal Base */
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                    transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .scroll-reveal.revealed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Zoom Effect */
+      .zoom-on-scroll {
+        transform: scale(0.95);
+        transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .zoom-on-scroll.zoomed {
+        transform: scale(1);
+      }
+
+      /* Navbar Scrolled State */
+      .navbar.scrolled {
+        background-color: rgba(10, 10, 10, 0.95);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .navbar {
+        transition: transform 0.3s ease, background-color 0.3s ease;
+      }
+
+      /* Stagger Children Animation */
+      .gear-grid > *,
+      .why-cards > *,
+      .images-grid > *,
+      .images-grid1 > * {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
+
+      .gear-grid.staggered > *,
+      .why-cards.staggered > *,
+      .images-grid.staggered > *,
+      .images-grid1.staggered > * {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Reduced Motion Support */
+      @media (prefers-reduced-motion: reduce) {
+        .scroll-reveal,
+        .zoom-on-scroll,
+        .gear-grid > *,
+        .why-cards > *,
+        .images-grid > *,
+        .images-grid1 > * {
+          transition: none !important;
+          animation: none !important;
+          transform: none !important;
+          opacity: 1 !important;
+        }
+      }
+
+      /* Mobile Optimization */
+      @media (max-width: 768px) {
+        .scroll-reveal {
+          transform: translateY(30px);
+        }
+        
+        .navbar {
+          transform: translateY(0) !important;
+        }
+      }
+    `;
+    
+    document.head.appendChild(style);
+  }
+
+  // ============================================================================
+  // INITIALIZE ALL EFFECTS
+  // ============================================================================
+  
+  function init() {
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (prefersReducedMotion) {
+      console.log('Reduced motion preferred - scroll effects simplified');
+      return;
+    }
+
+    console.log('🎨 Initializing smooth scroll effects...');
+
+    // Add styles first
+    addScrollStyles();
+
+    // Initialize all effects
+    initScrollProgress();
+    initScrollReveal();
+    initStaggerAnimation();
+    initNavbarScroll();
+    initParallaxElements();
+    initImageZoom();
+    initSmoothScroll();
+
+    console.log('✅ Smooth scroll effects initialized');
+  }
+
+  // Wait for DOM and existing scripts to be ready
+  function initWhenReady() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(init, 100); // Small delay to let other scripts initialize
+      });
+    } else {
+      setTimeout(init, 100);
+    }
+  }
+
+  initWhenReady();
+
+})();
