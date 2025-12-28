@@ -1178,8 +1178,8 @@ button.next:hover {
 }
 
 .studio-header .section-title {
-   
-  font-weight: 700;
+   font-family: 'Inter', sans-serif;
+  font-weight: 400;
   letter-spacing: 0.4px;
   margin: 0;
   font-size: clamp(1.45rem, 3.2vw, 2rem);
