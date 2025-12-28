@@ -434,7 +434,7 @@ body{
 .hamburger-menu.is-active .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 /* NAVBAR */
 .navbar {
-  position: absolute;
+  position:fixed;
   top: 0;
   left: 0;
   width: 100%;
