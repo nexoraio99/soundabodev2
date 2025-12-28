@@ -1347,7 +1347,7 @@ button.next:hover {
 }
 
 .why-title {
-  font-family: 'Inter', system-ui, sans-serif;
+ font-family: 'figtree', sans-serif;
   font-size: clamp(1.75rem, 4.5vw, 2.6rem);
   margin: 0;
   font-weight: 700;
