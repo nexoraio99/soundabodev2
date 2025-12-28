@@ -1506,7 +1506,7 @@
       startAutoplay();
     })();
 
-    // ENROLL MODAL (aligned with DJ Level pages)
+    // ENROLL MODAL (Updated with Google Sheets integration)
 (function () {
   const overlay = document.getElementById('enroll-modal');
   const openBtns = document.querySelectorAll('[data-open-enroll], a[href="/enroll"], a[href="#enroll"]');
@@ -1514,6 +1514,10 @@
   const cancelBtn = document.getElementById('modal-cancel');
   const form = document.getElementById('enroll-form');
   const success = document.getElementById('enroll-success');
+  const submitBtn = form?.querySelector('button[type="submit"]');
+
+  // 🔥 PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJyBy1qVa2jlQ0aa3FhtkxcJJpBcgvJHIuxp2ms5l--4GMd6zLZywUWC1qQIu1uGEG0A/exec';
 
   function openModal() {
     overlay.classList.add('is-open');
@@ -1543,10 +1547,75 @@
   }
 
   if (form) {
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (success) success.style.display = 'block';
-      setTimeout(closeModal, 1200);
+      
+      // Get form values
+      const name = document.getElementById('enroll-name')?.value || '';
+      const phone = document.getElementById('enroll-phone')?.value || '';
+      const email = form.querySelector('input[type="email"], label:contains("Email") + input')?.value || '';
+      const interest = form.querySelector('select')?.value || '';
+      
+      // Validate required fields
+      if (!name || !phone) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      
+      // Disable submit button
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+      }
+      
+      // Prepare data
+      const formData = {
+        name: name,
+        phone: phone,
+        email: email,
+        interest: interest
+      };
+      
+      try {
+        // Send to Google Sheets
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Important for Google Apps Script
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        // Show success message
+        if (success) success.style.display = 'block';
+        
+        // Track conversion (if you have tracking)
+        if (typeof sendConversionTracking === 'function') {
+          sendConversionTracking('submit_lead_form', formData);
+        }
+        
+        // Reset form
+        form.reset();
+        
+        // Close modal after delay
+        setTimeout(() => {
+          closeModal();
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send enquiry';
+          }
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Form submission error:', error);
+        alert('Something went wrong. Please try again or call us directly.');
+        
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send enquiry';
+        }
+      }
     });
   }
 })();
