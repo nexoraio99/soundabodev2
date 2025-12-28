@@ -1444,7 +1444,7 @@ button.next:hover {
 
 .why-card:hover {
   transform: translateY(-8px);
-  border-color: rgba(130, 80, 255, 0.85);
+  border-color: rgba(131, 131, 131, 0.85);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
 }
 
