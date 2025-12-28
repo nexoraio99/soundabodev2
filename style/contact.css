@@ -262,6 +262,7 @@ body {
    ============================================================================ */
 .form-container {
     width: 100%;
+    height: fit-content;
     max-width: 500px;
     padding: clamp(1.5rem, 4vw, 2.5rem);
     background: rgba(10, 10, 10, 0.85);
