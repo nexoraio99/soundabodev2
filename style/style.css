@@ -1891,7 +1891,7 @@ button.next:hover {
 .divider-container {
   background: #000;
   position: relative;
-  z-index: 9999;
+  z-index:1;
   min-height: 28px;
   padding: 8px 0;
 }
