@@ -1343,6 +1343,7 @@ button.next:hover {
 .why-header {
   text-align: center;
   margin-bottom: clamp(28px, 6vw, 40px);
+   font-family:'Figtree', sans-serif;
 }
 
 .why-title {
