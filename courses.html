@@ -270,9 +270,20 @@
     .stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:18px; max-width:420px; }
     @media (min-width:640px) { .stats { grid-template-columns: repeat(4,minmax(0,1fr)); max-width:none; } }
     .stat { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:10px 12px; border-radius:12px; text-align:left; border:1px solid rgba(255,255,255,0.04); }
-    .stat .num { font-weight:700; font-size:15px; }
+    .stat .num { font-weight:700; font-size:15px; background: linear-gradient(135deg, var(--neon-1), var(--neon-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent; }
     .stat .label { font-size:11px; color:var(--muted); margin-top:2px; }
-    
+    .stat.counting .num {
+    animation: counterPulse 0.3s ease-in-out;
+  }
+  
+  @keyframes counterPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
         /* ============================================================================
        TESTIMONIALS (Carousel) - styles added
        ============================================================================ */
@@ -561,10 +572,22 @@
         </div>
 
         <div class="stats" aria-hidden="true">
-          <div class="stat"><div class="num">1000+</div><div class="label">Students trained</div></div>
-          <div class="stat"><div class="num">200+</div><div class="label">Industry projects</div></div>
-          <div class="stat"><div class="num">50+</div><div class="label">Partner venues</div></div>
-          <div class="stat"><div class="num">4</div><div class="label">Course levels</div></div>
+          <div class="stat">
+            <div class="num counter-number" data-target="1000">0</div>
+            <div class="label">Students trained</div>
+          </div>
+          <div class="stat">
+            <div class="num counter-number" data-target="200">0</div>
+            <div class="label">Industry projects</div>
+          </div>
+          <div class="stat">
+            <div class="num counter-number" data-target="50">0</div>
+            <div class="label">Partner venues</div>
+          </div>
+          <div class="stat">
+            <div class="num counter-number" data-target="4">0</div>
+            <div class="label">Course levels</div>
+          </div>
         </div>
       </div>
 
@@ -1522,6 +1545,78 @@
     });
   }
 })();
+
+ // Stats Counter Animation
+ (function initStatsCounter() {
+    const statsContainer = document.querySelector('.stats');
+    const counters = document.querySelectorAll('.counter-number');
+    
+    if (!statsContainer || counters.length === 0) {
+      console.warn('Stats counter: elements not found');
+      return;
+    }
+    
+    let hasAnimated = false;
+    
+    function animateCounter(counter) {
+      const target = parseInt(counter.dataset.target);
+      const suffix = counter.dataset.suffix || '';
+      const duration = 2000; // 2 seconds animation
+      const start = 0;
+      const frameRate = 16; // ~60fps
+      const totalFrames = duration / frameRate;
+      const increment = target / totalFrames;
+      let current = start;
+      
+      const parentStat = counter.closest('.stat');
+      if (parentStat) parentStat.classList.add('counting');
+      
+      const timer = setInterval(() => {
+        current += increment;
+        
+        if (current >= target) {
+          counter.textContent = target.toLocaleString() + suffix;
+          clearInterval(timer);
+          if (parentStat) {
+            setTimeout(() => parentStat.classList.remove('counting'), 300);
+          }
+        } else {
+          counter.textContent = Math.floor(current).toLocaleString() + suffix;
+        }
+      }, frameRate);
+    }
+    
+    const observerOptions = {
+      threshold: 0.3,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !hasAnimated) {
+          hasAnimated = true;
+          
+          // Fade in stats container
+          statsContainer.classList.add('revealed');
+          
+          // Start counting with stagger effect
+          setTimeout(() => {
+            counters.forEach((counter, index) => {
+              setTimeout(() => {
+                animateCounter(counter);
+              }, index * 150); // 150ms delay between each counter
+            });
+          }, 400); // Wait 400ms after reveal
+          
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+    
+    observer.observe(statsContainer);
+    
+    console.log('✅ Stats counter animation ready');
+  })();
   </script>
 </body>
 </html>
