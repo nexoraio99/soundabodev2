@@ -1354,7 +1354,7 @@ button.next:hover {
  font-family: 'Inter', sans-serif;
   font-size: clamp(1.75rem, 4.5vw, 2.6rem);
   margin: 0;
-  font-weight: 700;
+  font-weight: 500;
   color: #fff;
 }
 
