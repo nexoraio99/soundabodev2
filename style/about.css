@@ -395,9 +395,9 @@ body{
 /* -----------------------------
    Reveal animations (intersection observer toggles .revealed)
    ----------------------------- */
-.fade-in-left, .fade-in-right, .fade-in-up { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
-.fade-in-left { transform: translateX(-18px); }
-.fade-in-right { transform: translateX(18px); }
+.fade-in-left, .fade-in-right, .fade-in-up { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease;align-item:left; }
+.fade-in-left { transform: translateX(-18px); align-item:left; }
+.fade-in-right { transform: translateX(18px); align-item:left; }
 .revealed { opacity: 1 !important; transform: none !important; }
 
 /* -----------------------------
