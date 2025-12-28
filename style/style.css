@@ -479,6 +479,7 @@
   }
   
   .sa-description .sa-col p {
+     font-family:'figtree', sans-serif;
     max-width: 620px;
     margin: 0 auto;
     text-align: center;
