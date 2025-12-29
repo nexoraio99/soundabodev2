@@ -1551,7 +1551,7 @@
   const success = document.getElementById('enroll-success');
 
   // 🔥 YOUR GOOGLE APPS SCRIPT WEB APP URL
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxrdfexvygftaEWnsbbAhCOpbWIilclYVNec7Vs3-kP/dev';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJyBy1qVa2jlQ0aa3FhtkxcJJpBcgvJHIuxp2ms5l--4GMd6zLZywUWC1qQIu1uGEG0A/exec';
 
   // Debug: Log element discovery
   console.log('📋 Element Discovery:', {
@@ -1749,7 +1749,6 @@
       
       const response = await fetch(SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },
