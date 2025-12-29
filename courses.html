@@ -1527,8 +1527,10 @@
       startAutoplay();
     })();
 
-   // ENROLL MODAL (Fixed - Google Sheets Integration)
-(function () {
+  (function () {
+  console.log('🔧 Enroll Modal Script Loading...');
+  
+  // Get all required elements
   const overlay = document.getElementById('enroll-modal');
   const openBtns = document.querySelectorAll('[data-open-enroll], a[href="/enroll"], a[href="#enroll"]');
   const closeBtn = document.getElementById('modal-close-btn');
@@ -1536,183 +1538,44 @@
   const form = document.getElementById('enroll-form');
   const success = document.getElementById('enroll-success');
 
-  // 🔥 PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+  // 🔥 YOUR GOOGLE APPS SCRIPT WEB APP URL
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxrdfexvygftaEWnsbbAhCOpbWIilclYVNec7Vs3-kP/dev';
 
-  function openModal() {
-    overlay.classList.add('is-open');
-    overlay.setAttribute('aria-hidden', 'false');
-  }
-
-  function closeModal() {
-    overlay.classList.remove('is-open');
-    overlay.setAttribute('aria-hidden', 'true');
-    if (success) success.style.display = 'none';
-  }
-
-  openBtns.forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.preventDefault();
-      openModal();
-    });
+  // Debug: Log element discovery
+  console.log('📋 Element Discovery:', {
+    overlay: !!overlay,
+    openButtons: openBtns.length,
+    closeBtn: !!closeBtn,
+    cancelBtn: !!cancelBtn,
+    form: !!form,
+    success: !!success
   });
 
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-
-  if (overlay) {
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) closeModal();
-    });
+  // Check if form exists
+  if (!form) {
+    console.error('❌ Form element not found! ID: enroll-form');
+    return;
   }
 
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      // Get form values - FIXED selector
-      const nameInput = document.getElementById('enroll-name');
-      const phoneInput = document.getElementById('enroll-phone');
-      
-      // Get email input (third input in form after name and phone)
-      const allInputs = form.querySelectorAll('input');
-      const emailInput = allInputs[2]; // Third input is email
-      
-      // Get select dropdown
-      const interestSelect = form.querySelector('select');
-      
-      const name = nameInput?.value.trim() || '';
-      const phone = phoneInput?.value.trim() || '';
-      const email = emailInput?.value.trim() || '';
-      const interest = interestSelect?.value || '';
-      
-      // Validate required fields
-      if (!name || !phone) {
-        alert('Please fill in your name and phone number');
-        return;
-      }
-      
-      // Get submit button
-      const submitBtn = form.querySelector('button[type="submit"]');
-      
-      // Disable submit button
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-      }
-      
-      // Prepare data
-      const formData = {
-        name: name,
-        phone: phone,
-        email: email,
-        interest: interest
-      };
-      
-      try {
-        // Send to Google Sheets
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors', // Important for Google Apps Script
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData)
-        });
-        
-        // Show success message
-        if (success) success.style.display = 'block';
-        
-        // Track conversion (if tracking function exists)
-        if (typeof sendConversionTracking === 'function') {
-          sendConversionTracking('submit_lead_form', formData);
-        }
-        
-        // Also try the old tracking function if it exists
-        if (typeof uet_report_conversion === 'function') {
-          uet_report_conversion('form_submit');
-        }
-        
-        // Reset form
-        form.reset();
-        
-        // Close modal after delay
-        setTimeout(() => {
-          closeModal();
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send enquiry';
-          }
-        }, 2000);
-        
-      } catch (error) {
-        console.error('Form submission error:', error);
-        alert('Something went wrong. Please try again or call us at 997-501-6189');
-        
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Send enquiry';
-        }
-      }
-    });
-  }
-})();
+  // Log form structure
+  console.log('📝 Form Structure:', {
+    inputs: form.querySelectorAll('input').length,
+    selects: form.querySelectorAll('select').length,
+    buttons: form.querySelectorAll('button').length
+  });
 
-
-// ============================================================================
-// ALTERNATIVE VERSION: If you want to add IDs to your inputs for easier access
-// ============================================================================
-
-/* 
-  If the above doesn't work, update your HTML form to include IDs:
-
-  <form id="enroll-form" novalidate>
-    <label class="label">Full Name</label>
-    <input class="input" id="enroll-name" required />
-    
-    <label class="label">Phone Number</label>
-    <input class="input" id="enroll-phone" required />
-    
-    <label class="label">Email (optional)</label>
-    <input class="input" id="enroll-email" />  <!-- ADD THIS ID -->
-    
-    <label class="label">Interested In</label>
-    <select class="input" id="enroll-interest">  <!-- ADD THIS ID -->
-      <option>Music Production</option>
-      <option>DJ Training</option>
-    </select>
-    
-    <div class="modal-actions">
-      <button type="button" class="btn btn-ghost" id="modal-cancel">Cancel</button>
-      <button type="submit" class="btn btn-primary">Send enquiry</button>
-    </div>
-    
-    <div class="form-note">We will contact you within 24 hours.</div>
-    <div class="form-success" id="enroll-success">Thanks - we'll call you shortly.</div>
-  </form>
-*/
-
-// Then use this simpler version:
-
-(function () {
-  const overlay = document.getElementById('enroll-modal');
-  const openBtns = document.querySelectorAll('[data-open-enroll], a[href="/enroll"], a[href="#enroll"]');
-  const closeBtn = document.getElementById('modal-close-btn');
-  const cancelBtn = document.getElementById('modal-cancel');
-  const form = document.getElementById('enroll-form');
-  const success = document.getElementById('enroll-success');
-
-  // 🔥 PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJyBy1qVa2j|Q0aa3FhtkxcJJpBcgvJHluxp2ms5|-4GMd6zLZywUWC1qQlu1..';
-
+  // MODAL FUNCTIONS
   function openModal() {
+    console.log('🔓 Opening modal...');
     if (overlay) {
       overlay.classList.add('is-open');
       overlay.setAttribute('aria-hidden', 'false');
+      console.log('✅ Modal opened');
     }
   }
 
   function closeModal() {
+    console.log('🔒 Closing modal...');
     if (overlay) {
       overlay.classList.remove('is-open');
       overlay.setAttribute('aria-hidden', 'true');
@@ -1720,153 +1583,255 @@
     if (success) {
       success.style.display = 'none';
     }
+    console.log('✅ Modal closed');
   }
 
-  // Open modal buttons
-  openBtns.forEach(btn => {
+  // OPEN MODAL EVENT LISTENERS
+  openBtns.forEach((btn, index) => {
+    console.log(`🔘 Registering open button ${index + 1}:`, btn.tagName, btn.getAttribute('href'));
     btn.addEventListener('click', e => {
       e.preventDefault();
+      console.log('👆 Open button clicked:', btn);
       openModal();
     });
   });
 
-  // Close modal buttons
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+  // CLOSE MODAL EVENT LISTENERS
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      console.log('👆 Close button clicked');
+      closeModal();
+    });
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      console.log('👆 Cancel button clicked');
+      closeModal();
+    });
+  }
 
   // Click outside to close
   if (overlay) {
     overlay.addEventListener('click', e => {
-      if (e.target === overlay) closeModal();
+      if (e.target === overlay) {
+        console.log('👆 Clicked outside modal');
+        closeModal();
+      }
     });
   }
 
-  // Form submission
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  // FORM SUBMISSION - THE CRITICAL PART
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    console.log('📤 Form submission started');
+    console.log('═══════════════════════════════════════');
+
+    // METHOD 1: Try to get inputs by ID first
+    let nameInput = document.getElementById('enroll-name');
+    let phoneInput = document.getElementById('enroll-phone');
+    let emailInput = document.getElementById('enroll-email');
+    let interestSelect = document.getElementById('enroll-interest');
+
+    console.log('🔍 Method 1 - Get by ID:', {
+      nameInput: !!nameInput,
+      phoneInput: !!phoneInput,
+      emailInput: !!emailInput,
+      interestSelect: !!interestSelect
+    });
+
+    // METHOD 2: If IDs don't work, get by form elements array
+    if (!nameInput || !phoneInput) {
+      console.warn('⚠️ IDs not found, using fallback method...');
+      const inputs = form.querySelectorAll('input[type="text"], input:not([type])');
+      const phones = form.querySelectorAll('input[type="tel"]');
+      const emails = form.querySelectorAll('input[type="email"]');
+      const selects = form.querySelectorAll('select');
+
+      nameInput = inputs[0];
+      phoneInput = phones[0] || inputs[1];
+      emailInput = emails[0] || inputs[2];
+      interestSelect = selects[0];
+
+      console.log('🔍 Method 2 - Get by querySelectorAll:', {
+        nameInput: !!nameInput,
+        phoneInput: !!phoneInput,
+        emailInput: !!emailInput,
+        interestSelect: !!interestSelect
+      });
+    }
+
+    // Extract values
+    const name = nameInput?.value?.trim() || '';
+    const phone = phoneInput?.value?.trim() || '';
+    const email = emailInput?.value?.trim() || '';
+    const interest = interestSelect?.value || '';
+
+    console.log('📊 Extracted Values:', {
+      name: name ? `"${name}" (${name.length} chars)` : 'EMPTY',
+      phone: phone ? `"${phone}" (${phone.length} chars)` : 'EMPTY',
+      email: email ? `"${email}" (${email.length} chars)` : 'EMPTY or N/A',
+      interest: interest ? `"${interest}"` : 'EMPTY or N/A'
+    });
+
+    // VALIDATION
+    console.log('✅ Running validation...');
+    
+    if (!name) {
+      console.error('❌ Validation failed: Name is required');
+      alert('Please enter your name');
+      nameInput?.focus();
+      return;
+    }
+
+    if (!phone) {
+      console.error('❌ Validation failed: Phone is required');
+      alert('Please enter your phone number');
+      phoneInput?.focus();
+      return;
+    }
+
+    // Phone validation
+    const phoneDigits = phone.replace(/\D/g, '');
+    console.log('📞 Phone validation:', {
+      original: phone,
+      digitsOnly: phoneDigits,
+      length: phoneDigits.length
+    });
+
+    if (phoneDigits.length < 10) {
+      console.error('❌ Validation failed: Phone must be 10+ digits');
+      alert('Please enter a valid 10-digit phone number');
+      phoneInput?.focus();
+      return;
+    }
+
+    console.log('✅ All validations passed');
+
+    // Get submit button
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn?.textContent || 'Send enquiry';
+
+    // Disable button
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      console.log('🔒 Submit button disabled');
+    }
+
+    // Prepare data
+    const formData = {
+      name: name,
+      phone: phone,
+      email: email || 'Not provided',
+      interest: interest || 'Not specified',
+      timestamp: new Date().toISOString(),
+      source: 'Website Enroll Modal'
+    };
+
+    console.log('📦 Prepared FormData:', JSON.stringify(formData, null, 2));
+    console.log('🌐 Sending to:', SCRIPT_URL);
+
+    try {
+      console.log('⏳ Fetching...');
       
-      // Get form values using IDs (SIMPLER & MORE RELIABLE)
-      const name = document.getElementById('enroll-name')?.value.trim() || '';
-      const phone = document.getElementById('enroll-phone')?.value.trim() || '';
-      const email = document.getElementById('enroll-email')?.value.trim() || '';
-      const interest = document.getElementById('enroll-interest')?.value || '';
-      
-      // Validate required fields
-      if (!name) {
-        alert('Please enter your name');
-        document.getElementById('enroll-name')?.focus();
-        return;
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      console.log('📬 Response received:', {
+        type: response.type,
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
+
+      // Note: With no-cors mode, we can't read the response
+      // So we assume success if no error is thrown
+      console.log('✅ Form submitted successfully (no-cors mode)');
+
+      // Show success message
+      if (success) {
+        success.style.display = 'block';
+        console.log('✅ Success message displayed');
       }
-      
-      if (!phone) {
-        alert('Please enter your phone number');
-        document.getElementById('enroll-phone')?.focus();
-        return;
-      }
-      
-      // Basic phone validation (10 digits)
-      const phoneDigits = phone.replace(/\D/g, '');
-      if (phoneDigits.length < 10) {
-        alert('Please enter a valid 10-digit phone number');
-        document.getElementById('enroll-phone')?.focus();
-        return;
-      }
-      
-      // Get submit button
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalBtnText = submitBtn?.textContent || 'Send enquiry';
-      
-      // Disable submit button
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-      }
-      
-      // Prepare data object
-      const formData = {
-        name: name,
-        phone: phone,
-        email: email,
-        interest: interest
-      };
-      
-      console.log('Submitting form data:', formData);
-      
+
+      // Track conversion
+      console.log('📊 Tracking conversions...');
       try {
-        // Send to Google Sheets
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData)
-        });
-        
-        console.log('✅ Form submitted successfully');
-        
-        // Show success message
-        if (success) {
-          success.style.display = 'block';
+        // Google Tag Manager
+        if (window.dataLayer) {
+          window.dataLayer.push({
+            event: 'form_submission',
+            form_name: 'enroll_modal',
+            course_interest: interest
+          });
+          console.log('✅ GTM dataLayer pushed');
         }
-        
-        // Track conversion for analytics
-        try {
-          // Google Tag Manager / dataLayer
-          if (window.dataLayer) {
-            window.dataLayer.push({
-              event: 'form_submission',
-              form_name: 'enroll_modal',
-              course_interest: interest
-            });
-          }
-          
-          // Facebook Pixel
-          if (window.fbq) {
-            window.fbq('track', 'Lead', {
-              content_name: interest,
-              content_category: 'enrollment'
-            });
-          }
-          
-          // Bing UET
-          if (window.uetq) {
-            window.uetq.push('event', 'submit_lead_form', {
-              event_category: 'enrollment',
-              event_label: interest
-            });
-          }
-        } catch (trackingError) {
-          console.warn('Tracking error:', trackingError);
+
+        // Facebook Pixel
+        if (window.fbq) {
+          window.fbq('track', 'Lead', {
+            content_name: interest,
+            content_category: 'enrollment'
+          });
+          console.log('✅ Facebook Pixel tracked');
         }
-        
-        // Reset form
-        form.reset();
-        
-        // Close modal after 2 seconds
-        setTimeout(() => {
-          closeModal();
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalBtnText;
-          }
-        }, 2000);
-        
-      } catch (error) {
-        console.error('❌ Form submission error:', error);
-        
-        // Show error message
-        alert('Oops! Something went wrong. Please call us directly at 997-501-6189 or try again.');
-        
-        // Re-enable button
+
+        // Bing UET
+        if (window.uetq) {
+          window.uetq.push('event', 'submit_lead_form', {
+            event_category: 'enrollment',
+            event_label: interest
+          });
+          console.log('✅ Bing UET tracked');
+        }
+      } catch (trackingError) {
+        console.warn('⚠️ Tracking error:', trackingError);
+      }
+
+      // Reset form
+      form.reset();
+      console.log('🔄 Form reset');
+
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        closeModal();
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent = originalBtnText;
+          console.log('🔓 Submit button re-enabled');
         }
+        console.log('═══════════════════════════════════════');
+        console.log('✅ FORM SUBMISSION COMPLETE');
+        console.log('═══════════════════════════════════════');
+      }, 2000);
+
+    } catch (error) {
+      console.error('═══════════════════════════════════════');
+      console.error('❌ FORM SUBMISSION ERROR:');
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      console.error('═══════════════════════════════════════');
+
+      alert('Oops! Something went wrong. Please call us directly at 997-501-6189 or try again.');
+
+      // Re-enable button
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+        console.log('🔓 Submit button re-enabled after error');
       }
-    });
-  }
+    }
+  });
+
+  console.log('✅ Enroll Modal Script Loaded Successfully');
 })();
  // Stats Counter Animation
  (function initStatsCounter() {
