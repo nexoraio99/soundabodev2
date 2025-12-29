@@ -1111,45 +1111,56 @@
       </div>
     </section>
   </main>
-
- <!-- ENROLL MODAL - FIXED VERSION -->
+<!-- FIXED ENROLL MODAL HTML -->
 <div id="enroll-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <div class="modal-header">
       <h3 class="modal-title">Enroll / Book Demo - Soundabode</h3>
-      <button class="modal-close" id="modal-close-btn">&times;</button>
+      <button class="modal-close" id="modal-close-btn" type="button">&times;</button>
     </div>
 
     <div class="modal-body">
       <form id="enroll-form" novalidate>
-        <label class="label">Full Name *</label>
+        
+        <!-- Name Input - FIXED with proper ID and type -->
+        <label class="label" for="enroll-name">Full Name *</label>
         <input 
           class="input" 
           id="enroll-name" 
+          name="name"
           type="text"
           placeholder="Enter your full name"
           required 
+          autocomplete="name"
         />
 
-        <label class="label">Phone Number *</label>
+        <!-- Phone Input - FIXED with proper ID and type -->
+        <label class="label" for="enroll-phone">Phone Number *</label>
         <input 
           class="input" 
           id="enroll-phone" 
+          name="phone"
           type="tel"
           placeholder="10-digit mobile number"
+          pattern="[0-9]{10}"
           required 
+          autocomplete="tel"
         />
 
-        <label class="label">Email (optional)</label>
+        <!-- Email Input - FIXED with proper ID and type -->
+        <label class="label" for="enroll-email">Email (optional)</label>
         <input 
           class="input" 
           id="enroll-email" 
+          name="email"
           type="email"
           placeholder="your.email@example.com"
+          autocomplete="email"
         />
 
-        <label class="label">Interested In *</label>
-        <select class="input" id="enroll-interest" required>
+        <!-- Interest Select - FIXED with proper ID and name -->
+        <label class="label" for="enroll-interest">Interested In *</label>
+        <select class="input" id="enroll-interest" name="interest" required>
           <option value="">-- Select Course --</option>
           <option value="Music Production">Music Production</option>
           <option value="DJ Training">DJ Training</option>
@@ -1162,13 +1173,14 @@
         </div>
 
         <div class="form-note">We will contact you within 24 hours.</div>
-        <div class="form-success" id="enroll-success">
+        <div class="form-success" id="enroll-success" style="display: none;">
           ✅ Thanks! We'll call you shortly.
         </div>
       </form>
     </div>
   </div>
 </div>
+
 
   <!-- FOOTER -->
   <footer class="site-footer">
