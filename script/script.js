@@ -1,3 +1,4 @@
+
 /* ============================================================================
    SOUNDABODE SITE SCRIPT - COMPLETE FIXED VERSION
    - Mobile video autoplay fixed
@@ -157,8 +158,9 @@
   
       videosInitialized: false,
       videoRetryCount: {},
-  
+      carouselUserInteracted: false,
       inited: false
+      
     };
   
     /* ==========================================================================
@@ -435,7 +437,10 @@
       track.style.justifyContent = track.style.justifyContent || 'flex-start';
       const wrapper = DOM.carouselSection ? DOM.carouselSection : track.parentElement; 
       if (wrapper) wrapper.style.overflow = wrapper.style.overflow || 'hidden';
-  
+      if (isMobile()) {
+        track.style.transform = 'translate3d(0,0,0)';
+        track.style.willChange = 'transform';
+      }
       setTimeout(() => {
         try {
           const measuredWidth = measureOneSetWidth(originalItems);
@@ -466,30 +471,47 @@
         } catch (err) { 
           console.error('initCarouselClones error', err); 
         }
-      }, CONFIG.CAROUSEL_CLONE_DELAY);
+      }, isMobile() ? CONFIG.CAROUSEL_CLONE_DELAY * 2 : CONFIG.CAROUSEL_CLONE_DELAY);
     }
   
     function checkCarouselInView() {
       const section = DOM.carouselSection; 
       const track = DOM.carouselTrack; 
       if (!track) return;
-      
+    
+      // If no section wrapper, assume always in view
       if (!section) { 
         if (!state.carouselInView) { 
           state.carouselInView = true; 
-          if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation(); 
+          if (
+            !isMobile() &&
+            state.carouselInitialized &&
+            !state.isCarouselAnimating
+          ) {
+            startCarouselAnimation();
+          }
         } 
         return; 
       }
-      
+    
       const rect = section.getBoundingClientRect(); 
       const vh = window.innerHeight;
-      const inView = rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR && rect.bottom > -vh * 0.2;
-      
+      const inView =
+        rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR &&
+        rect.bottom > -vh * 0.2;
+    
       if (inView && !state.carouselInView) { 
-        state.carouselInView = true; 
-        if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation(); 
-      }
+        state.carouselInView = true;
+    
+        // 🚫 DO NOT auto-start on mobile
+        if (
+          !isMobile() &&
+          state.carouselInitialized &&
+          !state.isCarouselAnimating
+        ) {
+          startCarouselAnimation();
+        }
+      } 
       else if (!inView && state.carouselInView) { 
         state.carouselInView = false; 
         stopCarouselAnimation(); 
@@ -498,6 +520,7 @@
   
     function startCarouselAnimation() {
       if (state.isCarouselAnimating || !state.carouselInitialized) return;
+if (isMobile() && !state.carouselUserInteracted) return;
   
       if (!state.carouselOneSetWidth || state.carouselOneSetWidth <= 0) {
         const track = DOM.carouselTrack; 
@@ -553,6 +576,8 @@
       let lastX = 0;
   
       function handleStart(e) {
+        state.carouselUserInteracted = true;
+
         isDragging = true;
         const wasAnimating = state.isCarouselAnimating;
         if (wasAnimating) stopCarouselAnimation();
@@ -638,7 +663,9 @@
             if (state.carouselInView) startCarouselAnimation();
           }, 600);
         } else {
-          if (state.carouselInView) startCarouselAnimation();
+          if (state.carouselInView) {
+            requestAnimationFrame(() => startCarouselAnimation());
+          }
         }
       }
   
@@ -653,16 +680,17 @@
       track.style.cursor = 'grab';
     }
   
-    function bindCarouselHoverPause() { 
-      const track = DOM.carouselTrack; 
-      if (!track) return; 
-      
-      track.addEventListener('mouseenter', stopCarouselAnimation, { passive: true }); 
-      track.addEventListener('mouseleave', () => { 
-        if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) {
+    function bindCarouselHoverPause() {
+      const track = DOM.carouselTrack;
+      if (!track) return;
+    
+      track.addEventListener('mouseenter', stopCarouselAnimation, { passive: true });
+    
+      track.addEventListener('mouseleave', () => {
+        if (!isMobile() && state.carouselInView && state.carouselInitialized) {
           startCarouselAnimation();
         }
-      }, { passive: true }); 
+      }, { passive: true });
     }
   
     function initCarouselNavButtons() {
@@ -1444,3 +1472,4 @@
     else scheduleInitWhenReady();
   
   })();
+  
