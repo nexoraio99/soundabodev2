@@ -1,5 +1,6 @@
 /* ============================================================================
-   SOUNDABODE SITE SCRIPT - COMPLETE FIXED VERSION
+   SOUNDABODE SITE SCRIPT - WITH GOOGLE SHEETS INTEGRATION
+   - Dual submission: Google Sheets + Backend Email
    - Mobile video autoplay fixed
    - Carousel with drag/swipe support
    - Infinite seamless scrolling
@@ -24,7 +25,10 @@
       STYLES_READY_TIMEOUT: 2500,
       BOOT_TIMEOUT: 350,
       VIDEO_RETRY_ATTEMPTS: 3,
-      VIDEO_RETRY_DELAY: 1000
+      VIDEO_RETRY_DELAY: 1000,
+      
+      // ✅ ADD YOUR GOOGLE SHEETS WEB APP URL HERE
+      SHEETS_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'
     };
   
     /* ==========================================================================
@@ -168,6 +172,46 @@
     const rAF = (fn) => requestAnimationFrame(fn);
     const cAF = (id) => { try { if (id) cancelAnimationFrame(id); } catch (e) {} };
     const safe = (fn) => { try { fn(); } catch (e) { console.error(e); } };
+
+    /* ==========================================================================
+       GOOGLE SHEETS SUBMISSION HELPER
+       ========================================================================== */
+    async function submitToGoogleSheets(data) {
+      if (!CONFIG.SHEETS_URL || CONFIG.SHEETS_URL.includes('YOUR_DEPLOYMENT_ID')) {
+        console.warn('⚠️ Google Sheets URL not configured');
+        return { success: false, error: 'Sheets URL not configured' };
+      }
+
+      try {
+        const payload = new URLSearchParams({
+          name: data.fullName || data.name || '',
+          email: data.email || '',
+          phone: data.phone || '',
+          message: data.message || '',
+          course: data.course || '',
+          source: data.source || 'Website',
+          timestamp: new Date().toISOString()
+        });
+
+        const response = await fetch(CONFIG.SHEETS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: payload.toString()
+        });
+
+        if (response.ok) {
+          console.log('✅ Data saved to Google Sheets');
+          return { success: true };
+        } else {
+          const text = await response.text();
+          console.warn('⚠️ Google Sheets save failed:', text);
+          return { success: false, error: text };
+        }
+      } catch (err) {
+        console.error('❌ Google Sheets error:', err);
+        return { success: false, error: err.message };
+      }
+    }
   
     /* ==========================================================================
        VIDEO HANDLING - MOBILE FIX
@@ -444,7 +488,6 @@
           const clones = originalItems.map((it) => it.cloneNode(true));
           while (track.firstChild) track.removeChild(track.firstChild);
   
-          // Create 3 sets for seamless infinite scroll
           clones.forEach((c) => { 
             c.style.flex = c.style.flex || c.getAttribute('data-flex') || ''; 
             track.appendChild(c.cloneNode(true)); 
@@ -457,7 +500,6 @@
             state.carouselOneSetWidth = measureOneSetWidth(Array.from(newItems).slice(0, clones.length));
           }
   
-          // Start from middle set for seamless looping
           state.carouselScrollPos = state.carouselOneSetWidth;
           track.style.transform = `translate3d(-${state.carouselScrollPos}px, 0, 0)`;
   
@@ -519,7 +561,6 @@
         state.carouselScrollPos += state.carouselSpeed; 
         const w = state.carouselOneSetWidth || 0;
         
-        // Seamless infinite loop
         if (w > 0) {
           if (state.carouselScrollPos >= w * 2) {
             state.carouselScrollPos -= w;
@@ -860,7 +901,7 @@
     }
   
     /* ==========================================================================
-       Popup form handling
+       ✅ POPUP FORM HANDLER - WITH DUAL SUBMISSION (Sheets + Email)
        ========================================================================== */
     function initPopupFormHandler() {
       const form = DOM.popupForm;
@@ -887,9 +928,30 @@
           submitBtn.disabled = true;
           submitBtn.textContent = 'Sending...';
         }
-  
+
+        /* ========================================
+           1️⃣ SEND TO GOOGLE SHEETS
+           ======================================== */
+        let sheetsSuccess = false;
+        try {
+          const sheetsResult = await submitToGoogleSheets({
+            fullName: name,
+            email: email,
+            phone: phone,
+            message: '',
+            source: 'Homepage Popup'
+          });
+          sheetsSuccess = sheetsResult.success;
+        } catch (sheetErr) {
+          console.error('❌ Sheets submission error:', sheetErr);
+        }
+
+        /* ========================================
+           2️⃣ SEND TO BACKEND EMAIL API
+           ======================================== */
         const BACKEND_URL = API.base + '/api/popup-form';
-  
+        let emailSuccess = false;
+
         try {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -905,38 +967,43 @@
           const result = await resp.json().catch(() => ({}));
   
           if (resp.ok && result && result.success) {
-            if (statusMsg) {
-              statusMsg.textContent = "✅ Thank you! We'll contact you soon.";
-              statusMsg.style.color = '#00ff88';
-            }
-            try {
-              sendConversionTracking('popup_form_submitted', { name: name, email: email });
-            } catch (e) {}
-            form.reset();
-            setTimeout(() => {
-              if (state.hidePopup) state.hidePopup();
-            }, 900);
-          } else {
-            const msg = (result && result.message) ? result.message : 'Submission failed';
-            throw new Error(msg);
+            emailSuccess = true;
           }
         } catch (err) {
-          console.error('Popup submit error', err);
+          console.error('Popup backend error', err);
+        }
+
+        /* ========================================
+           3️⃣ HANDLE SUCCESS / FAILURE
+           ======================================== */
+        if (sheetsSuccess || emailSuccess) {
           if (statusMsg) {
-            statusMsg.textContent = err.name === 'AbortError' ? '❌ Request timed out. Try again.' : '❌ Failed to submit. Please try again.';
+            statusMsg.textContent = "✅ Thank you! We'll contact you soon.";
+            statusMsg.style.color = '#00ff88';
+          }
+          try {
+            sendConversionTracking('popup_form_submitted', { name: name, email: email });
+          } catch (e) {}
+          form.reset();
+          setTimeout(() => {
+            if (state.hidePopup) state.hidePopup();
+          }, 900);
+        } else {
+          if (statusMsg) {
+            statusMsg.textContent = '❌ Failed to submit. Please call us: +91 997-501-6189';
             statusMsg.style.color = '#ff4444';
           }
-        } finally {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Get Started';
-          }
+        }
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Get Started';
         }
       });
     }
   
     /* ==========================================================================
-       Contact form handler
+       ✅ CONTACT FORM HANDLER - WITH DUAL SUBMISSION (Sheets + Email)
        ========================================================================== */
     function initContactFormHandler() {
       const form = DOM.contactForm;
@@ -967,8 +1034,31 @@
           submitBtn.disabled = true;
           submitBtn.textContent = 'Sending...';
         }
-  
+
+        /* ========================================
+           1️⃣ SEND TO GOOGLE SHEETS
+           ======================================== */
+        let sheetsSuccess = false;
+        try {
+          const sheetsResult = await submitToGoogleSheets({
+            fullName: data.fullName,
+            email: data.email,
+            phone: data.phone,
+            course: data.course,
+            message: data.message,
+            source: 'Contact Form'
+          });
+          sheetsSuccess = sheetsResult.success;
+        } catch (sheetErr) {
+          console.error('❌ Sheets submission error:', sheetErr);
+        }
+
+        /* ========================================
+           2️⃣ SEND TO BACKEND EMAIL API
+           ======================================== */
         const BACKEND_URL = API.base + '/api/contact-form';
+        let emailSuccess = false;
+
         try {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -988,30 +1078,35 @@
           clearTimeout(timeoutId);
           const result = await resp.json().catch(() => ({}));
           if (resp.ok && result && result.success) {
-            if (statusMsg) {
-              statusMsg.textContent = "✅ Message sent successfully! We'll get back to you soon.";
-              statusMsg.style.color = '#00ff88';
-            }
-            try {
-              sendConversionTracking('contact_form_submitted', { name: data.fullName, email: data.email });
-            } catch (e) {}
-            form.reset();
-            if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset();
-          } else {
-            const msg = (result && result.message) ? result.message : 'Submission failed';
-            throw new Error(msg);
+            emailSuccess = true;
           }
         } catch (err) {
-          console.error('Contact submit error', err);
+          console.error('Contact backend error', err);
+        }
+
+        /* ========================================
+           3️⃣ HANDLE SUCCESS / FAILURE
+           ======================================== */
+        if (sheetsSuccess || emailSuccess) {
           if (statusMsg) {
-            statusMsg.textContent = err.name === 'AbortError' ? '❌ Request timed out. Try again.' : '❌ Failed to send message. Please try again.';
+            statusMsg.textContent = "✅ Message sent successfully! We'll get back to you soon.";
+            statusMsg.style.color = '#00ff88';
+          }
+          try {
+            sendConversionTracking('contact_form_submitted', { name: data.fullName, email: data.email });
+          } catch (e) {}
+          form.reset();
+          if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset();
+        } else {
+          if (statusMsg) {
+            statusMsg.textContent = '❌ Failed to send. Please call us: +91 997-501-6189';
             statusMsg.style.color = '#ff4444';
           }
-        } finally {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Message';
-          }
+        }
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send Message';
         }
       });
     }
@@ -1375,6 +1470,7 @@
       if (state.inited) return;
       state.inited = true;
       console.log('[Soundabode] Using backend base:', API.base);
+      console.log('[Soundabode] Google Sheets URL:', CONFIG.SHEETS_URL);
       console.log('[Soundabode] Initializing mobile video support...');
       
       ensureAuroraText();
@@ -1382,13 +1478,8 @@
       state.ticking = true;
       masterAnimationLoop();
   
-      // Initialize video handling FIRST
       initIntroVideos();
-  
-      // Initialize carousel with all features (drag/swipe/nav)
       initCarousel();
-  
-      // Then other modules
       initTestimonials();
       initPopup();
       initPopupFormHandler();
@@ -1403,7 +1494,6 @@
       initWhyDropdown();
       initBingUET();
   
-      // Retry carousel init if needed
       setTimeout(() => {
         if (!state.carouselInitialized) {
           console.log('[Carousel] Retrying initialization...');
