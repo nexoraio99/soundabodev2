@@ -2,7 +2,7 @@
    Soundabode Contact Page JS
    - Navbar mobile toggle & active link
    - Scroll shadow
-   - Contact form submission (no reCAPTCHA)
+   - Contact form submission to Google Sheets
    - Enhanced Conversions dataLayer push (on successful submit)
    =========================== */
 
@@ -57,10 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const statusMsg = document.getElementById('form-status');
 
-  // prefer attribute; fallback to prod endpoint
-  const BACKEND_URL =
-    contactForm.getAttribute('data-backend') ||
-    'https://soundabodev2-server.onrender.com/api/contact-form';
+  // Google Apps Script Web App URL
+  // You can set this via data-script-url attribute or fallback to default
+  const GOOGLE_SCRIPT_URL =
+    contactForm.getAttribute('data-script-url') ||
+    'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -73,7 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
       email: contactForm.querySelector('#email')?.value.trim() || '',
       phone: contactForm.querySelector('#phone')?.value.trim() || '',
       course: contactForm.querySelector('#course')?.value || '',
-      message: contactForm.querySelector('#message')?.value.trim() || '' // optional
+      message: contactForm.querySelector('#message')?.value.trim() || '',
+      source: 'Contact Page'
     };
 
     // Basic validation (message optional)
@@ -86,6 +88,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      if (statusMsg) {
+        statusMsg.style.display = 'block';
+        statusMsg.textContent = '❌ Please enter a valid email address';
+        statusMsg.style.color = '#ff4444';
+      }
+      return;
+    }
+
     // Disable button & show "Sending..."
     if (submitBtn) {
       submitBtn.disabled = true;
@@ -93,17 +106,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const res = await fetch(BACKEND_URL, {
+      // Create FormData for Google Apps Script
+      const scriptFormData = new FormData();
+      scriptFormData.append('fullName', formData.fullName);
+      scriptFormData.append('email', formData.email);
+      scriptFormData.append('phone', formData.phone);
+      scriptFormData.append('course', formData.course);
+      scriptFormData.append('message', formData.message);
+      scriptFormData.append('source', formData.source);
+
+      // Submit to Google Sheets
+      const res = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        mode: 'cors',
-        credentials: 'omit',
-        body: JSON.stringify(formData)
+        body: scriptFormData
       });
 
-      const result = await res.json().catch(() => ({}));
+      // Check if submission was successful
+      // Note: Google Apps Script returns text response
+      const result = await res.text();
+      
+      // Parse JSON response if possible
+      let jsonResult;
+      try {
+        jsonResult = JSON.parse(result);
+      } catch (e) {
+        // If not JSON, assume success if no error
+        jsonResult = { success: true };
+      }
 
-      if (res.ok && result && result.success) {
+      if (jsonResult.success !== false) {
         // ✅ Show success message
         if (statusMsg) {
           statusMsg.style.display = 'block';
@@ -124,8 +155,13 @@ document.addEventListener('DOMContentLoaded', () => {
           ec_phone: formData.phone,
           ec_course: formData.course
         });
+
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          if (statusMsg) statusMsg.style.display = 'none';
+        }, 5000);
       } else {
-        throw new Error(result?.message || 'Submission failed');
+        throw new Error(jsonResult?.message || 'Submission failed');
       }
     } catch (err) {
       console.error('❌ Contact submit error:', err);
