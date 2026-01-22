@@ -28,7 +28,7 @@
       VIDEO_RETRY_DELAY: 1000,
       
       // ✅ ADD YOUR GOOGLE SHEETS WEB APP URL HERE
-      SHEETS_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'
+      SHEETS_URL: 'https://script.google.com/macros/s/AKfycbwJyBy1qVa2jlQ0aa3FhtkxcJJpBcgvJHIuxp2ms5l--4GMd6zLZywUWC1qQIu1uGEG0A/exec'
     };
   
     /* ==========================================================================
