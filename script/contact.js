@@ -12,7 +12,7 @@
    const CONFIG = {
     BACKEND_URL: 'https://soundabodev2-server.onrender.com/api/contact-form',
     // ✅ REPLACE WITH YOUR GOOGLE SHEETS DEPLOYMENT URL
-    SHEETS_URL: 'https://script.google.com/macros/s/AKfycbwJyBy1qVa2jlQ0aa3FhtkxcJJpBcgvJHIuxp2ms5l--4GMd6zLZywUWC1qQIu1uGEG0A/exec'
+    SHEETS_URL: 'https://script.google.com/macros/s/AKfycbwm1MVuGYm-BogHsaPQUqGK3l-knu7DHlWfrfivWiEnkkcfu2rPBWtNqgGIruePg37lKg/exec'
   };
   
   /* ---------- NAVBAR ---------- */
