@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // You can set this via data-script-url attribute or fallback to default
   const GOOGLE_SCRIPT_URL =
     contactForm.getAttribute('data-script-url') ||
-    'https://script.google.com/macros/s/AKfycbwJyBy1qVa2jlQ0aa3FhtkxcJJpBcgvJHIuxp2ms5l--4GMd6zLZywUWC1qQIu1uGEG0A/exec';
+    'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -106,19 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      // Create FormData for Google Apps Script
-      const scriptFormData = new FormData();
-      scriptFormData.append('fullName', formData.fullName);
-      scriptFormData.append('email', formData.email);
-      scriptFormData.append('phone', formData.phone);
-      scriptFormData.append('course', formData.course);
-      scriptFormData.append('message', formData.message);
-      scriptFormData.append('source', formData.source);
+      // Log the data being sent (for debugging)
+      console.log('Submitting form data:', formData);
 
-      // Submit to Google Sheets
+      // Submit as JSON to Google Sheets
       const res = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        body: scriptFormData
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
       });
 
       // Check if submission was successful
