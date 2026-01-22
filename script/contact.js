@@ -2,9 +2,18 @@
    Soundabode Contact Page JS
    - Navbar mobile toggle & active link
    - Scroll shadow
-   - Contact form submission to Google Sheets
+   - Contact form submission with Google Sheets + Email
    - Enhanced Conversions dataLayer push (on successful submit)
    =========================== */
+
+/* ===========================
+   CONFIGURATION
+   =========================== */
+const CONFIG = {
+  BACKEND_URL: 'https://soundabodev2-server.onrender.com/api/contact-form',
+  // ✅ REPLACE WITH YOUR GOOGLE SHEETS DEPLOYMENT URL
+  SHEETS_URL: 'https://script.google.com/macros/s/AKfycbwJyBy1qVa2jlQ0aa3FhtkxcJJpBcgvJHIuxp2ms5l--4GMd6zLZywUWC1qQIu1uGEG0A/exec'
+};
 
 /* ---------- NAVBAR ---------- */
 document.addEventListener('DOMContentLoaded', () => {
@@ -50,18 +59,66 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* ---------- CONTACT FORM ---------- */
+/* ==========================================================================
+   GOOGLE SHEETS SUBMISSION HELPER
+   ========================================================================== */
+async function submitToGoogleSheets(data) {
+  if (!CONFIG.SHEETS_URL || CONFIG.SHEETS_URL.includes('YOUR_DEPLOYMENT_ID')) {
+    console.warn('⚠️ Google Sheets URL not configured');
+    return { success: false, error: 'Sheets URL not configured' };
+  }
+
+  try {
+    // Build payload for contact form
+    const payload = new URLSearchParams({
+      name: data.fullName || '',
+      email: data.email || '',
+      phone: data.phone || '',
+      course: data.course || '',
+      message: data.message || '',
+      source: 'Contact Form'  // ✅ Routes to "contact" sheet
+    });
+
+    console.log('📤 Sending to Google Sheets (Contact Form)');
+    console.log('   Data:', {
+      name: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      course: data.course,
+      source: 'Contact Form'
+    });
+
+    const response = await fetch(CONFIG.SHEETS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: payload.toString()
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ Sheets response:', result);
+      console.log('   Saved to sheet:', result.sheet || 'unknown');
+      return { success: true, sheet: result.sheet };
+    } else {
+      const text = await response.text();
+      console.warn('⚠️ Google Sheets save failed:', text);
+      return { success: false, error: text };
+    }
+  } catch (err) {
+    console.error('❌ Google Sheets error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+/* ---------- CONTACT FORM - DUAL SUBMISSION ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   const contactForm = document.getElementById('contactForm');
   if (!contactForm) return;
 
   const statusMsg = document.getElementById('form-status');
 
-  // Google Apps Script Web App URL
-  // You can set this via data-script-url attribute or fallback to default
-  const GOOGLE_SCRIPT_URL =
-    contactForm.getAttribute('data-script-url') ||
-    'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+  // Allow override via data attribute
+  const backendURL = contactForm.getAttribute('data-backend') || CONFIG.BACKEND_URL;
 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -74,11 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
       email: contactForm.querySelector('#email')?.value.trim() || '',
       phone: contactForm.querySelector('#phone')?.value.trim() || '',
       course: contactForm.querySelector('#course')?.value || '',
-      message: contactForm.querySelector('#message')?.value.trim() || '',
-      source: 'Contact Page'
+      message: contactForm.querySelector('#message')?.value.trim() || '' // optional
     };
 
-    // Basic validation (message optional)
+    /* ========================================
+       VALIDATION
+       ======================================== */
     if (!formData.fullName || !formData.email || !formData.phone || !formData.course) {
       if (statusMsg) {
         statusMsg.style.display = 'block';
@@ -99,85 +157,126 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Disable button & show "Sending..."
+    // Phone validation (10 digits)
+    const phoneDigits = formData.phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 10) {
+      if (statusMsg) {
+        statusMsg.style.display = 'block';
+        statusMsg.textContent = '❌ Please enter a valid 10-digit phone number';
+        statusMsg.style.color = '#ff4444';
+      }
+      return;
+    }
+
+    /* ========================================
+       DISABLE BUTTON & SHOW LOADING
+       ======================================== */
     if (submitBtn) {
       submitBtn.disabled = true;
       if (btnText) btnText.textContent = 'Sending...';
     }
 
+    /* ========================================
+       1️⃣ SEND TO GOOGLE SHEETS
+       ======================================== */
+    let sheetsSuccess = false;
     try {
-      // Log the data being sent (for debugging)
-      console.log('Submitting form data:', formData);
+      const sheetsResult = await submitToGoogleSheets(formData);
+      sheetsSuccess = sheetsResult.success;
+      if (sheetsSuccess) {
+        console.log('✅ Data saved to Google Sheets:', sheetsResult.sheet);
+      }
+    } catch (sheetErr) {
+      console.error('❌ Sheets submission error:', sheetErr);
+    }
 
-      // Submit as JSON to Google Sheets
-      const res = await fetch(GOOGLE_SCRIPT_URL, {
+    /* ========================================
+       2️⃣ SEND TO BACKEND EMAIL API
+       ======================================== */
+    let emailSuccess = false;
+    try {
+      const res = await fetch(backendURL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        credentials: 'omit',
         body: JSON.stringify(formData)
       });
 
-      // Check if submission was successful
-      // Note: Google Apps Script returns text response
-      const result = await res.text();
-      
-      // Parse JSON response if possible
-      let jsonResult;
-      try {
-        jsonResult = JSON.parse(result);
-      } catch (e) {
-        // If not JSON, assume success if no error
-        jsonResult = { success: true };
-      }
+      const result = await res.json().catch(() => ({}));
 
-      if (jsonResult.success !== false) {
-        // ✅ Show success message
-        if (statusMsg) {
-          statusMsg.style.display = 'block';
-          statusMsg.textContent = '✅ Message sent successfully! We\'ll get back to you soon.';
-          statusMsg.style.color = '#00aa6c';
-        }
-
-        // ✅ Clear form
-        contactForm.reset();
-
-        // ✅ Enhanced Conversions: push user data to dataLayer
-        // This fires ONLY on successful submission
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: 'contact_form_submit',
-          ec_name: formData.fullName,
-          ec_email: formData.email,
-          ec_phone: formData.phone,
-          ec_course: formData.course
-        });
-
-        // Hide success message after 5 seconds
-        setTimeout(() => {
-          if (statusMsg) statusMsg.style.display = 'none';
-        }, 5000);
+      if (res.ok && result && result.success) {
+        emailSuccess = true;
+        console.log('✅ Email sent via backend');
       } else {
-        throw new Error(jsonResult?.message || 'Submission failed');
+        console.warn('⚠️ Backend email failed:', result?.message);
       }
     } catch (err) {
-      console.error('❌ Contact submit error:', err);
+      console.error('❌ Backend email error:', err);
+    }
+
+    /* ========================================
+       3️⃣ HANDLE SUCCESS / FAILURE
+       ======================================== */
+    if (sheetsSuccess || emailSuccess) {
+      // ✅ SUCCESS - At least one submission worked
       if (statusMsg) {
         statusMsg.style.display = 'block';
-        statusMsg.textContent = '❌ Failed to send message. Please try again.';
+        statusMsg.textContent = '✅ Message sent successfully! We\'ll get back to you soon.';
+        statusMsg.style.color = '#00aa6c';
+      }
+
+      // Clear form
+      contactForm.reset();
+
+      // ✅ Enhanced Conversions: push user data to dataLayer
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'contact_form_submit',
+        ec_name: formData.fullName,
+        ec_email: formData.email,
+        ec_phone: formData.phone,
+        ec_course: formData.course
+      });
+
+      // ✅ Bing UET conversion tracking
+      try {
+        if (window.uetq && Array.isArray(window.uetq.push)) {
+          window.uetq.push('event', 'contact_form_submit', {
+            event_category: 'contact',
+            event_label: formData.course
+          });
+        }
+      } catch (trackErr) {
+        console.warn('Tracking error:', trackErr);
+      }
+
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        if (statusMsg) statusMsg.style.display = 'none';
+      }, 5000);
+
+    } else {
+      // ❌ FAILURE - Both submissions failed
+      if (statusMsg) {
+        statusMsg.style.display = 'block';
+        statusMsg.textContent = '❌ Failed to send message. Please call us at +91 997-501-6189 or try again.';
         statusMsg.style.color = '#ff4444';
       }
-    } finally {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        if (btnText) btnText.textContent = 'Send Message';
-      }
+    }
+
+    /* ========================================
+       RE-ENABLE BUTTON
+       ======================================== */
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      if (btnText) btnText.textContent = 'Send Message';
     }
   });
 });
 
 /* ==========================================================================
-   Bing UET (unchanged, lazy-load safe)
+   Bing UET - Initialize on load
    ========================================================================== */
 function initBingUET() {
   (function(w, d, t, r, u) {
@@ -202,4 +301,11 @@ function initBingUET() {
     i = d.getElementsByTagName(t)[0];
     i.parentNode.insertBefore(n, i);
   })(window, document, "script", "//bat.bing.com/bat.js", "uetq");
+}
+
+// Initialize Bing UET
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initBingUET);
+} else {
+  initBingUET();
 }
