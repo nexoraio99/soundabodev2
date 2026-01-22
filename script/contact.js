@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Scroll shadow
-  const onScroll = () => {
+   onScroll = () => {
     if (!nav) return;
     if (window.scrollY > 8) {
       nav.classList.add('is-scrolled');
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Active link highlight for Contact page
   document.querySelectorAll('.nav-links a, #mobile-menu a').forEach((a) => {
-    const href = (a.getAttribute('href') || '').toLowerCase();
+     href = (a.getAttribute('href') || '').toLowerCase();
     if (href.includes('contact')) a.classList.add('is-active');
   });
 });
@@ -126,13 +126,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = contactForm.querySelector('button[type="submit"]');
     const btnText = submitBtn?.querySelector('.btn-text');
 
-    const formData = {
-      fullName: contactForm.querySelector('#fullName')?.value.trim() || '',
-      email: contactForm.querySelector('#email')?.value.trim() || '',
-      phone: contactForm.querySelector('#phone')?.value.trim() || '',
-      course: contactForm.querySelector('#course')?.value || '',
-      message: contactForm.querySelector('#message')?.value.trim() || '' // optional
-    };
+    const courseEl = contactForm.querySelector('#course');
+const courseValue = courseEl?.value?.trim() || '';
+
+const formData = {
+  fullName: contactForm.querySelector('#fullName')?.value.trim() || '',
+  email: contactForm.querySelector('#email')?.value.trim() || '',
+  phone: contactForm.querySelector('#phone')?.value.trim() || '',
+  course: courseValue === '' || courseValue.toLowerCase().includes('select')
+    ? ''
+    : courseValue,
+  message: contactForm.querySelector('#message')?.value.trim() || ''
+};
 
     /* ========================================
        VALIDATION
