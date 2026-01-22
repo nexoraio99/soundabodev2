@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // You can set this via data-script-url attribute or fallback to default
   const GOOGLE_SCRIPT_URL =
     contactForm.getAttribute('data-script-url') ||
-    'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+    'https://script.google.com/macros/s/AKfycbwJyBy1qVa2jlQ0aa3FhtkxcJJpBcgvJHIuxp2ms5l--4GMd6zLZywUWC1qQIu1uGEG0A/exec';
 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
