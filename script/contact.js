@@ -41,7 +41,7 @@
     }
   
     // Scroll shadow
-     onScroll = () => {
+    const onScroll = () => {
       if (!nav) return;
       if (window.scrollY > 8) {
         nav.classList.add('is-scrolled');
@@ -54,7 +54,7 @@
   
     // Active link highlight for Contact page
     document.querySelectorAll('.nav-links a, #mobile-menu a').forEach((a) => {
-       href = (a.getAttribute('href') || '').toLowerCase();
+      const href = (a.getAttribute('href') || '').toLowerCase();
       if (href.includes('contact')) a.classList.add('is-active');
     });
   });
