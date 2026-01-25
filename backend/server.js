@@ -126,7 +126,7 @@ async function getAccessTokenCached() {
     cachedToken = { token, expiry };
     
     const expiresInMinutes = Math.round((expiry - now) / 60000);
-    console.log(`🔑 Gmail access token refreshed — expires in ${expiresInMinutes}m`);
+    console.log(`🔑 Gmail access token refreshed expires in ${expiresInMinutes}m`);
     console.log(`   Next auto-refresh: ${new Date(expiry - 10 * 60 * 1000).toLocaleString('en-IN')}`);
     
     return token;
@@ -619,7 +619,7 @@ app.post('/api/popup-form', async (req, res) => {
 
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const ref = randomUUID().slice(0, 8).toUpperCase();
-    const subject = `[Popup] Homepage Inquiry — ${fullName} — ${timestampLocal} — ${ref}`;
+    const subject = `[Popup] Homepage Inquiry  ${fullName}  ${timestampLocal}  ${ref}`;
 
     console.log('Popup subject ->', subject);
 
@@ -674,8 +674,8 @@ app.post('/api/contact-form', async (req, res) => {
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const ref = randomUUID().slice(0, 8).toUpperCase();
     const subject = isCourse
-      ? `[Contact] Course Enquiry — ${formattedCourse} — ${fullName} — ${timestampLocal} — ${ref}`
-      : `[Contact] General Enquiry — ${fullName} — ${timestampLocal} — ${ref}`;
+      ? `[Contact] Course Enquiry  ${formattedCourse}  ${fullName}  ${timestampLocal}  ${ref}`
+      : `[Contact] General Enquiry  ${fullName}  ${timestampLocal}  ${ref}`;
 
     console.log('Contact subject ->', subject);
 
@@ -698,7 +698,7 @@ app.post('/api/contact-form', async (req, res) => {
     });
 
     const userHtml = getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse });
-    const userSubject = `${COMPANY_NAME} — We've received your ${enquiryType.toLowerCase()}!`;
+    const userSubject = `${COMPANY_NAME}  We've received your ${enquiryType.toLowerCase()}!`;
     
     sendEmailRawAsync({ 
       to: email, 
