@@ -13,7 +13,7 @@
     --clr-1: #00c2ff;
     --clr-2: #33ff8c;
     --clr-3: #ffc640;
-    --clr-4: #e54cff;
+    --clr-4: #e54cff;own
     
     /* Typography */
     --fs: clamp(2.5rem, 7vw, 6rem);
@@ -1725,7 +1725,7 @@ button.next:hover {
   gap: 10px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(124, 124, 124, 0.692);
   padding: 10px 14px;
   border-radius: 10px;
   cursor: pointer;
