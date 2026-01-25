@@ -442,324 +442,409 @@
       if (DOM.navbar) safe(() => { DOM.navbar.style.opacity = '1'; DOM.navbar.style.pointerEvents = 'auto'; });
     }
   
-    /* ==========================================================================
-       CAROUSEL - Complete implementation with drag/swipe
-       ========================================================================== */
-    function getGapValuePx(el) {
-      try { 
-        const cs = getComputedStyle(el); 
-        const gap = cs.getPropertyValue('gap') || cs.getPropertyValue('column-gap') || '0px'; 
-        return parseFloat(gap) || 0; 
-      } catch (e) { 
-        return 0; 
-      }
-    }
+    /* ============================================================================
+   CAROUSEL FIX - Replace the carousel functions in your script.js
+   ============================================================================ */
+
+// Add this to your state object (at the top where state is defined)
+const state = {
+  // ... existing state properties ...
+  carouselInView: false,
+  isCarouselAnimating: false,
+  carouselOneSetWidth: 0,
+  carouselInitialized: false,
+  carouselScrollPos: 0,
+  carouselAnimationId: null,
+  carouselSpeed: isMobile() ? 0.8 : 1.0,
+  carouselLastUpdate: 0, // ✅ ADD THIS
+  carouselDriftCorrection: 0 // ✅ ADD THIS
+};
+
+/* ==========================================================================
+   FIXED CAROUSEL FUNCTIONS - Replace existing carousel code
+   ========================================================================== */
+
+function getGapValuePx(el) {
+  try { 
+    const cs = getComputedStyle(el); 
+    const gap = cs.getPropertyValue('gap') || cs.getPropertyValue('column-gap') || '0px'; 
+    return parseFloat(gap) || 0; 
+  } catch (e) { 
+    return 0; 
+  }
+}
+
+function measureOneSetWidth(items) {
+  if (!items || items.length === 0) return 0;
+  let total = 0;
+  for (let i = 0; i < items.length; i++) {
+    total += items[i].getBoundingClientRect().width;
+  }
+  const track = DOM.carouselTrack;
+  const gap = track ? getGapValuePx(track) : 0;
+  if (items.length > 1) total += gap * (items.length - 1);
+  return Math.round(total);
+}
+
+function initCarouselClones() {
+  const track = DOM.carouselTrack; 
+  if (!track || state.carouselInitialized) return;
   
-    function measureOneSetWidth(items) {
-      if (!items || items.length === 0) return 0;
-      let total = 0;
-      for (let i = 0; i < items.length; i++) {
-        total += items[i].getBoundingClientRect().width;
-      }
-      const track = DOM.carouselTrack;
-      const gap = track ? getGapValuePx(track) : 0;
-      if (items.length > 1) total += gap * (items.length - 1);
-      return Math.round(total);
-    }
+  const originalItems = Array.from(track.querySelectorAll('.carousel-item'));
+  if (!originalItems.length) return;
+
+  track.style.display = 'flex';
+  track.style.flexWrap = 'nowrap';
+  track.style.justifyContent = 'flex-start';
   
-    function initCarouselClones() {
-      const track = DOM.carouselTrack; 
-      if (!track || state.carouselInitialized) return;
+  const wrapper = DOM.carouselSection || track.parentElement; 
+  if (wrapper) wrapper.style.overflow = 'hidden';
+
+  setTimeout(() => {
+    try {
+      const measuredWidth = measureOneSetWidth(originalItems);
+      state.carouselOneSetWidth = measuredWidth > 0 ? measuredWidth : Math.round((track.scrollWidth || track.offsetWidth || 0) / 2);
+
+      const clones = originalItems.map((it) => it.cloneNode(true));
+      while (track.firstChild) track.removeChild(track.firstChild);
+
+      // Create 3 sets for seamless loop
+      clones.forEach((c) => { 
+        c.style.flex = c.style.flex || c.getAttribute('data-flex') || ''; 
+        track.appendChild(c.cloneNode(true)); 
+      });
+      clones.forEach((c) => { track.appendChild(c.cloneNode(true)); });
+      clones.forEach((c) => { track.appendChild(c.cloneNode(true)); });
+
+      if (!state.carouselOneSetWidth || state.carouselOneSetWidth === 0) {
+        const newItems = track.querySelectorAll('.carousel-item');
+        state.carouselOneSetWidth = measureOneSetWidth(Array.from(newItems).slice(0, clones.length));
+      }
+
+      // ✅ Start at middle set to allow seamless scrolling in both directions
+      state.carouselScrollPos = state.carouselOneSetWidth;
+      state.carouselDriftCorrection = 0;
+      track.style.transform = `translate3d(-${state.carouselScrollPos}px, 0, 0)`;
+
+      state.carouselInitialized = true;
+      console.log('[Carousel] Initialized - Set width:', state.carouselOneSetWidth);
       
-      const originalItems = Array.from(track.querySelectorAll('.carousel-item'));
-      if (!originalItems.length) return;
+      if (state.carouselInView && !state.isCarouselAnimating) {
+        startCarouselAnimation();
+      }
+    } catch (err) { 
+      console.error('initCarouselClones error', err); 
+    }
+  }, CONFIG.CAROUSEL_CLONE_DELAY);
+}
+
+function checkCarouselInView() {
+  const section = DOM.carouselSection; 
+  const track = DOM.carouselTrack; 
+  if (!track) return;
   
-      track.style.display = track.style.display || 'flex';
-      track.style.flexWrap = 'nowrap';
-      track.style.justifyContent = track.style.justifyContent || 'flex-start';
-      const wrapper = DOM.carouselSection ? DOM.carouselSection : track.parentElement; 
-      if (wrapper) wrapper.style.overflow = wrapper.style.overflow || 'hidden';
+  if (!section) { 
+    if (!state.carouselInView) { 
+      state.carouselInView = true; 
+      if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation(); 
+    } 
+    return; 
+  }
   
+  const rect = section.getBoundingClientRect(); 
+  const vh = window.innerHeight;
+  const inView = rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR && rect.bottom > -vh * 0.2;
+  
+  if (inView && !state.carouselInView) { 
+    state.carouselInView = true; 
+    if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation(); 
+  }
+  else if (!inView && state.carouselInView) { 
+    state.carouselInView = false; 
+    stopCarouselAnimation(); 
+  }
+}
+
+// ✅ COMPLETELY REWRITTEN - NO MORE GLITCHING
+function startCarouselAnimation() {
+  if (state.isCarouselAnimating || !state.carouselInitialized) return;
+
+  if (!state.carouselOneSetWidth || state.carouselOneSetWidth <= 0) {
+    const track = DOM.carouselTrack; 
+    const allItems = track ? track.querySelectorAll('.carousel-item') : [];
+    if (allItems.length) {
+      state.carouselOneSetWidth = measureOneSetWidth(
+        Array.from(allItems).slice(0, Math.max(1, Math.floor(allItems.length / 3)))
+      );
+    } else return;
+  }
+
+  // ✅ CRITICAL: Stop any existing animation first
+  stopCarouselAnimation();
+
+  state.isCarouselAnimating = true; 
+  const track = DOM.carouselTrack; 
+  if (!track) return;
+
+  state.carouselLastUpdate = performance.now();
+  console.log('[Carousel] Animation started');
+
+  function step(currentTime) {
+    if (!state.isCarouselAnimating) {
+      console.log('[Carousel] Animation stopped');
+      return;
+    }
+    
+    // ✅ Delta time for smooth animation
+    const deltaTime = currentTime - state.carouselLastUpdate;
+    state.carouselLastUpdate = currentTime;
+
+    // ✅ Move based on time delta (smoother animation)
+    const movement = state.carouselSpeed * Math.min(deltaTime / 16, 3);
+    state.carouselScrollPos += movement;
+    
+    const w = state.carouselOneSetWidth || 0;
+    
+    if (w > 0) {
+      // ✅ CRITICAL FIX: Proper boundary wrapping with drift correction
+      if (state.carouselScrollPos >= w * 2) {
+        const overflow = state.carouselScrollPos - (w * 2);
+        state.carouselScrollPos = w + overflow;
+        state.carouselDriftCorrection = 0; // Reset drift
+      } else if (state.carouselScrollPos <= 0) {
+        const underflow = Math.abs(state.carouselScrollPos);
+        state.carouselScrollPos = w - underflow;
+        state.carouselDriftCorrection = 0; // Reset drift
+      }
+
+      // ✅ Drift correction every second
+      if (Math.abs(state.carouselDriftCorrection) > 60) {
+        const targetPos = Math.round(state.carouselScrollPos / w) * w;
+        const diff = targetPos - state.carouselScrollPos;
+        state.carouselScrollPos += diff * 0.1; // Gradual correction
+        state.carouselDriftCorrection = 0;
+      }
+      state.carouselDriftCorrection++;
+    }
+    
+    // ✅ Round to prevent sub-pixel rendering issues
+    const finalPos = Math.round(Math.max(0, state.carouselScrollPos));
+    track.style.transform = `translate3d(-${finalPos}px, 0, 0)`;
+    
+    state.carouselAnimationId = requestAnimationFrame(step);
+  }
+  
+  state.carouselAnimationId = requestAnimationFrame(step);
+}
+
+// ✅ IMPROVED STOP FUNCTION
+function stopCarouselAnimation() { 
+  if (state.carouselAnimationId) {
+    cancelAnimationFrame(state.carouselAnimationId);
+    state.carouselAnimationId = null;
+  }
+  state.isCarouselAnimating = false;
+  console.log('[Carousel] Animation stopped, position:', state.carouselScrollPos);
+}
+
+// ✅ IMPROVED DRAG/SWIPE HANDLER
+function initCarouselDragSwipe() {
+  const track = DOM.carouselTrack;
+  if (!track) return;
+
+  let isDragging = false;
+  let startX = 0;
+  let startScrollPos = 0;
+  let currentX = 0;
+  let velocity = 0;
+  let lastTime = 0;
+  let lastX = 0;
+
+  function handleStart(e) {
+    isDragging = true;
+    
+    // ✅ CRITICAL: Properly stop animation before dragging
+    const wasAnimating = state.isCarouselAnimating;
+    stopCarouselAnimation();
+
+    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    startX = clientX;
+    currentX = clientX;
+    lastX = clientX;
+    startScrollPos = state.carouselScrollPos || 0;
+    velocity = 0;
+    lastTime = performance.now();
+
+    track.style.cursor = 'grabbing';
+    track.style.transition = 'none';
+    
+    track.querySelectorAll('a').forEach(link => {
+      link.style.pointerEvents = 'none';
+    });
+  }
+
+  function handleMove(e) {
+    if (!isDragging) return;
+
+    e.preventDefault();
+    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    currentX = clientX;
+    const deltaX = currentX - startX;
+    
+    const now = performance.now();
+    const dt = now - lastTime;
+    if (dt > 0) {
+      velocity = (currentX - lastX) / dt;
+    }
+    lastX = currentX;
+    lastTime = now;
+
+    let newPos = startScrollPos - deltaX;
+    const w = state.carouselOneSetWidth || 0;
+    
+    // ✅ Wrap position during drag
+    if (w > 0) {
+      while (newPos >= w * 2) {
+        newPos -= w;
+        startScrollPos -= w;
+        startX = currentX;
+      }
+      while (newPos <= 0) {
+        newPos += w;
+        startScrollPos += w;
+        startX = currentX;
+      }
+    }
+
+    state.carouselScrollPos = newPos;
+    track.style.transform = `translate3d(-${Math.round(newPos)}px, 0, 0)`;
+  }
+
+  function handleEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+
+    track.style.cursor = 'grab';
+    
+    setTimeout(() => {
+      track.querySelectorAll('a').forEach(link => {
+        link.style.pointerEvents = '';
+      });
+    }, 200);
+
+    // ✅ Apply momentum with proper boundaries
+    if (Math.abs(velocity) > 0.3) {
+      let momentumPos = state.carouselScrollPos - (velocity * 200);
+      const w = state.carouselOneSetWidth || 0;
+      
+      if (w > 0) {
+        while (momentumPos >= w * 2) momentumPos -= w;
+        while (momentumPos <= 0) momentumPos += w;
+      }
+
+      track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      track.style.transform = `translate3d(-${Math.round(momentumPos)}px, 0, 0)`;
+      state.carouselScrollPos = momentumPos;
+
       setTimeout(() => {
-        try {
-          const measuredWidth = measureOneSetWidth(originalItems);
-          state.carouselOneSetWidth = measuredWidth > 0 ? measuredWidth : Math.round((track.scrollWidth || track.offsetWidth || 0) / 2);
-  
-          const clones = originalItems.map((it) => it.cloneNode(true));
-          while (track.firstChild) track.removeChild(track.firstChild);
-  
-          clones.forEach((c) => { 
-            c.style.flex = c.style.flex || c.getAttribute('data-flex') || ''; 
-            track.appendChild(c.cloneNode(true)); 
-          });
-          clones.forEach((c) => { track.appendChild(c.cloneNode(true)); });
-          clones.forEach((c) => { track.appendChild(c.cloneNode(true)); });
-  
-          if (!state.carouselOneSetWidth || state.carouselOneSetWidth === 0) {
-            const newItems = track.querySelectorAll('.carousel-item');
-            state.carouselOneSetWidth = measureOneSetWidth(Array.from(newItems).slice(0, clones.length));
-          }
-  
-          state.carouselScrollPos = state.carouselOneSetWidth;
-          track.style.transform = `translate3d(-${state.carouselScrollPos}px, 0, 0)`;
-  
-          state.carouselInitialized = true;
-          if (state.carouselInView && !state.isCarouselAnimating) startCarouselAnimation();
-        } catch (err) { 
-          console.error('initCarouselClones error', err); 
-        }
-      }, CONFIG.CAROUSEL_CLONE_DELAY);
-    }
-  
-    function checkCarouselInView() {
-      const section = DOM.carouselSection; 
-      const track = DOM.carouselTrack; 
-      if (!track) return;
-      
-      if (!section) { 
-        if (!state.carouselInView) { 
-          state.carouselInView = true; 
-          if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation(); 
-        } 
-        return; 
-      }
-      
-      const rect = section.getBoundingClientRect(); 
-      const vh = window.innerHeight;
-      const inView = rect.top < vh * CONFIG.CAROUSEL_STRICT_VIEWPORT_FACTOR && rect.bottom > -vh * 0.2;
-      
-      if (inView && !state.carouselInView) { 
-        state.carouselInView = true; 
-        if (state.carouselInitialized && !state.isCarouselAnimating) startCarouselAnimation(); 
-      }
-      else if (!inView && state.carouselInView) { 
-        state.carouselInView = false; 
-        stopCarouselAnimation(); 
-      }
-    }
-  
-    function startCarouselAnimation() {
-      if (state.isCarouselAnimating || !state.carouselInitialized) return;
-  
-      if (!state.carouselOneSetWidth || state.carouselOneSetWidth <= 0) {
-        const track = DOM.carouselTrack; 
-        const allItems = track ? track.querySelectorAll('.carousel-item') : [];
-        if (allItems.length) {
-          state.carouselOneSetWidth = measureOneSetWidth(Array.from(allItems).slice(0, Math.max(1, Math.floor(allItems.length / 3))));
-        } else return;
-      }
-  
-      state.isCarouselAnimating = true; 
-      const track = DOM.carouselTrack; 
-      if (!track) return;
-      if (state.carouselAnimationId) cAF(state.carouselAnimationId); 
-      state.carouselAnimationId = null;
-  
-      function step() {
-        if (!state.isCarouselAnimating) return;
-        
-        state.carouselScrollPos += state.carouselSpeed; 
-        const w = state.carouselOneSetWidth || 0;
-        
-        if (w > 0) {
-          if (state.carouselScrollPos >= w * 2) {
-            state.carouselScrollPos -= w;
-          } else if (state.carouselScrollPos <= 0) {
-            state.carouselScrollPos += w;
-          }
-        }
-        
-        track.style.transform = `translate3d(-${Math.max(0, Math.round(state.carouselScrollPos))}px, 0, 0)`;
-        state.carouselAnimationId = rAF(step);
-      }
-      step();
-    }
-  
-    function stopCarouselAnimation() { 
-      if (state.carouselAnimationId) cAF(state.carouselAnimationId); 
-      state.carouselAnimationId = null; 
-      state.isCarouselAnimating = false; 
-    }
-  
-    function initCarouselDragSwipe() {
-      const track = DOM.carouselTrack;
-      if (!track) return;
-  
-      let isDragging = false;
-      let startX = 0;
-      let startScrollPos = 0;
-      let currentX = 0;
-      let velocity = 0;
-      let lastTime = 0;
-      let lastX = 0;
-  
-      function handleStart(e) {
-        isDragging = true;
-        const wasAnimating = state.isCarouselAnimating;
-        if (wasAnimating) stopCarouselAnimation();
-  
-        const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-        startX = clientX;
-        currentX = clientX;
-        lastX = clientX;
-        startScrollPos = state.carouselScrollPos || 0;
-        velocity = 0;
-        lastTime = Date.now();
-  
-        track.style.cursor = 'grabbing';
-        track.style.transition = 'none';
-        
-        track.querySelectorAll('a').forEach(link => {
-          link.style.pointerEvents = 'none';
-        });
-      }
-  
-      function handleMove(e) {
-        if (!isDragging) return;
-  
-        e.preventDefault();
-        const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-        currentX = clientX;
-        const deltaX = currentX - startX;
-        
-        const now = Date.now();
-        const dt = now - lastTime;
-        if (dt > 0) {
-          velocity = (currentX - lastX) / dt;
-        }
-        lastX = currentX;
-        lastTime = now;
-  
-        let newPos = startScrollPos - deltaX;
-        const w = state.carouselOneSetWidth || 0;
-        
-        if (w > 0) {
-          if (newPos >= w * 2) {
-            newPos -= w;
-            startScrollPos -= w;
-            startX += deltaX;
-          } else if (newPos <= 0) {
-            newPos += w;
-            startScrollPos += w;
-            startX += deltaX;
-          }
-        }
-  
-        state.carouselScrollPos = newPos;
-        track.style.transform = `translate3d(-${Math.round(newPos)}px, 0, 0)`;
-      }
-  
-      function handleEnd() {
-        if (!isDragging) return;
-        isDragging = false;
-  
-        track.style.cursor = 'grab';
-        
-        setTimeout(() => {
-          track.querySelectorAll('a').forEach(link => {
-            link.style.pointerEvents = '';
-          });
-        }, 200);
-  
-        if (Math.abs(velocity) > 0.5) {
-          let momentumPos = state.carouselScrollPos - (velocity * 200);
-          const w = state.carouselOneSetWidth || 0;
-          
-          if (w > 0) {
-            while (momentumPos >= w * 2) momentumPos -= w;
-            while (momentumPos <= 0) momentumPos += w;
-          }
-  
-          track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-          track.style.transform = `translate3d(-${Math.round(momentumPos)}px, 0, 0)`;
-          state.carouselScrollPos = momentumPos;
-  
-          setTimeout(() => {
-            track.style.transition = '';
-            if (state.carouselInView) startCarouselAnimation();
-          }, 600);
-        } else {
-          if (state.carouselInView) startCarouselAnimation();
-        }
-      }
-  
-      track.addEventListener('mousedown', handleStart, { passive: false });
-      document.addEventListener('mousemove', handleMove, { passive: false });
-      document.addEventListener('mouseup', handleEnd, { passive: true });
-  
-      track.addEventListener('touchstart', handleStart, { passive: true });
-      track.addEventListener('touchmove', handleMove, { passive: false });
-      track.addEventListener('touchend', handleEnd, { passive: true });
-  
-      track.style.cursor = 'grab';
-    }
-  
-    function bindCarouselHoverPause() { 
-      const track = DOM.carouselTrack; 
-      if (!track) return; 
-      
-      track.addEventListener('mouseenter', stopCarouselAnimation, { passive: true }); 
-      track.addEventListener('mouseleave', () => { 
-        if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) {
+        track.style.transition = '';
+        if (state.carouselInView) {
+          // ✅ Restart animation cleanly
+          state.carouselLastUpdate = performance.now();
           startCarouselAnimation();
         }
-      }, { passive: true }); 
-    }
-  
-    function initCarouselNavButtons() {
-      const prevBtn = document.getElementById('carousel-nav-prev');
-      const nextBtn = document.getElementById('carousel-nav-next');
-      const track = DOM.carouselTrack;
-      
-      if (!prevBtn || !nextBtn || !track) {
-        console.warn('Carousel nav buttons not found');
-        return;
+      }, 600);
+    } else {
+      if (state.carouselInView) {
+        // ✅ Restart animation cleanly
+        state.carouselLastUpdate = performance.now();
+        startCarouselAnimation();
       }
+    }
+  }
+
+  track.addEventListener('mousedown', handleStart, { passive: false });
+  document.addEventListener('mousemove', handleMove, { passive: false });
+  document.addEventListener('mouseup', handleEnd, { passive: true });
+
+  track.addEventListener('touchstart', handleStart, { passive: true });
+  track.addEventListener('touchmove', handleMove, { passive: false });
+  track.addEventListener('touchend', handleEnd, { passive: true });
+
+  track.style.cursor = 'grab';
+}
+
+function bindCarouselHoverPause() { 
+  const track = DOM.carouselTrack; 
+  if (!track) return; 
   
-      function scrollCarouselManually(direction) {
-        const wasAnimating = state.isCarouselAnimating;
-        if (wasAnimating) stopCarouselAnimation();
+  track.addEventListener('mouseenter', () => {
+    stopCarouselAnimation();
+  }, { passive: true }); 
   
-        const scrollAmount = isMobile() ? 300 : 400;
-        let newPos = state.carouselScrollPos || 0;
-        newPos += direction * scrollAmount;
-        
-        const w = state.carouselOneSetWidth || 0;
-        if (w > 0) {
-          while (newPos >= w * 2) newPos -= w;
-          while (newPos <= 0) newPos += w;
-        }
+  track.addEventListener('mouseleave', () => { 
+    if (state.carouselInView && state.carouselInitialized && state.carouselOneSetWidth > 0) {
+      state.carouselLastUpdate = performance.now();
+      startCarouselAnimation();
+    }
+  }, { passive: true }); 
+}
+
+function initCarouselNavButtons() {
+  const prevBtn = document.getElementById('carousel-nav-prev');
+  const nextBtn = document.getElementById('carousel-nav-next');
+  const track = DOM.carouselTrack;
   
-        track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        track.style.transform = `translate3d(-${Math.round(newPos)}px, 0, 0)`;
-        state.carouselScrollPos = newPos;
-  
-        setTimeout(() => {
-          track.style.transition = '';
-          if (wasAnimating && state.carouselInView) {
-            startCarouselAnimation();
-          }
-        }, 550);
+  if (!prevBtn || !nextBtn || !track) {
+    console.warn('Carousel nav buttons not found');
+    return;
+  }
+
+  function scrollCarouselManually(direction) {
+    const wasAnimating = state.isCarouselAnimating;
+    stopCarouselAnimation();
+
+    const scrollAmount = isMobile() ? 300 : 400;
+    let newPos = state.carouselScrollPos || 0;
+    newPos += direction * scrollAmount;
+    
+    const w = state.carouselOneSetWidth || 0;
+    if (w > 0) {
+      while (newPos >= w * 2) newPos -= w;
+      while (newPos <= 0) newPos += w;
+    }
+
+    track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    track.style.transform = `translate3d(-${Math.round(newPos)}px, 0, 0)`;
+    state.carouselScrollPos = newPos;
+
+    setTimeout(() => {
+      track.style.transition = '';
+      if (wasAnimating && state.carouselInView) {
+        state.carouselLastUpdate = performance.now();
+        startCarouselAnimation();
       }
+    }, 550);
+  }
+
+  prevBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    scrollCarouselManually(-1);
+  });
   
-      prevBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        scrollCarouselManually(-1);
-      });
-      
-      nextBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        scrollCarouselManually(1);
-      });
-    }
-  
-    function initCarousel() {
-      initCarouselClones();
-      bindCarouselHoverPause();
-      initCarouselDragSwipe();
-      initCarouselNavButtons();
-    }
-  
+  nextBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    scrollCarouselManually(1);
+  });
+}
+
+function initCarousel() {
+  console.log('[Carousel] Initializing...');
+  initCarouselClones();
+  bindCarouselHoverPause();
+  initCarouselDragSwipe();
+  initCarouselNavButtons();
+}
     /* ==========================================================================
        Testimonials
        ========================================================================== */
