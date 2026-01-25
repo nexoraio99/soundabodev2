@@ -1,4 +1,4 @@
-// server.js - Soundabode Backend with Enhanced Email Templates
+// server.js - Soundabode Backend with Enhanced Email Templates & Token Management
 // Usage: set EMAIL_USER, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET, EMAIL_REFRESH_TOKEN, ADMIN_EMAIL, CORS_ORIGINS
 
 import express from 'express';
@@ -11,10 +11,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
 
-
 dotenv.config();
 
-// After dotenv.config()
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -78,7 +76,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ------------------- Static files (MUST be before clean URL handler) -------------------
+// ------------------- Static files -------------------
 app.use(express.static(__dirname));
 
 // ------------------- Gmail (OAuth2) setup -------------------
@@ -101,33 +99,77 @@ if (process.env.EMAIL_REFRESH_TOKEN) {
 
 const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-// ------------------- TOKEN CACHING -------------------
+// ------------------- ENHANCED TOKEN CACHING -------------------
 let cachedToken = null;
+let refreshInterval = null;
 
 async function getAccessTokenCached() {
   const now = Date.now();
-  if (cachedToken && cachedToken.token && cachedToken.expiry && (cachedToken.expiry - now > 30 * 1000)) {
+  
+  // Return cached token if still valid (with 5-minute buffer before expiry)
+  if (cachedToken && cachedToken.token && cachedToken.expiry && 
+      (cachedToken.expiry - now > 5 * 60 * 1000)) {
     return cachedToken.token;
   }
 
   try {
+    // This automatically uses your refresh_token to get a new access_token
     const res = await oauth2Client.getAccessToken();
     const token = (res && res.token) ? res.token : (typeof res === 'string' ? res : null);
+    
+    if (!token) {
+      throw new Error('Failed to obtain access token');
+    }
+    
     const creds = oauth2Client.credentials || {};
-    const expiry = creds.expiry_date ? Number(creds.expiry_date) : (Date.now() + 55 * 60 * 1000);
+    
+    // Gmail access tokens typically expire in 3600 seconds (60 minutes)
+    const expiry = creds.expiry_date 
+      ? Number(creds.expiry_date) 
+      : (Date.now() + 55 * 60 * 1000);
 
     cachedToken = { token, expiry };
-    console.log(`🔑 Gmail access token refreshed — expires in ${Math.round((expiry - now) / 60000)}m`);
+    
+    const expiresInMinutes = Math.round((expiry - now) / 60000);
+    console.log(`🔑 Gmail access token refreshed — expires in ${expiresInMinutes}m`);
+    console.log(`   Next auto-refresh: ${new Date(expiry - 10 * 60 * 1000).toLocaleString('en-IN')}`);
+    
     return token;
   } catch (err) {
-    console.warn('⚠️ getAccessTokenCached error:', err && err.message ? err.message : err);
-    return null;
+    console.error('❌ getAccessTokenCached error:', err.message || err);
+    
+    // If refresh token is invalid/revoked, log helpful message
+    if (err.message && err.message.includes('invalid_grant')) {
+      console.error('⚠️  CRITICAL: Refresh token is invalid or revoked!');
+      console.error('   Regenerate OAuth2 credentials at: https://developers.google.com/oauthplayground');
+    }
+    
+    cachedToken = null;
+    throw err;
   }
+}
+
+// Proactive token refresh scheduler
+function startTokenRefreshScheduler() {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+  
+  // Refresh token every 50 minutes (before 60-minute expiry)
+  refreshInterval = setInterval(async () => {
+    try {
+      console.log('⏰ Scheduled token refresh triggered...');
+      await getAccessTokenCached();
+    } catch (err) {
+      console.error('⚠️  Scheduled token refresh failed:', err.message || err);
+    }
+  }, 50 * 60 * 1000);
+  
+  console.log('✅ Token refresh scheduler started (every 50 minutes)');
 }
 
 // ------------------- Email Template Helpers -------------------
 
-// Base email template with modern design
 function getBaseEmailTemplate({ title, content, footerNote = '' }) {
   return `
     <!DOCTYPE html>
@@ -141,10 +183,8 @@ function getBaseEmailTemplate({ title, content, footerNote = '' }) {
       <table role="presentation" style="width:100%;border-collapse:collapse;background-color:#f4f4f7;padding:40px 20px;">
         <tr>
           <td align="center">
-            <!-- Main Container -->
             <table role="presentation" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);overflow:hidden;">
               
-              <!-- Header with Logo -->
               <tr>
                 <td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:32px 24px;text-align:center;">
                   <img src="${LOGO_URL}" alt="${COMPANY_NAME}" style="height:50px;width:auto;margin-bottom:16px;">
@@ -152,14 +192,12 @@ function getBaseEmailTemplate({ title, content, footerNote = '' }) {
                 </td>
               </tr>
               
-              <!-- Content -->
               <tr>
                 <td style="padding:40px 32px;">
                   ${content}
                 </td>
               </tr>
               
-              <!-- Action Buttons -->
               <tr>
                 <td style="padding:0 32px 32px;">
                   <table role="presentation" style="width:100%;border-collapse:collapse;">
@@ -168,9 +206,7 @@ function getBaseEmailTemplate({ title, content, footerNote = '' }) {
                         <a href="https://wa.me/${WHATSAPP_NUMBER}" style="display:block;background-color:#25D366;color:#ffffff;text-decoration:none;padding:14px 20px;border-radius:8px;text-align:center;font-weight:600;font-size:14px;">
                           <table role="presentation" style="width:100%;">
                             <tr>
-                              <td align="center">
-                                📱 WhatsApp
-                              </td>
+                              <td align="center">📱 WhatsApp</td>
                             </tr>
                           </table>
                         </a>
@@ -179,9 +215,7 @@ function getBaseEmailTemplate({ title, content, footerNote = '' }) {
                         <a href="tel:${PHONE_NUMBER}" style="display:block;background-color:#667eea;color:#ffffff;text-decoration:none;padding:14px 20px;border-radius:8px;text-align:center;font-weight:600;font-size:14px;">
                           <table role="presentation" style="width:100%;">
                             <tr>
-                              <td align="center">
-                                📞 Call Us
-                              </td>
+                              <td align="center">📞 Call Us</td>
                             </tr>
                           </table>
                         </a>
@@ -191,7 +225,6 @@ function getBaseEmailTemplate({ title, content, footerNote = '' }) {
                 </td>
               </tr>
               
-              <!-- Footer -->
               <tr>
                 <td style="background-color:#f8f9fa;padding:24px 32px;border-top:1px solid #e9ecef;">
                   ${footerNote ? `<p style="margin:0 0 12px;color:#6c757d;font-size:13px;">${footerNote}</p>` : ''}
@@ -224,7 +257,6 @@ function getBaseEmailTemplate({ title, content, footerNote = '' }) {
   `;
 }
 
-// Admin notification email for popup form
 function getAdminPopupEmail({ fullName, email, phone, message, timestamp, ref }) {
   const content = `
     <div style="background:linear-gradient(135deg,rgba(102,126,234,0.1) 0%,rgba(118,75,162,0.1) 100%);border-left:4px solid #667eea;padding:20px;border-radius:8px;margin-bottom:24px;">
@@ -274,18 +306,15 @@ function getAdminPopupEmail({ fullName, email, phone, message, timestamp, ref })
     </div>
   `;
   
-  const footerNote = `Submitted: ${timestamp} | Source: Homepage Popup | Ref: ${ref}`;
-  
   return getBaseEmailTemplate({
     title: '🎉 New Popup Inquiry',
     content,
-    footerNote
+    footerNote: `Submitted: ${timestamp} | Source: Homepage Popup | Ref: ${ref}`
   });
 }
 
-// Admin notification email for contact form
 function getAdminContactEmail({ fullName, email, phone, course, message, timestamp, ref, isCourse }) {
-  const courseDisplay = course ? course : 'N/A';
+  const courseDisplay = course || 'N/A';
   const enquiryIcon = isCourse ? '🎓' : '📧';
   const enquiryType = isCourse ? 'Course Enquiry' : 'General Enquiry';
   const gradientColor = isCourse ? 'rgba(76,175,80,0.1)' : 'rgba(102,126,234,0.1)';
@@ -349,16 +378,13 @@ function getAdminContactEmail({ fullName, email, phone, course, message, timesta
     </div>
   `;
   
-  const footerNote = `Submitted: ${timestamp} | Source: Contact Page | Ref: ${ref}`;
-  
   return getBaseEmailTemplate({
     title: `${enquiryIcon} New ${enquiryType}`,
     content,
-    footerNote
+    footerNote: `Submitted: ${timestamp} | Source: Contact Page | Ref: ${ref}`
   });
 }
 
-// User autoresponse for popup form
 function getUserPopupEmail({ fullName, ref }) {
   const content = `
     <h2 style="margin:0 0 16px;color:#212529;font-size:20px;">Hi ${fullName}! 👋</h2>
@@ -400,7 +426,6 @@ function getUserPopupEmail({ fullName, ref }) {
   });
 }
 
-// User autoresponse for contact form
 function getUserContactEmail({ fullName, course, ref, isCourse }) {
   const courseText = isCourse ? `about our <strong>${course}</strong> course` : 'your inquiry';
   
@@ -484,22 +509,26 @@ function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
   return Buffer.from(parts.join('\r\n')).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-// ------------------- Send email with retries -------------------
-async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 2 }) {
-  if (!process.env.EMAIL_USER) throw new Error('EMAIL_USER not configured');
-
-  try {
-    const token = await getAccessTokenCached();
-    if (token) {
-      oauth2Client.setCredentials({ access_token: token, refresh_token: process.env.EMAIL_REFRESH_TOKEN });
-    }
-  } catch (err) {
-    console.warn('⚠️ Could not set access token:', err && err.message ? err.message : err);
+// ------------------- Enhanced email sending with retries -------------------
+async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 3 }) {
+  if (!process.env.EMAIL_USER) {
+    throw new Error('EMAIL_USER not configured');
   }
 
   let lastErr = null;
+  
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
+      // Always get fresh token (will use cache if still valid)
+      const token = await getAccessTokenCached();
+      
+      if (token) {
+        oauth2Client.setCredentials({ 
+          access_token: token, 
+          refresh_token: process.env.EMAIL_REFRESH_TOKEN 
+        });
+      }
+
       const raw = buildRawMessage({
         from: `"${COMPANY_NAME}" <${process.env.EMAIL_USER}>`,
         to,
@@ -513,26 +542,41 @@ async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 2 })
         userId: 'me',
         requestBody: { raw }
       });
-      console.log(`✅ Email sent to ${to} id=${res.data && res.data.id} (${Date.now() - t0}ms)`);
-      return { success: true, id: res.data && res.data.id };
+      
+      const duration = Date.now() - t0;
+      console.log(`✅ Email sent to ${to} (attempt ${attempt}/${maxRetries}, ${duration}ms)`);
+      console.log(`   Message ID: ${res.data?.id}`);
+      
+      return { success: true, id: res.data?.id };
+      
     } catch (err) {
       lastErr = err;
-      console.warn(`Email attempt ${attempt} failed:`, err && err.message ? err.message : err);
-      if (err && err.code && (err.code === 401 || err.code === 403)) {
+      console.warn(`⚠️  Email attempt ${attempt}/${maxRetries} failed: ${err.message || err}`);
+      
+      // If auth error, invalidate cache and force token refresh
+      if (err.code === 401 || err.code === 403) {
+        console.warn('   Auth error detected - clearing token cache');
         cachedToken = null;
       }
-      if (attempt < maxRetries) await new Promise(r => setTimeout(r, 800));
+      
+      // Wait before retry (exponential backoff)
+      if (attempt < maxRetries) {
+        const waitMs = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        console.log(`   Retrying in ${waitMs}ms...`);
+        await new Promise(r => setTimeout(r, waitMs));
+      }
     }
   }
 
-  return { success: false, error: lastErr && (lastErr.message || String(lastErr)) };
+  console.error(`❌ Email to ${to} failed after ${maxRetries} attempts`);
+  return { 
+    success: false, 
+    error: lastErr?.message || String(lastErr) 
+  };
 }
 
-// ------------------- Non-blocking send helper (root-cause fix)
-// Send emails asynchronously so HTTP requests aren't delayed by external Gmail API latency.
+// Non-blocking send helper
 function sendEmailRawAsync(emailOptions) {
-  // Fire-and-forget but log results (so failures are visible in server logs).
-  // We intentionally do not await this in the request handler to keep response fast.
   setImmediate(async () => {
     try {
       const res = await sendEmailRaw(emailOptions);
@@ -540,7 +584,7 @@ function sendEmailRawAsync(emailOptions) {
         console.warn('Background email failed:', res.error);
       }
     } catch (err) {
-      console.error('Background sendEmailRawAsync error:', err && err.message ? err.message : err);
+      console.error('Background sendEmailRawAsync error:', err?.message || err);
     }
   });
 }
@@ -551,21 +595,30 @@ app.get('/', (req, res) => {
     status: 'OK',
     service: 'Soundabode Backend',
     timestamp: new Date().toISOString(),
-    endpoints: { popupForm: '/api/popup-form', contactForm: '/api/contact-form', health: '/health' },
+    endpoints: { 
+      popupForm: '/api/popup-form', 
+      contactForm: '/api/contact-form', 
+      health: '/health' 
+    },
     configured: !!(process.env.EMAIL_USER && process.env.EMAIL_CLIENT_ID && process.env.EMAIL_REFRESH_TOKEN)
   });
 });
 
-app.get('/health', (req, res) => res.json({ status: 'healthy', timestamp: new Date().toISOString() }));
+app.get('/health', (req, res) => res.json({ 
+  status: 'healthy', 
+  timestamp: new Date().toISOString(),
+  tokenCached: !!cachedToken,
+  tokenExpiry: cachedToken ? new Date(cachedToken.expiry).toISOString() : null
+}));
 
 // ------------------- POPUP FORM -------------------
 app.post('/api/popup-form', async (req, res) => {
   try {
     console.log('📩 /api/popup-form payload:', req.body);
     const fullName = pickName(req.body);
-    const email = (req.body && req.body.email) ? String(req.body.email).trim() : '';
-    const phone = (req.body && req.body.phone) ? String(req.body.phone).trim() : '';
-    const message = (req.body && req.body.message) ? String(req.body.message).trim() : '';
+    const email = (req.body?.email) ? String(req.body.email).trim() : '';
+    const phone = (req.body?.phone) ? String(req.body.phone).trim() : '';
+    const message = (req.body?.message) ? String(req.body.message).trim() : '';
 
     if (!fullName || !email || !phone) {
       console.log('❌ Popup validation failed');
@@ -579,42 +632,33 @@ app.post('/api/popup-form', async (req, res) => {
 
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const ref = randomUUID().slice(0, 8).toUpperCase();
-    const subject = `[Popup] Homepage Inquiry  ${fullName} ${timestampLocal} ${ref}`;
+    const subject = `[Popup] Homepage Inquiry — ${fullName} — ${timestampLocal} — ${ref}`;
 
     console.log('Popup subject ->', subject);
 
-    // Prepare admin email (unchanged templates)
     const adminHtml = getAdminPopupEmail({ fullName, email, phone, message, timestamp: timestampLocal, ref });
 
-    // --- ROOT-CAUSE FIX: Send admin email asynchronously (non-blocking) so response is fast ---
-    try {
-      sendEmailRawAsync({
-        to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-        subject,
-        htmlBody: adminHtml,
-        textBody: `New popup inquiry from ${fullName} (${email}, ${phone})`
-      });
-    } catch (bgErr) {
-      console.warn('Non-blocking: failed to queue admin email', bgErr && bgErr.message ? bgErr.message : bgErr);
-    }
+    // Send admin email asynchronously (non-blocking)
+    sendEmailRawAsync({
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      subject,
+      htmlBody: adminHtml,
+      textBody: `New popup inquiry from ${fullName} (${email}, ${phone})`
+    });
 
-    // Prepare user autoresponse and send async (do not block)
-    try {
-      const userHtml = getUserPopupEmail({ fullName, ref });
-      sendEmailRawAsync({
-        to: email,
-        subject: `Thanks for your interest in ${COMPANY_NAME}!`,
-        htmlBody: userHtml,
-        textBody: `Hi ${fullName}, thanks for contacting Soundabode. We'll respond within 24 hours. Ref: ${ref}`
-      });
-    } catch (bgErr) {
-      console.warn('Non-blocking: failed to queue user popup email', bgErr && bgErr.message ? bgErr.message : bgErr);
-    }
+    // Send user autoresponse asynchronously
+    const userHtml = getUserPopupEmail({ fullName, ref });
+    sendEmailRawAsync({
+      to: email,
+      subject: `Thanks for your interest in ${COMPANY_NAME}!`,
+      htmlBody: userHtml,
+      textBody: `Hi ${fullName}, thanks for contacting Soundabode. We'll respond within 24 hours. Ref: ${ref}`
+    });
 
-    // Return success immediately (fast response)
-    return res.status(200).json({ success: true, message: 'Popup inquiry received', ref });
+    // Return success immediately
+    return res.status(200).json({ success: true, message: 'Inquiry received successfully!', ref });
   } catch (err) {
-    console.error('Popup error:', err && err.message ? err.message : err);
+    console.error('Popup error:', err?.message || err);
     return res.status(500).json({ success: false, message: 'Failed to process popup form' });
   }
 });
@@ -624,11 +668,11 @@ app.post('/api/contact-form', async (req, res) => {
   try {
     console.log('📩 /api/contact-form payload:', req.body);
 
-    const fullName = (req.body && (req.body.fullName || req.body.fullname || req.body.name)) || '';
-    const email = (req.body && req.body.email) ? String(req.body.email).trim() : '';
-    const phone = (req.body && req.body.phone) ? String(req.body.phone).trim() : '';
-    const course = (req.body && req.body.course) ? String(req.body.course).trim() : '';
-    const message = (req.body && req.body.message) ? String(req.body.message).trim() : '';
+    const fullName = pickName(req.body);
+    const email = (req.body?.email) ? String(req.body.email).trim() : '';
+    const phone = (req.body?.phone) ? String(req.body.phone).trim() : '';
+    const course = (req.body?.course) ? String(req.body.course).trim() : '';
+    const message = (req.body?.message) ? String(req.body.message).trim() : '';
 
     if (!fullName || !email || !phone) {
       console.log('❌ Contact validation failed');
@@ -647,12 +691,11 @@ app.post('/api/contact-form', async (req, res) => {
     const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     const ref = randomUUID().slice(0, 8).toUpperCase();
     const subject = isCourse
-      ? `[Contact] Course Enquiry  ${formattedCourse}  ${fullName}  ${timestampLocal}  ${ref}`
-      : `[Contact] General Enquiry  ${fullName}  ${timestampLocal}  ${ref}`;
+      ? `[Contact] Course Enquiry — ${formattedCourse} — ${fullName} — ${timestampLocal} — ${ref}`
+      : `[Contact] General Enquiry — ${fullName} — ${timestampLocal} — ${ref}`;
 
     console.log('Contact subject ->', subject);
 
-    // Prepare admin email
     const adminHtml = getAdminContactEmail({ 
       fullName, 
       email, 
@@ -664,43 +707,34 @@ app.post('/api/contact-form', async (req, res) => {
       isCourse 
     });
 
-    // --- ROOT-CAUSE FIX: send admin email asynchronously so request is fast ---
-    try {
-      sendEmailRawAsync({
-        to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-        subject,
-        htmlBody: adminHtml,
-        textBody: `${enquiryType} from ${fullName} (${email}, ${phone})`
-      });
-    } catch (bgErr) {
-      console.warn('Non-blocking: failed to queue admin email', bgErr && bgErr.message ? bgErr.message : bgErr);
-    }
+    // Send admin email asynchronously
+    sendEmailRawAsync({
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      subject,
+      htmlBody: adminHtml,
+      textBody: `${enquiryType} from ${fullName} (${email}, ${phone})`
+    });
 
     // Send autoresponse to user asynchronously
-    try {
-      const userHtml = getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse });
-      const userSubject = `${COMPANY_NAME}  We've received your ${enquiryType.toLowerCase()}!`;
-      
-      sendEmailRawAsync({ 
-        to: email, 
-        subject: userSubject, 
-        htmlBody: userHtml, 
-        textBody: `Hi ${fullName}, thanks for contacting Soundabode. We'll reply within 24 hours. Ref: ${ref}` 
-      });
-    } catch (bgErr) {
-      console.warn('Non-blocking: failed to queue user contact email', bgErr && bgErr.message ? bgErr.message : bgErr);
-    }
+    const userHtml = getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse });
+    const userSubject = `${COMPANY_NAME} — We've received your ${enquiryType.toLowerCase()}!`;
+    
+    sendEmailRawAsync({ 
+      to: email, 
+      subject: userSubject, 
+      htmlBody: userHtml, 
+      textBody: `Hi ${fullName}, thanks for contacting Soundabode. We'll reply within 24 hours. Ref: ${ref}` 
+    });
 
-    // Return success immediately (fast response)
-    return res.status(200).json({ success: true, message: 'Message received and queued for processing!', ref });
+    // Return success immediately
+    return res.status(200).json({ success: true, message: 'Message received successfully!', ref });
   } catch (err) {
-    console.error('Contact error:', err && err.message ? err.message : err);
+    console.error('Contact error:', err?.message || err);
     return res.status(500).json({ success: false, message: 'Failed to send. Please try again.' });
   }
 });
 
-
-// Now your clean URL handler
+// Clean URL handler for HTML files
 app.get('*', async (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
   if (path.extname(req.path)) return next();
@@ -733,21 +767,26 @@ app.listen(PORT, async () => {
   console.log('='.repeat(60));
   console.log('✅ Soundabode Backend Server Running');
   console.log(`🌐 Port: ${PORT}`);
-  console.log('📧 Email Provider: Gmail API (Direct)');
+  console.log('📧 Email Provider: Gmail API (OAuth2 with auto-refresh)');
   console.log(`📱 WhatsApp: ${WHATSAPP_NUMBER}`);
   console.log(`☎️  Phone: ${PHONE_NUMBER}`);
   console.log('🔒 CORS Allowed Origins:', allowedOrigins.join(', '));
   console.log('⏰ Started:', new Date().toLocaleString('en-IN'));
   console.log('='.repeat(60));
 
-  // Pre-warm the Gmail access token to reduce first-request latency
+  // Pre-warm the Gmail access token
   try {
+    console.log('🔄 Pre-warming Gmail access token...');
     await getAccessTokenCached();
-    // Schedule periodic refresh every 45 minutes to keep token warm (non-blocking)
-    setInterval(() => {
-      getAccessTokenCached().catch((e) => console.warn('Periodic token refresh failed', e && e.message ? e.message : e));
-    }, 45 * 60 * 1000);
+    
+    // Start the automatic refresh scheduler
+    startTokenRefreshScheduler();
+    
+    console.log('✅ Gmail authentication ready - token will auto-refresh every 50 minutes');
+    console.log('   Your refresh token is valid for 6+ months (until revoked)');
   } catch (e) {
-    console.warn('Initial token pre-warm failed (ok if not configured)', e && e.message ? e.message : e);
+    console.error('❌ Failed to initialize Gmail authentication:', e.message || e);
+    console.error('   Server will continue but email features may not work');
+    console.error('   Please verify your OAuth2 credentials in .env file');
   }
-});
+}
