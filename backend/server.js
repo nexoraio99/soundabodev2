@@ -106,14 +106,13 @@ let refreshInterval = null;
 async function getAccessTokenCached() {
   const now = Date.now();
   
-  // Return cached token if still valid (with 5-minute buffer before expiry)
+  // Return cached token if still valid (with 5-minute buffer)
   if (cachedToken && cachedToken.token && cachedToken.expiry && 
       (cachedToken.expiry - now > 5 * 60 * 1000)) {
     return cachedToken.token;
   }
 
   try {
-    // This automatically uses your refresh_token to get a new access_token
     const res = await oauth2Client.getAccessToken();
     const token = (res && res.token) ? res.token : (typeof res === 'string' ? res : null);
     
@@ -122,11 +121,7 @@ async function getAccessTokenCached() {
     }
     
     const creds = oauth2Client.credentials || {};
-    
-    // Gmail access tokens typically expire in 3600 seconds (60 minutes)
-    const expiry = creds.expiry_date 
-      ? Number(creds.expiry_date) 
-      : (Date.now() + 55 * 60 * 1000);
+    const expiry = creds.expiry_date ? Number(creds.expiry_date) : (Date.now() + 55 * 60 * 1000);
 
     cachedToken = { token, expiry };
     
@@ -138,7 +133,6 @@ async function getAccessTokenCached() {
   } catch (err) {
     console.error('❌ getAccessTokenCached error:', err.message || err);
     
-    // If refresh token is invalid/revoked, log helpful message
     if (err.message && err.message.includes('invalid_grant')) {
       console.error('⚠️  CRITICAL: Refresh token is invalid or revoked!');
       console.error('   Regenerate OAuth2 credentials at: https://developers.google.com/oauthplayground');
@@ -149,13 +143,11 @@ async function getAccessTokenCached() {
   }
 }
 
-// Proactive token refresh scheduler
 function startTokenRefreshScheduler() {
   if (refreshInterval) {
     clearInterval(refreshInterval);
   }
   
-  // Refresh token every 50 minutes (before 60-minute expiry)
   refreshInterval = setInterval(async () => {
     try {
       console.log('⏰ Scheduled token refresh triggered...');
@@ -509,7 +501,7 @@ function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
   return Buffer.from(parts.join('\r\n')).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-// ------------------- Enhanced email sending with retries -------------------
+// ------------------- Enhanced email sending -------------------
 async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 3 }) {
   if (!process.env.EMAIL_USER) {
     throw new Error('EMAIL_USER not configured');
@@ -519,7 +511,6 @@ async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 3 })
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      // Always get fresh token (will use cache if still valid)
       const token = await getAccessTokenCached();
       
       if (token) {
@@ -553,13 +544,11 @@ async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 3 })
       lastErr = err;
       console.warn(`⚠️  Email attempt ${attempt}/${maxRetries} failed: ${err.message || err}`);
       
-      // If auth error, invalidate cache and force token refresh
       if (err.code === 401 || err.code === 403) {
         console.warn('   Auth error detected - clearing token cache');
         cachedToken = null;
       }
       
-      // Wait before retry (exponential backoff)
       if (attempt < maxRetries) {
         const waitMs = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
         console.log(`   Retrying in ${waitMs}ms...`);
@@ -575,7 +564,6 @@ async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 3 })
   };
 }
 
-// Non-blocking send helper
 function sendEmailRawAsync(emailOptions) {
   setImmediate(async () => {
     try {
@@ -611,7 +599,6 @@ app.get('/health', (req, res) => res.json({
   tokenExpiry: cachedToken ? new Date(cachedToken.expiry).toISOString() : null
 }));
 
-// ------------------- POPUP FORM -------------------
 app.post('/api/popup-form', async (req, res) => {
   try {
     console.log('📩 /api/popup-form payload:', req.body);
@@ -638,7 +625,6 @@ app.post('/api/popup-form', async (req, res) => {
 
     const adminHtml = getAdminPopupEmail({ fullName, email, phone, message, timestamp: timestampLocal, ref });
 
-    // Send admin email asynchronously (non-blocking)
     sendEmailRawAsync({
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject,
@@ -646,7 +632,6 @@ app.post('/api/popup-form', async (req, res) => {
       textBody: `New popup inquiry from ${fullName} (${email}, ${phone})`
     });
 
-    // Send user autoresponse asynchronously
     const userHtml = getUserPopupEmail({ fullName, ref });
     sendEmailRawAsync({
       to: email,
@@ -655,7 +640,6 @@ app.post('/api/popup-form', async (req, res) => {
       textBody: `Hi ${fullName}, thanks for contacting Soundabode. We'll respond within 24 hours. Ref: ${ref}`
     });
 
-    // Return success immediately
     return res.status(200).json({ success: true, message: 'Inquiry received successfully!', ref });
   } catch (err) {
     console.error('Popup error:', err?.message || err);
@@ -663,7 +647,6 @@ app.post('/api/popup-form', async (req, res) => {
   }
 });
 
-// ------------------- CONTACT FORM -------------------
 app.post('/api/contact-form', async (req, res) => {
   try {
     console.log('📩 /api/contact-form payload:', req.body);
@@ -707,7 +690,6 @@ app.post('/api/contact-form', async (req, res) => {
       isCourse 
     });
 
-    // Send admin email asynchronously
     sendEmailRawAsync({
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject,
@@ -715,7 +697,6 @@ app.post('/api/contact-form', async (req, res) => {
       textBody: `${enquiryType} from ${fullName} (${email}, ${phone})`
     });
 
-    // Send autoresponse to user asynchronously
     const userHtml = getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse });
     const userSubject = `${COMPANY_NAME} — We've received your ${enquiryType.toLowerCase()}!`;
     
@@ -726,7 +707,6 @@ app.post('/api/contact-form', async (req, res) => {
       textBody: `Hi ${fullName}, thanks for contacting Soundabode. We'll reply within 24 hours. Ref: ${ref}` 
     });
 
-    // Return success immediately
     return res.status(200).json({ success: true, message: 'Message received successfully!', ref });
   } catch (err) {
     console.error('Contact error:', err?.message || err);
@@ -734,7 +714,6 @@ app.post('/api/contact-form', async (req, res) => {
   }
 });
 
-// Clean URL handler for HTML files
 app.get('*', async (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
   if (path.extname(req.path)) return next();
@@ -759,10 +738,8 @@ app.get('*', async (req, res, next) => {
   }
 });
 
-// ------------------- 404 handler -------------------
 app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint not found' }));
 
-// ------------------- Start server -------------------
 app.listen(PORT, async () => {
   console.log('='.repeat(60));
   console.log('✅ Soundabode Backend Server Running');
@@ -774,14 +751,10 @@ app.listen(PORT, async () => {
   console.log('⏰ Started:', new Date().toLocaleString('en-IN'));
   console.log('='.repeat(60));
 
-  // Pre-warm the Gmail access token
   try {
     console.log('🔄 Pre-warming Gmail access token...');
     await getAccessTokenCached();
-    
-    // Start the automatic refresh scheduler
     startTokenRefreshScheduler();
-    
     console.log('✅ Gmail authentication ready - token will auto-refresh every 50 minutes');
     console.log('   Your refresh token is valid for 6+ months (until revoked)');
   } catch (e) {
@@ -789,4 +762,4 @@ app.listen(PORT, async () => {
     console.error('   Server will continue but email features may not work');
     console.error('   Please verify your OAuth2 credentials in .env file');
   }
-}
+});
