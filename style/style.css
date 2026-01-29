@@ -1544,8 +1544,7 @@ button.next:hover {
   display: grid;
   gap: var(--studio-gap);
   margin-top: 20px;
-  grid-template-columns: repeat(3, 1fr);
-   grid-auto-flow: column;
+   grid-template-columns: repeat(auto-fit, minmax(clamp(130px, 22vw, 240px), 1fr));
   align-items: stretch;
 }
 
