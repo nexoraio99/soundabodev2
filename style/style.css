@@ -1362,6 +1362,8 @@
   position: relative;
    text-align: center;
   z-index: 2;
+  width: 75%;
+  margin: 0 auto;
   overflow: hidden;
 }
 
@@ -1374,38 +1376,33 @@
 }
 
 .testimonial-container {
-  width: 100%;
-  max-width: 880px;
-  margin: 0 auto;
-  position: relative;
-  height: clamp(180px, 22vh, 240px);
-  min-height: clamp(180px, 22vh, 240px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%; 
+  max-width: 920px; 
+  margin: 0 auto; 
+  position: relative; 
+  --card-h: clamp(170px, 20vh, 240px);
+  height: var(--card-h); 
+  min-height: var(--card-h);
+  background: transparent;
 }
-
 .testimonial {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(720px, 92%);
-  max-width: 100%;
-  height: clamp(180px, 22vh, 240px);
-  min-height: clamp(180px, 22vh, 240px);
-  box-sizing: border-box;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
-  padding: clamp(14px, 2.4vw, 20px);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-  opacity: 0;
+  position: absolute; 
+  left: 50%; 
+  top: 50%; 
+  transform: translate(-50%, -50%) scale(.98);
+  width: min(88%, 820px); 
+  padding: clamp(12px,2.2vw,20px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.04); 
+  border-radius: 12px; 
+  opacity: 0; 
   pointer-events: none;
-  transition: opacity 0.45s ease, transform 0.45s ease;
+  transition: opacity .45s ease, transform .45s cubic-bezier(.2,.9,.2,1);
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  gap: 8px; 
+  text-align: center;
 }
 
 .testimonial.active {
@@ -1508,10 +1505,9 @@ button.next:hover {
 .studio-setup-enhanced {
   background: #000;
   color: #eaeaea;
-  padding: var(--section-padding-vertical) 0;
+  padding: clamp(60px, 8vw, 100px) 0; /* Consistent vertical padding */
   overflow-x: hidden;
 }
-
 .studio-inner {
   max-width: var(--studio-max-width);
   margin: 0 auto;
@@ -1544,7 +1540,7 @@ button.next:hover {
   display: grid;
   gap: var(--studio-gap);
   margin-top: 20px;
-   grid-template-columns: repeat(auto-fit, minmax(clamp(130px, 22vw, 240px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(clamp(130px, 22vw, 240px), 1fr));
   align-items: stretch;
 }
 
@@ -2270,6 +2266,10 @@ button.next:hover {
 
 /* ===== TABLETS & MEDIUM SCREENS: 1024px and below ===== */
 @media (max-width: 1024px) {
+  .testimonials{
+    width: 100%;
+    margin: 0 auto;
+  }
   .overlay-left,
   .overlay-right {
     justify-content: center;
@@ -2344,7 +2344,10 @@ button.next:hover {
   :root {
     --fs: clamp(2rem, 6vw, 5rem);
   }
-
+  .testimonials{
+    width: 100%;
+    margin: 0 auto;
+  }
   .about-container,
   .about-container1 {
     padding: clamp(35px, 5vw, 50px) clamp(20px, 3vw, 30px);
@@ -2369,6 +2372,10 @@ button.next:hover {
 
 /* ===== STANDARD TABLETS: 768px and below ===== */
 @media (max-width: 768px) {
+   .testimonials{
+    width: 100%;
+    margin: 0 auto;
+  }
   .hamburger-menu {
     display: block;
   }
@@ -2584,6 +2591,10 @@ button.next:hover {
 
 /* ===== SMALLER PHONES: 720px and below ===== */
 @media (max-width: 720px) {
+  .testimonials{
+    width: 100%;
+    margin: 0 auto;
+  }
   .why-dropdown-toggle {
     width: 100%;
     font-size: 0.98rem;
@@ -2676,6 +2687,9 @@ button.next:hover {
 
 /* ===== SMALL PHONES: 520px and below ===== */
 @media (max-width: 520px) {
+  .testimonials{
+    width: 90%;
+  }
   .testimonial-container {
     --card-h: 200px;
     height: var(--card-h);
@@ -2846,6 +2860,8 @@ button.next:hover {
 
   .testimonials {
     padding: clamp(30px, 4vw, 45px) clamp(12px, 2vw, 18px);
+    width: 100%;
+    margin: 0 auto;
   }
 
   .section-title {
@@ -3134,7 +3150,10 @@ button.next:hover {
   .about-container1 {
     padding: clamp(20px, 2.5vw, 30px) clamp(10px, 1.5vw, 15px);
   }
-
+  .testimonials{
+    width: 100%;
+    margin: 0 auto;
+  }
   .testimonial-container {
     --card-w: 92%;
     --card-h: 180px;
