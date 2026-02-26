@@ -827,6 +827,8 @@ h6 {
   color: #fff;
   text-decoration: none;
   font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+   white-space: nowrap;
+  width: fit-content;
   transition: all 0.3s;
 }
 
