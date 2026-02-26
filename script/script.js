@@ -864,7 +864,6 @@
       popup.classList.add('active');
       const firstInput = popup.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
       (firstInput || closeBtn).focus();
-      startHideTimer();
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
     }
