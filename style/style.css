@@ -932,6 +932,12 @@ h6 {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s;
 }
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
 .carousel-item:hover {
   transform: translateY(-6px);
