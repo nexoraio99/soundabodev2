@@ -35,55 +35,55 @@ app.use(express.urlencoded({ extended: true }));
 
 // ------------------- Rate limiter -------------------
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 120,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { success: false, message: 'Too many requests, try again later.' }
+    windowMs: 15 * 60 * 1000,
+    max: 120,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, message: 'Too many requests, try again later.' }
 });
 app.use('/api/', apiLimiter);
 
 // ------------------- CORS -------------------
 const defaultOrigins = [
-  'https://soundabode.com',
-  'https://www.soundabode.com',
-  'http://localhost:3000',
-  'http://localhost:5500',
-  'http://127.0.0.1:5500'
+    'https://soundabode.com',
+    'https://www.soundabode.com',
+    'http://localhost:3000',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500'
 ];
 
 const allowedOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(','))
-  .split(',')
-  .map(s => s.trim())
-  .filter(Boolean);
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
 
 app.use((req, res, next) => {
-  const origin = req.get('Origin') || req.get('origin');
+    const origin = req.get('Origin') || req.get('origin');
 
-  // Allow requests with no origin (server-to-server, Postman, etc.)
-  if (!origin) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  } else if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Vary', 'Origin');
-  } else {
-    // Still set headers so browser gets a proper CORS error (not a network error)
-    res.setHeader('Access-Control-Allow-Origin', allowedOrigins[0]);
-    res.setHeader('Vary', 'Origin');
-  }
+    // Allow requests with no origin (server-to-server, Postman, etc.)
+    if (!origin) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+    } else if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
+    } else {
+        // Still set headers so browser gets a proper CORS error (not a network error)
+        res.setHeader('Access-Control-Allow-Origin', allowedOrigins[0]);
+        res.setHeader('Vary', 'Origin');
+    }
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  next();
+    if (req.method === 'OPTIONS') return res.status(200).end();
+    next();
 });
 
 // ------------------- Logging middleware -------------------
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.ip} ${req.method} ${req.originalUrl} Origin:${req.get('origin') || 'none'}`);
-  next();
+    console.log(`[${new Date().toISOString()}] ${req.ip} ${req.method} ${req.originalUrl} Origin:${req.get('origin') || 'none'}`);
+    next();
 });
 
 // ------------------- Static files -------------------
@@ -98,13 +98,13 @@ console.log('  EMAIL_REFRESH_TOKEN:', process.env.EMAIL_REFRESH_TOKEN ? '✅' : 
 console.log('  ADMIN_EMAIL:', process.env.ADMIN_EMAIL || process.env.EMAIL_USER || '(not set)');
 
 const oauth2Client = new google.auth.OAuth2(
-  process.env.EMAIL_CLIENT_ID,
-  process.env.EMAIL_CLIENT_SECRET,
-  'https://developers.google.com/oauthplayground'
+    process.env.EMAIL_CLIENT_ID,
+    process.env.EMAIL_CLIENT_SECRET,
+    'https://developers.google.com/oauthplayground'
 );
 
 if (process.env.EMAIL_REFRESH_TOKEN) {
-  oauth2Client.setCredentials({ refresh_token: process.env.EMAIL_REFRESH_TOKEN });
+    oauth2Client.setCredentials({ refresh_token: process.env.EMAIL_REFRESH_TOKEN });
 }
 
 const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
@@ -114,77 +114,77 @@ let cachedToken = null;
 let refreshInterval = null;
 
 async function getAccessTokenCached() {
-  const now = Date.now();
+    const now = Date.now();
 
-  // Return cached token if still valid (with 5-minute buffer)
-  if (
-    cachedToken &&
-    cachedToken.token &&
-    cachedToken.expiry &&
-    cachedToken.expiry - now > 5 * 60 * 1000
-  ) {
-    return cachedToken.token;
-  }
-
-  try {
-    // Force a fresh token by resetting credentials with the refresh token
-    oauth2Client.setCredentials({ refresh_token: process.env.EMAIL_REFRESH_TOKEN });
-    const tokenResponse = await oauth2Client.getAccessToken();
-
-    const token =
-      tokenResponse?.token ||
-      tokenResponse?.res?.data?.access_token ||
-      null;
-
-    if (!token) {
-      throw new Error('Failed to obtain access token - token was null/undefined');
+    // Return cached token if still valid (with 5-minute buffer)
+    if (
+        cachedToken &&
+        cachedToken.token &&
+        cachedToken.expiry &&
+        cachedToken.expiry - now > 5 * 60 * 1000
+    ) {
+        return cachedToken.token;
     }
 
-    const creds = oauth2Client.credentials || {};
-    const expiry = creds.expiry_date
-      ? Number(creds.expiry_date)
-      : Date.now() + 55 * 60 * 1000;
+    try {
+        // Force a fresh token by resetting credentials with the refresh token
+        oauth2Client.setCredentials({ refresh_token: process.env.EMAIL_REFRESH_TOKEN });
+        const tokenResponse = await oauth2Client.getAccessToken();
 
-    cachedToken = { token, expiry };
+        const token =
+            tokenResponse?.token ||
+            tokenResponse?.res?.data?.access_token ||
+            null;
 
-    const expiresInMinutes = Math.round((expiry - now) / 60000);
-    console.log(`🔑 Gmail access token refreshed — expires in ${expiresInMinutes}m`);
-    console.log(`   Next auto-refresh: ${new Date(expiry - 10 * 60 * 1000).toLocaleString('en-IN')}`);
+        if (!token) {
+            throw new Error('Failed to obtain access token - token was null/undefined');
+        }
 
-    return token;
-  } catch (err) {
-    console.error('❌ getAccessTokenCached error:', err.message || err);
+        const creds = oauth2Client.credentials || {};
+        const expiry = creds.expiry_date
+            ? Number(creds.expiry_date)
+            : Date.now() + 55 * 60 * 1000;
 
-    if (err.message && err.message.includes('invalid_grant')) {
-      console.error('⚠️  CRITICAL: Refresh token is invalid or revoked!');
-      console.error('   Regenerate OAuth2 credentials at: https://developers.google.com/oauthplayground');
+        cachedToken = { token, expiry };
+
+        const expiresInMinutes = Math.round((expiry - now) / 60000);
+        console.log(`🔑 Gmail access token refreshed — expires in ${expiresInMinutes}m`);
+        console.log(`   Next auto-refresh: ${new Date(expiry - 10 * 60 * 1000).toLocaleString('en-IN')}`);
+
+        return token;
+    } catch (err) {
+        console.error('❌ getAccessTokenCached error:', err.message || err);
+
+        if (err.message && err.message.includes('invalid_grant')) {
+            console.error('⚠️  CRITICAL: Refresh token is invalid or revoked!');
+            console.error('   Regenerate OAuth2 credentials at: https://developers.google.com/oauthplayground');
+        }
+
+        cachedToken = null;
+        throw err;
     }
-
-    cachedToken = null;
-    throw err;
-  }
 }
 
 function startTokenRefreshScheduler() {
-  if (refreshInterval) clearInterval(refreshInterval);
+    if (refreshInterval) clearInterval(refreshInterval);
 
-  refreshInterval = setInterval(async () => {
-    try {
-      console.log('⏰ Scheduled token refresh triggered...');
-      cachedToken = null; // Force refresh
-      await getAccessTokenCached();
-    } catch (err) {
-      console.error('⚠️  Scheduled token refresh failed:', err.message || err);
-    }
-  }, 50 * 60 * 1000); // every 50 minutes
+    refreshInterval = setInterval(async () => {
+        try {
+            console.log('⏰ Scheduled token refresh triggered...');
+            cachedToken = null; // Force refresh
+            await getAccessTokenCached();
+        } catch (err) {
+            console.error('⚠️  Scheduled token refresh failed:', err.message || err);
+        }
+    }, 50 * 60 * 1000); // every 50 minutes
 
-  console.log('✅ Token refresh scheduler started (every 50 minutes)');
+    console.log('✅ Token refresh scheduler started (every 50 minutes)');
 }
 
 // ------------------- Email Template Helpers -------------------
 
 function getBaseEmailTemplate({ title, content, footerNote = '' }) {
-  return `
+    return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -263,7 +263,7 @@ function getBaseEmailTemplate({ title, content, footerNote = '' }) {
 }
 
 function getAdminPopupEmail({ fullName, email, phone, message, timestamp, ref }) {
-  const content = `
+    const content = `
     <div style="background:linear-gradient(135deg,rgba(102,126,234,0.1) 0%,rgba(118,75,162,0.1) 100%);border-left:4px solid #667eea;padding:20px;border-radius:8px;margin-bottom:24px;">
       <h2 style="margin:0 0 8px;color:#667eea;font-size:18px;">🔥 New Homepage Popup Inquiry</h2>
       <p style="margin:0;color:#6c757d;font-size:14px;">Someone is interested in your courses!</p>
@@ -311,21 +311,21 @@ function getAdminPopupEmail({ fullName, email, phone, message, timestamp, ref })
     </div>
   `;
 
-  return getBaseEmailTemplate({
-    title: '🎉 New Popup Inquiry',
-    content,
-    footerNote: `Submitted: ${timestamp} | Source: Homepage Popup | Ref: ${ref}`
-  });
+    return getBaseEmailTemplate({
+        title: '🎉 New Popup Inquiry',
+        content,
+        footerNote: `Submitted: ${timestamp} | Source: Homepage Popup | Ref: ${ref}`
+    });
 }
 
 function getAdminContactEmail({ fullName, email, phone, course, message, timestamp, ref, isCourse }) {
-  const courseDisplay = course || 'N/A';
-  const enquiryIcon = isCourse ? '🎓' : '📧';
-  const enquiryType = isCourse ? 'Course Enquiry' : 'General Enquiry';
-  const gradientColor = isCourse ? 'rgba(76,175,80,0.1)' : 'rgba(102,126,234,0.1)';
-  const borderColor = isCourse ? '#4CAF50' : '#667eea';
+    const courseDisplay = course || 'N/A';
+    const enquiryIcon = isCourse ? '🎓' : '📧';
+    const enquiryType = isCourse ? 'Course Enquiry' : 'General Enquiry';
+    const gradientColor = isCourse ? 'rgba(76,175,80,0.1)' : 'rgba(102,126,234,0.1)';
+    const borderColor = isCourse ? '#4CAF50' : '#667eea';
 
-  const content = `
+    const content = `
     <div style="background:linear-gradient(135deg,${gradientColor} 0%,${gradientColor} 100%);border-left:4px solid ${borderColor};padding:20px;border-radius:8px;margin-bottom:24px;">
       <h2 style="margin:0 0 8px;color:${borderColor};font-size:18px;">${enquiryIcon} New ${enquiryType}</h2>
       <p style="margin:0;color:#6c757d;font-size:14px;">Contact form submission from your website</p>
@@ -383,15 +383,15 @@ function getAdminContactEmail({ fullName, email, phone, course, message, timesta
     </div>
   `;
 
-  return getBaseEmailTemplate({
-    title: `${enquiryIcon} New ${enquiryType}`,
-    content,
-    footerNote: `Submitted: ${timestamp} | Source: Contact Page | Ref: ${ref}`
-  });
+    return getBaseEmailTemplate({
+        title: `${enquiryIcon} New ${enquiryType}`,
+        content,
+        footerNote: `Submitted: ${timestamp} | Source: Contact Page | Ref: ${ref}`
+    });
 }
 
 function getUserPopupEmail({ fullName, ref }) {
-  const content = `
+    const content = `
     <h2 style="margin:0 0 16px;color:#212529;font-size:20px;">Hi ${fullName}! 👋</h2>
 
     <p style="margin:0 0 16px;color:#495057;font-size:15px;line-height:1.6;">
@@ -424,19 +424,19 @@ function getUserPopupEmail({ fullName, ref }) {
     </div>
   `;
 
-  return getBaseEmailTemplate({
-    title: 'Thanks for Reaching Out!',
-    content,
-    footerNote: 'We look forward to helping you start your music journey! 🎧'
-  });
+    return getBaseEmailTemplate({
+        title: 'Thanks for Reaching Out!',
+        content,
+        footerNote: 'We look forward to helping you start your music journey! 🎧'
+    });
 }
 
 function getUserContactEmail({ fullName, course, ref, isCourse }) {
-  const courseText = isCourse
-    ? `about our <strong>${course}</strong> course`
-    : 'your inquiry';
+    const courseText = isCourse
+        ? `about our <strong>${course}</strong> course`
+        : 'your inquiry';
 
-  const content = `
+    const content = `
     <h2 style="margin:0 0 16px;color:#212529;font-size:20px;">Hi ${fullName}! 👋</h2>
 
     <p style="margin:0 0 16px;color:#495057;font-size:15px;line-height:1.6;">
@@ -476,361 +476,337 @@ function getUserContactEmail({ fullName, course, ref, isCourse }) {
     </div>
   `;
 
-  return getBaseEmailTemplate({
-    title: 'We Got Your Message!',
-    content,
-    footerNote: 'Looking forward to helping you achieve your music production goals! 🎹'
-  });
+    return getBaseEmailTemplate({
+        title: 'We Got Your Message!',
+        content,
+        footerNote: 'Looking forward to helping you achieve your music production goals! 🎹'
+    });
 }
 
 // ------------------- Utility Functions -------------------
 function pickName(body) {
-  if (!body) return 'Unknown';
-  return (body.fullName || body.fullname || body.name || 'Unknown').toString().trim();
+    if (!body) return 'Unknown';
+    return (body.fullName || body.fullname || body.name || 'Unknown').toString().trim();
 }
 
 function formatCourseName(course) {
-  const map = {
-    'dj-training': 'DJ Training',
-    'music-production': 'Music Production',
-    'audio-engineering': 'Audio Engineering'
-  };
-  if (!course) return 'N/A';
-  return map[course] || course;
+    const map = {
+        'dj-training': 'DJ Training',
+        'music-production': 'Music Production',
+        'audio-engineering': 'Audio Engineering'
+    };
+    if (!course) return 'N/A';
+    return map[course] || course;
 }
 
 function buildRawMessage({ from, to, subject, htmlBody, textBody }) {
-  const msgId = `<${randomUUID()}@soundabode.local>`;
-  const dateHeader = new Date().toUTCString();
-  const body = htmlBody || textBody || '';
+    const msgId = `<${randomUUID()}@soundabode.local>`;
+    const dateHeader = new Date().toUTCString();
+    const body = htmlBody || textBody || '';
 
-  const parts = [
-    `From: ${from}`,
-    `To: ${to}`,
-    `Subject: =?UTF-8?B?${Buffer.from(subject).toString('base64')}?=`,
-    `Message-ID: ${msgId}`,
-    `Date: ${dateHeader}`,
-    'MIME-Version: 1.0',
-    'Content-Type: text/html; charset=UTF-8',
-    'Content-Transfer-Encoding: base64',
-    '',
-    Buffer.from(body, 'utf-8').toString('base64')
-  ];
+    const parts = [
+        `From: ${from}`,
+        `To: ${to}`,
+        `Subject: =?UTF-8?B?${Buffer.from(subject).toString('base64')}?=`,
+        `Message-ID: ${msgId}`,
+        `Date: ${dateHeader}`,
+        'MIME-Version: 1.0',
+        'Content-Type: text/html; charset=UTF-8',
+        'Content-Transfer-Encoding: base64',
+        '',
+        Buffer.from(body, 'utf-8').toString('base64')
+    ];
 
-  return Buffer.from(parts.join('\r\n'))
-    .toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
+    return Buffer.from(parts.join('\r\n'))
+        .toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
 }
 
 // ------------------- Email sending (with full logging) -------------------
 async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 3 }) {
-  if (!process.env.EMAIL_USER) {
-    throw new Error('EMAIL_USER not configured');
-  }
-
-  let lastErr = null;
-
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const token = await getAccessTokenCached();
-
-      oauth2Client.setCredentials({
-        access_token: token,
-        refresh_token: process.env.EMAIL_REFRESH_TOKEN
-      });
-
-      const raw = buildRawMessage({
-        from: `"${COMPANY_NAME}" <${process.env.EMAIL_USER}>`,
-        to,
-        subject,
-        htmlBody,
-        textBody
-      });
-
-      const t0 = Date.now();
-      const res = await gmail.users.messages.send({
-        userId: 'me',
-        requestBody: { raw }
-      });
-
-      const duration = Date.now() - t0;
-      console.log(`✅ Email sent to "${to}" | subject: "${subject}" | attempt ${attempt}/${maxRetries} | ${duration}ms | msgId: ${res.data?.id}`);
-
-      return { success: true, id: res.data?.id };
-
-    } catch (err) {
-      lastErr = err;
-      const errMsg = err?.response?.data
-        ? JSON.stringify(err.response.data)
-        : err.message || String(err);
-
-      console.error(`❌ Email attempt ${attempt}/${maxRetries} to "${to}" FAILED: ${errMsg}`);
-
-      if (err.code === 401 || err.code === 403 || (err.status && (err.status === 401 || err.status === 403))) {
-        console.warn('   Auth error — clearing token cache for next retry');
-        cachedToken = null;
-      }
-
-      if (attempt < maxRetries) {
-        const waitMs = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
-        console.log(`   Retrying in ${waitMs}ms...`);
-        await new Promise(r => setTimeout(r, waitMs));
-      }
+    if (!process.env.EMAIL_USER) {
+        throw new Error('EMAIL_USER not configured');
     }
-  }
 
-  console.error(`❌❌ Email to "${to}" PERMANENTLY FAILED after ${maxRetries} attempts. Last error: ${lastErr?.message || lastErr}`);
-  return {
-    success: false,
-    error: lastErr?.message || String(lastErr)
-  };
+    let lastErr = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const token = await getAccessTokenCached();
+
+            oauth2Client.setCredentials({
+                access_token: token,
+                refresh_token: process.env.EMAIL_REFRESH_TOKEN
+            });
+
+            const raw = buildRawMessage({
+                from: `"${COMPANY_NAME}" <${process.env.EMAIL_USER}>`,
+                to,
+                subject,
+                htmlBody,
+                textBody
+            });
+
+            const t0 = Date.now();
+            const res = await gmail.users.messages.send({
+                userId: 'me',
+                requestBody: { raw }
+            });
+
+            const duration = Date.now() - t0;
+            console.log(`✅ Email sent to "${to}" | subject: "${subject}" | attempt ${attempt}/${maxRetries} | ${duration}ms | msgId: ${res.data?.id}`);
+
+            return { success: true, id: res.data?.id };
+
+        } catch (err) {
+            lastErr = err;
+            const errMsg = err?.response?.data
+                ? JSON.stringify(err.response.data)
+                : err.message || String(err);
+
+            console.error(`❌ Email attempt ${attempt}/${maxRetries} to "${to}" FAILED: ${errMsg}`);
+
+            if (err.code === 401 || err.code === 403 || (err.status && (err.status === 401 || err.status === 403))) {
+                console.warn('   Auth error — clearing token cache for next retry');
+                cachedToken = null;
+            }
+
+            if (attempt < maxRetries) {
+                const waitMs = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
+                console.log(`   Retrying in ${waitMs}ms...`);
+                await new Promise(r => setTimeout(r, waitMs));
+            }
+        }
+    }
+
+    console.error(`❌❌ Email to "${to}" PERMANENTLY FAILED after ${maxRetries} attempts. Last error: ${lastErr?.message || lastErr}`);
+    return {
+        success: false,
+        error: lastErr?.message || String(lastErr)
+    };
 }
 
 // Fire-and-forget but WITH full logging
 function sendEmailAsync(emailOptions) {
-  setImmediate(async () => {
-    try {
-      console.log(`📤 [ASYNC] Sending email to: ${emailOptions.to} | Subject: ${emailOptions.subject}`);
-      const result = await sendEmailRaw(emailOptions);
-      if (result.success) {
-        console.log(`✅ [ASYNC] Email delivered to: ${emailOptions.to}`);
-      } else {
-        console.error(`❌ [ASYNC] Email FAILED to: ${emailOptions.to} | Reason: ${result.error}`);
-      }
-    } catch (err) {
-      console.error(`❌ [ASYNC] Unexpected error sending to ${emailOptions.to}:`, err?.message || err);
-    }
-  });
+    setImmediate(async () => {
+        try {
+            console.log(`📤 [ASYNC] Sending email to: ${emailOptions.to} | Subject: ${emailOptions.subject}`);
+            const result = await sendEmailRaw(emailOptions);
+            if (result.success) {
+                console.log(`✅ [ASYNC] Email delivered to: ${emailOptions.to}`);
+            } else {
+                console.error(`❌ [ASYNC] Email FAILED to: ${emailOptions.to} | Reason: ${result.error}`);
+            }
+        } catch (err) {
+            console.error(`❌ [ASYNC] Unexpected error sending to ${emailOptions.to}:`, err?.message || err);
+        }
+    });
 }
 
 // ------------------- Routes -------------------
 app.get('/', (req, res) => {
-  res.json({
-    status: 'OK',
-    service: 'Soundabode Backend',
-    timestamp: new Date().toISOString(),
-    endpoints: {
-      popupForm: '/api/popup-form',
-      contactForm: '/api/contact-form',
-      health: '/health',
-      testEmail: '/api/test-email'
-    },
-    configured: !!(process.env.EMAIL_USER && process.env.EMAIL_CLIENT_ID && process.env.EMAIL_REFRESH_TOKEN)
-  });
+    res.json({
+        status: 'OK',
+        service: 'Soundabode Backend',
+        timestamp: new Date().toISOString(),
+        endpoints: {
+            popupForm: '/api/popup-form',
+            contactForm: '/api/contact-form',
+            health: '/health',
+            testEmail: '/api/test-email'
+        },
+        configured: !!(process.env.EMAIL_USER && process.env.EMAIL_CLIENT_ID && process.env.EMAIL_REFRESH_TOKEN)
+    });
 });
 
 app.get('/health', (req, res) =>
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    tokenCached: !!cachedToken,
-    tokenExpiry: cachedToken ? new Date(cachedToken.expiry).toISOString() : null
-  })
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        tokenCached: !!cachedToken,
+        tokenExpiry: cachedToken ? new Date(cachedToken.expiry).toISOString() : null
+    })
 );
 
 // ---- TEST EMAIL ENDPOINT (remove in production if desired) ----
 app.get('/api/test-email', async (req, res) => {
-  console.log('🧪 Test email endpoint hit');
-  const result = await sendEmailRaw({
-    to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-    subject: `Soundabode Backend — Test Email ${new Date().toLocaleString('en-IN')}`,
-    htmlBody: `<h2>✅ Test Email</h2><p>Gmail integration is working correctly. Server time: ${new Date().toISOString()}</p>`,
-    maxRetries: 2
-  });
+    console.log('🧪 Test email endpoint hit');
+    const result = await sendEmailRaw({
+        to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+        subject: `Soundabode Backend — Test Email ${new Date().toLocaleString('en-IN')}`,
+        htmlBody: `<h2>✅ Test Email</h2><p>Gmail integration is working correctly. Server time: ${new Date().toISOString()}</p>`,
+        maxRetries: 2
+    });
 
-  if (result.success) {
-    return res.json({ success: true, message: 'Test email sent successfully!', id: result.id });
-  } else {
-    return res.status(500).json({ success: false, message: 'Test email failed', error: result.error });
-  }
+    if (result.success) {
+        return res.json({ success: true, message: 'Test email sent successfully!', id: result.id });
+    } else {
+        return res.status(500).json({ success: false, message: 'Test email failed', error: result.error });
+    }
 });
 
 // ---- POPUP FORM ----
 app.post('/api/popup-form', async (req, res) => {
-  try {
-    console.log('📩 /api/popup-form received | body:', JSON.stringify(req.body));
+    try {
+        console.log('📩 /api/popup-form received | body:', JSON.stringify(req.body));
 
-    const fullName = pickName(req.body);
-    const email = req.body?.email ? String(req.body.email).trim() : '';
-    const phone = req.body?.phone ? String(req.body.phone).trim() : '';
-    const message = req.body?.message ? String(req.body.message).trim() : '';
+        const fullName = pickName(req.body);
+        const email = req.body?.email ? String(req.body.email).trim() : '';
+        const phone = req.body?.phone ? String(req.body.phone).trim() : '';
+        const message = req.body?.message ? String(req.body.message).trim() : '';
 
-    if (!fullName || fullName === 'Unknown' || !email || !phone) {
-      console.warn('❌ Popup validation failed — missing fields', { fullName, email, phone });
-      return res.status(400).json({ success: false, message: 'Name, email and phone are required.' });
+        if (!fullName || fullName === 'Unknown' || !email || !phone) {
+            console.warn('❌ Popup validation failed — missing fields', { fullName, email, phone });
+            return res.status(400).json({ success: false, message: 'Name, email and phone are required.' });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ success: false, message: 'Invalid email format.' });
+        }
+
+        const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+        const ref = randomUUID().slice(0, 8).toUpperCase();
+        const subject = `[Popup] Homepage Inquiry — ${fullName} — ${ref}`;
+
+        console.log(`📬 Popup inquiry | ref: ${ref} | name: ${fullName} | email: ${email} | phone: ${phone}`);
+
+        // Admin email
+        sendEmailAsync({
+            to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+            subject,
+            htmlBody: getAdminPopupEmail({ fullName, email, phone, message, timestamp: timestampLocal, ref })
+        });
+
+        // User confirmation email
+        sendEmailAsync({
+            to: email,
+            subject: `Thanks for your interest in ${COMPANY_NAME}!`,
+            htmlBody: getUserPopupEmail({ fullName, ref })
+        });
+
+        return res.status(200).json({ success: true, message: 'Inquiry received successfully!', ref });
+
+    } catch (err) {
+        console.error('❌ /api/popup-form error:', err?.message || err);
+        return res.status(500).json({ success: false, message: 'Failed to process popup form. Please try again.' });
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ success: false, message: 'Invalid email format.' });
-    }
-
-    const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-    const ref = randomUUID().slice(0, 8).toUpperCase();
-    const subject = `[Popup] Homepage Inquiry — ${fullName} — ${ref}`;
-
-    console.log(`📬 Popup inquiry | ref: ${ref} | name: ${fullName} | email: ${email} | phone: ${phone}`);
-
-    // Admin email
-    sendEmailAsync({
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-      subject,
-      htmlBody: getAdminPopupEmail({ fullName, email, phone, message, timestamp: timestampLocal, ref })
-    });
-
-    // User confirmation email
-    sendEmailAsync({
-      to: email,
-      subject: `Thanks for your interest in ${COMPANY_NAME}!`,
-      htmlBody: getUserPopupEmail({ fullName, ref })
-    });
-
-    return res.status(200).json({ success: true, message: 'Inquiry received successfully!', ref });
-
-  } catch (err) {
-    console.error('❌ /api/popup-form error:', err?.message || err);
-    return res.status(500).json({ success: false, message: 'Failed to process popup form. Please try again.' });
-  }
 });
 
 // ---- CONTACT FORM ----
 app.post('/api/contact-form', async (req, res) => {
-  try {
-    console.log('📩 /api/contact-form received | body:', JSON.stringify(req.body));
+    try {
+        console.log('📩 /api/contact-form received | body:', JSON.stringify(req.body));
 
-    const fullName = pickName(req.body);
-    const email = req.body?.email ? String(req.body.email).trim() : '';
-    const phone = req.body?.phone ? String(req.body.phone).trim() : '';
-    const course = req.body?.course ? String(req.body.course).trim() : '';
-    const message = req.body?.message ? String(req.body.message).trim() : '';
+        const fullName = pickName(req.body);
+        const email = req.body?.email ? String(req.body.email).trim() : '';
+        const phone = req.body?.phone ? String(req.body.phone).trim() : '';
+        const course = req.body?.course ? String(req.body.course).trim() : '';
+        const message = req.body?.message ? String(req.body.message).trim() : '';
 
-    if (!fullName || fullName === 'Unknown' || !email || !phone) {
-      console.warn('❌ Contact validation failed — missing fields', { fullName, email, phone });
-      return res.status(400).json({ success: false, message: 'Name, email and phone are required.' });
+        if (!fullName || fullName === 'Unknown' || !email || !phone) {
+            console.warn('❌ Contact validation failed — missing fields', { fullName, email, phone });
+            return res.status(400).json({ success: false, message: 'Name, email and phone are required.' });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ success: false, message: 'Invalid email format.' });
+        }
+
+        const isCourse = Boolean(course && course !== '');
+        const formattedCourse = isCourse ? formatCourseName(course) : 'N/A';
+        const enquiryType = isCourse ? 'Course Enquiry' : 'General Enquiry';
+
+        const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+        const ref = randomUUID().slice(0, 8).toUpperCase();
+
+        const subject = isCourse
+            ? `[Contact] Course Enquiry — ${formattedCourse} — ${fullName} — ${ref}`
+            : `[Contact] General Enquiry — ${fullName} — ${ref}`;
+
+        console.log(`📬 Contact form | ref: ${ref} | type: ${enquiryType} | name: ${fullName} | email: ${email} | course: ${formattedCourse}`);
+
+        // Admin email
+        sendEmailAsync({
+            to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+            subject,
+            htmlBody: getAdminContactEmail({
+                fullName, email, phone,
+                course: formattedCourse,
+                message, timestamp: timestampLocal,
+                ref, isCourse
+            })
+        });
+
+        // User confirmation email
+        sendEmailAsync({
+            to: email,
+            subject: `${COMPANY_NAME} — We've received your ${enquiryType.toLowerCase()}!`,
+            htmlBody: getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse })
+        });
+
+        return res.status(200).json({ success: true, message: 'Message received successfully!', ref });
+
+    } catch (err) {
+        console.error('❌ /api/contact-form error:', err?.message || err);
+        return res.status(500).json({ success: false, message: 'Failed to send. Please try again.' });
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ success: false, message: 'Invalid email format.' });
-    }
-
-    const isCourse = Boolean(course && course !== '');
-    const formattedCourse = isCourse ? formatCourseName(course) : 'N/A';
-    const enquiryType = isCourse ? 'Course Enquiry' : 'General Enquiry';
-
-    const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-    const ref = randomUUID().slice(0, 8).toUpperCase();
-
-    const subject = isCourse
-      ? `[Contact] Course Enquiry — ${formattedCourse} — ${fullName} — ${ref}`
-      : `[Contact] General Enquiry — ${fullName} — ${ref}`;
-
-    console.log(`📬 Contact form | ref: ${ref} | type: ${enquiryType} | name: ${fullName} | email: ${email} | course: ${formattedCourse}`);
-
-    // Admin email
-    sendEmailAsync({
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-      subject,
-      htmlBody: getAdminContactEmail({
-        fullName, email, phone,
-        course: formattedCourse,
-        message, timestamp: timestampLocal,
-        ref, isCourse
-      })
-    });
-
-    // User confirmation email
-    sendEmailAsync({
-      to: email,
-      subject: `${COMPANY_NAME} — We've received your ${enquiryType.toLowerCase()}!`,
-      htmlBody: getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse })
-    });
-
-    return res.status(200).json({ success: true, message: 'Message received successfully!', ref });
-
-  } catch (err) {
-    console.error('❌ /api/contact-form error:', err?.message || err);
-    return res.status(500).json({ success: false, message: 'Failed to send. Please try again.' });
-  }
 });
 
 // ---- Static HTML fallback ----
 app.get('*', async (req, res, next) => {
-  if (req.path.startsWith('/api/')) return next();
-  if (path.extname(req.path)) return next();
+    if (req.path.startsWith('/api/')) return next();
+    if (path.extname(req.path)) return next();
 
-  try {
-    let filePath = path.join(__dirname, req.path + '.html');
     try {
-      await fs.access(filePath);
-      return res.sendFile(filePath);
+        let filePath = path.join(__dirname, req.path + '.html');
+        try {
+            await fs.access(filePath);
+            return res.sendFile(filePath);
+        } catch {
+            filePath = path.join(__dirname, req.path, 'index.html');
+            try {
+                await fs.access(filePath);
+                return res.sendFile(filePath);
+            } catch {
+                return next();
+            }
+        }
     } catch {
-      filePath = path.join(__dirname, req.path, 'index.html');
-      try {
-        await fs.access(filePath);
-        return res.sendFile(filePath);
-      } catch {
         return next();
-      }
     }
-  } catch {
-    return next();
-  }
 });
 
 app.use((req, res) =>
-  res.status(404).json({ success: false, message: 'Endpoint not found' })
+    res.status(404).json({ success: false, message: 'Endpoint not found' })
 );
 
 // ------------------- Start Server -------------------
 app.listen(PORT, async () => {
-  console.log('='.repeat(60));
-  console.log('✅ Soundabode Backend Server Running');
-  console.log(`🌐 Port: ${PORT}`);
-  console.log('📧 Email Provider: Gmail API (OAuth2 with auto-refresh)');
-  console.log(`📱 WhatsApp: ${WHATSAPP_NUMBER}`);
-  console.log(`☎️  Phone: ${PHONE_NUMBER}`);
-  console.log('🔒 CORS Allowed Origins:', allowedOrigins.join(', '));
-  console.log('⏰ Started:', new Date().toLocaleString('en-IN'));
-  console.log('='.repeat(60));
+    console.log('='.repeat(60));
+    console.log('✅ Soundabode Backend Server Running');
+    console.log(`🌐 Port: ${PORT}`);
+    console.log('📧 Email Provider: Gmail API (OAuth2 with auto-refresh)');
+    console.log(`📱 WhatsApp: ${WHATSAPP_NUMBER}`);
+    console.log(`☎️  Phone: ${PHONE_NUMBER}`);
+    console.log('🔒 CORS Allowed Origins:', allowedOrigins.join(', '));
+    console.log('⏰ Started:', new Date().toLocaleString('en-IN'));
+    console.log('='.repeat(60));
 
-  // --- Pre-warm Gmail access token ---
-  try {
-    console.log('🔄 Pre-warming Gmail access token...');
-    await getAccessTokenCached();
-    startTokenRefreshScheduler();
-    console.log('✅ Gmail authentication ready — token will auto-refresh every 50 minutes');
+    // --- Pre-warm Gmail access token ---
+    try {
+        console.log('🔄 Pre-warming Gmail access token...');
+        await getAccessTokenCached();
+        startTokenRefreshScheduler();
+        console.log('✅ Gmail authentication ready — token will auto-refresh every 50 minutes');
 
-    // --- Send startup test email to confirm everything works ---
-    console.log('🧪 Sending startup test email to confirm Gmail is working...');
-    const testResult = await sendEmailRaw({
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-      subject: `✅ Soundabode Server Started — ${new Date().toLocaleString('en-IN')}`,
-      htmlBody: getBaseEmailTemplate({
-        title: '🚀 Server Started Successfully',
-        content: `
-          <p style="color:#495057;font-size:15px;">Your Soundabode backend server has started and Gmail integration is working correctly.</p>
-          <p style="color:#495057;font-size:15px;"><strong>Started at:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
-          <p style="color:#495057;font-size:15px;"><strong>Port:</strong> ${PORT}</p>
-          <p style="color:#6c757d;font-size:13px;">You will receive emails from popup and contact forms at this address.</p>
-        `,
-        footerNote: 'This is an automated startup notification.'
-      }),
-      maxRetries: 2
-    });
 
-    if (testResult.success) {
-      console.log('✅ Startup test email delivered! Check your inbox to confirm.');
-    } else {
-      console.error('❌ Startup test email FAILED:', testResult.error);
-      console.error('   Forms will not send emails until this is resolved.');
+    } catch (e) {
+        console.error('❌ Failed to initialize Gmail authentication:', e.message || e);
+        console.error('   Server is running but email features will NOT work.');
+        console.error('   Please verify OAuth2 credentials in your .env file.');
     }
-
-  } catch (e) {
-    console.error('❌ Failed to initialize Gmail authentication:', e.message || e);
-    console.error('   Server is running but email features will NOT work.');
-    console.error('   Please verify OAuth2 credentials in your .env file.');
-  }
 });
