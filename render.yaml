@@ -6,95 +6,32 @@ services:
     staticPublishDir: ./
     routes:
       - type: redirect
-        source: /about.html
-        destination: /about
-
-      # --- 1. HIGHEST PRIORITY: Specific Course DETAIL Pages (Must come BEFORE landing pages) ---
-      - type: rewrite
+        source: /courses/music-production/beginner-course
+        destination: /courses/music-production/beginner-course.html
+      - type: redirect
+        source: /courses/music-production/intermediate-course
+        destination: /courses/music-production/intermediate-course.html
+      - type: redirect
+        source: /courses/music-production/audio-engineering-diploma
+        destination: /courses/music-production/audio-engineering-diploma.html
+      - type: redirect
+        source: /courses/music-production/mixing-mastering-course
+        destination: /courses/music-production/mixing-mastering-course.html
+      - type: redirect
         source: /courses/dj-training/basic-dj-course
         destination: /courses/dj-training/basic-dj-course.html
-      - type: rewrite
+      - type: redirect
         source: /courses/dj-training/pro-dj-course
         destination: /courses/dj-training/pro-dj-course.html
-      - type: rewrite
+      - type: redirect
         source: /courses/dj-training/advanced-dj-performance
         destination: /courses/dj-training/advanced-dj-performance.html
       - type: rewrite
-        source: /courses/music-production/beginner-course
-        destination: /courses/music-production/beginner-course.html
-      - type: rewrite
-        source: /courses/music-production/intermediate-course
-        destination: /courses/music-production/intermediate-course.html
-      - type: rewrite
-        source: /courses/music-production/audio-engineering-diploma
-        destination: /courses/music-production/audio-engineering-diploma.html
-      - type: rewrite
-        source: /courses/music-production/mixing-mastering-course
-        destination: /courses/music-production/mixing-mastering-course.html
-      - type: rewrite
-        source: /courses/music-production/ableton-live-course
-        destination: /courses/music-production/ableton-live-course.html
-      - type: rewrite
-        source: /courses/music-production/logic-pro-x-course
-        destination: /courses/music-production/logic-pro-x-course.html
-      - type: rewrite
-        source: /courses/music-production/fl-studio-course
-        destination: /courses/music-production/fl-studio-course.html
-      - type: rewrite
-        source: /courses/music-production/music-theory-for-producers
-        destination: /courses/music-production/music-theory-for-producers.html
-      
-      # --- 2. SECONDARY PRIORITY: Category Landing Pages (Must come AFTER specific courses) ---
-      - type: rewrite
-        source: /courses/dj-training
-        destination: /courses-landing.html
-      - type: rewrite
-        source: /courses/music-production
-        destination: /courses-landing.html
-      - type: rewrite
-        source: /dj-training
-        destination: /courses.html
-      - type: rewrite
-        source: /music-production
-        destination: /courses.html
-
-      # --- 3. TERTIARY PRIORITY: Main Landing Pages & Misc (Must come AFTER all sub-paths) ---
-      - type: rewrite
         source: /courses
-        destination: /courses-landing.html
-      - type: rewrite
-        source: /about
-        destination: /about.html
-      - type: rewrite
-        source: /contact
-        destination: /contact.html
-      - type: rewrite
-        source: /enroll
-        destination: /enroll.html
-      - type: rewrite
-        source: /terms
-        destination: /terms.html
-      - type: rewrite
-        source: /privacy
-        destination: /privacy.html
+        destination: /courses.html
       - type: rewrite
         source: /blog
         destination: /blog.html
-      - type: rewrite
-        source: /blog/*
-        destination: /blog/*.html
-      - type: rewrite
-        source: /gallery
-        destination: /gallery.html
-      - type: rewrite
-        source: /testimonials
-        destination: /testimonials.html
-      - type: rewrite
-        source: /faq
-        destination: /faq.html
-      - type: rewrite
-        source: /error
-        destination: /404.html
     envVars:
       - key: NODE_VERSION
         value: 20
