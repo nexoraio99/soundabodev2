@@ -80,24 +80,12 @@ const allowedOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(','))
     .filter(Boolean);
 
 app.use((req, res, next) => {
-    const origin = req.get('Origin') || req.get('origin');
-
-    // Allow requests with no origin (server-to-server, Postman, etc.)
-    if (!origin) {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-    } else if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-        res.setHeader('Vary', 'Origin');
-    } else {
-        // Still set headers so browser gets a proper CORS error (not a network error)
-        res.setHeader('Access-Control-Allow-Origin', allowedOrigins[0]);
-        res.setHeader('Vary', 'Origin');
-    }
-
+    // Unconditionally allow all origins for the public API and testing
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-
+    // Note: Access-Control-Allow-Credentials cannot be 'true' when Allow-Origin is '*'
+    
     if (req.method === 'OPTIONS') return res.status(200).end();
     next();
 });
@@ -693,6 +681,31 @@ app.post('/api/blogs', async (req, res) => {
     await saveBlogs(blogs);
     io.emit('blogUpdate', newBlog);
     res.status(201).json({ success: true, blog: newBlog });
+});
+
+app.delete('/api/blogs/:id', async (req, res) => {
+    const { password } = req.body;
+    
+    // Simple admin check
+    if (password !== 'admin') {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const { id } = req.params;
+    let blogs = await getBlogs();
+    
+    const initialLength = blogs.length;
+    blogs = blogs.filter(b => b.id !== id);
+    
+    if (blogs.length === initialLength) {
+        return res.status(404).json({ success: false, message: 'Blog not found' });
+    }
+
+    await saveBlogs(blogs);
+    // Tell clients to refresh the blog list
+    io.emit('blogDeleted', id);
+    
+    res.json({ success: true, message: 'Blog deleted successfully' });
 });
 
 // Socket.io connection handling

@@ -220,7 +220,7 @@
     let currentCategory = 'All';
 
     // Fetch initial blogs
-    fetch(`${BACKEND_BASE}/api/blogs`)
+    fetch(`${BACKEND_BASE}/api/blogs?t=${Date.now()}`)
       .then(res => res.json())
       .then(blogs => {
         allBlogs = blogs;
