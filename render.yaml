@@ -1,7 +1,7 @@
 services:
   # Static site - serves HTML/CSS/JS files
   - type: web
-    name: soundabode
+    name: soundabodev2
     runtime: static
     buildCommand: "npm install"
     staticPublishPath: ./
