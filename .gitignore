@@ -20,3 +20,6 @@ Thumbs.db
 
 # Antigravity files
 .antigravity/
+
+# Blog data (persisted in Neon Postgres, not in git)
+data/
