@@ -3,32 +3,88 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+
+  <!-- CRITICAL: Android viewport optimization -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+
+  <!-- Android-specific performance optimization -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Disable automatic phone number detection -->
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- Android Chrome theme color -->
+  <meta name="theme-color" content="#000000">
+  <meta name="msapplication-navbutton-color" content="#000000">
+
+  <!-- DNS Prefetch -->
+  <link rel="dns-prefetch" href="https://res.cloudinary.com">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <title>Discover Our Latest News | Soundabode Academy Blog</title>
-  <meta name="description" content="Stay updated with the latest music production tips, DJ performance guides, and academy news from Soundabode.">
+  <meta name="description"
+    content="Stay updated with the latest music production tips, DJ performance guides, and academy news from Soundabode.">
+
 
   <link rel="stylesheet" href="/style/style.css">
   <link rel="stylesheet" href="/style/blog.css">
   <link rel="icon" href="/Assets/favicon.ico">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Google Tag Manager -->
+  <script>
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-KVRWZ2DP');
+  </script>
 </head>
 
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KVRWZ2DP" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+
   <!-- NAVBAR -->
   <nav class="navbar">
     <a href="/" class="logo">
-      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="Soundabode Logo" class="logo-img">
+      <img
+        src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png"
+        alt="Soundabode Logo" class="logo-img">
     </a>
     <div class="nav-links">
       <a href="/about">About</a>
       <a href="/courses">Courses</a>
-      <a href="/blog" class="active">Blog</a>
+      <a href="/blog" style="color: #fff; font-weight: 700;">Blog</a>
       <a href="/contact">Contact</a>
     </div>
+
+    <!-- Hamburger Menu Button -->
     <button class="hamburger-menu" aria-label="Toggle menu">
-      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
     </button>
+
+    <!-- Call Action Button -->
+    <div class="nav-actions">
+      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"
+            fill="currentColor" />
+        </svg>
+      </a>
+    </div>
   </nav>
 
   <!-- MOBILE MENU -->
@@ -41,17 +97,22 @@
 
   <!-- MAIN BLOG CONTENT -->
   <main class="blog-main-container">
-    
+
     <!-- HEADER HERO -->
     <header class="blog-header-hero">
       <div class="container">
         <span class="badge-accent">Blog</span>
         <h1 class="hero-title">Discover our latest news</h1>
-        <p class="hero-desc">Discover the achievements that set us apart. From groundbreaking projects to industry accolades, <br> we take pride in our accomplishments.</p>
-        
+        <p class="hero-desc">Discover the achievements that set us apart. From groundbreaking projects to industry
+          accolades, <br> we take pride in our accomplishments.</p>
+
         <div class="search-bar-container">
           <div class="search-input-wrapper">
-            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input type="text" id="blog-search" placeholder="Search articles...">
           </div>
           <button class="btn-search">Find Now</button>
@@ -67,7 +128,7 @@
           <!-- Big cards will go here -->
           <div class="loading-state">Loading latest tracks...</div>
         </div>
-        
+
         <div class="load-more-container">
           <button id="load-more-btn" class="btn-load-more">Load More</button>
         </div>
@@ -97,11 +158,17 @@
           <p class="subscribe-desc">Subscribe to my newsletter for all the latest updates :</p>
           <div class="subscribe-input-group">
             <div class="field-with-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
               <input type="email" placeholder="Email Address">
             </div>
             <button class="btn-subscribe">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
               Subscribe
             </button>
           </div>
@@ -118,7 +185,10 @@
     <div class="modal-backdrop"></div>
     <div class="modal-content">
       <button class="modal-close" aria-label="Close">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
       </button>
       <div id="modal-article-body" class="modal-article-body">
         <!-- Full content goes here -->
@@ -134,7 +204,8 @@
           <div class="footer-logo-text">
             <span class="logo-dot"></span> enjoyy
           </div>
-          <p class="footer-about">Enjoyy Design, the comprehensive design system solution that revolutionizes the way you create digital experiences.</p>
+          <p class="footer-about">Enjoyy Design, the comprehensive design system solution that revolutionizes the way
+            you create digital experiences.</p>
         </div>
         <div class="footer-nav-col">
           <h4>Company</h4>
@@ -162,10 +233,23 @@
             <button>Subscribe</button>
           </div>
           <div class="footer-socials">
-            <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path></svg></a>
-            <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path></svg></a>
-            <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path><circle cx="4" cy="4" r="2"></circle></svg></a>
-            <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path></svg></a>
+            <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
+              </svg></a>
+            <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z">
+                </path>
+              </svg></a>
+            <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path>
+                <circle cx="4" cy="4" r="2"></circle>
+              </svg></a>
+            <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z">
+                </path>
+              </svg></a>
           </div>
         </div>
       </div>
