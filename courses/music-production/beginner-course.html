@@ -138,15 +138,58 @@
     .hamburger-menu.is-active .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
     @media (max-width:768px) { .hamburger-menu { display:block; } .nav-links { display:none; } }
 
-    /* WHATSAPP FLOAT */
-    .whatsapp-float {
-      position: fixed; width: clamp(50px,12vw,60px); height: clamp(50px,12vw,60px);
-      bottom: clamp(15px,3vw,25px); right: clamp(15px,3vw,25px);
-      background-color:#25d366; border-radius:50%; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      display:flex; align-items:center; justify-content:center; z-index:999; transition: all 0.3s ease; text-decoration:none;
+    /* SOCIAL FLOATS */
+    .social-floats-container {
+      position: fixed;
+      bottom: clamp(15px, 3vw, 25px);
+      right: clamp(15px, 3vw, 25px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 999;
     }
-    .whatsapp-float:hover { transform: scale(1.1); background-color:#20ba5a; }
-    .whatsapp-icon { width: clamp(24px,6vw,30px); height: clamp(24px,6vw,30px); filter: brightness(0) invert(1); }
+    .social-float {
+      width: clamp(40px, 8vw, 50px);
+      height: clamp(40px, 8vw, 50px);
+      border-radius: 50%;
+      padding: 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    .social-float:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
+    .social-icon {
+      width: clamp(20px, 4vw, 24px);
+      height: clamp(20px, 4vw, 24px);
+      filter: brightness(0) invert(1);
+    }
+    .whatsapp-float {
+      background-color: #25d366;
+      order: 3;
+    }
+    .whatsapp-float:hover {
+      background-color: #20ba5a;
+    }
+    .facebook-float {
+      background-color: #1877F2;
+      order: 2;
+    }
+    .facebook-float:hover {
+      background-color: #166fe5;
+    }
+    .instagram-float {
+      background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+      order: 1;
+    }
+    .instagram-float:hover {
+      filter: contrast(1.1);
+    }
 
     /* HERO, cards, etc. (kept same design) */
     .hero { display:grid; grid-template-columns: 1fr; gap:28px; align-items:center; margin-top:80px; }
@@ -278,7 +321,7 @@
       <span class="bar"></span>
     </button>
 
-    <!-- Call Action Button -->
+        <!-- Call Action Button -->
     <div class="nav-actions">
       <a href="tel:+919975016189" class="action-btn call-btn" title="Call us">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -294,7 +337,7 @@
   <div class="nav-menu">
     <a href="/about">About</a>
     <a href="/courses">Courses</a>
-      <a href="/blog">Blog</a>
+    <a href="/blog">Blog</a>
     <a href="/contact">Contact</a>
   </div>
 
@@ -302,23 +345,23 @@
   <div class="social-floats-container">
     <a href="https://www.instagram.com/soundabode" class="social-float instagram-float" target="_blank"
       rel="noopener noreferrer" title="Follow us on Instagram">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram"
+      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/instagram.svg" alt="Instagram"
         class="social-icon" loading="lazy">
     </a>
     <a href="https://www.facebook.com/soundabode" class="social-float facebook-float" target="_blank"
       rel="noopener noreferrer" title="Follow us on Facebook">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook"
+      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/facebook.svg" alt="Facebook"
         class="social-icon" loading="lazy">
     </a>
     <a href="https://wa.me/919975016189" class="social-float whatsapp-float" target="_blank" rel="noopener noreferrer"
       title="Chat on WhatsApp" aria-label="Chat with Soundabode on WhatsApp">
-      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp"
+      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/whatsapp.svg" alt="WhatsApp"
         class="social-icon" loading="lazy">
       <span class="whatsapp-label">Chat</span>
     </a>
   </div>
 
-  <main class="container" style="margin-top:6px;">
+  <main class="container" role="main">
     <!-- HERO -->
     <section class="hero" aria-labelledby="hero-heading">
       <div>
