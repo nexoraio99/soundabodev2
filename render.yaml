@@ -3,7 +3,7 @@ services:
     name: soundabode
     env: static
     buildCommand: "npm install && npm run build" # Dummy if not needed
-    staticPublishDir: ./
+    staticPublishPath: ./
     routes:
       - type: redirect
         source: /index.html
