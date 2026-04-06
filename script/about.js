@@ -20,7 +20,7 @@ const cta = document.getElementById('ctaBtn');
 if (cta) {
   cta.addEventListener('click', () => {
     // Prefer direct contact page if exists; otherwise do a small press-flash
-    const contactHref = '/contact.html';
+    const contactHref = '/contact';
     // Only navigate if contact page likely exists — this is a best-effort assumption.
     // If you prefer always to go to contact, remove the check.
     fetch(contactHref, { method: 'HEAD' })

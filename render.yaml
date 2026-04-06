@@ -6,32 +6,80 @@ services:
     staticPublishDir: ./
     routes:
       - type: redirect
-        source: /courses/music-production/beginner-course
-        destination: /courses/music-production/beginner-course.html
+        source: /index.html
+        destination: /
       - type: redirect
-        source: /courses/music-production/intermediate-course
-        destination: /courses/music-production/intermediate-course.html
+        source: /about.html
+        destination: /about
       - type: redirect
-        source: /courses/music-production/audio-engineering-diploma
-        destination: /courses/music-production/audio-engineering-diploma.html
+        source: /courses.html
+        destination: /courses
       - type: redirect
-        source: /courses/music-production/mixing-mastering-course
-        destination: /courses/music-production/mixing-mastering-course.html
+        source: /blog.html
+        destination: /blog
       - type: redirect
-        source: /courses/dj-training/basic-dj-course
-        destination: /courses/dj-training/basic-dj-course.html
+        source: /contact.html
+        destination: /contact
       - type: redirect
-        source: /courses/dj-training/pro-dj-course
-        destination: /courses/dj-training/pro-dj-course.html
+        source: /enroll.html
+        destination: /enroll
       - type: redirect
-        source: /courses/dj-training/advanced-dj-performance
-        destination: /courses/dj-training/advanced-dj-performance.html
+        source: /courses/music-production/beginner-course.html
+        destination: /courses/music-production/beginner-course
+      - type: redirect
+        source: /courses/music-production/intermediate-course.html
+        destination: /courses/music-production/intermediate-course
+      - type: redirect
+        source: /courses/music-production/audio-engineering-diploma.html
+        destination: /courses/music-production/audio-engineering-diploma
+      - type: redirect
+        source: /courses/music-production/mixing-mastering-course.html
+        destination: /courses/music-production/mixing-mastering-course
+      - type: redirect
+        source: /courses/dj-training/basic-dj-course.html
+        destination: /courses/dj-training/basic-dj-course
+      - type: redirect
+        source: /courses/dj-training/pro-dj-course.html
+        destination: /courses/dj-training/pro-dj-course
+      - type: redirect
+        source: /courses/dj-training/advanced-dj-performance.html
+        destination: /courses/dj-training/advanced-dj-performance
+      - type: rewrite
+        source: /about
+        destination: /about.html
       - type: rewrite
         source: /courses
         destination: /courses.html
       - type: rewrite
         source: /blog
         destination: /blog.html
+      - type: rewrite
+        source: /contact
+        destination: /contact.html
+      - type: rewrite
+        source: /enroll
+        destination: /enroll.html
+      - type: rewrite
+        source: /courses/music-production/beginner-course
+        destination: /courses/music-production/beginner-course.html
+      - type: rewrite
+        source: /courses/music-production/intermediate-course
+        destination: /courses/music-production/intermediate-course.html
+      - type: rewrite
+        source: /courses/music-production/audio-engineering-diploma
+        destination: /courses/music-production/audio-engineering-diploma.html
+      - type: rewrite
+        source: /courses/music-production/mixing-mastering-course
+        destination: /courses/music-production/mixing-mastering-course.html
+      - type: rewrite
+        source: /courses/dj-training/basic-dj-course
+        destination: /courses/dj-training/basic-dj-course.html
+      - type: rewrite
+        source: /courses/dj-training/pro-dj-course
+        destination: /courses/dj-training/pro-dj-course.html
+      - type: rewrite
+        source: /courses/dj-training/advanced-dj-performance
+        destination: /courses/dj-training/advanced-dj-performance.html
     envVars:
       - key: NODE_VERSION
         value: 20

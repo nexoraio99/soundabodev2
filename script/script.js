@@ -12,7 +12,7 @@
 
   /* ==========================================================================
      URL Normalization (Clean URLs) - DISABLED
-     (Kept .html extensions for static hosting compatibility)
+     (Now handled by backend server for consistent routing)
      ========================================================================== */
   /*
   function normalizeUrl() {

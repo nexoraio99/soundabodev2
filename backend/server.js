@@ -861,6 +861,13 @@ app.get('*', async (req, res, next) => {
     // Standardize path: remove trailing slash for consistent resolution
     const normalizedPath = req.path.replace(/\/+$/, '') || '/index';
 
+    // Redirect if request has .html extension
+    if (req.path.endsWith('.html')) {
+        const cleanPath = req.path.slice(0, -5);
+        console.log(`[Clean URL] Redirecting: ${req.path} -> ${cleanPath}`);
+        return res.redirect(301, cleanPath);
+    }
+
     // 0. Special case for the courses landing page to avoid file/folder conflict
     if (normalizedPath === '/courses') {
         const landingPath = path.join(__dirname, '..', 'courses-landing.html');
