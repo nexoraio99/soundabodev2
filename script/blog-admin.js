@@ -1,255 +1,429 @@
-/* blog-admin.js - Blog Administration Dashboard with SEO, GEO & Edit Support */
+/* ══════════════════════════════════════════════════════════
+   Soundabode Blog Admin — Dashboard Controller
+   ══════════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Backend URL configuration
-    const BACKEND_BASE = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com';
-    const socket = typeof io !== 'undefined' ? io(BACKEND_BASE) : null;
-    const loginPanel = document.getElementById('login-panel');
-    const adminPanel = document.getElementById('admin-panel');
-    const blogForm = document.getElementById('blog-form');
-    const submitBtn = document.getElementById('submit-btn');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    const loginBtn = document.getElementById('login-btn');
-    const adminPassInput = document.getElementById('admin-pass');
-    const editIdInput = document.getElementById('edit-id');
+  const BACKEND = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com';
+  const socket = typeof io !== 'undefined' ? io(BACKEND) : null;
 
-    // ── Character counters ──
-    setupCharCount('metaTitle', 60);
-    setupCharCount('metaDescription', 160);
+  // ── DOM Refs ──
+  const loginOverlay = document.getElementById('login-overlay');
+  const dashboard = document.getElementById('dashboard');
+  const adminPass = document.getElementById('admin-pass');
+  const loginBtn = document.getElementById('login-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const blogForm = document.getElementById('blog-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const cancelBtn = document.getElementById('cancel-edit-btn');
+  const editIdInput = document.getElementById('edit-id');
+  const composeTitleLabel = document.getElementById('compose-title-label');
+  const breadcrumbPage = document.getElementById('breadcrumb-page');
+  const searchInput = document.getElementById('search-posts');
 
-    function setupCharCount(fieldId, limit) {
-        const field = document.getElementById(fieldId);
-        const counter = document.getElementById(`${fieldId}-count`);
-        if (!field || !counter) return;
+  let allBlogs = [];
+  let adminPassword = '';
 
-        function update() {
-            const len = field.value.length;
-            counter.textContent = `${len} / ${limit}`;
-            counter.classList.remove('warn', 'danger');
-            if (len > limit) counter.classList.add('danger');
-            else if (len > limit * 0.85) counter.classList.add('warn');
-        }
-        field.addEventListener('input', update);
-        update();
+  // ══════════════════════════════════════════
+  // AUTH
+  // ══════════════════════════════════════════
+  function login() {
+    const pass = adminPass.value.trim();
+    if (pass === 'admin') {
+      adminPassword = pass;
+      loginOverlay.classList.add('hidden');
+      dashboard.classList.remove('hidden');
+      loadBlogs();
+    } else {
+      adminPass.style.borderColor = '#dc2626';
+      adminPass.focus();
+      setTimeout(() => { adminPass.style.borderColor = ''; }, 1500);
     }
+  }
 
-    // ── Login ──
-    function checkPass() {
-        const pass = adminPassInput.value;
-        if (pass === 'admin') {
-            loginPanel.style.display = 'none';
-            adminPanel.style.display = 'block';
-            loadAdminBlogs();
-        } else {
-            alert('Invalid password! Hint: admin');
-        }
+  loginBtn.addEventListener('click', login);
+  adminPass.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+  logoutBtn.addEventListener('click', () => {
+    dashboard.classList.add('hidden');
+    loginOverlay.classList.remove('hidden');
+    adminPass.value = '';
+    adminPassword = '';
+  });
+
+  // ══════════════════════════════════════════
+  // NAVIGATION
+  // ══════════════════════════════════════════
+  const sidebarLinks = document.querySelectorAll('.sidebar-link[data-view]');
+  const views = document.querySelectorAll('.view');
+  const viewLabels = { overview: 'Dashboard', compose: 'Compose', posts: 'All Posts' };
+
+  function switchView(viewName) {
+    views.forEach(v => v.classList.remove('active'));
+    sidebarLinks.forEach(l => l.classList.remove('active'));
+
+    const target = document.getElementById(`view-${viewName}`);
+    const link = document.querySelector(`.sidebar-link[data-view="${viewName}"]`);
+    if (target) target.classList.add('active');
+    if (link) link.classList.add('active');
+    breadcrumbPage.textContent = viewLabels[viewName] || viewName;
+  }
+
+  sidebarLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      switchView(link.dataset.view);
+    });
+  });
+
+  // Quick nav buttons
+  document.getElementById('topbar-new-post').addEventListener('click', () => {
+    resetForm();
+    switchView('compose');
+  });
+
+  document.querySelectorAll('[data-goto]').forEach(btn => {
+    btn.addEventListener('click', () => switchView(btn.dataset.goto));
+  });
+
+  // ══════════════════════════════════════════
+  // CHAR COUNTERS
+  // ══════════════════════════════════════════
+  setupCharCount('metaTitle', 60);
+  setupCharCount('metaDescription', 160);
+
+  function setupCharCount(id, limit) {
+    const field = document.getElementById(id);
+    const counter = document.getElementById(`${id}-count`);
+    if (!field || !counter) return;
+    const update = () => {
+      const len = field.value.length;
+      counter.textContent = `${len}/${limit}`;
+      counter.classList.remove('warn', 'over');
+      if (len > limit) counter.classList.add('over');
+      else if (len > limit * 0.85) counter.classList.add('warn');
+    };
+    field.addEventListener('input', update);
+    update();
+  }
+
+  // Update SEO badge
+  ['metaTitle', 'metaDescription'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', updateSeoBadge);
+  });
+
+  function updateSeoBadge() {
+    const badge = document.getElementById('seo-status');
+    const hasTitle = document.getElementById('metaTitle')?.value.trim();
+    const hasDesc = document.getElementById('metaDescription')?.value.trim();
+    if (hasTitle && hasDesc) {
+      badge.textContent = 'Complete';
+      badge.classList.add('active');
+    } else if (hasTitle || hasDesc) {
+      badge.textContent = 'Partial';
+      badge.classList.remove('active');
+    } else {
+      badge.textContent = 'Not Set';
+      badge.classList.remove('active');
     }
+  }
 
-    if (loginBtn) loginBtn.addEventListener('click', checkPass);
-    if (adminPassInput) {
-        adminPassInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') checkPass();
-        });
+  // Update GEO badge
+  document.getElementById('geoTarget')?.addEventListener('change', () => {
+    const badge = document.getElementById('geo-status');
+    const val = document.getElementById('geoTarget').value;
+    if (val) {
+      badge.textContent = val;
+      badge.classList.add('active');
+    } else {
+      badge.textContent = 'Global';
+      badge.classList.remove('active');
     }
+  });
 
-    // ── Cancel Edit ──
-    if (cancelEditBtn) {
-        cancelEditBtn.addEventListener('click', () => {
-            resetForm();
-        });
+  // ══════════════════════════════════════════
+  // LOAD BLOGS
+  // ══════════════════════════════════════════
+  async function loadBlogs() {
+    try {
+      const res = await fetch(`${BACKEND}/api/blogs?t=${Date.now()}`);
+      allBlogs = await res.json();
+      renderStats();
+      renderRecentPosts();
+      renderLatestList();
+      renderAllPosts();
+    } catch (err) {
+      console.error('Load error:', err);
     }
+  }
 
-    function resetForm() {
-        blogForm.reset();
-        editIdInput.value = '';
-        submitBtn.innerText = 'Publish Blog Post';
-        cancelEditBtn.style.display = 'none';
-        document.getElementById('author').value = 'Soundabode';
-        // Reset char counters
-        ['metaTitle', 'metaDescription'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.dispatchEvent(new Event('input'));
-        });
-        // Scroll to top of form
-        document.querySelector('.admin-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // ── Stats ──
+  function renderStats() {
+    document.getElementById('stat-total').textContent = allBlogs.length;
+    document.getElementById('stat-seo').textContent = allBlogs.filter(b => b.metaTitle || b.metaDescription).length;
+    document.getElementById('stat-geo').textContent = allBlogs.filter(b => b.geoTarget).length;
+    const cats = new Set(allBlogs.map(b => b.category || 'General'));
+    document.getElementById('stat-categories').textContent = cats.size;
+  }
+
+  // ── Recent Posts Grid (top 3) ──
+  function renderRecentPosts() {
+    const container = document.getElementById('recent-posts');
+    const recent = allBlogs.slice(0, 3);
+    if (recent.length === 0) {
+      container.innerHTML = '<div class="empty-state">No posts yet. Create your first blog post.</div>';
+      return;
     }
+    container.innerHTML = recent.map(blog => postCard(blog)).join('');
+  }
 
-    // ── Publish / Update ──
-    if (blogForm) {
-        blogForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const isEdit = !!editIdInput.value;
+  function postCard(blog) {
+    const hasSeo = blog.metaTitle || blog.metaDescription;
+    const hasGeo = blog.geoTarget;
+    const excerpt = (blog.content || '').substring(0, 120) + (blog.content?.length > 120 ? '...' : '');
+    const imgHtml = blog.imageUrl
+      ? `<img src="${esc(blog.imageUrl)}" alt="" onerror="this.parentElement.innerHTML='<span class=placeholder-icon>📄</span>'">`
+      : '<span class="placeholder-icon">📄</span>';
 
-            const blogData = {
-                heading: document.getElementById('heading').value,
-                subheading: document.getElementById('subheading').value,
-                content: document.getElementById('content').value,
-                imageUrl: document.getElementById('imageUrl').value,
-                category: document.getElementById('category').value,
-                author: document.getElementById('author').value,
-                metaTitle: document.getElementById('metaTitle').value,
-                metaDescription: document.getElementById('metaDescription').value,
-                metaImage: document.getElementById('metaImage').value,
-                geoTarget: document.getElementById('geoTarget').value,
-                password: document.getElementById('publish-pass').value
-            };
+    return `
+      <div class="post-card">
+        <div class="post-card-image">
+          ${imgHtml}
+          <span class="post-card-category">${esc(blog.category || 'General')}</span>
+        </div>
+        <div class="post-card-body">
+          <div class="post-card-meta">by ${esc(blog.author || 'Soundabode')} · ${esc(blog.date || '')}</div>
+          <div class="post-card-title">${esc(blog.heading)}</div>
+          <div class="post-card-excerpt">${esc(excerpt)}</div>
+          <div class="post-card-footer">
+            <div class="post-card-tags">
+              ${hasSeo ? '<span class="tag tag-seo">SEO</span>' : ''}
+              ${hasGeo ? `<span class="tag tag-geo">${esc(blog.geoTarget)}</span>` : ''}
+            </div>
+            <div class="post-card-actions">
+              <button class="action-btn" onclick="editBlog('${blog.id}')" title="Edit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="action-btn action-delete" onclick="deleteBlog('${blog.id}')" title="Delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
 
-            if (isEdit) {
-                blogData.id = editIdInput.value;
-            }
-
-            submitBtn.innerText = isEdit ? 'Updating...' : 'Publishing...';
-            submitBtn.disabled = true;
-
-            try {
-                const response = await fetch(`${BACKEND_BASE}/api/blogs`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(blogData)
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert(isEdit ? 'Blog Updated Successfully!' : 'Blog Published Successfully! It is now live on the website.');
-                    resetForm();
-                    loadAdminBlogs();
-                } else {
-                    alert(result.message || 'Failed to publish blog.');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Error connecting to server.');
-            } finally {
-                submitBtn.innerText = isEdit ? 'Update Blog Post' : 'Publish Blog Post';
-                submitBtn.disabled = false;
-            }
-        });
+  // ── Latest List ──
+  function renderLatestList() {
+    const container = document.getElementById('latest-list');
+    const latest = allBlogs.slice(0, 5);
+    if (latest.length === 0) {
+      container.innerHTML = '<div class="empty-state">No posts yet.</div>';
+      return;
     }
+    container.innerHTML = `
+      <div class="table-row table-row-head">
+        <div>Title</div><div>Category</div><div>Author</div><div>SEO</div><div></div>
+      </div>
+      ${latest.map(blog => tableRow(blog)).join('')}
+    `;
+  }
 
-    // ── Edit Blog ──
-    window.editBlog = function(blogJson) {
-        try {
-            const blog = JSON.parse(decodeURIComponent(blogJson));
-            
-            editIdInput.value = blog.id;
-            document.getElementById('heading').value = blog.heading || '';
-            document.getElementById('subheading').value = blog.subheading || '';
-            document.getElementById('imageUrl').value = blog.imageUrl || '';
-            document.getElementById('content').value = blog.content || '';
-            document.getElementById('author').value = blog.author || 'Soundabode';
-            document.getElementById('metaTitle').value = blog.metaTitle || '';
-            document.getElementById('metaDescription').value = blog.metaDescription || '';
-            document.getElementById('metaImage').value = blog.metaImage || '';
+  // ── All Posts Table ──
+  function renderAllPosts(filter = '') {
+    const container = document.getElementById('all-posts-table');
+    let filtered = allBlogs;
+    if (filter) {
+      const q = filter.toLowerCase();
+      filtered = allBlogs.filter(b =>
+        b.heading?.toLowerCase().includes(q) ||
+        b.category?.toLowerCase().includes(q) ||
+        b.author?.toLowerCase().includes(q)
+      );
+    }
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="empty-state">${filter ? 'No posts match your search.' : 'No posts yet.'}</div>`;
+      return;
+    }
+    container.innerHTML = `
+      <div class="table-row table-row-head">
+        <div>Title</div><div>Category</div><div>Author</div><div>SEO</div><div></div>
+      </div>
+      ${filtered.map(blog => tableRow(blog)).join('')}
+    `;
+  }
 
-            // Set select values
-            const categorySelect = document.getElementById('category');
-            if (categorySelect) {
-                const opt = [...categorySelect.options].find(o => o.value === blog.category);
-                if (opt) opt.selected = true;
-            }
-            const geoSelect = document.getElementById('geoTarget');
-            if (geoSelect) {
-                const opt = [...geoSelect.options].find(o => o.value === (blog.geoTarget || ''));
-                if (opt) opt.selected = true;
-            }
+  function tableRow(blog) {
+    const hasSeo = blog.metaTitle || blog.metaDescription;
+    return `
+      <div class="table-row">
+        <div class="table-cell-title">
+          <strong>${esc(blog.heading)}</strong>
+          <span>${esc(blog.date || '')}${blog.geoTarget ? ` · ${esc(blog.geoTarget)}` : ''}</span>
+        </div>
+        <div class="table-cell">${esc(blog.category || 'General')}</div>
+        <div class="table-cell">${esc(blog.author || 'Soundabode')}</div>
+        <div class="table-cell">${hasSeo ? '<span class="tag tag-seo">SEO ✓</span>' : '<span style="color:var(--grey-400)">—</span>'}</div>
+        <div class="table-cell-actions">
+          <button class="action-btn" onclick="editBlog('${blog.id}')" title="Edit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="action-btn action-delete" onclick="deleteBlog('${blog.id}')" title="Delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  }
 
-            // Update char counters
-            ['metaTitle', 'metaDescription'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.dispatchEvent(new Event('input'));
-            });
+  // Search
+  searchInput?.addEventListener('input', () => {
+    renderAllPosts(searchInput.value.trim());
+  });
 
-            submitBtn.innerText = 'Update Blog Post';
-            cancelEditBtn.style.display = 'block';
+  // ══════════════════════════════════════════
+  // COMPOSE / EDIT / DELETE
+  // ══════════════════════════════════════════
+  function resetForm() {
+    blogForm.reset();
+    editIdInput.value = '';
+    composeTitleLabel.textContent = 'Create New Post';
+    submitBtn.textContent = 'Publish';
+    cancelBtn.classList.add('hidden');
+    document.getElementById('author').value = 'Soundabode';
+    updateSeoBadge();
+    document.getElementById('geo-status').textContent = 'Global';
+    document.getElementById('geo-status').classList.remove('active');
+    ['metaTitle', 'metaDescription'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.dispatchEvent(new Event('input'));
+    });
+  }
 
-            document.querySelector('.admin-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } catch (err) {
-            console.error('Edit parse error:', err);
-            alert('Failed to load blog for editing.');
-        }
+  // Submit form
+  blogForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const isEdit = !!editIdInput.value;
+
+    const payload = {
+      heading: document.getElementById('heading').value,
+      subheading: document.getElementById('subheading').value,
+      content: document.getElementById('content').value,
+      imageUrl: document.getElementById('imageUrl').value,
+      category: document.getElementById('category').value,
+      author: document.getElementById('author').value,
+      metaTitle: document.getElementById('metaTitle').value,
+      metaDescription: document.getElementById('metaDescription').value,
+      metaImage: document.getElementById('metaImage').value,
+      geoTarget: document.getElementById('geoTarget').value,
+      password: document.getElementById('publish-pass').value || adminPassword
     };
 
-    // ── Delete Blog ──
-    const blogList = document.getElementById('blog-list');
+    if (isEdit) payload.id = editIdInput.value;
 
-    window.deleteBlog = async function(id) {
-        if (!confirm('Are you sure you want to delete this blog? This cannot be undone.')) return;
-        
-        const pass = document.getElementById('admin-pass').value || document.getElementById('publish-pass').value;
-        if (!pass) {
-            alert('Admin password required to delete. Please fill the Confirm Password field.');
-            return;
-        }
+    submitBtn.textContent = isEdit ? 'Updating...' : 'Publishing...';
+    submitBtn.disabled = true;
 
-        try {
-            const res = await fetch(`${BACKEND_BASE}/api/blogs/${id}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: pass })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert('Blog deleted successfully.');
-                loadAdminBlogs();
-                // If we were editing this blog, reset the form
-                if (editIdInput.value === id) resetForm();
-            } else {
-                alert(data.message || 'Failed to delete blog.');
-            }
-        } catch (err) {
-            console.error(err);
-            alert('Error deleting blog.');
-        }
-    };
+    try {
+      const res = await fetch(`${BACKEND}/api/blogs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        resetForm();
+        await loadBlogs();
+        switchView('overview');
+      } else {
+        alert(data.message || 'Failed to save.');
+      }
+    } catch (err) {
+      alert('Connection error.');
+    } finally {
+      submitBtn.textContent = isEdit ? 'Update' : 'Publish';
+      submitBtn.disabled = false;
+    }
+  });
 
-    // ── Load Blog List ──
-    async function loadAdminBlogs() {
-        if (!blogList) return;
-        try {
-            const res = await fetch(`${BACKEND_BASE}/api/blogs?t=${Date.now()}`);
-            const blogs = await res.json();
-            
-            if (blogs.length === 0) {
-                blogList.innerHTML = '<p style="color: var(--text-muted);">No blogs published yet.</p>';
-                return;
-            }
+  // Cancel edit
+  cancelBtn.addEventListener('click', () => {
+    resetForm();
+    switchView('overview');
+  });
 
-            blogList.innerHTML = blogs.map(blog => {
-                const hasSeo = blog.metaTitle || blog.metaDescription;
-                const hasGeo = blog.geoTarget;
-                const encodedBlog = encodeURIComponent(JSON.stringify(blog));
+  // Edit blog
+  window.editBlog = function(id) {
+    const blog = allBlogs.find(b => b.id === id);
+    if (!blog) return;
 
-                return `
-                    <div class="admin-blog-item">
-                        <div class="admin-blog-item-header">
-                            <div class="admin-blog-item-info">
-                                <h3>${escapeHtml(blog.heading)}</h3>
-                                <div class="admin-blog-item-meta">
-                                    <span>📅 ${blog.date}</span>
-                                    <span style="color: var(--primary);">📁 ${escapeHtml(blog.category || 'General')}</span>
-                                    <span>✍️ ${escapeHtml(blog.author || 'Soundabode')}</span>
-                                    ${hasSeo ? '<span class="admin-tag admin-tag-seo">SEO ✓</span>' : ''}
-                                    ${hasGeo ? `<span class="admin-tag admin-tag-geo">GEO: ${escapeHtml(blog.geoTarget)}</span>` : ''}
-                                </div>
-                            </div>
-                            <div class="admin-blog-actions">
-                                <button class="admin-btn-edit" onclick="editBlog('${encodedBlog}')">✏️ Edit</button>
-                                <button class="admin-btn-danger" onclick="deleteBlog('${blog.id}')">🗑️ Delete</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        } catch (err) {
-            console.error(err);
-            blogList.innerHTML = '<p style="color: #ff5555;">Failed to load blogs.</p>';
-        }
+    editIdInput.value = blog.id;
+    document.getElementById('heading').value = blog.heading || '';
+    document.getElementById('subheading').value = blog.subheading || '';
+    document.getElementById('content').value = blog.content || '';
+    document.getElementById('imageUrl').value = blog.imageUrl || '';
+    document.getElementById('author').value = blog.author || 'Soundabode';
+    document.getElementById('metaTitle').value = blog.metaTitle || '';
+    document.getElementById('metaDescription').value = blog.metaDescription || '';
+    document.getElementById('metaImage').value = blog.metaImage || '';
+
+    setSelect('category', blog.category);
+    setSelect('geoTarget', blog.geoTarget || '');
+
+    composeTitleLabel.textContent = 'Edit Post';
+    submitBtn.textContent = 'Update';
+    cancelBtn.classList.remove('hidden');
+
+    updateSeoBadge();
+    const geoBadge = document.getElementById('geo-status');
+    if (blog.geoTarget) {
+      geoBadge.textContent = blog.geoTarget;
+      geoBadge.classList.add('active');
+    } else {
+      geoBadge.textContent = 'Global';
+      geoBadge.classList.remove('active');
     }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    ['metaTitle', 'metaDescription'].forEach(id => {
+      document.getElementById(id)?.dispatchEvent(new Event('input'));
+    });
+
+    switchView('compose');
+  };
+
+  // Delete blog
+  window.deleteBlog = async function(id) {
+    if (!confirm('Delete this post? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`${BACKEND}/api/blogs/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword })
+      });
+      if (res.ok) {
+        if (editIdInput.value === id) resetForm();
+        await loadBlogs();
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Delete failed.');
+      }
+    } catch (err) {
+      alert('Connection error.');
     }
+  };
+
+  // ── Helpers ──
+  function setSelect(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const opt = [...el.options].find(o => o.value === value);
+    if (opt) opt.selected = true;
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
 });
