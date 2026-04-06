@@ -51,8 +51,20 @@ services:
         source: /courses/dj-training/pro-dj-course
         destination: /courses/dj-training/pro-dj-course.html
       - type: rewrite
-        source: /courses/dj-training/advanced-dj-course
-        destination: /courses/dj-training/advanced-dj-course.html
+        source: /courses/dj-training/advanced-dj-performance
+        destination: /courses/dj-training/advanced-dj-performance.html
+      - type: rewrite
+        source: /courses/music-production/beginner-course
+        destination: /courses/music-production/beginner-course.html
+      - type: rewrite
+        source: /courses/music-production/intermediate-course
+        destination: /courses/music-production/intermediate-course.html
+      - type: rewrite
+        source: /courses/music-production/audio-engineering-diploma
+        destination: /courses/music-production/audio-engineering-diploma.html
+      - type: rewrite
+        source: /courses/music-production/mixing-mastering-course
+        destination: /courses/music-production/mixing-mastering-course.html
       - type: rewrite
         source: /courses/music-production/ableton-live-course
         destination: /courses/music-production/ableton-live-course.html

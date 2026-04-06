@@ -153,11 +153,17 @@ app.get('*', async (req, res, next) => {
     for (const filePath of candidates) {
         try {
             await fs.access(filePath);
-            console.log(`[Routing] Serving Clean URL: ${req.path} -> ${path.basename(filePath)}`);
+            const fileName = path.basename(filePath);
+            console.log(`[Clean URL] Request: ${req.path} -> Serving: ${fileName}`);
             return res.sendFile(filePath);
         } catch (e) {
             // Check next candidate
         }
+    }
+
+    // Defensive: log if we are inside /courses/ but no file was found
+    if (req.path.startsWith('/courses/')) {
+        console.warn(`[Routing Warning] Course sub-path requested but no matching file found: ${req.path}`);
     }
 
     // Default to index.html for SPA-like behavior on root or non-matching routes
