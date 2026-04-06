@@ -205,12 +205,12 @@
   </footer>
 
   <!-- Real-Time Logic -->
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="/script/script.js" defer></script>
   <script>
     // Backend configuration
     const BACKEND_BASE = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com';
-    const socket = io(BACKEND_BASE);
+    const socket = typeof io !== 'undefined' ? io(BACKEND_BASE) : null;
     const blogFeed = document.getElementById('blog-feed');
     const latestGrid = document.getElementById('latest-news-grid');
     const loadingState = document.getElementById('loading-state');
@@ -232,12 +232,14 @@
       });
 
     // Listen for live updates
-    socket.on('blogUpdate', (blog) => {
-      const index = allBlogs.findIndex(b => b.id === blog.id);
-      if(index > -1) allBlogs[index] = blog;
-      else allBlogs.unshift(blog);
-      renderAll();
-    });
+    if (socket) {
+      socket.on('blogUpdate', (blog) => {
+        const index = allBlogs.findIndex(b => b.id === blog.id);
+        if(index > -1) allBlogs[index] = blog;
+        else allBlogs.unshift(blog);
+        renderAll();
+      });
+    }
 
     // Filtering logic
     filterBtns.forEach(btn => {
