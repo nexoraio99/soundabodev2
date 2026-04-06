@@ -98,7 +98,7 @@ app.get('/api/blogs', async (req, res) => {
 
 app.post('/api/blogs', async (req, res) => {
     const { id, heading, subheading, date, content, imageUrl, category, author, password } = req.body;
-    
+
     // Simple admin check
     if (password !== 'admin') {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -137,27 +137,32 @@ app.use(express.static(__dirname));
 // 2. Clean URL support: Try adding .html
 app.get('*', async (req, res, next) => {
     // Skip if it's an API call or has a file extension
-    if (req.path.startsWith('/api/')) return next();
+    if (req.path.startsWith('/api/') || req.path.startsWith('/socket.io/')) return next();
     if (path.extname(req.path)) return next();
 
-    try {
-        let filePath = path.join(__dirname, req.path + '.html');
+    // Standardize path: remove trailing slash for consistent resolution
+    const normalizedPath = req.path.replace(/\/+$/, '') || '/index';
+
+    // 1. Try exact path + .html (e.g. /about -> about.html)
+    // 2. Then try [path]/index.html (rare but useful for folders)
+    const candidates = [
+        path.join(__dirname, normalizedPath + '.html'),
+        path.join(__dirname, normalizedPath, 'index.html')
+    ];
+
+    for (const filePath of candidates) {
         try {
             await fs.access(filePath);
+            console.log(`[Routing] Serving Clean URL: ${req.path} -> ${path.basename(filePath)}`);
             return res.sendFile(filePath);
-        } catch {
-            // Try [path]/index.html
-            filePath = path.join(__dirname, req.path, 'index.html');
-            try {
-                await fs.access(filePath);
-                return res.sendFile(filePath);
-            } catch {
-                return next();
-            }
+        } catch (e) {
+            // Check next candidate
         }
-    } catch {
-        return next();
     }
+
+    // Default to index.html for SPA-like behavior on root or non-matching routes
+    // But only if it's not a courses sub-path (to avoid the courses.html override)
+    return next();
 });
 
 // ------------------- Socket.io -------------------
