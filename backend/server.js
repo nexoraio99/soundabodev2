@@ -866,33 +866,50 @@ app.post('/api/contact-form', async (req, res) => {
 });
 
 // ---- Clean URL / Static HTML fallback ----
+// Maps clean URLs to their actual HTML files on disk.
+// This handles the tricky case where "courses.html" lives at root
+// but "courses/" is also a real directory with sub-pages inside it.
+// Without explicit handling, Express can confuse the file vs directory.
+
+// Explicit mappings for root-level pages that could conflict with directories
+const ROOT_PAGE_MAP = {
+    '/courses': 'courses.html',
+    '/about': 'about.html',
+    '/blog': 'blog.html',
+    '/contact': 'contact.html',
+    '/enroll': 'enroll.html',
+    '/privacy': 'privacy.html',
+    '/terms': 'terms.html',
+};
+
 app.get('*', async (req, res, next) => {
-    // Skip if it's an API call or has a file extension
+    // Skip API calls, socket.io, and requests with file extensions (css, js, images, etc.)
     if (req.path.startsWith('/api/') || req.path.startsWith('/socket.io/')) return next();
     if (path.extname(req.path)) return next();
 
-    // Standardize path: remove trailing slash for consistent resolution
+    // Normalize: strip trailing slashes, default bare "/" to "/index"
     const normalizedPath = req.path.replace(/\/+$/, '') || '/index';
 
-    // Redirect if request has .html extension
+    // Auto-redirect .html URLs to their clean versions (SEO best practice)
     if (req.path.endsWith('.html')) {
         const cleanPath = req.path.slice(0, -5);
-        console.log(`[Clean URL] Redirecting: ${req.path} -> ${cleanPath}`);
+        console.log(`[Clean URL] 301 Redirect: ${req.path} -> ${cleanPath}`);
         return res.redirect(301, cleanPath);
     }
 
-    // 0. Special case for the courses landing page to avoid file/folder conflict
-    if (normalizedPath === '/courses') {
-        const landingPath = path.join(__dirname, '..', 'courses-landing.html');
+    // 1. Check explicit root-page map first (resolves file/directory conflicts)
+    if (ROOT_PAGE_MAP[normalizedPath]) {
+        const mapped = path.join(__dirname, '..', ROOT_PAGE_MAP[normalizedPath]);
         try {
-            await fs.access(landingPath);
-            console.log(`[Clean URL] Request: /courses -> Special Mapping: courses-landing.html`);
-            return res.sendFile(landingPath);
-        } catch (e) {}
+            await fs.access(mapped);
+            console.log(`[Clean URL] ${req.path} -> ${ROOT_PAGE_MAP[normalizedPath]} (mapped)`);
+            return res.sendFile(mapped);
+        } catch (e) {
+            console.warn(`[Clean URL] Mapped file missing: ${ROOT_PAGE_MAP[normalizedPath]}`);
+        }
     }
 
-    // 1. Try exact path + .html (e.g. /about -> about.html)
-    // 2. Then try [path]/index.html (rare but useful for folders)
+    // 2. Generic resolution: try path.html, then path/index.html
     const candidates = [
         path.join(__dirname, '..', normalizedPath + '.html'),
         path.join(__dirname, '..', normalizedPath, 'index.html')
@@ -901,20 +918,19 @@ app.get('*', async (req, res, next) => {
     for (const filePath of candidates) {
         try {
             await fs.access(filePath);
-            const fileName = path.basename(filePath);
-            console.log(`[Clean URL] Request: ${req.path} -> Serving: ${fileName}`);
+            const relative = path.relative(path.join(__dirname, '..'), filePath);
+            console.log(`[Clean URL] ${req.path} -> ${relative}`);
             return res.sendFile(filePath);
         } catch (e) {
-            // Check next candidate
+            // Try next candidate
         }
     }
 
-    // Defensive: log if we are inside /courses/ but no file was found
+    // Log unresolved course paths for debugging
     if (req.path.startsWith('/courses/')) {
-        console.warn(`[Routing Warning] Course sub-path requested but no matching file found: ${req.path}`);
+        console.warn(`[Clean URL] No file found for course path: ${req.path}`);
     }
 
-    // Default to index.html for SPA-like behavior on root or non-matching routes
     return next();
 });
 
