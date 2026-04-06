@@ -850,6 +850,16 @@ app.get('*', async (req, res, next) => {
     // Standardize path: remove trailing slash for consistent resolution
     const normalizedPath = req.path.replace(/\/+$/, '') || '/index';
 
+    // 0. Special case for the courses landing page to avoid file/folder conflict
+    if (normalizedPath === '/courses') {
+        const landingPath = path.join(__dirname, '..', 'courses-landing.html');
+        try {
+            await fs.access(landingPath);
+            console.log(`[Clean URL] Request: /courses -> Special Mapping: courses-landing.html`);
+            return res.sendFile(landingPath);
+        } catch (e) {}
+    }
+
     // 1. Try exact path + .html (e.g. /about -> about.html)
     // 2. Then try [path]/index.html (rare but useful for folders)
     const candidates = [
