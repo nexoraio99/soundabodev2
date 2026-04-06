@@ -1,15 +1,15 @@
-/* ═══ MAGAZINE BLOG STYLES (Soundabode Dark Edition) ═══ */
+/* ═══ MAGAZINE BLOG STYLES (Soundabode Dark Edition - Monochromatic) ═══ */
 
 :root {
   --blog-bg: #050505;
   --blog-text: #eaeaea;
-  --blog-muted: rgba(234, 234, 234, 0.65);
+  --blog-muted: rgba(234, 234, 234, 0.45);
   --blog-border: rgba(255, 255, 255, 0.1);
-  --blog-accent: #00c2ff;
-  --blog-accent-green: #33ff8c;
-  --blog-accent-gradient: linear-gradient(45deg, #2cf8ff, #7a25f2, #ed2eed);
-  --blog-heading-gradient: linear-gradient(110deg, #3a4045 0%, #768087 35%, #ffffff 45%, #ffffff 50%, #768087 55%, #3a4045 100%);
-  --blog-card-bg: rgba(255, 255, 255, 0.03);
+  --blog-accent: #FFFFFF;
+  --blog-accent-grey: #888888;
+  --blog-accent-gradient: linear-gradient(45deg, #333333, #666666, #999999);
+  --blog-heading-gradient: linear-gradient(110deg, #5a6065 0%, #869097 35%, #ffffff 45%, #ffffff 50%, #869097 55%, #5a6065 100%);
+  --blog-card-bg: rgba(255, 255, 255, 0.02);
   --font-main: 'Inter', sans-serif;
 }
 
@@ -49,7 +49,7 @@ body {
 .blog-header-hero {
   padding: 100px 0 60px;
   text-align: center;
-  background: radial-gradient(circle at top, rgba(0, 194, 255, 0.1) 0%, rgba(5, 5, 5, 0) 70%);
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(5, 5, 5, 0) 70%);
 }
 
 .badge-accent {
@@ -60,7 +60,7 @@ body {
   border-radius: 99px;
   font-size: 0.7rem;
   font-weight: 700;
-  color: var(--blog-accent);
+  color: #FFF;
   margin-bottom: 24px;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -116,13 +116,13 @@ body {
 }
 
 .search-input-wrapper input:focus {
-  border-color: var(--blog-accent);
+  border-color: #FFF;
   background: rgba(255, 255, 255, 0.08);
 }
 
 .btn-search {
   padding: 16px 36px;
-  background: var(--blog-accent-green);
+  background: #FFF;
   color: #000;
   border: none;
   border-radius: 14px;
@@ -130,12 +130,11 @@ body {
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(51, 255, 140, 0.2);
 }
 
 .btn-search:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(51, 255, 140, 0.4);
+  background: #eee;
 }
 
 /* ── LAYOUT ── */
@@ -209,7 +208,7 @@ body {
   font-size: 0.65rem;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--blog-accent);
+  color: #FFF;
   z-index: 2;
   letter-spacing: 1px;
 }
@@ -297,7 +296,7 @@ body {
 
 .mini-date {
   font-size: 0.7rem;
-  color: var(--blog-accent);
+  color: var(--blog-accent-grey);
   margin-bottom: 6px;
   font-weight: 700;
   text-transform: uppercase;
@@ -318,25 +317,11 @@ body {
 /* SUBSCRIBE CARD */
 .subscribe-card {
   padding: 40px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(25, 25, 25, 0.2) 100%);
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 32px;
   border: 1px solid var(--blog-border);
   position: relative;
   overflow: hidden;
-}
-
-.subscribe-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  padding: 1px;
-  border-radius: 32px;
-  background: var(--blog-accent-gradient);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0.3;
 }
 
 .subscribe-desc {
@@ -349,7 +334,7 @@ body {
 .btn-subscribe {
   width: 100%;
   padding: 16px;
-  background: var(--blog-accent-green);
+  background: #FFF;
   color: #000;
   border: none;
   border-radius: 14px;
@@ -379,7 +364,7 @@ body {
 }
 
 .modal-meta {
-  color: var(--blog-accent);
+  color: #FFF;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -399,33 +384,138 @@ body {
   width: 56px;
   height: 56px;
   backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: 0.3s;
 }
+
+.modal-close:hover { transform: rotate(90deg); background: rgba(255,255,255,0.2); }
 
 /* ── FOOTER ── */
 .blog-footer {
+  padding: 80px 0 40px;
   background: #000;
   border-top: 1px solid var(--blog-border);
-  padding: 100px 0 40px;
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 60px;
 }
 
 .footer-logo-text {
-  font-size: 1.8rem;
-  font-weight: 900;
+  font-size: 1.6rem;
+  font-weight: 800;
   color: #FFF;
-  text-transform: uppercase;
-  letter-spacing: 3px;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
 }
 
-.footer-nav-col h4, .footer-subscribe-col h4 {
+.footer-about, .footer-address {
+  color: var(--blog-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.footer-nav-col h4 {
   font-size: 0.9rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2px;
   color: #FFF;
+  margin-bottom: 24px;
+}
+
+.footer-nav-col ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-nav-col li {
+  margin-bottom: 12px;
+}
+
+.footer-nav-col a {
+  text-decoration: none;
+  color: var(--blog-muted);
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.footer-nav-col a:hover {
+  color: #FFF;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 30px;
+  border-top: 1px solid var(--blog-border);
+  font-size: 0.85rem;
+  color: var(--blog-muted);
+}
+
+.footer-legal {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-legal a {
+  color: var(--blog-muted);
+  text-decoration: none;
+}
+
+.footer-legal a:hover {
+  color: #FFF;
+}
+
+/* ── FLOATING SOCIALS ── */
+.floating-socials {
+  position: fixed;
+  right: 40px;
+  bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.social-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  padding: 10px;
+}
+
+.social-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: grayscale(1);
+}
+
+.social-btn:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.social-btn:hover img {
+  filter: grayscale(0);
 }
 
 @media (max-width: 900px) {
   .blog-grid-layout { grid-template-columns: 1fr; gap: 40px; }
   .main-blog-feed { grid-template-columns: 1fr; }
   .modal-content { padding: 60px 24px; }
+  .floating-socials { right: 20px; bottom: 20px; scale: 0.8; }
 }
