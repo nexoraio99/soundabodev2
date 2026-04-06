@@ -8,15 +8,15 @@
   <meta name="theme-color" content="#000000" />
 
   <!-- Favicon / App Icons -->
-  <link rel="icon" href="/Assets/favicon.ico" sizes="any" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/Assets/favicon-16x16.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/Assets/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="48x48" href="/Assets/favicon-48x48.png" />
-  <link rel="icon" type="image/png" sizes="64x64" href="/Assets/favicon-64x64.png" />
-  <link rel="icon" type="image/png" sizes="192x192" href="/Assets/favicon-192x192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="/Assets/favicon-512x512.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/Assets/favicon-180x180.png" />
-  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="icon" href="Assets/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="16x16" href="Assets/favicon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="Assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="Assets/favicon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="64x64" href="Assets/favicon-64x64.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="Assets/favicon-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="Assets/favicon-512x512.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="Assets/favicon-180x180.png" />
+  <link rel="manifest" href="site.webmanifest" />
 
   <!-- Open Graph -->
 
@@ -66,18 +66,6 @@
 
 <meta name="twitter:image" content="/Assets/og-soundabode-cover.jpg">
  
-    <script>
-    (function() {
-      var path = window.location.pathname;
-      if (path.indexOf('.html') !== -1) {
-        var cleanPath = path.replace('.html', '');
-        var cleanUrl = window.location.origin + cleanPath + window.location.search + window.location.hash;
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, '', cleanUrl);
-        }
-      }
-    })();
-  </script>
 
   <!-- ========================
        Google Tag Manager (deferred non-blocking)
@@ -160,6 +148,7 @@
       style="display:none;visibility:hidden" alt="fb-ns"/>
   </noscript>
 
+  <link rel="stylesheet" href="style/style.css" />
   <style>
     /* ------------------------
        Base / Utility
@@ -251,6 +240,12 @@
     }
     .whatsapp-float:hover { transform: scale(1.1); background-color:#20ba5a; }
     .whatsapp-icon { width: clamp(24px,6vw,30px); height: clamp(24px,6vw,30px); filter: brightness(0) invert(1); }
+    .whatsapp-label { display: none; color: #fff; font-size: 14px; font-weight: 600; margin-left: 8px; white-space: nowrap; }
+
+    @media (max-width: 768px) {
+      .whatsapp-float { width: auto; height: 50px; padding: 0 20px; border-radius: 30px; }
+      .whatsapp-label { display: block; }
+    }
 
     /* HERO */
     .hero { display:grid; grid-template-columns: 1fr; gap:28px; align-items:center; margin-top:80px; }
@@ -322,7 +317,7 @@
     }
     .testimonial.active { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
 
-    .quote { color: rgba(230,230,230,0.95); margin: 0; font-size: clamp(.9rem, 1.8vw, 1.02rem); line-height:1.5; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+    .quote { color: rgba(230,230,230,0.95); margin: 0; font-size: clamp(.9rem, 1.8vw, 1.02rem); line-height:1.5; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
     .author { margin: 0; font-weight:700; font-size: clamp(.86rem,1.6vw,1rem); color:#fff; }
     .role { margin: 0; color: rgba(200,200,200,0.7); font-size: clamp(.72rem,1.1vw,.84rem); }
 
@@ -336,7 +331,7 @@
 
     @media (max-width:520px) {
       .testimonial-container { --card-h: 210px; }
-      .quote { -webkit-line-clamp: 3; font-size: .98rem; }
+      .quote { -webkit-line-clamp: 3; line-clamp: 3; font-size: .98rem; }
       .testimonial { padding: 12px; border-radius: 10px; }
     }
     /* HERO VISUAL */
@@ -360,7 +355,15 @@
     .tab-panel { margin-top:20px; transition: all 240ms ease; opacity:1; }
     .levels-grid { display:grid; grid-template-columns:1fr; gap:14px; }
     @media (min-width:920px) { .levels-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    .level-card { background: radial-gradient(circle at top left, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); padding:14px 14px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.06); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; display:flex; gap:12px; }
+    .level-card { 
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); 
+      padding:14px 14px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.06); 
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; 
+      display:flex; gap:12px; 
+    }
+    @media (max-width: 480px) {
+      .level-card { flex-direction: column; align-items: flex-start; }
+    }
     .level-card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.12); }
     .level-badge { width:40px; height:40px; border-radius:12px; background: rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; flex-shrink:0; }
     .level-content { flex:1; min-width:0; }
@@ -405,33 +408,18 @@
 
     /* FOOTER */
     footer { margin-top:40px; padding:20px 0; border-top:1px solid rgba(255,255,255,0.03); color:var(--muted); font-size:13px; }
-    .site-footer { background-color:#000; font-family:"Roboto Mono", monospace; color:#fff; padding:18px 20px; border-top:1px solid #2222222e; position:relative; z-index:2; }
-    .footer-container { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
-    .footer-columns { display:flex; gap:60px; flex-wrap:wrap; }
-    .footer-column h4 { color:#888; font-size:0.75rem; font-weight:400; letter-spacing:2px; text-transform:uppercase; padding:4px 1px; margin-bottom:6px; }
-    .footer-column ul { list-style:none; padding:0; margin:0; }
-    .footer-column li { margin-bottom:6px; }
-    .footer-column a, .footer-column p { color:#fff; text-decoration:none; font-size:0.7rem; line-height:1.5; margin:0; transition:opacity 0.3s; }
-    .footer-column a:hover { opacity:0.7; }
-    .footer-copyright p { margin-right:40px; color:#888; font-size:0.6rem; }
 
     /* RESPONSIVE */
     @media (max-width:768px) {
       .hero { margin-top:72px; }
       .hero h1 { font-size:26px; }
-      .hero .cta-row button { flex:1 1 100%; text-align:center; }
       .hero-visual { height:280px; }
       .enroll-bottom { flex-direction:column; align-items:flex-start; }
       .enroll-bottom .actions { width:100%; flex-direction:column; }
       .enroll-bottom .actions a { width:100%; text-align:center; }
     }
     @media (max-width:480px) {
-      .site-footer { padding: clamp(18px,2vw,25px) clamp(12px,2vw,18px); }
       .footer-container { gap: clamp(12px,2vw,18px); }
-      .footer-columns { gap: clamp(18px,2vw,25px); margin-bottom: clamp(15px,2vw,20px); }
-      .footer-column h4 { font-size: clamp(0.6rem,1.2vw,0.75rem); margin-bottom: clamp(6px,1vw,10px); }
-      .footer-column a, .footer-column p { font-size: clamp(0.55rem,1vw,0.65rem); }
-      .footer-copyright p { margin-right:0; font-size: clamp(0.5rem,0.9vw,0.6rem); }
     }
     /* MODAL (aligned with DJ Level pages) */
 .modal-overlay {
@@ -517,43 +505,66 @@
 
   <!-- NAVBAR -->
   <nav class="navbar">
-    <a href="/index" class="logo" aria-label="Soundabode home">
-      <!-- switched from cloudinary to local asset -->
-      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img" />
+    <a href="/" class="logo">
+      <img
+        src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png"
+        alt="Soundabode Logo" class="logo-img">
     </a>
 
+    <!-- Desktop Navigation Links -->
     <div class="nav-links">
-      <a href="/about">About</a>
-      <a href="/courses">Courses</a>
-      <a href="/contact">Contact</a>
+      <a href="/about.html">About</a>
+      <a href="/courses.html">Courses</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/contact.html">Contact</a>
     </div>
 
+    <!-- Hamburger Menu Button -->
     <button class="hamburger-menu" aria-label="Toggle menu">
       <span class="bar"></span>
       <span class="bar"></span>
       <span class="bar"></span>
     </button>
 
+    <!-- Call Action Button -->
     <div class="nav-actions">
-      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion('call')">
+      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20.01 15.38c-1.23 0-2.42-0.2-3.53-0.56a0.977 0.977 0 0 0-1.01 0.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c0.27-0.28 0.35-0.67 0.24-1.02-0.37-1.11-0.56-2.3-0.56-3.53 0-0.54-0.45-0.99-0.99-0.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c0.71 0 0.99-0.63 0.99-1.18v-3.45c0-0.54-0.45-0.99-0.99-0.99z" fill="currentColor"/>
+          <path
+            d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"
+            fill="currentColor" />
         </svg>
       </a>
     </div>
   </nav>
 
   <!-- MOBILE MENU -->
-  <div class="nav-menu" role="dialog" aria-hidden="true">
-    <a href="/about">About</a>
-    <a href="/courses">Courses</a>
-    <a href="/contact">Contact</a>
+  <div class="nav-menu">
+    <a href="/about.html">About</a>
+    <a href="/courses.html">Courses</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/contact.html">Contact</a>
   </div>
 
-  <!-- WHATSAPP FLOAT -->
-  <a href="https://wa.me/919975016189" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp" onclick="uet_report_conversion('whatsapp')">
-    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp" class="whatsapp-icon" loading="lazy" />
-  </a>
+  <!-- SOCIAL FLOATING BUTTONS -->
+  <div class="social-floats-container">
+    <a href="https://www.instagram.com/soundabode" class="social-float instagram-float" target="_blank"
+      rel="noopener noreferrer" title="Follow us on Instagram">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram"
+        class="social-icon" loading="lazy">
+    </a>
+    <a href="https://www.facebook.com/soundabode" class="social-float facebook-float" target="_blank"
+      rel="noopener noreferrer" title="Follow us on Facebook">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook"
+        class="social-icon" loading="lazy">
+    </a>
+    <a href="https://wa.me/919975016189" class="social-float whatsapp-float" target="_blank" rel="noopener noreferrer"
+      title="Chat on WhatsApp" aria-label="Chat with Soundabode on WhatsApp">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp"
+        class="social-icon" loading="lazy">
+      <span class="whatsapp-label">Chat</span>
+    </a>
+  </div>
 
   <main class="container" style="margin-top:6px;">
     <!-- HERO -->
@@ -566,7 +577,7 @@
         </h1>
         <p>One Academy, two Power Paths, choose yours with infinite music careers. Become the artist the world remembers</p>
 
-        <div class="cta-row">
+        <div class="cta-row" style="display: flex; gap: 15px; margin-top: 25px;">
           <button class="btn-primary" id="explore-emp">Explore EMP</button>
           <button class="btn-outline" id="explore-dj">DJ Training</button>
         </div>
@@ -607,7 +618,7 @@
      class="floating-img album"
      id="float-album" loading="lazy">
 
-<img src="/Assets/game-soundtrack.jpg"
+<img src="Assets/game-soundtrack.jpg"
      alt="Studio mock"
      class="floating-img studio"
      id="float-studio" loading="lazy">
@@ -780,7 +791,7 @@
           <div class="card-block">
             <h4>Download Course Brochures</h4>
             <div class="brochures">
-           <a href="/music-production-brochure" 
+           <a href="music-production-brochure" 
    target="_blank" 
    rel="noopener noreferrer">
   Music Production & Audio Engineering Brochure
@@ -866,8 +877,8 @@
         <div class="muted" style="margin-top:4px;">Pay ₹30,000 to reserve your seat. Flexible installments available.</div>
       </div>
       <div class="actions">
-        <a class="btn-primary" href="/enroll">Enroll Now</a>
-        <a class="btn-outline" href="/contact">Contact Us</a>
+        <a class="btn-primary" href="/enroll.html">Enroll Now</a>
+        <a class="btn-outline" href="/contact.html">Contact Us</a>
       </div>
     </section>
 
@@ -1106,8 +1117,8 @@
         <div class="muted" style="margin-top:4px;">Pay ₹30,000 to reserve your seat. Flexible installments available.</div>
       </div>
       <div class="actions">
-        <a class="btn-primary" href="/enroll">Enroll Now</a>
-        <a class="btn-outline" href="/contact">Contact Us</a>
+        <a class="btn-primary" href="/enroll.html">Enroll Now</a>
+        <a class="btn-outline" href="/contact.html">Contact Us</a>
       </div>
     </section>
   </main>
@@ -1182,41 +1193,7 @@
 </div>
 
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-columns">
-        <div class="footer-column">
-          <h4>ABOUT</h4>
-          <ul>
-            <li><a href="/about">ABOUT</a></li>
-            <li><a href="/courses">COURSES</a></li>
-            <li><a href="/contact">CONTACT</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>LOCATION</h4>
-          <p>VISION 9, 2ND FLOOR,<br />KUNAL ICON RD,<br />PIMPLE SAUDAGAR, PUNE,<br />MAHARASHTRA 411017</p>
-        </div>
-        <div class="footer-column">
-          <h4>SOCIALS</h4>
-          <ul>
-            <li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">INSTAGRAM</a></li>
-            <li><a href="https://www.facebook.com/soundabode/" target="_blank" rel="noopener noreferrer">FACEBOOK</a></li>
-            <li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YOUTUBE</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>PRIVACY POLICY</h4>
-          <ul><li><a href="/privacy">PRIVACY POLICY</a></li></ul>
-        </div>
-      </div>
 
-      <div class="footer-copyright">
-        <p><span id="year"></span> © SOUNDABODE. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
 
   <!-- JS INTERACTIVITY -->
   <script>
@@ -1312,13 +1289,16 @@
       }
     }
 
-    // handle route based on current pathname
+    // handle route based on current pathname and hash
     function handleRoute(options = {}) {
       const path = (window.location.pathname || "").toLowerCase();
-      if (path.startsWith("/courses/dj-training")) {
+      const hash = (window.location.hash || "").toLowerCase();
+
+      // Check hash first for deep linking or active session navigation
+      if (hash === "#dj-training" || path.includes("/courses/dj-training")) {
         activate(false, options); // DJ tab
       } else {
-        // /courses, /courses/music-production, /courses.html -> EMP tab
+        // Default to EMP tab
         activate(true, options);
       }
     }
@@ -1328,13 +1308,13 @@
       tabEmp.addEventListener("click", (e) => {
         e.preventDefault && e.preventDefault();
         activate(true);
-        setUrl("/courses/music-production");
+        setUrl("#music-production");
       });
 
       tabDj.addEventListener("click", (e) => {
         e.preventDefault && e.preventDefault();
         activate(false);
-        setUrl("/courses/dj-training");
+        setUrl("#dj-training");
       });
     }
 
@@ -1343,7 +1323,7 @@
       exploreEmp.addEventListener("click", (e) => {
         e.preventDefault && e.preventDefault();
         activate(true, { scroll: true });
-        setUrl("/courses/music-production");
+        setUrl("#music-production");
       });
     }
 
@@ -1351,7 +1331,7 @@
       exploreDj.addEventListener("click", (e) => {
         e.preventDefault && e.preventDefault();
         activate(false, { scroll: true });
-        setUrl("/courses/dj-training");
+        setUrl("#dj-training");
       });
     }
 
@@ -1362,13 +1342,8 @@
 
     // initial route on page load
     (function handleInitialRoute() {
-      const path = (window.location.pathname || "").toLowerCase();
       handleRoute({ scroll: false });
-
-      // if someone opened /courses.html directly, normalise to /courses
-      if (path === "/courses.html") {
-        setUrl("/courses", { replace: true });
-      }
+      // Removed extensionless normalization to keep .html visible for server compatibility
     })();
 
     // parallax visuals
@@ -1718,27 +1693,22 @@
     let hasAnimated = false;
     
     function animateCounter(counter) {
-      const target = parseInt(counter.dataset.target);
-      const suffix = counter.dataset.suffix || '';
-      const duration = 2000; // 2 seconds animation
-      const start = 0;
-      const frameRate = 16; // ~60fps
-      const totalFrames = duration / frameRate;
-      const increment = target / totalFrames;
-      let current = start;
+      const originalText = counter.dataset.target || counter.textContent;
+      const targetValue = parseInt(originalText.replace(/[^0-9]/g, '')) || 0;
+      const suffix = originalText.replace(/[0-9]/g, '') || '';
       
-      const parentStat = counter.closest('.stat');
-      if (parentStat) parentStat.classList.add('counting');
+      const duration = 2000;
+      const frameRate = 1000 / 60;
+      const totalFrames = duration / frameRate;
+      const increment = targetValue / totalFrames;
+      
+      let current = 0;
       
       const timer = setInterval(() => {
         current += increment;
-        
-        if (current >= target) {
-          counter.textContent = target.toLocaleString() + suffix;
+        if (current >= targetValue) {
+          counter.textContent = targetValue.toLocaleString() + suffix;
           clearInterval(timer);
-          if (parentStat) {
-            setTimeout(() => parentStat.classList.remove('counting'), 300);
-          }
         } else {
           counter.textContent = Math.floor(current).toLocaleString() + suffix;
         }
@@ -1777,5 +1747,68 @@
     console.log('✅ Stats counter animation ready');
   })();
   </script>
+
+  <!-- ============================================================================
+         FOOTER
+         ============================================================================ -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-columns">
+        <!-- Column 1: Brand -->
+        <div class="footer-column brand-column">
+          <h3 class="footer-logo">SOUNDABODE</h3>
+          <p class="footer-tagline">
+            Professional Music Production &<br>
+            DJ Training Institute
+          </p>
+          <p class="footer-address">
+            Vision 9, 2nd Floor, Kunal Icon Rd,<br>
+            Pimple Saudagar, Pune 411017
+          </p>
+        </div>
+
+        <!-- Column 2: Shop/Courses -->
+        <div class="footer-column">
+          <h4>Courses</h4>
+          <ul>
+            <li><a href="/courses.html">Music Production</a></li>
+            <li><a href="/courses.html">DJ Performance</a></li>
+            <li><a href="/courses.html">Sound Engineering</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Quick Links -->
+        <div class="footer-column">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+            <li><a href="https://razorpay.me/@soundabode" target="_blank" rel="noopener noreferrer">Make Payment</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Stay In Touch -->
+        <div class="footer-column">
+          <h4>Stay In Touch</h4>
+          <ul class="social-links-text">
+            <li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+            <li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+            <li><a href="https://www.facebook.com/soundabode" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright">Copyright © 2026 SoundAbode. All rights reserved.</p>
+        <div class="legal-links">
+          <a href="/privacy.html">Privacy</a>
+          <a href="/terms.html">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="script/script.js" defer></script>
 </body>
 </html>

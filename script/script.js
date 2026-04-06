@@ -11,6 +11,32 @@
   'use strict';
 
   /* ==========================================================================
+     URL Normalization (Clean URLs) - DISABLED
+     (Kept .html extensions for static hosting compatibility)
+     ========================================================================== */
+  /*
+  function normalizeUrl() {
+    try {
+      const path = window.location.pathname;
+      if (path && path.endsWith('.html')) {
+        const cleanPath = path.substring(0, path.length - 5);
+        const cleanUrl = window.location.origin + cleanPath + window.location.search + window.location.hash;
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', cleanUrl);
+          console.log('[Routing] Normalized URL to:', cleanPath);
+        }
+      }
+    } catch (e) {
+      console.warn('[Routing] URL normalization failed:', e);
+    }
+  }
+
+  // Run normalization immediately
+  normalizeUrl();
+  */
+
+
+  /* ==========================================================================
      Config / Constants
      ========================================================================== */
   const CONFIG = {

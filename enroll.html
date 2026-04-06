@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enroll Now - Soundabode</title>
+  <link rel="stylesheet" href="style/style.css">
+  <style>
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --accent: #00d4ff;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .enroll-container {
+      max-width: 500px;
+      margin: 80px auto;
+      padding: 40px;
+      background: rgba(20, 20, 30, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #00d4ff, #9c27ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      color: #888;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.1);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #00d4ff, #9c27ff);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #enroll-success {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 255, 127, 0.1);
+      border: 1px solid rgba(0, 255, 127, 0.2);
+      border-radius: 10px;
+      color: #00ff7f;
+      margin-top: 20px;
+    }
+    .back-home {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back-home:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="enroll-container">
+    <h1>Enroll Now</h1>
+    <p>Launch your career in music today. Fill out the form below and we'll get in touch.</p>
+    
+    <form id="enroll-form">
+      <div class="form-group">
+        <label for="enroll-name">Full Name *</label>
+        <input type="text" id="enroll-name" name="name" placeholder="Enter your full name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="enroll-phone">Phone Number *</label>
+        <input type="tel" id="enroll-phone" name="phone" placeholder="10-digit mobile number" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="enroll-email">Email Address</label>
+        <input type="email" id="enroll-email" name="email" placeholder="Optional email address">
+      </div>
+      
+      <div class="form-group">
+        <label for="enroll-interest">Select Your Course *</label>
+        <select id="enroll-interest" name="interest" required>
+          <option value="">-- Choose a course --</option>
+          <option value="Advanced DJ Training">Advanced DJ Training</option>
+          <option value="Music Production (Ableton)">Music Production (Ableton)</option>
+          <option value="Audio Engineering">Audio Engineering</option>
+          <option value="Mixing & Mastering">Mixing & Mastering</option>
+          <option value="Psytrance Production">Psytrance Production</option>
+          <option value="Techno / House Production">Techno / House Production</option>
+        </select>
+      </div>
+      
+      <button type="submit" id="submit-btn">Send Application</button>
+    </form>
+    
+    <div id="enroll-success">
+      <h3>Application Sent!</h3>
+      <p>Thank you for choosing Soundabode. Our team will reach out to you within 24 hours.</p>
+    </div>
+    
+    <a href="/index.html" class="back-home">← Back to Soundabode</a>
+  </div>
+
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-columns">
+        <!-- Column 1: Brand -->
+        <div class="footer-column brand-column">
+          <h3 class="footer-logo">SOUNDABODE</h3>
+          <p class="footer-tagline">
+            Professional Music Production &<br>
+            DJ Training Institute
+          </p>
+          <p class="footer-address">
+            Vision 9, 2nd Floor, Kunal Icon Rd,<br>
+            Pimple Saudagar, Pune 411017
+          </p>
+        </div>
+
+        <!-- Column 2: Shop/Courses -->
+        <div class="footer-column">
+          <h4>Courses</h4>
+          <ul>
+            <li><a href="/courses.html">Music Production</a></li>
+            <li><a href="/courses.html">DJ Performance</a></li>
+            <li><a href="/courses.html">Sound Engineering</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Quick Links -->
+        <div class="footer-column">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+            <li><a href="https://razorpay.me/@soundabode" target="_blank" rel="noopener noreferrer">Make Payment</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Stay In Touch -->
+        <div class="footer-column">
+          <h4>Stay In Touch</h4>
+          <ul class="social-links-text">
+            <li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+            <li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+            <li><a href="https://www.facebook.com/soundabode" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright">Copyright © 2026 SoundAbode. All rights reserved.</p>
+        <div class="legal-links">
+          <a href="/privacy.html">Privacy</a>
+          <a href="/terms.html">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJyBy1qVa2jlQ0aa3FhtkxcJJpBcgvJHIuxp2ms5l--4GMd6zLZywUWC1qQIu1uGEG0A/exec';
+    const form = document.getElementById('enroll-form');
+    const success = document.getElementById('enroll-success');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('enroll-name').value.trim();
+      const phone = document.getElementById('enroll-phone').value.replace(/\D/g, '');
+      const email = document.getElementById('enroll-email').value.trim() || 'Not provided';
+      const interest = document.getElementById('enroll-interest').value;
+
+      if (phone.length !== 10) {
+        alert('Please enter a valid 10-digit phone number');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+
+      const payload = new URLSearchParams({
+        name,
+        phone,
+        email,
+        interest,
+        source: 'Standalone Enroll Page',
+        timestamp: new Date().toISOString()
+      });
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: payload.toString()
+        });
+        
+        form.style.display = 'none';
+        success.style.display = 'block';
+      } catch (error) {
+        console.error('Submission error:', error);
+        alert('Something went wrong. Please try again or contact us on WhatsApp.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Application';
+      }
+    });
+  </script>
+</body>
+</html>

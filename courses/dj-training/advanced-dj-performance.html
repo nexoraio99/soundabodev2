@@ -51,22 +51,6 @@
   }
   </script>
 
-  <script>
-    (function() {
-      try {
-        var path = window.location.pathname || '';
-        if (path.indexOf('.html') !== -1) {
-          var cleanPath = path.replace(/\.html$/, '');
-          var cleanUrl = window.location.origin + cleanPath + window.location.search + window.location.hash;
-          if (window.history && window.history.replaceState) {
-            window.history.replaceState(null, '', cleanUrl);
-          }
-        }
-      } catch (err) {
-        if (window.console && console.warn) console.warn('URL cleanup failed', err);
-      }
-    })();
-  </script>
 
   <style>
     :root {
@@ -256,7 +240,7 @@
 <body>
   <!-- NAVBAR -->
   <nav class="navbar" role="navigation" aria-label="Primary navigation">
-    <a href="/index.html" class="logo" aria-label="Soundabode Home">
+    <a href="/" class="logo" aria-label="Soundabode Home">
       <img
         src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png"
         alt="SoundAbode Logo"
@@ -288,34 +272,13 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"
-            fill="currentColor"
-          />
+            fill="currentColor" />
         </svg>
       </a>
     </div>
   </nav>
 
   <!-- MOBILE MENU -->
-  <div class="nav-menu" id="mobile-menu" aria-hidden="true">
-    <a href="/about.html">About</a>
-    <a href="/courses.html">Courses</a>
-    <a href="/contact.html">Contact</a>
-  </div>
-
-  <!-- WHATSAPP FLOAT -->
-  <a
-    href="https://wa.me/919975016189"
-    class="whatsapp-float"
-    target="_blank"
-    rel="noopener noreferrer"
-    title="Chat on WhatsApp"
-    aria-label="Chat on WhatsApp"
-    onclick="uet_report_conversion('whatsapp')"
-  >
-    <img
-      src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg"
-      alt="WhatsApp"
-      class="whatsapp-icon"
       loading="lazy"
     />
   </a>
@@ -335,7 +298,7 @@
 
         <div class="cta-row">
           <a class="btn-primary" href="#enroll" data-open-enroll>Enroll Now</a>
-          <a class="btn-outline" href="/courses/dj-training/basic-dj-training.html" target="_blank" rel="noopener noreferrer">Level 1</a>
+          <a class="btn-outline" href="/courses/dj-training/basic-dj-course.html">Level 1</a>
            <a class="btn-outline" href="/courses/dj-training/pro-dj-course.html">Level 2</a>
         </div>
 
@@ -599,7 +562,7 @@
         <a class="btn-primary" href="https://wa.me/919975016189" target="_blank" rel="noopener noreferrer">
           Book a Free Demo Class
         </a>
-        <a class="btn-outline" href="/enroll" data-open-enroll>
+        <a class="btn-outline" href="/enroll.html" data-open-enroll>
           Enroll Now
         </a>
       </div>
@@ -667,9 +630,9 @@
         <div class="footer-column">
           <h4>ABOUT</h4>
           <ul style="list-style:none;padding:0;margin:0">
-            <li><a href="about.html">ABOUT</a></li>
-            <li><a href="courses.html">COURSES</a></li>
-            <li><a href="contact.html">CONTACT</a></li>
+            <li><a href="/about.html">ABOUT</a></li>
+            <li><a href="/courses.html">COURSES</a></li>
+            <li><a href="/contact.html">CONTACT</a></li>
           </ul>
         </div>
         <div class="footer-column">
@@ -692,7 +655,7 @@
         <div class="footer-column">
           <h4>PRIVACY POLICY</h4>
           <ul style="list-style:none;padding:0;margin:0">
-            <li><a href="privacy.html">PRIVACY POLICY</a></li>
+            <li><a href="/privacy.html">PRIVACY POLICY</a></li>
           </ul>
         </div>
       </div>

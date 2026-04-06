@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <!-- CRITICAL: Android viewport optimization -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+
+  <!-- Android-specific performance optimization -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Disable automatic phone number detection -->
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- Android Chrome theme color -->
+  <meta name="theme-color" content="#000000">
+  <meta name="msapplication-navbutton-color" content="#000000">
+
+  <!-- DNS Prefetch -->
+  <link rel="dns-prefetch" href="https://res.cloudinary.com">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+  <title>Real-Time Blog | Soundabode Academy</title>
+  <meta name="description" content="The latest from our studio, directly to you in real-time. Soundabode Academy News.">
+
+  <link rel="stylesheet" href="style/style.css">
+  <link rel="stylesheet" href="style/blog.css">
+  <link rel="icon" href="Assets/favicon.ico">
+  
+  <!-- Google Tag Manager -->
+  <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KVRWZ2DP');
+  </script>
+</head>
+
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KVRWZ2DP"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/" class="logo">
+      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="Soundabode Logo" class="logo-img">
+    </a>
+
+    <!-- Desktop Navigation Links -->
+    <div class="nav-links">
+      <a href="/about.html">About</a>
+      <a href="/courses.html">Courses</a>
+      <a href="/blog.html" style="color: #fff; font-weight: 700;">Blog</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger-menu" aria-label="Toggle menu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+    <!-- Call Action Button -->
+    <div class="nav-actions">
+      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor" />
+        </svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="nav-menu">
+    <a href="/about.html">About</a>
+    <a href="/courses.html">Courses</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/contact.html">Contact</a>
+  </div>
+
+  <!-- SOCIAL FLOATING BUTTONS -->
+  <div class="social-floats-container">
+    <a href="https://www.instagram.com/soundabode" class="social-float instagram-float" target="_blank"
+      rel="noopener noreferrer" title="Follow us on Instagram">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram"
+        class="social-icon" loading="lazy">
+    </a>
+    <a href="https://www.facebook.com/soundabode" class="social-float facebook-float" target="_blank"
+      rel="noopener noreferrer" title="Follow us on Facebook">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook"
+        class="social-icon" loading="lazy">
+    </a>
+    <a href="https://wa.me/919975016189" class="social-float whatsapp-float" target="_blank" rel="noopener noreferrer"
+      title="Chat on WhatsApp" aria-label="Chat with Soundabode on WhatsApp">
+      <img src="https://cdn.jsdelivr.gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp"
+        class="social-icon" loading="lazy">
+      <span class="whatsapp-label">Chat</span>
+    </a>
+  </div>
+
+  <!-- BLOG HERO -->
+  <header class="blog-hero">
+    <h1 class="aurora-text">Latest News</h1>
+    <p class="hero-tagline">Stay tuned for real-time updates from Soundabode studio.</p>
+  </header>
+
+  <section class="blog-section">
+    <div class="container">
+      <!-- LATEST NEWS GRID -->
+      <div id="latest-news-grid" class="latest-news-grid">
+        <!-- Hero/Featured Card and Mini-Grid will be injected here -->
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <section class="blog-section">
+    <div class="container">
+      <h2 class="section-title">All Articles</h2>
+      
+      <!-- CATEGORY FILTER -->
+      <div class="blog-categories" id="category-filters">
+        <button class="filter-btn active" data-category="All">All Categories</button>
+        <button class="filter-btn" data-category="Production">Production</button>
+        <button class="filter-btn" data-category="DJ Performance">DJ Performance</button>
+        <button class="filter-btn" data-category="Events">Events</button>
+        <button class="filter-btn" data-category="Academy News">Academy News</button>
+      </div>
+
+      <!-- BLOG FEED -->
+      <div class="blog-feed-grid" id="blog-feed">
+        <div id="loading-state" class="loading-state">
+          <p>Connecting to Soundabode pulse...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-columns">
+        <!-- Column 1: Brand -->
+        <div class="footer-column brand-column">
+          <h3 class="footer-logo">SOUNDABODE</h3>
+          <p class="footer-tagline">
+            Professional Music Production &<br>
+            DJ Training Institute
+          </p>
+          <p class="footer-address">
+            Vision 9, 2nd Floor, Kunal Icon Rd,<br>
+            Pimple Saudagar, Pune 411017
+          </p>
+        </div>
+
+        <!-- Column 2: Shop/Courses -->
+        <div class="footer-column">
+          <h4>Courses</h4>
+          <ul>
+            <li><a href="/courses.html">Music Production</a></li>
+            <li><a href="/courses.html">DJ Performance</a></li>
+            <li><a href="/courses.html">Sound Engineering</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Quick Links -->
+        <div class="footer-column">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+            <li><a href="https://razorpay.me/@soundabode" target="_blank" rel="noopener noreferrer">Make Payment</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Stay In Touch -->
+        <div class="footer-column">
+          <h4>Stay In Touch</h4>
+          <ul class="social-links-text">
+            <li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+            <li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+            <li><a href="https://www.facebook.com/soundabode" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright">Copyright © 2026 SoundAbode. All rights reserved.</p>
+        <div class="legal-links">
+          <a href="/privacy.html">Privacy</a>
+          <a href="/terms.html">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Real-Time Logic -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script/script.js" defer></script>
+  <script>
+    const socket = io();
+    const blogFeed = document.getElementById('blog-feed');
+    const latestGrid = document.getElementById('latest-news-grid');
+    const loadingState = document.getElementById('loading-state');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    
+    let allBlogs = [];
+    let currentCategory = 'All';
+
+    // Fetch initial blogs
+    fetch('/api/blogs')
+      .then(res => res.json())
+      .then(blogs => {
+        allBlogs = blogs;
+        renderAll();
+      })
+      .catch(err => {
+          console.error('Failed to fetch blogs:', err);
+          if(loadingState) loadingState.innerHTML = '<p class="error-text">Could not load blogs. Please try again later.</p>';
+      });
+
+    // Listen for live updates
+    socket.on('blogUpdate', (blog) => {
+      const index = allBlogs.findIndex(b => b.id === blog.id);
+      if(index > -1) allBlogs[index] = blog;
+      else allBlogs.unshift(blog);
+      renderAll();
+    });
+
+    // Filtering logic
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCategory = btn.dataset.category;
+            renderAll();
+        });
+    });
+
+    function renderAll() {
+        if(loadingState) loadingState.style.display = 'none';
+        
+        // Latest News Section (Latest 4)
+        latestGrid.innerHTML = '';
+        if (allBlogs.length > 0) {
+            const latest4 = allBlogs.slice(0, 4);
+            
+            // 1. Hero Card (The Absolute Latest)
+            const heroPost = latest4[0];
+            latestGrid.innerHTML += createBlogHTML(heroPost, 'hero');
+            
+            // 2. Mini Grid (The 3 following)
+            if (latest4.length > 1) {
+                let miniGridHTML = '<div class="mini-grid">';
+                latest4.slice(1).forEach(post => {
+                    miniGridHTML += createBlogHTML(post, 'mini');
+                });
+                miniGridHTML += '</div>';
+                latestGrid.innerHTML += miniGridHTML;
+            }
+        }
+
+        // Filterable Feed (Remaining or all depending on filter)
+        blogFeed.innerHTML = '';
+        const filtered = currentCategory === 'All' 
+            ? allBlogs.slice(allBlogs.length > 4 ? 4 : 4) // Show all after first 4 if 'All', but logic fix:
+            : allBlogs.filter(b => b.category === currentCategory);
+            
+        // Actually, if filter is applied, show all matching. if 'All', show all after top 4
+        const feedBlogs = currentCategory === 'All' ? allBlogs.slice(4) : filtered;
+
+        if (feedBlogs.length === 0) {
+            blogFeed.innerHTML = '<div class="empty-state"><p>No articles found in this category.</p></div>';
+        } else {
+            feedBlogs.forEach(blog => {
+                blogFeed.innerHTML += createBlogHTML(blog, 'feed');
+            });
+        }
+    }
+
+    function createBlogHTML(blog, type) {
+        const placeholder = 'https://ik.imagekit.io/Nex1ora2/dj-performance-training.jpg';
+        const img = blog.imageUrl || placeholder;
+        const category = blog.category || 'General';
+        const author = blog.author || 'Soundabode';
+        
+        if (type === 'hero') {
+            return `
+                <article class="blog-card hero-card" id="blog-${blog.id}">
+                    <div class="card-img" style="background-image: url('${img}')"></div>
+                    <div class="card-content">
+                        <span class="card-category">${category}</span>
+                        <h2 class="blog-title">${blog.heading}</h2>
+                        <p class="blog-subheading">${blog.subheading}</p>
+                        <div class="card-meta">
+                            <span class="author">${author}</span>
+                            <span class="date">${blog.date}</span>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+        
+        if (type === 'mini') {
+            return `
+                <article class="blog-card mini-card" id="blog-${blog.id}">
+                    <div class="card-img" style="background-image: url('${img}')"></div>
+                    <div class="card-content">
+                        <span class="card-category">${category}</span>
+                        <h3 class="blog-title">${blog.heading}</h3>
+                        <div class="card-meta">
+                            <span class="date">${blog.date}</span>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+        
+        // Default FEED card
+        return `
+            <article class="blog-card feed-card" id="blog-${blog.id}">
+                <div class="card-img" style="background-image: url('${img}')"></div>
+                <div class="card-content">
+                    <span class="card-category">${category}</span>
+                    <h3 class="blog-title">${blog.heading}</h3>
+                    <p class="blog-subheading">${blog.subheading}</p>
+                    <div class="card-meta">
+                        <span class="author">${author}</span>
+                        <span class="date">${blog.date}</span>
+                    </div>
+                </div>
+            </article>
+        `;
+    }
+  </script>
+</body>
+</html>

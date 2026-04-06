@@ -1,7 +1,8 @@
 {
-  "name": "soundabode-backend",
-  "version": "1.0.0",
+  "name": "soundabode-v2",
+  "version": "1.1.0",
   "type": "module",
+  "description": "Consolidated Soundabode V2 server with Clean URLs and Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -13,9 +14,11 @@
     "express-rate-limit": "^7.1.5",
     "googleapis": "^128.0.0",
     "helmet": "^7.1.0",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   }
 }
+

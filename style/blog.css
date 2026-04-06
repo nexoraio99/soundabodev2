@@ -1,0 +1,227 @@
+/* blog.css - Soundabode Magazine Layout (Inspired by Wealth Wave) */
+
+.blog-hero {
+    padding: clamp(80px, 12vh, 120px) 20px 40px;
+    text-align: center;
+    background: radial-gradient(circle at center, rgba(30,30,30,0.4) 0%, rgba(0,0,0,0) 100%);
+}
+
+.hero-tagline {
+    color: var(--text-muted, #94A3B8);
+    margin-top: 10px;
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+    font-weight: 300;
+}
+
+.blog-section {
+    padding: 40px 0;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+/* LATEST NEWS GRID */
+.latest-news-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Hero card: Horizontal on desktop */
+.hero-card {
+    display: flex;
+    flex-direction: row;
+    height: clamp(300px, 40vh, 450px);
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+}
+
+.hero-card .card-img {
+    flex: 1.2;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-card .card-content {
+    flex: 1;
+    padding: clamp(20px, 4vw, 40px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: rgba(10, 10, 10, 0.4);
+}
+
+.hero-card .blog-title {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    margin: 15px 0;
+}
+
+/* Mini Grid: 3 horizontal cards below hero */
+.mini-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.mini-card {
+    display: flex;
+    gap: 15px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.mini-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(0, 194, 255, 0.3);
+}
+
+.mini-card .card-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.mini-card .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.mini-card .blog-title {
+    font-size: 0.95rem;
+    line-height: 1.3;
+    margin-bottom: 5px;
+}
+
+/* CATEGORY FILTERS */
+.blog-categories {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 18px;
+    border-radius: 99px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    color: #94A3B8;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+.filter-btn.active {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+}
+
+/* FEED GRID */
+.blog-feed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.feed-card {
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.feed-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(0, 194, 255, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.feed-card .card-img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background-size: cover;
+    background-position: center;
+}
+
+.feed-card .card-content {
+    padding: 24px;
+}
+
+.feed-card .blog-title {
+    font-size: 1.25rem;
+    margin: 12px 0;
+    line-height: 1.2;
+}
+
+/* COMMON STYLE TOKENS */
+.card-category {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #00c2ff;
+    font-weight: 700;
+}
+
+.card-meta {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #64748B;
+}
+
+.blog-subheading {
+    font-size: 0.95rem;
+    color: #94A3B8;
+    line-height: 1.4;
+    margin-bottom: 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .mini-grid {
+        grid-template-columns: 1fr;
+    }
+    .hero-card {
+        flex-direction: column;
+        height: auto;
+    }
+    .hero-card .card-img {
+        width: 100%;
+        aspect-ratio: 16/9;
+    }
+}
+
+@media (max-width: 600px) {
+    .blog-feed-grid {
+        grid-template-columns: 1fr;
+    }
+}

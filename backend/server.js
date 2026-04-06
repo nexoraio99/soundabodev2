@@ -1,4 +1,4 @@
-// server.js - Soundabode Backend with Enhanced Email Templates & Token Management
+// server.js - Soundabode Backend with Enhanced Email Templates, Token Management & Real-Time Blog
 // Usage: set EMAIL_USER, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET, EMAIL_REFRESH_TOKEN, ADMIN_EMAIL, CORS_ORIGINS
 
 import express from 'express';
@@ -10,6 +10,8 @@ import { randomUUID } from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
+import { Server as SocketServer } from 'socket.io';
+import http from 'http';
 
 dotenv.config();
 
@@ -17,7 +19,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const server = http.createServer(app);
+const io = new SocketServer(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 const PORT = Number(process.env.PORT) || 3000;
+const DATA_DIR = path.join(__dirname, 'data');
+const BLOGS_FILE = path.join(DATA_DIR, 'blogs.json');
 
 // ------------------- Configuration -------------------
 const PHONE_NUMBER = '+919975016189';
@@ -605,6 +616,76 @@ function sendEmailAsync(emailOptions) {
     });
 }
 
+// ------------------- Blog API -------------------
+
+async function ensureDataDir() {
+    try {
+        await fs.mkdir(DATA_DIR, { recursive: true });
+        try {
+            await fs.access(BLOGS_FILE);
+        } catch {
+            await fs.writeFile(BLOGS_FILE, '[]', 'utf8');
+        }
+    } catch (err) {
+        console.error('Error ensuring data directory:', err);
+    }
+}
+
+async function getBlogs() {
+    await ensureDataDir();
+    try {
+        const data = await fs.readFile(BLOGS_FILE, 'utf8');
+        return JSON.parse(data || '[]');
+    } catch (err) {
+        return [];
+    }
+}
+
+async function saveBlogs(blogs) {
+    await fs.writeFile(BLOGS_FILE, JSON.stringify(blogs, null, 2), 'utf8');
+}
+
+app.get('/api/blogs', async (req, res) => {
+    const blogs = await getBlogs();
+    res.json(blogs);
+});
+
+app.post('/api/blogs', async (req, res) => {
+    const { id, heading, subheading, date, content, password } = req.body;
+    
+    // Simple admin check
+    if (password !== 'admin') {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const blogs = await getBlogs();
+    const newBlog = {
+        id: id || Date.now().toString(),
+        heading,
+        subheading,
+        date: date || new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        content
+    };
+
+    if (id) {
+        const index = blogs.findIndex(b => b.id === id);
+        if (index > -1) blogs[index] = newBlog;
+        else blogs.unshift(newBlog);
+    } else {
+        blogs.unshift(newBlog);
+    }
+
+    await saveBlogs(blogs);
+    io.emit('blogUpdate', newBlog);
+    res.status(201).json({ success: true, blog: newBlog });
+});
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+    console.log(`Plug Socket connected: ${socket.id}`);
+    socket.on('disconnect', () => console.log(`Plug Socket disconnected: ${socket.id}`));
+});
+
 // ------------------- Routes -------------------
 app.get('/', (req, res) => {
     res.json({
@@ -630,7 +711,7 @@ app.get('/health', (req, res) =>
     })
 );
 
-// ---- TEST EMAIL ENDPOINT (remove in production if desired) ----
+// ---- TEST EMAIL ENDPOINT ----
 app.get('/api/test-email', async (req, res) => {
     console.log('🧪 Test email endpoint hit');
     const result = await sendEmailRaw({
@@ -785,7 +866,7 @@ app.use((req, res) =>
 );
 
 // ------------------- Start Server -------------------
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
     console.log('='.repeat(60));
     console.log('✅ Soundabode Backend Server Running');
     console.log(`🌐 Port: ${PORT}`);
@@ -802,8 +883,6 @@ app.listen(PORT, async () => {
         await getAccessTokenCached();
         startTokenRefreshScheduler();
         console.log('✅ Gmail authentication ready — token will auto-refresh every 50 minutes');
-
-
     } catch (e) {
         console.error('❌ Failed to initialize Gmail authentication:', e.message || e);
         console.error('   Server is running but email features will NOT work.');

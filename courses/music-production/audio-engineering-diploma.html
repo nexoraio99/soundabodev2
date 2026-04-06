@@ -56,19 +56,9 @@
 }
 </script>
   
-  <!-- remove .html from URL (client-side) -->
-  <script>
-    (function() {
-      var path = window.location.pathname;
-      if (path.indexOf('.html') !== -1) {
-        var cleanPath = path.replace('.html', '');
-        var cleanUrl = window.location.origin + cleanPath + window.location.search + window.location.hash;
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, '', cleanUrl);
-        }
-      }
-    })();
-  </script>
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="../../style/style.css">
+
 
   <style>
     :root {
@@ -278,26 +268,33 @@
 <body>
   <!-- NAVBAR -->
   <nav class="navbar">
-    <a href="index.html" class="logo">
-      <img src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png" alt="SoundAbode Logo" class="logo-img" />
+    <a href="/" class="logo">
+      <img
+        src="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png"
+        alt="Soundabode Logo" class="logo-img">
     </a>
 
+    <!-- Desktop Navigation Links -->
     <div class="nav-links">
-      <a href="about.html">About</a>
-      <a href="courses.html">Courses</a>
-      <a href="contact.html">Contact</a>
+      <a href="/about.html">About</a>
+      <a href="/courses.html">Courses</a>
+      <a href="/contact.html">Contact</a>
     </div>
 
+    <!-- Hamburger Menu Button -->
     <button class="hamburger-menu" aria-label="Toggle menu">
       <span class="bar"></span>
       <span class="bar"></span>
       <span class="bar"></span>
     </button>
 
+    <!-- Call Action Button -->
     <div class="nav-actions">
-      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion('call')">
+      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" fill="currentColor"/>
+          <path
+            d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"
+            fill="currentColor" />
         </svg>
       </a>
     </div>
@@ -305,15 +302,30 @@
 
   <!-- MOBILE MENU -->
   <div class="nav-menu">
-    <a href="about.html">About</a>
-    <a href="courses.html">Courses</a>
-    <a href="contact.html">Contact</a>
+    <a href="/about.html">About</a>
+    <a href="/courses.html">Courses</a>
+    <a href="/contact.html">Contact</a>
   </div>
 
-  <!-- WHATSAPP FLOAT -->
-  <a href="https://wa.me/919975016189" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp" onclick="uet_report_conversion('whatsapp')">
-    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp" class="whatsapp-icon" loading="lazy" />
-  </a>
+  <!-- SOCIAL FLOATING BUTTONS -->
+  <div class="social-floats-container">
+    <a href="https://www.instagram.com/soundabode" class="social-float instagram-float" target="_blank"
+      rel="noopener noreferrer" title="Follow us on Instagram">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram"
+        class="social-icon" loading="lazy">
+    </a>
+    <a href="https://www.facebook.com/soundabode" class="social-float facebook-float" target="_blank"
+      rel="noopener noreferrer" title="Follow us on Facebook">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook"
+        class="social-icon" loading="lazy">
+    </a>
+    <a href="https://wa.me/919975016189" class="social-float whatsapp-float" target="_blank" rel="noopener noreferrer"
+      title="Chat on WhatsApp" aria-label="Chat with Soundabode on WhatsApp">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp"
+        class="social-icon" loading="lazy">
+      <span class="whatsapp-label">Chat</span>
+    </a>
+  </div>
 
   <main class="container" style="margin-top: 6px;">
     <!-- HERO -->
@@ -344,10 +356,10 @@
         </div>
 
         <div class="cta-row">
-          <a class="btn-outline" href="/enroll">Enroll Now</a>
-           <a class="btn-outline" href="/courses/music-production/beginner-course.html" target="_blank" rel="noopener noreferrer">Level 1</a>
-           <a class="btn-outline" href="/courses/music-production/intermediate-course.html" target="_blank" rel="noopener noreferrer">Level 2</a>
-          <a class="btn-outline" href="/courses/music-production/mixing-mastering-course.html" target="_blank" rel="noopener noreferrer">Level 4</a>
+          <a class="btn-outline" href="/enroll.html">Enroll Now</a>
+           <a class="btn-outline" href="/courses/music-production/beginner-course.html">Level 1</a>
+           <a class="btn-outline" href="/courses/music-production/intermediate-course.html">Level 2</a>
+          <a class="btn-outline" href="/courses/music-production/mixing-mastering-course.html">Level 4</a>
         </div>
       </div>
 
@@ -546,7 +558,7 @@
           </ul>
         </div>
         <div class="card">
-          <a href="/mixing-mastering-course.html">
+          <a href="/courses/music-production/mixing-mastering-course.html">
           <h3 style="margin-top:0;font-size:15px;">Next Step: Level 4</h3>
           <p class="muted" style="font-size:14px;margin-top:6px;">
             Next step: <strong>Level 4 – Advanced Mixing & Mastering</strong>, where you’ll specialise in high-end
@@ -690,8 +702,8 @@
         </div>
       </div>
       <div class="actions">
-        <a class="btn-primary" href="/enroll">Enroll Now</a>
-        <a class="btn-outline" href="contact.html#contact">Talk To Our Team</a>
+        <a class="btn-primary" href="/enroll.html">Enroll Now</a>
+        <a class="btn-outline" href="/contact.html#contact">Talk To Our Team</a>
       </div>
     </section>
   </main>
@@ -750,44 +762,62 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
+  <!-- ============================================================================
+         FOOTER
+         ============================================================================ -->
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-columns">
-        <div class="footer-column">
-          <h4>ABOUT</h4>
-          <ul>
-            <li><a href="about.html">ABOUT</a></li>
-            <li><a href="courses.html">COURSES</a></li>
-            <li><a href="contact.html">CONTACT</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>LOCATION</h4>
-          <p>
-            VISION 9, 2ND FLOOR,<br />
-            KUNAL ICON RD,<br />
-            PIMPLE SAUDAGAR, PUNE,<br />
-            MAHARASHTRA 411017
+        <!-- Column 1: Brand -->
+        <div class="footer-column brand-column">
+          <h3 class="footer-logo">SOUNDABODE</h3>
+          <p class="footer-tagline">
+            Professional Music Production &<br>
+            DJ Training Institute
+          </p>
+          <p class="footer-address">
+            Vision 9, 2nd Floor, Kunal Icon Rd,<br>
+            Pimple Saudagar, Pune 411017
           </p>
         </div>
+
+        <!-- Column 2: Shop/Courses -->
         <div class="footer-column">
-          <h4>SOCIALS</h4>
+          <h4>Courses</h4>
           <ul>
-            <li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">INSTAGRAM</a></li>
-            <li><a href="https://www.facebook.com/soundabode/" target="_blank" rel="noopener noreferrer">FACEBOOK</a></li>
-            <li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YOUTUBE</a></li>
+            <li><a href="/courses.html">Music Production</a></li>
+            <li><a href="/courses.html">DJ Performance</a></li>
+            <li><a href="/courses.html">Sound Engineering</a></li>
           </ul>
         </div>
+
+        <!-- Column 3: Quick Links -->
         <div class="footer-column">
-          <h4>PRIVACY POLICY</h4>
+          <h4>Quick Links</h4>
           <ul>
-            <li><a href="privacy.html">PRIVACY POLICY</a></li>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+            <li><a href="https://razorpay.me/@soundabode" target="_blank" rel="noopener noreferrer">Make Payment</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Stay In Touch -->
+        <div class="footer-column">
+          <h4>Stay In Touch</h4>
+          <ul class="social-links-text">
+            <li><a href="https://www.instagram.com/soundabode" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+            <li><a href="https://www.youtube.com/@soundabode" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+            <li><a href="https://www.facebook.com/soundabode" target="_blank" rel="noopener noreferrer">Facebook</a></li>
           </ul>
         </div>
       </div>
-      <div class="footer-copyright">
-        <p><span id="year"></span> © SOUNDABODE. All rights reserved.</p>
+
+      <div class="footer-bottom">
+        <p class="copyright">Copyright © 2026 SoundAbode. All rights reserved.</p>
+        <div class="legal-links">
+          <a href="/privacy.html">Privacy</a>
+          <a href="/terms.html">Terms</a>
+        </div>
       </div>
     </div>
   </footer>

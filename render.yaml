@@ -2,118 +2,113 @@ services:
   - type: web
     name: soundabode
     env: static
-    buildCommand: echo "Static site - no build needed"
-    staticPublishPath: .
-    
-    # Custom headers
-    headers:
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-      - path: /*
-        name: X-Frame-Options
-        value: SAMEORIGIN
-    
-    # URL rewrites - this is the key part
+    buildCommand: "npm install && npm run build" # Dummy if not needed
+    staticPublishDir: ./
     routes:
-      # Music Production courses
-      - type: rewrite
-        source: /courses/music-production/beginner-course
-        destination: /courses/music-production/beginner-course.html
-      
-      - type: rewrite
-        source: /courses/music-production/intermediate-course
-        destination: /courses/music-production/intermediate-course.html
-      
-      - type: rewrite
-        source: /courses/music-production/audio-engineering-diploma
-        destination: /courses/music-production/audio-engineering-diploma.html
-      
-      - type: rewrite
-        source: /courses/music-production/mixing-mastering-course
-        destination: /courses/music-production/mixing-mastering-course.html
-      
-      # DJ Training courses
-      - type: rewrite
-        source: /courses/dj-training/basic-dj-course
-        destination: /courses/dj-training/basic-dj-course.html
-      
-      - type: rewrite
-        source: /courses/dj-training/pro-dj-course
-        destination: /courses/dj-training/pro-dj-course.html
-      
-      - type: rewrite
-        source: /courses/dj-training/advanced-dj-performance
-        destination: /courses/dj-training/advanced-dj-performance.html
-      
-      # Other pages
-      - type: rewrite
-        source: /about
-        destination: /about.html
-      
-      - type: rewrite
-        source: /contact
-        destination: /contact.html
-      
-      - type: rewrite
-        source: /courses
-        destination: /courses/index.html
-      
-      - type: rewrite
-        source: /privacy
-        destination: /privacy.html
-      
-      - type: rewrite
-        source: /enroll
-        destination: /enroll.html
-      
-      # Redirect .html URLs to clean URLs (optional - for SEO)
-      - type: redirect
-        source: /courses/music-production/beginner-course.html
-        destination: /courses/music-production/beginner-course
-        status: 301
-      
-      - type: redirect
-        source: /courses/music-production/intermediate-course.html
-        destination: /courses/music-production/intermediate-course
-        status: 301
-      
-      - type: redirect
-        source: /courses/music-production/audio-engineering-diploma.html
-        destination: /courses/music-production/audio-engineering-diploma
-        status: 301
-      
-      - type: redirect
-        source: /courses/music-production/mixing-mastering-course.html
-        destination: /courses/music-production/mixing-mastering-course
-        status: 301
-      
-      - type: redirect
-        source: /courses/dj-training/basic-dj-course.html
-        destination: /courses/dj-training/basic-dj-course
-        status: 301
-      
-      - type: redirect
-        source: /courses/dj-training/pro-dj-course.html
-        destination: /courses/dj-training/pro-dj-course
-        status: 301
-      
-      - type: redirect
-        source: /courses/dj-training/advanced-dj-performance.html
-        destination: /courses/dj-training/advanced-dj-performance
-        status: 301
-      
       - type: redirect
         source: /about.html
         destination: /about
-        status: 301
-      
-      - type: redirect
-        source: /contact.html
-        destination: /contact
-        status: 301
-      
-      - type: redirect
-        source: /privacy.html
-        destination: /privacy
-        status: 301
+      - type: rewrite
+        source: /about
+        destination: /about.html
+      - type: rewrite
+        source: /contact
+        destination: /contact.html
+      - type: rewrite
+        source: /courses
+        destination: /courses.html
+      - type: rewrite
+        source: /dj-training
+        destination: /courses.html
+      - type: rewrite
+        source: /music-production
+        destination: /courses.html
+      - type: rewrite
+        source: /enroll
+        destination: /enroll.html
+      - type: rewrite
+        source: /terms
+        destination: /terms.html
+      - type: rewrite
+        source: /privacy
+        destination: /privacy.html
+      - type: rewrite
+        source: /dj-brochure
+        destination: /dj-brochure.html
+      - type: rewrite
+        source: /music-production-brochure
+        destination: /music-production-brochure.html
+      - type: rewrite
+        source: /courses/dj-training
+        destination: /courses.html
+      - type: rewrite
+        source: /courses/music-production
+        destination: /courses.html
+      - type: rewrite
+        source: /courses/dj-training/basic-dj-course
+        destination: /courses/dj-training/basic-dj-course.html
+      - type: rewrite
+        source: /courses/dj-training/pro-dj-course
+        destination: /courses/dj-training/pro-dj-course.html
+      - type: rewrite
+        source: /courses/dj-training/advanced-dj-course
+        destination: /courses/dj-training/advanced-dj-course.html
+      - type: rewrite
+        source: /courses/music-production/ableton-live-course
+        destination: /courses/music-production/ableton-live-course.html
+      - type: rewrite
+        source: /courses/music-production/logic-pro-x-course
+        destination: /courses/music-production/logic-pro-x-course.html
+      - type: rewrite
+        source: /courses/music-production/fl-studio-course
+        destination: /courses/music-production/fl-studio-course.html
+      - type: rewrite
+        source: /courses/music-production/music-theory-for-producers
+        destination: /courses/music-production/music-theory-for-producers.html
+      - type: rewrite
+        source: /courses/audio-engineering/mixing-and-mastering
+        destination: /courses/audio-engineering/mixing-and-mastering.html
+      - type: rewrite
+        source: /courses/audio-engineering/sound-design
+        destination: /courses/audio-engineering/sound-design.html
+      - type: rewrite
+        source: /courses/audio-engineering/recording-techniques
+        destination: /courses/audio-engineering/recording-techniques.html
+      - type: rewrite
+        source: /courses/special-programs/summer-camp
+        destination: /courses/special-programs/summer-camp.html
+      - type: rewrite
+        source: /courses/special-programs/weekend-workshops
+        destination: /courses/special-programs/weekend-workshops.html
+      - type: rewrite
+        source: /courses/special-programs/one-on-one-mentorship
+        destination: /courses/special-programs/one-on-one-mentorship.html
+      - type: rewrite
+        source: /blog
+        destination: /blog.html
+      - type: rewrite
+        source: /blog/*
+        destination: /blog/*.html
+      - type: rewrite
+        source: /gallery
+        destination: /gallery.html
+      - type: rewrite
+        source: /testimonials
+        destination: /testimonials.html
+      - type: rewrite
+        source: /faq
+        destination: /faq.html
+      - type: rewrite
+        source: /error
+        destination: /404.html
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+  - type: worker
+    name: soundabode-workflow-worker
+    env: node
+    buildCommand: "npm install"
+    startCommand: "npm run worker"
+    envVars:
+      - key: NODE_VERSION
+        value: 20

@@ -138,24 +138,55 @@ h6 {
 /* ============================================================================
    COMPONENTS
    ============================================================================ */
-/* Glow Button */
+/* Buttons */
+.btn-primary,
+.btn-outline,
 .glow-border {
   position: relative;
-  background: #111;
-  color: #b5b5b5;
-  font-size: clamp(0.75rem, 2vw, 1rem);
-  font-weight: 500;
-  letter-spacing: 1px;
-  border: none;
-  text-decoration: none;
-  border-radius: 8px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 28px);
+  border-radius: 8px 10px;
+  font-size: clamp(0.75rem, 2vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-decoration: none;
   cursor: pointer;
+  transition: all 0.3s ease;
   z-index: 6;
   isolation: isolate;
-  margin-top: clamp(12px, 2vw, 20px);
+  border: none;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background: var(--clr-2);
+  color: #000;
+  box-shadow: 0 4px 15px rgba(51, 255, 140, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(51, 255, 140, 0.4);
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+}
+
+/* Glow Button Variant */
+.glow-border {
+  background: #111;
+  color: #b5b5b5;
   animation: fadeIn 1.6s ease-out forwards;
-  display: inline-block;
 }
 
 .glow-border::before {
@@ -168,6 +199,7 @@ h6 {
   background-size: 400%;
   animation: glowing 20s linear infinite;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask-composite: xor;
   filter: blur(1.2px);
@@ -208,6 +240,32 @@ h6 {
   width: clamp(20px, 4vw, 24px);
   height: clamp(20px, 4vw, 24px);
   filter: brightness(0) invert(1);
+}
+
+.whatsapp-icon {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) invert(1);
+}
+
+.whatsapp-label {
+    display: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .whatsapp-float {
+        width: auto;
+        padding: 0 20px;
+        border-radius: 30px;
+    }
+    .whatsapp-label {
+        display: block;
+    }
 }
 
 /* Specific Button Colors */
@@ -1078,7 +1136,8 @@ h6 {
   color: #ddd;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
   max-height: calc(1.45em * 4);
 }
@@ -1203,7 +1262,7 @@ button.next:hover {
   display: grid;
   gap: var(--studio-gap);
   margin-top: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(clamp(130px, 22vw, 240px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   align-items: stretch;
 }
 
@@ -1963,13 +2022,23 @@ button.next:hover {
     display: block;
   }
 
-  .intro-panel {
-    width: 100%;
-    height: 50vh;
-  }
-
   .intro-overlay {
     flex-direction: column;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  .intro-panel {
+    width: 100%;
+    height: 50vh; /* Reverted to 50vh to show both panels */
+    flex-shrink: 0;
+  }
+
+  /* Ensure the second panel is visible on mobile as requested */
+  .panel-right {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .overlay-left,
