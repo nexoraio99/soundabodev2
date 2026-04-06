@@ -1,6 +1,7 @@
 services:
   - type: web
     name: soundabode
+    plan: free
     runtime: static
     buildCommand: "npm install && npm run build" # Dummy if not needed
     staticPublishPath: ./
@@ -85,6 +86,7 @@ services:
         value: 20
   - type: web
     name: soundabodev2-server
+    plan: free
     runtime: node
     buildCommand: "npm install"
     startCommand: "node backend/server.js"
