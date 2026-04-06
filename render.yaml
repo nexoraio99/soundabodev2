@@ -1,9 +1,10 @@
 services:
+  # Static site - serves HTML/CSS/JS files
   - type: web
     name: soundabode
     plan: free
     runtime: static
-    buildCommand: "npm install && npm run build" # Dummy if not needed
+    buildCommand: "npm install"
     staticPublishPath: ./
     routes:
       - type: redirect
@@ -83,7 +84,9 @@ services:
         destination: /courses/dj-training/advanced-dj-performance.html
     envVars:
       - key: NODE_VERSION
-        value: 20
+        value: "20"
+
+  # Backend API server - handles forms, email, blog API
   - type: web
     name: soundabodev2-server
     plan: free
@@ -92,12 +95,4 @@ services:
     startCommand: "node backend/server.js"
     envVars:
       - key: NODE_VERSION
-        value: 20
-  - type: worker
-    name: soundabode-workflow-worker
-    runtime: node
-    buildCommand: "npm install"
-    startCommand: "npm run worker"
-    envVars:
-      - key: NODE_VERSION
-        value: 20
+        value: "20"
