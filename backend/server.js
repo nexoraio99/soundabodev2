@@ -10,6 +10,7 @@ import { randomUUID } from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
+import { neon } from '@neondatabase/serverless';
 import { Server as SocketServer } from 'socket.io';
 import http from 'http';
 
@@ -27,8 +28,15 @@ const io = new SocketServer(server, {
     }
 });
 const PORT = Number(process.env.PORT) || 3000;
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const BLOGS_FILE = path.join(DATA_DIR, 'blogs.json');
+// ------------------- Neon Postgres -------------------
+const DATABASE_URL = process.env.DATABASE_URL;
+let sql;
+if (DATABASE_URL) {
+    sql = neon(DATABASE_URL);
+    console.log('✅ Neon Postgres configured');
+} else {
+    console.warn('⚠️  DATABASE_URL not set — blog features will not persist data!');
+}
 
 // ------------------- Configuration -------------------
 const PHONE_NUMBER = '+919975016189';
@@ -616,33 +624,44 @@ function sendEmailAsync(emailOptions) {
     });
 }
 
-// ------------------- Blog API -------------------
+// ------------------- Blog API (Neon Postgres) -------------------
 
-async function ensureDataDir() {
+async function ensureBlogsTable() {
+    if (!sql) return;
     try {
-        await fs.mkdir(DATA_DIR, { recursive: true });
-        try {
-            await fs.access(BLOGS_FILE);
-        } catch {
-            await fs.writeFile(BLOGS_FILE, '[]', 'utf8');
-        }
+        await sql`
+            CREATE TABLE IF NOT EXISTS blogs (
+                id TEXT PRIMARY KEY,
+                heading TEXT NOT NULL,
+                subheading TEXT,
+                date TEXT,
+                content TEXT,
+                image_url TEXT DEFAULT '',
+                category TEXT DEFAULT 'General',
+                author TEXT DEFAULT 'Soundabode',
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            )
+        `;
+        console.log('✅ Blogs table ready');
     } catch (err) {
-        console.error('Error ensuring data directory:', err);
+        console.error('❌ Failed to create blogs table:', err.message);
     }
 }
 
 async function getBlogs() {
-    await ensureDataDir();
+    if (!sql) return [];
     try {
-        const data = await fs.readFile(BLOGS_FILE, 'utf8');
-        return JSON.parse(data || '[]');
+        const rows = await sql`
+            SELECT id, heading, subheading, date, content,
+                   image_url AS "imageUrl", category, author
+            FROM blogs
+            ORDER BY created_at DESC
+        `;
+        return rows;
     } catch (err) {
+        console.error('❌ getBlogs error:', err.message);
         return [];
     }
-}
-
-async function saveBlogs(blogs) {
-    await fs.writeFile(BLOGS_FILE, JSON.stringify(blogs, null, 2), 'utf8');
 }
 
 app.get('/api/blogs', async (req, res) => {
@@ -652,60 +671,72 @@ app.get('/api/blogs', async (req, res) => {
 
 app.post('/api/blogs', async (req, res) => {
     const { id, heading, subheading, date, content, password } = req.body;
-    
+
     // Simple admin check
     if (password !== 'admin') {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    const blogs = await getBlogs();
-    const newBlog = {
-        id: id || Date.now().toString(),
-        heading,
-        subheading,
-        date: date || new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-        content,
-        imageUrl: req.body.imageUrl || '',
-        category: req.body.category || 'General',
-        author: req.body.author || 'Soundabode'
-    };
-
-    if (id) {
-        const index = blogs.findIndex(b => b.id === id);
-        if (index > -1) blogs[index] = newBlog;
-        else blogs.unshift(newBlog);
-    } else {
-        blogs.unshift(newBlog);
+    if (!sql) {
+        return res.status(500).json({ success: false, message: 'Database not configured' });
     }
 
-    await saveBlogs(blogs);
-    io.emit('blogUpdate', newBlog);
-    res.status(201).json({ success: true, blog: newBlog });
+    try {
+        const blogId = id || Date.now().toString();
+        const blogDate = date || new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+        const imageUrl = req.body.imageUrl || '';
+        const category = req.body.category || 'General';
+        const author = req.body.author || 'Soundabode';
+
+        // Upsert: insert or update if id exists
+        await sql`
+            INSERT INTO blogs (id, heading, subheading, date, content, image_url, category, author, created_at)
+            VALUES (${blogId}, ${heading}, ${subheading || ''}, ${blogDate}, ${content || ''}, ${imageUrl}, ${category}, ${author}, NOW())
+            ON CONFLICT (id) DO UPDATE SET
+                heading = EXCLUDED.heading,
+                subheading = EXCLUDED.subheading,
+                date = EXCLUDED.date,
+                content = EXCLUDED.content,
+                image_url = EXCLUDED.image_url,
+                category = EXCLUDED.category,
+                author = EXCLUDED.author
+        `;
+
+        const newBlog = { id: blogId, heading, subheading, date: blogDate, content, imageUrl, category, author };
+        io.emit('blogUpdate', newBlog);
+        res.status(201).json({ success: true, blog: newBlog });
+    } catch (err) {
+        console.error('❌ POST /api/blogs error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to save blog' });
+    }
 });
 
 app.delete('/api/blogs/:id', async (req, res) => {
     const { password } = req.body;
-    
+
     // Simple admin check
     if (password !== 'admin') {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    const { id } = req.params;
-    let blogs = await getBlogs();
-    
-    const initialLength = blogs.length;
-    blogs = blogs.filter(b => b.id !== id);
-    
-    if (blogs.length === initialLength) {
-        return res.status(404).json({ success: false, message: 'Blog not found' });
+    if (!sql) {
+        return res.status(500).json({ success: false, message: 'Database not configured' });
     }
 
-    await saveBlogs(blogs);
-    // Tell clients to refresh the blog list
-    io.emit('blogDeleted', id);
-    
-    res.json({ success: true, message: 'Blog deleted successfully' });
+    try {
+        const { id } = req.params;
+        const result = await sql`DELETE FROM blogs WHERE id = ${id}`;
+
+        if (result.count === 0) {
+            return res.status(404).json({ success: false, message: 'Blog not found' });
+        }
+
+        io.emit('blogDeleted', id);
+        res.json({ success: true, message: 'Blog deleted successfully' });
+    } catch (err) {
+        console.error('❌ DELETE /api/blogs error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to delete blog' });
+    }
 });
 
 // Socket.io connection handling
@@ -961,4 +992,7 @@ server.listen(PORT, async () => {
         console.error('   Server is running but email features will NOT work.');
         console.error('   Please verify OAuth2 credentials in your .env file.');
     }
+
+    // --- Initialize Neon Postgres blogs table ---
+    await ensureBlogsTable();
 });
