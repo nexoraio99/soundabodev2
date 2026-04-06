@@ -47,21 +47,21 @@ services:
       # --- 2. SECONDARY PRIORITY: Category Landing Pages (Must come AFTER specific courses) ---
       - type: rewrite
         source: /courses/dj-training
-        destination: /courses.html
+        destination: /courses/index.html
       - type: rewrite
         source: /courses/music-production
-        destination: /courses.html
+        destination: /courses/index.html
       - type: rewrite
         source: /dj-training
-        destination: /courses.html
+        destination: /courses/index.html
       - type: rewrite
         source: /music-production
-        destination: /courses.html
+        destination: /courses/index.html
 
       # --- 3. TERTIARY PRIORITY: Main Landing Pages & Misc (Must come AFTER all sub-paths) ---
       - type: rewrite
         source: /courses
-        destination: /courses.html
+        destination: /courses/index.html
       - type: rewrite
         source: /about
         destination: /about.html
@@ -79,7 +79,7 @@ services:
         destination: /privacy.html
       - type: rewrite
         source: /blog
-        destination: /blog.html
+        destination: /blog/index.html
       - type: rewrite
         source: /blog/*
         destination: /blog/*.html
