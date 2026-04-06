@@ -1,7 +1,7 @@
 services:
   - type: web
     name: soundabode
-    env: static
+    runtime: static
     buildCommand: "npm install && npm run build" # Dummy if not needed
     staticPublishPath: ./
     routes:
@@ -85,7 +85,7 @@ services:
         value: 20
   - type: web
     name: soundabodev2-server
-    env: node
+    runtime: node
     buildCommand: "npm install"
     startCommand: "node backend/server.js"
     envVars:
@@ -93,7 +93,7 @@ services:
         value: 20
   - type: worker
     name: soundabode-workflow-worker
-    env: node
+    runtime: node
     buildCommand: "npm install"
     startCommand: "npm run worker"
     envVars:
