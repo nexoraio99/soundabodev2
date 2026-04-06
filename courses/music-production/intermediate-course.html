@@ -1082,9 +1082,29 @@
               if (formNote) formNote.style.display = 'none';
               if (formSuccess) formSuccess.style.display = '';
 
-              // TODO: replace with a real backend POST if desired
-              // Example:
-              // fetch('/api/enquiry', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, phone, ...}) })
+              // Submit to backend
+              const BACKEND_BASE = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com';
+              const payload = {
+                name,
+                phone,
+                email: form.querySelector('#email')?.value || '',
+                course: document.getElementById('enroll-modal-title')?.textContent || 'Level 2 Intermediate Production',
+                message: form.querySelector('#message')?.value || '',
+                source: 'Level 2 Course Page'
+              };
+
+              fetch(`${BACKEND_BASE}/api/contact-form`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              })
+              .then(res => res.json())
+              .then(data => {
+                console.log('Enquiry response:', data);
+              })
+              .catch(err => {
+                console.error('Enquiry error:', err);
+              });
 
               setTimeout(function () {
                 closeModal();

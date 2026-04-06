@@ -208,7 +208,9 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="/script/script.js" defer></script>
   <script>
-    const socket = io();
+    // Backend configuration
+    const BACKEND_BASE = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com';
+    const socket = io(BACKEND_BASE);
     const blogFeed = document.getElementById('blog-feed');
     const latestGrid = document.getElementById('latest-news-grid');
     const loadingState = document.getElementById('loading-state');
@@ -218,7 +220,7 @@
     let currentCategory = 'All';
 
     // Fetch initial blogs
-    fetch('/api/blogs')
+    fetch(`${BACKEND_BASE}/api/blogs`)
       .then(res => res.json())
       .then(blogs => {
         allBlogs = blogs;

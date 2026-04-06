@@ -996,21 +996,29 @@
           if (formNote) formNote.style.display = 'none';
           if (formSuccess) formSuccess.style.display = '';
 
-          // Example: send to backend here (commented)
-          /*
+          // Submit to backend
+          const BACKEND_BASE = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com';
           const payload = {
             name,
             phone,
             email: form.querySelector('#email')?.value || '',
-            course: form.querySelector('#course')?.value || '',
-            message: form.querySelector('#message')?.value || ''
+            course: document.getElementById('enroll-modal-title')?.textContent || 'Level 1 Music Production',
+            message: form.querySelector('#message')?.value || '',
+            source: 'Level 1 Course Page'
           };
-          fetch('/api/enquiry', {
+
+          fetch(`${BACKEND_BASE}/api/contact-form`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
-          }).then(res => { ... })
-          */
+          })
+          .then(res => res.json())
+          .then(data => {
+            console.log('Enquiry response:', data);
+          })
+          .catch(err => {
+            console.error('Enquiry error:', err);
+          });
 
           setTimeout(() => { closeModal(); }, 1800);
         });

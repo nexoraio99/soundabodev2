@@ -1,7 +1,9 @@
 /* blog-admin.js - JavaScript for the blog administration dashboard */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const socket = typeof io !== 'undefined' ? io() : null;
+    // Backend URL configuration
+    const BACKEND_BASE = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com';
+    const socket = typeof io !== 'undefined' ? io(BACKEND_BASE) : null;
     const loginPanel = document.getElementById('login-panel');
     const adminPanel = document.getElementById('admin-panel');
     const blogForm = document.getElementById('blog-form');
@@ -47,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch('/api/blogs', {
+                const response = await fetch(`${BACKEND_BASE}/api/blogs`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(blogData)
