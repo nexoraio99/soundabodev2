@@ -98,7 +98,8 @@ app.use((req, res, next) => {
 });
 
 // ------------------- Static files -------------------
-app.use(express.static(__dirname));
+// Serve from the parent directory (project root)
+app.use(express.static(path.join(__dirname, '..')));
 
 // ------------------- Gmail (OAuth2) setup -------------------
 console.log('📧 Gmail configuration:');
@@ -664,7 +665,10 @@ app.post('/api/blogs', async (req, res) => {
         heading,
         subheading,
         date: date || new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-        content
+        content,
+        imageUrl: req.body.imageUrl || '',
+        category: req.body.category || 'General',
+        author: req.body.author || 'Soundabode'
     };
 
     if (id) {
@@ -837,28 +841,40 @@ app.post('/api/contact-form', async (req, res) => {
     }
 });
 
-// ---- Static HTML fallback ----
+// ---- Clean URL / Static HTML fallback ----
 app.get('*', async (req, res, next) => {
-    if (req.path.startsWith('/api/')) return next();
+    // Skip if it's an API call or has a file extension
+    if (req.path.startsWith('/api/') || req.path.startsWith('/socket.io/')) return next();
     if (path.extname(req.path)) return next();
 
-    try {
-        let filePath = path.join(__dirname, req.path + '.html');
+    // Standardize path: remove trailing slash for consistent resolution
+    const normalizedPath = req.path.replace(/\/+$/, '') || '/index';
+
+    // 1. Try exact path + .html (e.g. /about -> about.html)
+    // 2. Then try [path]/index.html (rare but useful for folders)
+    const candidates = [
+        path.join(__dirname, '..', normalizedPath + '.html'),
+        path.join(__dirname, '..', normalizedPath, 'index.html')
+    ];
+
+    for (const filePath of candidates) {
         try {
             await fs.access(filePath);
+            const fileName = path.basename(filePath);
+            console.log(`[Clean URL] Request: ${req.path} -> Serving: ${fileName}`);
             return res.sendFile(filePath);
-        } catch {
-            filePath = path.join(__dirname, req.path, 'index.html');
-            try {
-                await fs.access(filePath);
-                return res.sendFile(filePath);
-            } catch {
-                return next();
-            }
+        } catch (e) {
+            // Check next candidate
         }
-    } catch {
-        return next();
     }
+
+    // Defensive: log if we are inside /courses/ but no file was found
+    if (req.path.startsWith('/courses/')) {
+        console.warn(`[Routing Warning] Course sub-path requested but no matching file found: ${req.path}`);
+    }
+
+    // Default to index.html for SPA-like behavior on root or non-matching routes
+    return next();
 });
 
 app.use((req, res) =>
