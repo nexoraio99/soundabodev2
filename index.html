@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -602,9 +603,9 @@
       <span class="bar"></span>
     </button>
 
-        <!-- Call Action Button -->
+    <!-- Call Action Button -->
     <div class="nav-actions">
-      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us">
+      <a href="tel:+919975016189" class="action-btn call-btn" title="Call us" onclick="uet_report_conversion()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"
@@ -612,9 +613,17 @@
         </svg>
       </a>
     </div>
+    <script>
+      function uet_report_conversion_contact() {
+        window.uetq = window.uetq || [];
+        window.uetq.push('event', 'contact', { "event_label": "5547903c-7e42-4d18-ab6d-4b58e660dafe" });
+      }
+    </script>
   </nav>
 
-  <!-- MOBILE MENU -->
+  <!-- ============================================================================
+         MOBILE MENU
+         ============================================================================ -->
   <div class="nav-menu">
     <a href="/about">About</a>
     <a href="/courses">Courses</a>
@@ -622,27 +631,47 @@
     <a href="/contact">Contact</a>
   </div>
 
-  <!-- SOCIAL FLOATING BUTTONS -->
-  <div class="social-floats-container">
-    <a href="https://www.instagram.com/soundabode" class="social-float instagram-float" target="_blank"
-      rel="noopener noreferrer" title="Follow us on Instagram">
-      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/instagram.svg" alt="Instagram"
-        class="social-icon" loading="lazy">
-    </a>
-    <a href="https://www.facebook.com/soundabode" class="social-float facebook-float" target="_blank"
-      rel="noopener noreferrer" title="Follow us on Facebook">
-      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/facebook.svg" alt="Facebook"
-        class="social-icon" loading="lazy">
-    </a>
-    <a href="https://wa.me/919975016189" class="social-float whatsapp-float" target="_blank" rel="noopener noreferrer"
-      title="Chat on WhatsApp" aria-label="Chat with Soundabode on WhatsApp">
-      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/whatsapp.svg" alt="WhatsApp"
-        class="social-icon" loading="lazy">
-      <span class="whatsapp-label">Chat</span>
-    </a>
+  <!-- ============================================================================
+         INTRO VIDEO PANELS
+         ============================================================================ -->
+  <div class="intro-overlay">
+    <!-- Left Panel - DJ Training -->
+    <div class="intro-panel panel-left">
+      <video muted loop playsinline preload="metadata" poster="https://soundabode.com/Assets/hero-dj-poster.jpg"
+        data-src="https://ik.imagekit.io/Nex1ora2/Dj-training.mp4" data-mobile-autoplay="true">
+        <source data-src="https://ik.imagekit.io/Nex1ora2/Dj-training.mp4" type="video/mp4">
+      </video>
+      <div class="overlay-left">
+        <h2 class="left-font">Drop Beats. Command Crowds.</h2>
+        <p>Step behind the decks with Soundabode's DJ Courses where rhythm meets mastery. Learn to mix, scratch, and
+          perform like the pros with industry standard Pioneer gear and real-world club techniques.</p>
+        <p>From bedroom sets to main-stage energy your DJ journey starts here.</p>
+        <a href="/courses" class="glow-border" style="display:inline-block; margin-top: 12px;">Explore
+          Courses</a>
+      </div>
+    </div>
+
+    <!-- Right Panel - Music Production -->
+    <div class="intro-panel panel-right">
+      <video muted loop playsinline preload="metadata" poster="https://soundabode.com/Assets/hero-production-poster.jpg"
+        data-src="https://ik.imagekit.io/Nex1ora2/music-production.mp4" data-mobile-autoplay="true">
+        <source data-src="https://ik.imagekit.io/Nex1ora2/music-production.mp4" type="video/mp4">
+      </video>
+      <div class="overlay-right">
+        <h2 class="right-font">Create Sounds That Move The World.</h2>
+        <p>Craft your own sonic identity with Soundabode's Music Production & Audio Engineering Courses in Pune, India.
+          Master sound design, arrangement, and mixing from the first note to your final release. Build, produce, and
+          release music that's uniquely you.</p>
+        <a href="/courses" class="glow-border" style="display:inline-block; margin-top: 12px;">Explore
+          Courses</a>
+      </div>
+    </div>
   </div>
 
-  <main class="container" role="main">
+  <!-- ============================================================================
+         MAIN HERO CONTENT
+         ============================================================================ -->
+  <main class="main-content">
     <div class="title-container">
       <h2>WELCOME TO</h2>
       <h1 class="aurora-text">SOUNDABODE</h1>
@@ -707,17 +736,17 @@
   <div class="social-floats-container">
     <a href="https://www.instagram.com/soundabode" class="social-float instagram-float" target="_blank"
       rel="noopener noreferrer" title="Follow us on Instagram">
-      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/instagram.svg" alt="Instagram"
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram"
         class="social-icon" loading="lazy">
     </a>
     <a href="https://www.facebook.com/soundabode" class="social-float facebook-float" target="_blank"
       rel="noopener noreferrer" title="Follow us on Facebook">
-      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/facebook.svg" alt="Facebook"
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook"
         class="social-icon" loading="lazy">
     </a>
     <a href="https://wa.me/919975016189" class="social-float whatsapp-float" target="_blank" rel="noopener noreferrer"
       title="Chat on WhatsApp" onclick="uet_report_conversion_contact()" aria-label="Chat with Soundabode on WhatsApp">
-      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/whatsapp.svg" alt="WhatsApp"
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp"
         class="social-icon" loading="lazy">
       <span class="whatsapp-label">Chat</span>
     </a>
