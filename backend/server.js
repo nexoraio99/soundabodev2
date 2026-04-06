@@ -639,10 +639,29 @@ async function ensureBlogsTable() {
                 image_url TEXT DEFAULT '',
                 category TEXT DEFAULT 'General',
                 author TEXT DEFAULT 'Soundabode',
+                meta_title TEXT DEFAULT '',
+                meta_description TEXT DEFAULT '',
+                meta_image TEXT DEFAULT '',
+                geo_target TEXT DEFAULT '',
                 created_at TIMESTAMPTZ DEFAULT NOW()
             )
         `;
-        console.log('✅ Blogs table ready');
+        // Add new columns for existing tables (safe: IF NOT EXISTS prevents errors)
+        const newColumns = [
+            { name: 'meta_title', type: 'TEXT DEFAULT \'\'' },
+            { name: 'meta_description', type: 'TEXT DEFAULT \'\'' },
+            { name: 'meta_image', type: 'TEXT DEFAULT \'\'' },
+            { name: 'geo_target', type: 'TEXT DEFAULT \'\'' },
+        ];
+        for (const col of newColumns) {
+            try {
+                await sql`SELECT ${sql(col.name)} FROM blogs LIMIT 0`;
+            } catch {
+                await sql`ALTER TABLE blogs ADD COLUMN ${sql.unsafe(col.name + ' ' + col.type)}`;
+                console.log(`  ➕ Added column: ${col.name}`);
+            }
+        }
+        console.log('✅ Blogs table ready (with SEO & GEO fields)');
     } catch (err) {
         console.error('❌ Failed to create blogs table:', err.message);
     }
@@ -653,7 +672,9 @@ async function getBlogs() {
     try {
         const rows = await sql`
             SELECT id, heading, subheading, date, content,
-                   image_url AS "imageUrl", category, author
+                   image_url AS "imageUrl", category, author,
+                   meta_title AS "metaTitle", meta_description AS "metaDescription",
+                   meta_image AS "metaImage", geo_target AS "geoTarget"
             FROM blogs
             ORDER BY created_at DESC
         `;
@@ -687,11 +708,15 @@ app.post('/api/blogs', async (req, res) => {
         const imageUrl = req.body.imageUrl || '';
         const category = req.body.category || 'General';
         const author = req.body.author || 'Soundabode';
+        const metaTitle = req.body.metaTitle || '';
+        const metaDescription = req.body.metaDescription || '';
+        const metaImage = req.body.metaImage || '';
+        const geoTarget = req.body.geoTarget || '';
 
         // Upsert: insert or update if id exists
         await sql`
-            INSERT INTO blogs (id, heading, subheading, date, content, image_url, category, author, created_at)
-            VALUES (${blogId}, ${heading}, ${subheading || ''}, ${blogDate}, ${content || ''}, ${imageUrl}, ${category}, ${author}, NOW())
+            INSERT INTO blogs (id, heading, subheading, date, content, image_url, category, author, meta_title, meta_description, meta_image, geo_target, created_at)
+            VALUES (${blogId}, ${heading}, ${subheading || ''}, ${blogDate}, ${content || ''}, ${imageUrl}, ${category}, ${author}, ${metaTitle}, ${metaDescription}, ${metaImage}, ${geoTarget}, NOW())
             ON CONFLICT (id) DO UPDATE SET
                 heading = EXCLUDED.heading,
                 subheading = EXCLUDED.subheading,
@@ -699,10 +724,14 @@ app.post('/api/blogs', async (req, res) => {
                 content = EXCLUDED.content,
                 image_url = EXCLUDED.image_url,
                 category = EXCLUDED.category,
-                author = EXCLUDED.author
+                author = EXCLUDED.author,
+                meta_title = EXCLUDED.meta_title,
+                meta_description = EXCLUDED.meta_description,
+                meta_image = EXCLUDED.meta_image,
+                geo_target = EXCLUDED.geo_target
         `;
 
-        const newBlog = { id: blogId, heading, subheading, date: blogDate, content, imageUrl, category, author };
+        const newBlog = { id: blogId, heading, subheading, date: blogDate, content, imageUrl, category, author, metaTitle, metaDescription, metaImage, geoTarget };
         io.emit('blogUpdate', newBlog);
         res.status(201).json({ success: true, blog: newBlog });
     } catch (err) {

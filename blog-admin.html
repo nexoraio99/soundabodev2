@@ -35,6 +35,13 @@
 
     <div class="admin-card">
       <form id="blog-form">
+        <input type="hidden" id="edit-id" value="">
+
+        <!-- Content Section -->
+        <div class="admin-section-header">
+          <span class="admin-section-icon">📝</span> Content
+        </div>
+
         <div class="admin-form-group">
           <label class="admin-label">Blog Heading</label>
           <input type="text" id="heading" class="admin-input" placeholder="e.g. Master Your Mix" required>
@@ -67,11 +74,60 @@
           <label class="admin-label">Content</label>
           <textarea id="content" class="admin-textarea" rows="10" placeholder="Write your blog post here..." required></textarea>
         </div>
+
+        <!-- SEO Section -->
+        <div class="admin-section-header">
+          <span class="admin-section-icon">🔍</span> SEO Settings
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-label">Meta Title <span class="admin-hint">(Overrides heading for search engines — max 60 chars)</span></label>
+          <input type="text" id="metaTitle" class="admin-input" placeholder="e.g. Master Your Mix | Soundabode Blog" maxlength="70">
+          <div class="admin-char-count" id="metaTitle-count">0 / 60</div>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-label">Meta Description <span class="admin-hint">(Appears in Google results — max 160 chars)</span></label>
+          <textarea id="metaDescription" class="admin-textarea" rows="3" placeholder="Write a compelling summary for search results..." maxlength="170"></textarea>
+          <div class="admin-char-count" id="metaDescription-count">0 / 160</div>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-label">Meta Image / OG Image URL <span class="admin-hint">(Social share preview image)</span></label>
+          <input type="text" id="metaImage" class="admin-input" placeholder="e.g. https://soundabode.com/Assets/og-image.jpg">
+        </div>
+
+        <!-- GEO Section -->
+        <div class="admin-section-header">
+          <span class="admin-section-icon">🌍</span> Geographic Targeting
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-label">Geo Target <span class="admin-hint">(Target region for this post)</span></label>
+          <select id="geoTarget" class="admin-input">
+            <option value="" selected>Global (No targeting)</option>
+            <option value="IN">India</option>
+            <option value="IN-MH">Maharashtra, India</option>
+            <option value="IN-DL">Delhi, India</option>
+            <option value="IN-KA">Karnataka, India</option>
+            <option value="US">United States</option>
+            <option value="GB">United Kingdom</option>
+            <option value="AE">UAE</option>
+            <option value="SG">Singapore</option>
+          </select>
+        </div>
+
+        <!-- Publish Section -->
+        <div class="admin-section-header">
+          <span class="admin-section-icon">🔐</span> Publish
+        </div>
+
         <div class="admin-form-group">
             <label class="admin-label">Confirm Password to Publish</label>
             <input type="password" id="publish-pass" class="admin-input" placeholder="Enter admin password again" required>
         </div>
-        <button type="submit" id="submit-btn" class="admin-btn">Publish Blog Post</button>
+        <div style="display: flex; gap: 12px;">
+          <button type="submit" id="submit-btn" class="admin-btn" style="flex: 1;">Publish Blog Post</button>
+          <button type="button" id="cancel-edit-btn" class="admin-btn admin-btn-secondary" style="flex: 0.4; display: none;">Cancel Edit</button>
+        </div>
       </form>
     </div>
 
