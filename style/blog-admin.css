@@ -1,0 +1,132 @@
+/* blog-admin.css - Professional Admin Styling for Soundabode Dashboard */
+
+:root {
+    --primary: #00c2ff;
+    --primary-hover: #00a0d6;
+    --bg-dark: #000000;
+    --bg-card: rgba(20, 20, 20, 0.8);
+    --text-main: #FFFFFF;
+    --text-muted: #64748B;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(20px);
+}
+
+body { 
+    background-color: var(--bg-dark); 
+    color: var(--text-main); 
+    font-family: 'Inter', sans-serif; 
+    margin: 0;
+    min-height: 100vh;
+}
+
+#admin-panel { 
+    display: none; 
+}
+
+/* LOGIN PANEL */
+#login-panel { 
+    padding: 2rem;
+    max-width: 400px; 
+    margin: 15vh auto; 
+    text-align: center; 
+    background: var(--bg-card);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* ADMIN DASHBOARD CONTAINERS */
+.blog-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+
+.admin-card {
+    background: var(--bg-card);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 4px 50px rgba(0,0,0,0.6);
+}
+
+/* FORM ELEMENTS */
+.admin-form-group {
+    margin-bottom: 24px;
+}
+
+.admin-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-input, .admin-textarea, .admin-select {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.admin-input:focus, .admin-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 15px rgba(0, 194, 255, 0.2);
+}
+
+.admin-textarea {
+    resize: vertical;
+}
+
+/* BUTTONS */
+.admin-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.admin-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 194, 255, 0.3);
+}
+
+.admin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* RESPONSIVE */
+.admin-form-row {
+    display: flex;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .admin-form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}

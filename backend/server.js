@@ -27,7 +27,7 @@ const io = new SocketServer(server, {
     }
 });
 const PORT = Number(process.env.PORT) || 3000;
-const DATA_DIR = path.join(__dirname, 'data');
+const DATA_DIR = path.join(__dirname, '..', 'data');
 const BLOGS_FILE = path.join(DATA_DIR, 'blogs.json');
 
 // ------------------- Configuration -------------------
@@ -40,7 +40,18 @@ const LOGO_URL = 'https://res.cloudinary.com/di5bqvkma/image/upload/v1761233576/
 
 // ------------------- Basic security & parsers -------------------
 app.set('trust proxy', 1);
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            "default-src": ["'self'"],
+            "script-src": ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.socket.io"],
+            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            "font-src": ["'self'", "https://fonts.gstatic.com"],
+            "img-src": ["'self'", "data:", "https://res.cloudinary.com"],
+            "connect-src": ["'self'", "ws:", "wss:", "http://localhost:3000", "https://soundabode.com"]
+        }
+    }
+}));
 app.use(express.json({ limit: '150kb' }));
 app.use(express.urlencoded({ extended: true }));
 

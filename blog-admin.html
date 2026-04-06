@@ -10,11 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   
-  <style>
-    body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; }
-    #admin-panel { display: none; }
-    #login-panel { padding-top: 15vh; max-width: 400px; margin: 0 auto; text-align: center; }
-  </style>
+  <link rel="stylesheet" href="/style/blog-admin.css">
 </head>
 
 <body>
@@ -27,7 +23,7 @@
     <div class="admin-form-group">
       <input type="password" id="admin-pass" class="admin-input" placeholder="Password: admin">
     </div>
-    <button class="admin-btn" onclick="checkPass()">Login</button>
+    <button id="login-btn" class="admin-btn">Login</button>
   </div>
 
   <!-- ADMIN PANEL -->
@@ -39,6 +35,14 @@
 
     <div class="admin-card">
       <form id="blog-form">
+        <div class="admin-form-group">
+          <label class="admin-label">Blog Heading</label>
+          <input type="text" id="heading" class="admin-input" placeholder="e.g. Master Your Mix" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-label">Short Subheading</label>
+          <input type="text" id="subheading" class="admin-input" placeholder="e.g. 5 Professional techniques for clarity" required>
+        </div>
         <div class="admin-form-group">
           <label class="admin-label">Image URL</label>
           <input type="text" id="imageUrl" class="admin-input" placeholder="e.g. Assets/blog-image.jpg">
@@ -77,62 +81,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const loginPanel = document.getElementById('login-panel');
-    const adminPanel = document.getElementById('admin-panel');
-    const blogForm = document.getElementById('blog-form');
-    const submitBtn = document.getElementById('submit-btn');
-
-    function checkPass() {
-      const pass = document.getElementById('admin-pass').value;
-      if (pass === 'admin') {
-        loginPanel.style.display = 'none';
-        adminPanel.style.display = 'block';
-      } else {
-        alert('Invalid password! Hint: admin');
-      }
-    }
-
-    blogForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const blogData = {
-        heading: document.getElementById('heading').value,
-        subheading: document.getElementById('subheading').value,
-        content: document.getElementById('content').value,
-        imageUrl: document.getElementById('imageUrl').value,
-        category: document.getElementById('category').value,
-        author: document.getElementById('author').value,
-        password: document.getElementById('publish-pass').value
-      };
-
-      submitBtn.innerText = 'Publishing...';
-      submitBtn.disabled = true;
-
-      try {
-        const response = await fetch('/api/blogs', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(blogData)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          alert('Blog Published Successfully! It is now live on the website.');
-          blogForm.reset();
-        } else {
-          alert(result.message || 'Failed to publish blog.');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Error connecting to server.');
-      } finally {
-        submitBtn.innerText = 'Publish Blog Post';
-        submitBtn.disabled = false;
-      }
-    });
-  </script>
+  <script src="/script/blog-admin.js"></script>
 </body>
 </html>
