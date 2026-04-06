@@ -98,6 +98,14 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20
+  - type: web
+    name: soundabodev2-server
+    env: node
+    buildCommand: "npm install"
+    startCommand: "node backend/server.js"
+    envVars:
+      - key: NODE_VERSION
+        value: 20
   - type: worker
     name: soundabode-workflow-worker
     env: node
