@@ -689,6 +689,42 @@
       </div>
     </div>
   </footer>
+  <div id="enroll-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="enroll-modal-title">Enroll / Book Demo - Level 1 Basic DJ Training</h3>
+        <button class="modal-close" id="modal-close-btn" type="button" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="enroll-form" novalidate>
+          <div class="modal-row">
+            <div>
+              <label class="label" for="name">Name</label>
+              <input type="text" id="name" class="input" placeholder="Your full name" required>
+            </div>
+            <div>
+              <label class="label" for="phone">Phone / WhatsApp</label>
+              <input type="tel" id="phone" class="input" placeholder="Your contact number" required>
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <label class="label" for="email">Email Address (Optional)</label>
+            <input type="email" id="email" class="input" placeholder="Your email address">
+          </div>
+          <div style="margin-top:10px;">
+            <label class="label" for="message">Message (Optional)</label>
+            <textarea id="message" rows="3" class="input" placeholder="Any specific requirements?"></textarea>
+          </div>
+          <div class="form-note" id="form-note">By clicking submit, you agree to be contacted by Soundabode via phone or email.</div>
+          <div class="form-success" id="form-success">Thank you! Our team will contact you shortly to confirm your booking.</div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="modal-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="modal-submit">Confirm Booking</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- JS -->
   <script>
