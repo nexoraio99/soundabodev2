@@ -1,4 +1,4 @@
-/* ═══ BLOG FRONTEND CONTROLLER ═══ */
+/*  BLOG FRONTEND CONTROLLER  */
 
 document.addEventListener('DOMContentLoaded', () => {
     // Backend configuration
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let displayedCount = 6;
     let filteredBlogs = [];
 
-    // ── FETCH BLOGS ──
+    //  FETCH BLOGS 
     async function fetchBlogs() {
         try {
             const res = await fetch(`${BACKEND_BASE}/api/blogs?t=${Date.now()}`);
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ── RENDER LOGIC ──
+    //  RENDER LOGIC 
     function renderAll() {
         // Clear containers
         blogFeed.innerHTML = '';
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // ── SEARCH LOGIC ──
+    //  SEARCH LOGIC 
     if (blogSearch) {
         blogSearch.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── LOAD MORE ──
+    //  LOAD MORE 
     if (loadMoreBtn) {
         loadMoreBtn.addEventListener('click', () => {
             displayedCount += 6;
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── FULL BLOG MODAL LOGIC ──
+    //  FULL BLOG MODAL LOGIC 
     window.openBlog = function(id) {
         const blog = allBlogs.find(b => b.id === id);
         if (!blog) return;

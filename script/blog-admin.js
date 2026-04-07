@@ -1,12 +1,12 @@
-/* ══════════════════════════════════════════════════════════
-   Soundabode Blog Admin — Dashboard Controller
-   ══════════════════════════════════════════════════════════ */
+/* 
+   Soundabode Blog Admin - Dashboard Controller
+    */
 
 document.addEventListener('DOMContentLoaded', () => {
   const BACKEND = window.SOUNDABODE_BACKEND_URL || 'https://soundabodev2-server.onrender.com';
   const socket = typeof io !== 'undefined' ? io(BACKEND) : null;
 
-  // ── DOM Refs ──
+  //  DOM Refs 
   const loginOverlay = document.getElementById('login-overlay');
   const dashboard = document.getElementById('dashboard');
   const adminPass = document.getElementById('admin-pass');
@@ -23,9 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let allBlogs = [];
   let adminPassword = '';
 
-  // ══════════════════════════════════════════
+  // 
   // AUTH
-  // ══════════════════════════════════════════
+  // 
   function login() {
     const pass = adminPass.value.trim();
     if (pass === 'admin') {
@@ -50,9 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
     adminPassword = '';
   });
 
-  // ══════════════════════════════════════════
+  // 
   // NAVIGATION
-  // ══════════════════════════════════════════
+  // 
   const sidebarLinks = document.querySelectorAll('.sidebar-link[data-view]');
   const views = document.querySelectorAll('.view');
   const viewLabels = { overview: 'Dashboard', compose: 'Compose', posts: 'All Posts' };
@@ -85,9 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => switchView(btn.dataset.goto));
   });
 
-  // ══════════════════════════════════════════
+  // 
   // CHAR COUNTERS
-  // ══════════════════════════════════════════
+  // 
   setupCharCount('metaTitle', 60);
   setupCharCount('metaDescription', 160);
 
@@ -140,9 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ══════════════════════════════════════════
+  // 
   // LOAD BLOGS
-  // ══════════════════════════════════════════
+  // 
   async function loadBlogs() {
     try {
       const res = await fetch(`${BACKEND}/api/blogs?t=${Date.now()}`);
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ── Stats ──
+  //  Stats 
   function renderStats() {
     document.getElementById('stat-total').textContent = allBlogs.length;
     document.getElementById('stat-seo').textContent = allBlogs.filter(b => b.metaTitle || b.metaDescription).length;
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('stat-categories').textContent = cats.size;
   }
 
-  // ── Recent Posts Grid (top 3) ──
+  //  Recent Posts Grid (top 3) 
   function renderRecentPosts() {
     const container = document.getElementById('recent-posts');
     const recent = allBlogs.slice(0, 3);
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
-  // ── Latest List ──
+  //  Latest List 
   function renderLatestList() {
     const container = document.getElementById('latest-list');
     const latest = allBlogs.slice(0, 5);
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
-  // ── All Posts Table ──
+  //  All Posts Table 
   function renderAllPosts(filter = '') {
     const container = document.getElementById('all-posts-table');
     let filtered = allBlogs;
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="table-cell">${esc(blog.category || 'General')}</div>
         <div class="table-cell">${esc(blog.author || 'Soundabode')}</div>
-        <div class="table-cell">${hasSeo ? '<span class="tag tag-seo">SEO ✓</span>' : '<span style="color:var(--grey-400)">—</span>'}</div>
+        <div class="table-cell">${hasSeo ? '<span class="tag tag-seo">SEO ✓</span>' : '<span style="color:var(--grey-400)">-</span>'}</div>
         <div class="table-cell-actions">
           <button class="action-btn" onclick="editBlog('${blog.id}')" title="Edit">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -281,9 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAllPosts(searchInput.value.trim());
   });
 
-  // ══════════════════════════════════════════
+  // 
   // COMPOSE / EDIT / DELETE
-  // ══════════════════════════════════════════
+  // 
   function resetForm() {
     blogForm.reset();
     editIdInput.value = '';
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // ── Helpers ──
+  //  Helpers 
   function setSelect(id, value) {
     const el = document.getElementById(id);
     if (!el) return;

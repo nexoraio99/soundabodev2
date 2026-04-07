@@ -35,7 +35,7 @@ if (DATABASE_URL) {
     sql = neon(DATABASE_URL);
     console.log('✅ Neon Postgres configured');
 } else {
-    console.warn('⚠️  DATABASE_URL not set — blog features will not persist data!');
+    console.warn('⚠️  DATABASE_URL not set - blog features will not persist data!');
 }
 
 // ------------------- Configuration -------------------
@@ -167,7 +167,7 @@ async function getAccessTokenCached() {
         cachedToken = { token, expiry };
 
         const expiresInMinutes = Math.round((expiry - now) / 60000);
-        console.log(`🔑 Gmail access token refreshed — expires in ${expiresInMinutes}m`);
+        console.log(`🔑 Gmail access token refreshed - expires in ${expiresInMinutes}m`);
         console.log(`   Next auto-refresh: ${new Date(expiry - 10 * 60 * 1000).toLocaleString('en-IN')}`);
 
         return token;
@@ -588,7 +588,7 @@ async function sendEmailRaw({ to, subject, htmlBody, textBody, maxRetries = 3 })
             console.error(`❌ Email attempt ${attempt}/${maxRetries} to "${to}" FAILED: ${errMsg}`);
 
             if (err.code === 401 || err.code === 403 || (err.status && (err.status === 401 || err.status === 403))) {
-                console.warn('   Auth error — clearing token cache for next retry');
+                console.warn('   Auth error - clearing token cache for next retry');
                 cachedToken = null;
             }
 
@@ -804,7 +804,7 @@ app.get('/api/test-email', async (req, res) => {
     console.log('🧪 Test email endpoint hit');
     const result = await sendEmailRaw({
         to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-        subject: `Soundabode Backend — Test Email ${new Date().toLocaleString('en-IN')}`,
+        subject: `Soundabode Backend - Test Email ${new Date().toLocaleString('en-IN')}`,
         htmlBody: `<h2>✅ Test Email</h2><p>Gmail integration is working correctly. Server time: ${new Date().toISOString()}</p>`,
         maxRetries: 2
     });
@@ -827,7 +827,7 @@ app.post('/api/popup-form', async (req, res) => {
         const message = req.body?.message ? String(req.body.message).trim() : '';
 
         if (!fullName || fullName === 'Unknown' || !email || !phone) {
-            console.warn('❌ Popup validation failed — missing fields', { fullName, email, phone });
+            console.warn('❌ Popup validation failed - missing fields', { fullName, email, phone });
             return res.status(400).json({ success: false, message: 'Name, email and phone are required.' });
         }
 
@@ -838,7 +838,7 @@ app.post('/api/popup-form', async (req, res) => {
 
         const timestampLocal = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
         const ref = randomUUID().slice(0, 8).toUpperCase();
-        const subject = `[Popup] Homepage Inquiry — ${fullName} — ${ref}`;
+        const subject = `[Popup] Homepage Inquiry - ${fullName} - ${ref}`;
 
         console.log(`📬 Popup inquiry | ref: ${ref} | name: ${fullName} | email: ${email} | phone: ${phone}`);
 
@@ -876,7 +876,7 @@ app.post('/api/contact-form', async (req, res) => {
         const message = req.body?.message ? String(req.body.message).trim() : '';
 
         if (!fullName || fullName === 'Unknown' || !email || !phone) {
-            console.warn('❌ Contact validation failed — missing fields', { fullName, email, phone });
+            console.warn('❌ Contact validation failed - missing fields', { fullName, email, phone });
             return res.status(400).json({ success: false, message: 'Name, email and phone are required.' });
         }
 
@@ -893,8 +893,8 @@ app.post('/api/contact-form', async (req, res) => {
         const ref = randomUUID().slice(0, 8).toUpperCase();
 
         const subject = isCourse
-            ? `[Contact] Course Enquiry — ${formattedCourse} — ${fullName} — ${ref}`
-            : `[Contact] General Enquiry — ${fullName} — ${ref}`;
+            ? `[Contact] Course Enquiry - ${formattedCourse} - ${fullName} - ${ref}`
+            : `[Contact] General Enquiry - ${fullName} - ${ref}`;
 
         console.log(`📬 Contact form | ref: ${ref} | type: ${enquiryType} | name: ${fullName} | email: ${email} | course: ${formattedCourse}`);
 
@@ -913,7 +913,7 @@ app.post('/api/contact-form', async (req, res) => {
         // User confirmation email
         sendEmailAsync({
             to: email,
-            subject: `${COMPANY_NAME} — We've received your ${enquiryType.toLowerCase()}!`,
+            subject: `${COMPANY_NAME} - We've received your ${enquiryType.toLowerCase()}!`,
             htmlBody: getUserContactEmail({ fullName, course: formattedCourse, ref, isCourse })
         });
 
@@ -1015,7 +1015,7 @@ server.listen(PORT, async () => {
         console.log('🔄 Pre-warming Gmail access token...');
         await getAccessTokenCached();
         startTokenRefreshScheduler();
-        console.log('✅ Gmail authentication ready — token will auto-refresh every 50 minutes');
+        console.log('✅ Gmail authentication ready - token will auto-refresh every 50 minutes');
     } catch (e) {
         console.error('❌ Failed to initialize Gmail authentication:', e.message || e);
         console.error('   Server is running but email features will NOT work.');
