@@ -1,22 +1,32 @@
 # Soundabode robots.txt
-# Optimized for high visibility across search and AI engines
+# Optimized for high visibility across search, ad engines, and AI models
 
 #  GLOBAL ACCESS 
 User-agent: *
 Allow: /
-Disallow: /blog-admin.html
 Disallow: /blog-admin
 Disallow: /backend/
 Disallow: /node_modules/
 
-#  SEARCH ENGINE SPECIFIC 
+#  GOOGLE SEARCH BOT 
 User-agent: Googlebot
 Allow: /
+Allow: /style/
+Allow: /script/
+Allow: /Assets/
 
+#  GOOGLE AD BOTS (Fix for blocked resources in Ad/Mobile tests) 
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: Mediapartners-Google
+Allow: /
+
+#  BING SEARCH BOT 
 User-agent: Bingbot
 Allow: /
 
-#  AI ENGINE ENHANCEMENTS (Boosting Visibility) 
+#  AI ENGINE ENHANCEMENTS 
 User-agent: GPTBot
 Allow: /
 
@@ -34,3 +44,4 @@ Allow: /
 
 #  SITEMAP REFERENCE 
 Sitemap: https://soundabode.com/sitemap.xml
+
