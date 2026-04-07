@@ -89,50 +89,6 @@ body {
   /* Optional: add top padding so content doesn't sit under fixed navbar */
   body{ padding-top: clamp(48px, 10vw, 64px); }
 
-/* WhatsApp Float */
-.whatsapp-float {
-    position: fixed;
-    width: 60px;
-    height: 60px;
-    bottom: 25px;
-    right: 25px;
-    background-color: #25D366;
-    border-radius: 50%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-@media (max-width: 768px) {
-    .whatsapp-float {
-        width: 50px;
-        height: 50px;
-        bottom: 20px;
-        right: 20px;
-    }
-    .whatsapp-icon {
-        width: 25px;
-        height: 25px;
-    }
-    .whatsapp-label {
-        display: none;
-    }
-}
-
-.whatsapp-float:hover {
-    transform: scale(1.1);
-    background-color: #20ba5a;
-}
-
-.whatsapp-icon {
-    width: 30px;
-    height: 30px;
-    filter: brightness(0) invert(1);
-}
 
 /* ============================================================================
    CONTACT SECTION - SWAPPED LAYOUT
