@@ -1,29 +1,23 @@
-# Cloudflare Pages Redirects
-# Mirroring the Render.yaml rules for Clean URLs
+# 1. Force Clean URLs for SEO (Redirects .html to the clean path)
+/index.html    /          301
+/*.html        /:splat    301
 
-# Redirects: .html to Clean URLs
-/index.html    /    301
-/*.html        /:1  301
-
-# Special redirect for images/assets if needed
-# /Assets/*    https://res.cloudinary.com/... (optional)
-
-# Rewrites: Clean URLs to .html (Cloudflare handles this via "Pretty URLs" setting, but explicit is better)
-/about         /about.html
-/contact       /contact.html
-/courses       /courses.html
-/enroll        /enroll.html
-/privacy       /privacy.html
-/terms         /terms.html
-/blog          /blog.html
-/blog-admin    /blog-admin.html
+# 2. Silent Rewrites: Serve the .html file when a clean URL is visited
+/about         /about.html          200
+/contact       /contact.html        200
+/courses       /courses.html        200
+/enroll        /enroll.html         200
+/privacy       /privacy.html        200
+/terms         /terms.html          200
+/blog          /blog.html           200
+/blog-admin    /blog-admin.html     200
 
 # Course subdirectories
-/courses/dj-training/basic-dj-course            /courses/dj-training/basic-dj-course.html
-/courses/dj-training/pro-dj-course              /courses/dj-training/pro-dj-course.html
-/courses/dj-training/advanced-dj-performance   /courses/dj-training/advanced-dj-performance.html
+/courses/dj-training/basic-dj-course              /courses/dj-training/basic-dj-course.html              200
+/courses/dj-training/pro-dj-course                /courses/dj-training/pro-dj-course.html                200
+/courses/dj-training/advanced-dj-performance      /courses/dj-training/advanced-dj-performance.html      200
 
-/courses/music-production/beginner-course       /courses/music-production/beginner-course.html
-/courses/music-production/intermediate-course   /courses/music-production/intermediate-course.html
-/courses/music-production/mixing-mastering-course /courses/music-production/mixing-mastering-course.html
-/courses/music-production/audio-engineering-diploma /courses/music-production/audio-engineering-diploma.html
+/courses/music-production/beginner-course         /courses/music-production/beginner-course.html         200
+/courses/music-production/intermediate-course     /courses/music-production/intermediate-course.html     200
+/courses/music-production/mixing-mastering-course /courses/music-production/mixing-mastering-course.html 200
+/courses/music-production/audio-engineering-diploma /courses/music-production/audio-engineering-diploma.html 200
