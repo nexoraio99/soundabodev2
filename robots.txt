@@ -1,0 +1,10 @@
+# Soundabode robots.txt
+# Standard search engine access control
+
+User-agent: *
+Allow: /
+Disallow: /blog-admin.html
+Disallow: /backend/
+
+# Referencing Sitemap
+Sitemap: https://soundabode.com/sitemap.xml
