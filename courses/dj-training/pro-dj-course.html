@@ -160,43 +160,45 @@
 
     /* HERO - COMPRESSED */
     .hero { display:grid; grid-template-columns: 1fr; gap:24px; align-items:center; margin-top:64px; }
-    @media (min-width:1020px) { .hero { grid-template-columns: 1.2fr 0.9fr; } }
-    .hero-kicker { font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+    @media (min-width:1020px) { .hero { grid-template-columns: 1.4fr 1fr; } }
+    .hero-kicker { display:inline-flex; gap:8px; padding:4px 10px; border-radius:999px; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); margin-bottom:8px; }
     .hero h1 { font-size:24px; margin:0; line-height:1.1; font-weight: 800; }
     @media (min-width:960px) { .hero h1 { font-size:32px; } }
     .gradient-text { background: linear-gradient(90deg, var(--neon-1), var(--neon-2)); -webkit-background-clip:text; background-clip:text; color:transparent; display:inline-block; margin-top:2px; }
-    .hero p { color: var(--muted); margin-top:10px; max-width:65ch; font-size: 13.5px; }
-    .hero .cta-row { margin-top:14px; display:flex; flex-wrap:wrap; gap:10px; }
-    .btn-primary, .btn-outline { padding:10px 14px; border-radius:10px; font-weight:700; border:none; cursor:pointer; white-space:nowrap; font-size:13px; display:inline-block; text-align:center; }
-    .btn-primary { background: linear-gradient(90deg, var(--neon-1), var(--neon-2)); color: #041014; }
-    .btn-outline { background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); color:#e8eef6; }
+    .hero p { color: var(--muted); margin-top:10px; max-width:60ch; font-size: 13.5px; }
+    .cta-row { margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-primary, .btn-outline { padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer; white-space:nowrap; font-size:13px; display:inline-block; text-align:center; }
+    .btn-primary { background: linear-gradient(90deg, var(--neon-1), var(--neon-2)); color: #041014; border:none; }
+    .btn-outline { background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); color:#e8eef6; }
 
     .hero-visual { position:relative; height:320px; border-radius:16px; overflow:hidden; border:1px solid rgba(17,16,16,0.06); background:#000; }
-    .hero-visual::before { content:""; position:absolute; inset:0; border-radius:16px; box-shadow: inset 0 0 60px rgba(78,231,255,0.06), inset 0 0 120px rgba(0,0,0,0.7); z-index:4; pointer-events:none; }
-    .gradient-layer { position:absolute; inset:0; background: radial-gradient(600px 200px at 10% 20%, #000000, transparent 8%), radial-gradient(500px 160px at 90% 80%, rgba(78,231,255,0.06), transparent 18%); animation: shift 9s ease-in-out infinite; z-index:0; }
+    .hero-visual::before { content:""; position:absolute; inset:0; border-radius:16px; box-shadow: inset 0 0 60px rgba(78,231,255,0.06), inset 0 0 120px rgba(0,0,0,0.7); pointer-events:none; z-index:4; }
+    .gradient-layer { position:absolute; inset:0; background: radial-gradient(600px 200px at 10% 20%, #000000, transparent 8%), radial-gradient(500px 160px at 90% 80%, rgba(78,231,255,0.04), transparent 16%); animation: shift 9s ease-in-out infinite; z-index:0; pointer-events:none; }
     @keyframes shift { 0% { filter: hue-rotate(0deg); } 50% { filter: hue-rotate(35deg); } 100% { filter: hue-rotate(0deg); } }
     .floating-img { position:absolute; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); border-radius:12px; border:1px solid rgba(0,0,0,0.08); object-fit:cover; z-index:3; max-width:100%; }
     .floating-img.album { left:20px; top:20px; width:150px; height:150px; }
     .floating-img.studio { right:20px; bottom:20px; width:120px; height:120px; }
 
-    /* Layout components - COMPRESSED */
+    /* SECTIONS - COMPRESSED */
     .page-section { margin-top:28px; padding:14px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.06); }
-    .page-section h2 { font-size:18px; margin:0 0 8px; }
-    .page-section p { color:var(--muted); font-size:13px; line-height:1.5; margin:6px 0; }
-    .two-column { display:grid; grid-template-columns: minmax(0,2fr) minmax(0,1.3fr); gap:14px; align-items:flex-start; margin-top:12px; }
-    @media (max-width:880px) { .two-column { grid-template-columns: 1fr; } }
-    .list { margin:6px 0 0; padding-left:16px; color:var(--muted); font-size:13px; }
-    .list li { margin-bottom:4px; }
-    .pill { display:inline-flex; padding:4px 8px; border-radius:999px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
+    .page-section h2 { margin: 0; font-size: 18px; margin-bottom: 8px; }
+    .page-section h3 { margin: 0; font-size: 14px; margin-top: 10px; }
+    .page-section p { margin: 6px 0; color: var(--muted); line-height: 1.5; font-size: 13px; }
+    .two-column { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap: 14px; align-items: flex-start; }
+    @media (max-width: 920px) { .two-column { grid-template-columns: 1fr; } }
+    .list { padding-left: 16px; margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .list li { margin-bottom: 4px; }
+    .pill { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
 
-    .faq { margin-top:12px; }
-    .faq-item { background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:10px; border-radius:8px; margin-top:6px; border: 1px solid rgba(255,255,255,0.04); }
-    .faq-question { display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:600; gap:8px; font-size:13px; }
-    .faq-question span { font-size:16px; }
-    .faq-answer { margin-top:6px; color:var(--muted); display:none; font-size:13px; }
+    .faq { margin-top: 10px; }
+    .faq-item { background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding: 10px; border-radius: 8px; margin-top: 6px; border: 1px solid rgba(255,255,255,0.04); }
+    .faq-question { display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; gap: 8px; font-size: 13px; }
+    .faq-question span { font-size: 16px; }
+    .faq-answer { margin-top: 6px; color: var(--muted); display: none; font-size: 13px; line-height: 1.5; }
 
-    .enroll-bottom { margin-top:28px; padding:16px; border-radius:12px; background: linear-gradient(180deg, rgba(9,17,26,0.6), rgba(8,11,14,0.45)); border: 1px solid rgba(255,255,255,0.04); display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-    .enroll-bottom .actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .enroll-bottom { margin-top: 24px; padding: 16px; border-radius: 12px; background: linear-gradient(180deg, rgba(9,17,26,0.6), rgba(8,11,14,0.45)); border: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .enroll-bottom .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 
     /* Modal Overlay Fix */
     .modal-overlay {
@@ -273,7 +275,7 @@
     </a>
   </div>
 
-  <main class="container" role="main">
+  <main class="container" style="margin-top: 6px;">
     <!-- HERO -->
     <section class="hero" aria-labelledby="hero-heading">
       <div>
@@ -282,333 +284,187 @@
           Level 2 - Pro DJ Training Course
           <span class="gradient-text">Push Your Limits. Own The Decks.</span>
         </h1>
-
-        <p class="hero-subtitle">Advanced DJ Course in Pune for professional mixing and live performance.</p>
-
         <p>
-          The Level 2 Pro DJ Training Course at <strong>Soundabode</strong> is built for aspiring DJs who are ready
-          to take their skills from the studio to the stage. Learn advanced mixing, harmonic blending, FX and digital
-          performance using <strong>Pioneer CDJs, Traktor, Rekordbox and Ableton Live</strong>, mentored by
-          professionals who perform at top Indian venues and festivals.
+          The Level 2 Pro DJ Training Course at Soundabode is built for aspiring DJs ready to transition from bedroom sets to professional stages. Master advanced mixing, harmonic blending, complex FX layering, and digital performance workflows using industry-standard Pioneer gear and professional software.
         </p>
 
-        <div class="hero-meta-row" aria-hidden="false">
-          <div class="meta-pill">4 month intensive program</div>
-          <div class="meta-pill">Advanced mixing and performance</div>
-          <div class="meta-pill">Real club and event exposure</div>
-        </div>
-
-        <div class="cta-row" role="region" aria-label="Call to action">
-          <a class="btn-primary" href="/contact">Book A Free Demo Class</a>
+        <div class="cta-row">
+          <a class="btn-primary" href="#enroll" data-open-enroll>Enroll Now</a>
           <a class="btn-outline" href="/courses/dj-training/basic-dj-course">Level 1</a>
           <a class="btn-outline" href="/courses/dj-training/advanced-dj-performance">Level 3</a>
+        </div>
+
+        <div class="badge-row">
+          <span class="pill">4 Months • Intensive Program</span>
+          <span class="pill">Fee: ₹ 60,000</span>
         </div>
       </div>
 
       <div>
-        <div class="hero-visual" id="hero-visual" role="img" aria-label="DJ performing on Pioneer CDJs at Soundabode studio">
+        <div class="hero-visual" id="hero-visual" role="img" aria-label="Professional DJ training and performance studio at Soundabode">
           <div class="gradient-layer" aria-hidden="true"></div>
 
           <div class="particles" aria-hidden="true">
-            <div class="particle" style="top:18%; left:20%; animation-delay:0s;"></div>
-            <div class="particle" style="top:32%; left:70%; animation-delay:2s;"></div>
-            <div class="particle" style="top:58%; left:42%; animation-delay:4s;"></div>
-            <div class="particle" style="top:68%; left:80%; animation-delay:6s;"></div>
+            <div class="particle" style="top: 18%; left: 20%; animation-delay: 0s;"></div>
+            <div class="particle" style="top: 32%; left: 70%; animation-delay: 2s;"></div>
+            <div class="particle" style="top: 58%; left: 42%; animation-delay: 4s;"></div>
+            <div class="particle" style="top: 68%; left: 80%; animation-delay: 6s;"></div>
           </div>
 
-          <!-- floating images with robust fallbacks & no layout overflow -->
           <img
             id="float-album"
             class="floating-img album"
             src="https://ik.imagekit.io/Nex1ora2/michael-benz-_NIaM1gEsfU-unsplash.jpg?updatedAt=17654045651666"
-            alt="DJ controller close up"
+            alt="DJ controller technology close-up"
             loading="lazy"
-            width="170" height="170"
-            onerror="(function(i){ console.warn('float-album failed:', i.src); i.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;400&quot; height=&quot;400&quot;><rect width=&quot;100%25&quot; height=&quot;100%25&quot; fill=&quot;%23071228&quot;/></svg>'; })(this);"
           />
           <img
             id="float-studio"
             class="floating-img studio"
             src="https://ik.imagekit.io/Nex1ora2/professional-dj-training-advanced-mixing-pune.jpg?updatedAt=1765478955742"
-            alt="Soundabode DJ studio"
+            alt="Soundabode DJ training studio setup"
             loading="lazy"
-            width="140" height="140"
-            onerror="(function(i){ console.warn('float-studio failed:', i.src); i.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;300&quot; height=&quot;300&quot;><rect width=&quot;100%25&quot; height=&quot;100%25&quot; fill=&quot;%23071228&quot;/></svg>'; })(this);"
           />
         </div>
       </div>
     </section>
 
-    <!-- OVERVIEW + OBJECTIVES -->
-    <section class="section" aria-labelledby="overview-heading">
-      <div class="section-header">
-        <h2 class="section-title" id="overview-heading">Course Overview</h2>
-        <p class="section-subtitle">
-          Over four months of professional grade DJ training you will explore advanced techniques like FX layering,
-          live remixing, genre transitions and building dynamic set energy.
-        </p>
-      </div>
-
-      <div class="two-column">
-        <div class="card">
-          <p>
-            You will develop a unique sound identity, learn to troubleshoot live setups and perform at
-            <strong>Soundabode partner venues</strong> to gain real stage confidence.
-            This is the level where you become a performer, not just a player.
-          </p>
-          <ul class="bullets" aria-hidden="false">
-            <li>Deep dive into pro DJ workflows and performance setups.</li>
-            <li>Guided practice sessions with feedback from working DJs.</li>
-            <li>Real world scenarios including club style transitions and rescue moves.</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3 style="margin:0 0 8px">Quick Facts</h3>
-          <div class="details-grid" role="grid">
-            <div class="detail-item" role="gridcell">
-              <div class="detail-label">Duration</div>
-              <div class="detail-value">4 months</div>
-            </div>
-            <div class="detail-item" role="gridcell">
-              <div class="detail-label">Fee</div>
-              <div class="detail-value">₹ 60,000</div>
-            </div>
-            <div class="detail-item" role="gridcell">
-              <div class="detail-label">Start With</div>
-              <div class="detail-value">₹ 20,000</div>
-            </div>
-            <div class="detail-item" role="gridcell">
-              <div class="detail-label">Mode</div>
-              <div class="detail-value">Weekday or weekend batches</div>
-            </div>
-          </div>
-
-          <a
-            href="https://www.notion.so/downloads/Soundabode-DJ-Training.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            style="display:inline-block;margin-top:12px;font-size:13px;text-decoration:underline;"
-          >
-            Download full DJ Training Brochure (PDF)
-          </a>
-        </div>
-      </div>
+    <!-- ABOUT THE COURSE -->
+    <section class="page-section" aria-labelledby="about-heading">
+      <h2 id="about-heading">About the Course</h2>
+      <p><strong>Step into the world of professional DJing.</strong></p>
+      <p>
+        Level 2 at <strong>Soundabode</strong> is where you move beyond the basics of beatmatching and explore the nuances of performance. Over four months, you'll dive deep into advanced techniques that define club-ready sets.
+      </p>
+      <p>
+        From <strong>harmonic mixing</strong> and <strong>FX layering</strong> to mastering digital workflows like <strong>Traktor and Rekordbox</strong>, this program is designed to make you versatile and confident behind any console.
+      </p>
+      <p>
+        You'll develop your unique sound identity while learning how to troubleshoot live setups and read any crowd energy. This is the level where you transform into a performer, gaining real confidence through guided practice and feedback from working DJs.
+      </p>
+      <p>
+        With access to <strong>Pioneer CDJs, DJM mixers, and Ableton Live</strong>, you'll be training on the exact equipment used in the world's best clubs and festivals.
+      </p>
     </section>
 
-    <!-- OBJECTIVES -->
-    <section class="section" aria-labelledby="objectives-heading">
-      <div class="section-header">
-        <h2 class="section-title" id="objectives-heading">Course Objectives</h2>
-        <p class="section-subtitle">Clear goals so you know exactly what you will be able to do by the end of Level 2.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <ul class="bullets">
-            <li>Master advanced mixing, FX and harmonic transitions.</li>
-            <li>Learn digital DJ setups with 4 deck mixing and HID mode.</li>
-            <li>Understand crowd reading, set energy and live performance flow.</li>
-            <li>Build a professional DJ profile, press kit and artist identity.</li>
-            <li>Gain real world gig experience and performance exposure.</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3 style="margin:0 0 6px">Skills You Will Work Toward</h3>
-          <div class="pill-row" aria-hidden="false">
-            <span class="pill">Advanced FX layering</span>
-            <span class="pill">Harmonic mixing</span>
-            <span class="pill">4 deck control</span>
-            <span class="pill">Set energy design</span>
-            <span class="pill">Artist branding</span>
-            <span class="pill">Gig preparation</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- WHAT YOU WILL LEARN -->
-    <section class="section" aria-labelledby="curriculum-heading">
-      <div class="section-header">
-        <h2 class="section-title" id="curriculum-heading">What You Will Learn</h2>
-        <p class="section-subtitle">A condensed view of the core topics covered in the Pro DJ Training Course.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3 style="margin-top:0;font-size:15px;">Advanced Mixing And FX</h3>
-          <ul class="bullets">
-            <li>Layering transitions, echo outs and filter sweeps.</li>
-            <li>Creative build ups and breakdowns for different genres.</li>
-            <li>Using FX to shape tension and release on the dance floor.</li>
-          </ul>
-
-          <h3 style="margin-top:14px;font-size:15px;">Harmonics And Key Mixing</h3>
-          <ul class="bullets">
-            <li>Camelot chart mastery and key detection.</li>
-            <li>Avoiding clashes and clashing chords in transitions.</li>
-            <li>Key shifting and musical phrasing for emotional impact.</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3 style="margin-top:0;font-size:15px;">Digital DJing And Controllers</h3>
-          <ul class="bullets">
-            <li>Traktor, Rekordbox and Ableton integration workflows.</li>
-            <li>Controller and HID techniques with Novation, Allen & Heath, Traktor.</li>
-            <li>Music management, playlist curation and export for gigs.</li>
-          </ul>
-
-          <h3 style="margin-top:14px;font-size:15px;">Live Performance Preparation</h3>
-          <ul class="bullets">
-            <li>Reading crowd energy and adjusting on the fly.</li>
-            <li>Building BPM and energy curves for different set lengths.</li>
-            <li>EQ mastery for club systems and monitoring environments.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- WHY SOUNDABODE / SKILLS -->
-    <section class="section" aria-labelledby="why-heading">
-      <div class="section-header">
-        <h2 class="section-title" id="why-heading">Why Choose Soundabode For Level 2</h2>
-        <p class="section-subtitle">Training that is directly connected to the real club and festival ecosystem in India.</p>
-      </div>
-
-      <div class="two-column">
-        <div class="card">
-          <ul class="bullets">
-            <li>Learn directly from professional DJs and label artists.</li>
-            <li>Train on Pioneer CDJs, DJM mixers and Ableton Live setups.</li>
-            <li>Perform at Soundabode partner venues across Pune.</li>
-            <li>Build your artist brand, EPK and social media presence.</li>
-            <li>Personal mentorship for club ready performance preparation.</li>
-            <li>Internship and networking opportunities within the Indian club circuit.</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3 style="margin-top:0;font-size:15px;">Skills You Will Master</h3>
-          <div class="pill-row">
-            <span class="pill">Advanced beatmatching</span>
-            <span class="pill">FX and creative mixing</span>
-            <span class="pill">4 deck mixing</span>
-            <span class="pill">Controller mapping</span>
-            <span class="pill">Harmonic key shifts</span>
-            <span class="pill">Artist branding strategy</span>
-            <span class="pill">Club ready DJ sets</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CAREER PATH -->
-    <section class="section" aria-labelledby="career-heading">
-      <div class="section-header">
-        <h2 class="section-title" id="career-heading">Career Path After Level 2</h2>
-        <p class="section-subtitle">Use Level 2 to move from hobbyist to professional DJ with gig ready skills.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <ul class="bullets">
-            <li>Perform professional club and event sets.</li>
-            <li>Record and release your own DJ mixtapes and live recordings.</li>
-            <li>Collaborate with producers, labels and event brands.</li>
-            <li>Strengthen your portfolio for festivals and touring opportunities.</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3 style="margin-top:0;font-size:15px;">Next Step: Level 3</h3>
-          <p class="muted" style="font-size:14px;margin-top:6px;">
-            After Level 2 you can join <strong><a href="/courses/dj-training/advanced-dj-performance">Level 3 Professional DJ and Performance Path</a></strong>, where the focus
-            shifts to long term artist career growth, residencies and advanced brand building.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- COURSE DETAILS (RECAP) -->
-    <section class="section" aria-labelledby="details-heading">
-      <div class="section-header">
-        <h2 class="section-title" id="details-heading">Course Details</h2>
-      </div>
-
-      <div class="card">
-        <div class="details-grid" role="grid">
-          <div class="detail-item"><div class="detail-label">Duration</div><div class="detail-value">4 months</div></div>
-          <div class="detail-item"><div class="detail-label">Fee</div><div class="detail-value">₹ 60,000</div></div>
-          <div class="detail-item"><div class="detail-label">Installment</div><div class="detail-value">Start with ₹ 20,000</div></div>
-          <div class="detail-item"><div class="detail-label">Mode</div><div class="detail-value">Weekday or weekend batches</div></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- LOCATION -->
-    <section class="section" aria-labelledby="location-heading">
+    <!-- OBJECTIVES + WHAT YOU LEARN -->
+    <section class="page-section" aria-labelledby="objectives-heading">
       <div class="two-column">
         <div>
-          <div class="section-header"><h2 class="section-title" id="location-heading">Location And Contact</h2>
-            <p class="section-subtitle">Visit the studio, sit in for a session or book a demo class with our team.</p>
-          </div>
-          <div class="card">
-            <p class="muted" style="margin-top:0;">
-              <strong>Soundabode Academy</strong><br />
-              218, Vision 9 Mall, Pimple Saudagar, Pune 27<br />
-              📞 997-501-6189<br />
-              📧 services@soundabode.com
-            </p>
-          </div>
+          <h2 id="objectives-heading">Course Objectives</h2>
+          <ul class="list">
+            <li>Master advanced mixing & transition styles.</li>
+            <li>In-depth FX layering & filter techniques.</li>
+            <li>Professional harmonic (key) mixing mastery.</li>
+            <li>Digital DJ setups with 4-deck control.</li>
+            <li>Crowd reading & set energy design skills.</li>
+            <li>Artist branding foundations & set recordings.</li>
+            <li>Real-world gig preparation & technical setup.</li>
+          </ul>
         </div>
 
         <div>
-          <div class="section-header"><h2 class="section-title">Brochure Download</h2>
-            <p class="section-subtitle">Get the complete DJ Training curriculum and module wise breakdown in PDF format.</p>
-          </div>
-          <div class="card">
+          <h2>What You Will Learn</h2>
+          <h3>Condensed Overview</h3>
+          <ul class="list">
+            <li><strong>Advanced Mixing:</strong> Layering echo outs, filter sweeps, and creative build-ups.</li>
+            <li><strong>Harmonic Mixing:</strong> Mastering the Camelot wheel and key detection workflows.</li>
+            <li><strong>Digital Ecosystem:</strong> Deep dive into Rekordbox, Traktor, and controller mapping.</li>
+            <li><strong>Performance Strategy:</strong> Building energy curves and managing long set formats.</li>
+            <li><strong>Technical Mastery:</strong> Mastering EQ, gain staging, and booth monitoring.</li>
+            <li><strong>Branding:</strong> Creating your artist profile and recording professional mixtapes.</li>
+          </ul>
+
+          <div style="margin-top: 16px;">
             <a
               href="https://www.notion.so/downloads/Soundabode-DJ-Training.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              class="btn-outline"
-              style="display:inline-block;text-align:center;"
+              class="pill"
+              style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;"
             >
-              Download Full DJ Training Brochure (PDF)
+              📥 Download Full DJ Training Brochure (PDF)
             </a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- FAQ -->
-    <section class="section" aria-labelledby="faq-heading">
-      <div class="section-header"><h2 class="section-title" id="faq-heading">Frequently Asked Questions</h2></div>
+    <!-- WHY SOUNDABODE -->
+    <section class="page-section" aria-labelledby="why-heading">
+      <div class="two-column">
+        <div>
+          <h2 id="why-heading">Why Choose Soundabode for Level 2</h2>
+          <ul class="list">
+            <li>Learn directly from touring DJs and professional label artists.</li>
+            <li>Intensive hands-on training on the latest Pioneer CDJ & DJM setups.</li>
+            <li>Performance opportunities at Soundabode partner venues across Pune.</li>
+            <li>Guided mixtape recording and feedback sessions.</li>
+            <li>Free access to studio practice hours during the course.</li>
+            <li>Small batch sizes for personalized focus and skill development.</li>
+          </ul>
+        </div>
 
+        <div>
+          <h2>Tools and Technology You Train On</h2>
+          <ul class="list">
+            <li>Pioneer CDJ series and Nexus mixers.</li>
+            <li>Native Instruments Traktor Pro and controllers.</li>
+            <li>Pioneer Rekordbox music management software.</li>
+            <li>Ableton Live for hybrid performance setups.</li>
+            <li>Professional monitoring and club-grade sound systems.</li>
+            <li>HID mode and multi-deck digital setups.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAREER + DETAILS -->
+    <section class="page-section" aria-labelledby="career-heading">
+      <div class="two-column">
+        <div>
+          <h2 id="career-heading">Career Path After Level 2</h2>
+          <p class="muted" style="margin-top:0;">Level 2 prepares you for various roles in the performance and event industry.</p>
+          <ul class="list">
+            <li>Professional Club and Lounge DJ.</li>
+            <li>Event and Private Party Performance Specialist.</li>
+            <li>Hybrid Performance Artist (Software + Hardware).</li>
+            <li>Artist Resident at local venues and clubs.</li>
+            <li>Podcast and Radio Show curator and mixer.</li>
+            <li>Graduate to Level 3 for advanced artist branding.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>Course Details</h2>
+          <ul class="list">
+            <li><strong>Duration:</strong> 4 Months (Intensive Training).</li>
+            <li><strong>Fee:</strong> ₹ 60,000.</li>
+            <li><strong>Initial Payment:</strong> Start with ₹ 20,000.</li>
+            <li><strong>Batch Options:</strong> Weekday or Weekend batches available.</li>
+            <li><strong>Location:</strong> Soundabode Academy, Vision 9 Mall, Pune.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="page-section" aria-labelledby="faq-heading">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
       <div class="faq" aria-live="polite">
         <div class="faq-item">
-          <div class="faq-question" role="button" tabindex="0"><span>Q1. Who can join the Pro DJ course?</span><span class="muted">+</span></div>
-          <div class="faq-answer">Anyone who has completed Level 1 or already has basic mixing experience can join directly. If you are unsure, we can assess your current level in a short demo session.</div>
+          <div class="faq-question" role="button" tabindex="0"><span>Q1. Who can join the Level 2 course?</span><span class="muted">+</span></div>
+          <div class="faq-answer">Anyone who has completed Level 1 or already has basic beatmatching and mixing experience can join. We conduct a short assessment for direct entries.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-question" role="button" tabindex="0"><span>Q2. Is this course suitable for club DJs?</span><span class="muted">+</span></div>
-          <div class="faq-answer">Yes. Level 2 is designed specifically to prepare you for club, festival and event performance setups, including realistic practice on club style sound systems.</div>
+          <div class="faq-answer">Yes. Level 2 is designed specifically to prepare you for modern club environments, festivals, and event performance standards.</div>
         </div>
 
         <div class="faq-item">
           <div class="faq-question" role="button" tabindex="0"><span>Q3. Do I get to perform during the course?</span><span class="muted">+</span></div>
-          <div class="faq-answer">Yes. Every trainee performs at least once during our student showcase events and partner venue nights, with feedback from mentors on set design and crowd control.</div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question" role="button" tabindex="0"><span>Q4. Do you teach Traktor and Rekordbox both?</span><span class="muted">+</span></div>
-          <div class="faq-answer">Yes. You will learn both Traktor and Rekordbox, plus HID mode and Ableton Live integration so that you can perform confidently on different rigs.</div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question" role="button" tabindex="0"><span>Q5. Will Soundabode help me get gigs?</span><span class="muted">+</span></div>
-          <div class="faq-answer">Absolutely. Through our industry network and venue partnerships we create opportunities for students to perform professionally and start building a track record.</div>
+          <div class="faq-answer">Absolutely. We organize student showcase nights and offer performance exposure at our partner venues to help you gain real stage confidence.</div>
         </div>
       </div>
     </section>
@@ -616,13 +472,14 @@
     <!-- CTA -->
     <section class="enroll-bottom" aria-label="Enroll call to action">
       <div>
-        <h3 style="margin:0;">Ready to start your Pro DJ journey?</h3>
-        <div class="muted" style="margin-top:6px;">Take the leap from DJing as a hobby to performing as a professional artist with Soundabode Level 2 Pro DJ Training Course.</div>
+        <h3 style="margin: 0;">Ready to push your DJ skills?</h3>
+        <div class="muted" style="margin-top: 6px;">
+          Take the leap from DJing as a hobby to performing as a professional artist with Soundabode Level 2 Pro DJ Training Course.
+        </div>
       </div>
-
       <div class="actions">
-        <a class="btn-primary" href="/enroll">Enroll Now</a>
-        <a class="btn-outline" href="/contact#contact">Talk To Our Team</a>
+        <a class="btn-primary" href="#enroll" data-open-enroll>Enroll Now</a>
+        <a class="btn-outline" href="/contact">Talk To Our Team</a>
       </div>
     </section>
   </main>
