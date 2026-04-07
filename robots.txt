@@ -5,6 +5,7 @@
 User-agent: *
 Allow: /
 Disallow: /blog-admin.html
+Disallow: /blog-admin
 Disallow: /backend/
 Disallow: /node_modules/
 

@@ -3,21 +3,23 @@
 
   <!-- Main pages -->
   <url><loc>https://soundabode.com/</loc></url>
-  <url><loc>https://soundabode.com/about.html</loc></url>
-  <url><loc>https://soundabode.com/courses.html</loc></url>
-  <url><loc>https://soundabode.com/blog.html</loc></url>
-  <url><loc>https://soundabode.com/contact.html</loc></url>
-  <url><loc>https://soundabode.com/privacy.html</loc></url>
+  <url><loc>https://soundabode.com/about</loc></url>
+  <url><loc>https://soundabode.com/courses</loc></url>
+  <url><loc>https://soundabode.com/blog</loc></url>
+  <url><loc>https://soundabode.com/contact</loc></url>
+  <url><loc>https://soundabode.com/enroll</loc></url>
+  <url><loc>https://soundabode.com/privacy</loc></url>
+  <url><loc>https://soundabode.com/terms</loc></url>
 
   <!-- Music Production -->
-  <url><loc>https://soundabode.com/courses/music-production/beginner-course.html</loc></url>
-  <url><loc>https://soundabode.com/courses/music-production/intermediate-course.html</loc></url>
-  <url><loc>https://soundabode.com/courses/music-production/audio-engineering-diploma.html</loc></url>
-  <url><loc>https://soundabode.com/courses/music-production/mixing-mastering-course.html</loc></url>
+  <url><loc>https://soundabode.com/courses/music-production/beginner-course</loc></url>
+  <url><loc>https://soundabode.com/courses/music-production/intermediate-course</loc></url>
+  <url><loc>https://soundabode.com/courses/music-production/audio-engineering-diploma</loc></url>
+  <url><loc>https://soundabode.com/courses/music-production/mixing-mastering-course</loc></url>
 
   <!-- DJ Training -->
-  <url><loc>https://soundabode.com/courses/dj-training/basic-dj-course.html</loc></url>
-  <url><loc>https://soundabode.com/courses/dj-training/pro-dj-course.html</loc></url>
-  <url><loc>https://soundabode.com/courses/dj-training/advanced-dj-performance.html</loc></url>
+  <url><loc>https://soundabode.com/courses/dj-training/basic-dj-course</loc></url>
+  <url><loc>https://soundabode.com/courses/dj-training/pro-dj-course</loc></url>
+  <url><loc>https://soundabode.com/courses/dj-training/advanced-dj-performance</loc></url>
 
 </urlset>
