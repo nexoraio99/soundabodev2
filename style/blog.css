@@ -59,16 +59,6 @@ body {
   border-bottom: 1px solid var(--blog-border);
 }
 
-.badge-accent {
-  display: inline-block;
-  padding: 8px 20px;
-  background: var(--blog-panel);
-  border: 1px solid var(--blog-border);
-  border-radius: 99px;
-  font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
-  margin-bottom: 24px;
-}
-
 .hero-title { font-size: var(--fs-hero); line-height: 0.95; margin-bottom: 24px; }
 
 .hero-desc {
