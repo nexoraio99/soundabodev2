@@ -708,11 +708,11 @@
     }
 
     track.addEventListener('mousedown', handleStart, { passive: false });
-    document.addEventListener('mousemove', handleMove, { passive: false });
+    document.addEventListener('mousemove', handleMove, { passive: true });
     document.addEventListener('mouseup', handleEnd, { passive: true });
 
     track.addEventListener('touchstart', handleStart, { passive: true });
-    track.addEventListener('touchmove', handleMove, { passive: false });
+    track.addEventListener('touchmove', handleMove, { passive: true });
     track.addEventListener('touchend', handleEnd, { passive: true });
 
     track.style.cursor = 'grab';
