@@ -1,0 +1,29 @@
+# Cloudflare Pages Redirects
+# Mirroring the Render.yaml rules for Clean URLs
+
+# Redirects: .html to Clean URLs
+/index.html    /    301
+/*.html        /:1  301
+
+# Special redirect for images/assets if needed
+# /Assets/*    https://res.cloudinary.com/... (optional)
+
+# Rewrites: Clean URLs to .html (Cloudflare handles this via "Pretty URLs" setting, but explicit is better)
+/about         /about.html
+/contact       /contact.html
+/courses       /courses.html
+/enroll        /enroll.html
+/privacy       /privacy.html
+/terms         /terms.html
+/blog          /blog.html
+/blog-admin    /blog-admin.html
+
+# Course subdirectories
+/courses/dj-training/basic-dj-course            /courses/dj-training/basic-dj-course.html
+/courses/dj-training/pro-dj-course              /courses/dj-training/pro-dj-course.html
+/courses/dj-training/advanced-dj-performance   /courses/dj-training/advanced-dj-performance.html
+
+/courses/music-production/beginner-course       /courses/music-production/beginner-course.html
+/courses/music-production/intermediate-course   /courses/music-production/intermediate-course.html
+/courses/music-production/mixing-mastering-course /courses/music-production/mixing-mastering-course.html
+/courses/music-production/audio-engineering-diploma /courses/music-production/audio-engineering-diploma.html
