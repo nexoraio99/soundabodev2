@@ -306,15 +306,17 @@ body {
 .post-card-actions { display: flex; gap: 8px; }
 
 .action-btn {
-  width: 36px; height: 36px;
+  width: 40px; height: 40px;
   background: var(--input-bg); border: 1px solid var(--border-color);
-  border-radius: 10px; color: var(--text-muted); cursor: pointer;
+  border-radius: 12px; color: var(--text-main); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
 }
 
-.action-btn:hover { border-color: var(--white); color: var(--white); }
-.action-btn.action-delete:hover { border-color: #FF4D4D; color: #FF4D4D; }
+.action-btn svg { width: 18px; height: 18px; stroke-width: 2px; }
+
+.action-btn:hover { border-color: var(--white); background: rgba(255,255,255,0.05); }
+.action-btn.action-delete:hover { border-color: #FF4D4D; color: #FF4D4D; background: rgba(255,77,77,0.05); }
 
 /*  TABLES  */
 .posts-table {
