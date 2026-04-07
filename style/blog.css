@@ -237,11 +237,11 @@ body {
 .modal-content {
   position: relative;
   width: 90%;
-  max-width: 900px;
-  height: 90vh;
+  max-width: 780px;
+  height: 82vh;
   background: var(--blog-panel);
   border: 1px solid var(--blog-border);
-  border-radius: 32px;
+  border-radius: 28px;
   overflow-y: auto;
   transform: translateY(40px) scale(0.95);
   transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
@@ -280,7 +280,7 @@ body {
 .modal-close:hover { background: #FFF; color: #000; transform: rotate(90deg); }
 
 .modal-article-body {
-  padding: 0 80px 80px;
+  padding: 0 50px 60px;
 }
 
 .modal-header {
@@ -308,9 +308,9 @@ body {
 }
 
 .modal-hero-img {
-  width: calc(100% + 160px);
-  margin: 0 -80px 60px;
-  height: 500px;
+  width: calc(100% + 100px);
+  margin: 0 -50px 40px;
+  height: 380px;
   overflow: hidden;
 }
 
@@ -321,10 +321,10 @@ body {
 }
 
 .modal-text-content {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   line-height: 1.8;
   color: #DDD;
-  max-width: 720px;
+  max-width: 650px;
 }
 
 .modal-text-content p {
