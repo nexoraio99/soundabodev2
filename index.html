@@ -74,248 +74,7 @@
   <!-- ========================================
          CRITICAL CSS - EXPANDED FOR INSTANT RENDER
          ======================================== -->
-  <style>
-    /* Reset & Base */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      text-transform: uppercase;
-      font-weight: 800;
-      background: linear-gradient(110deg, #3a4045 0%, #768087 35%, #ffffff 45%, #ffffff 50%, #768087 55%, #3a4045 100%);
-      background-size: 300% auto;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
-      background-position: center center;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      max-width: 100vw;
-      overflow-x: hidden;
-      background: #000;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-      background-color: #000000;
-      color: #ffffff;
-      overflow-x: hidden;
-      min-height: 100vh;
-      -webkit-text-size-adjust: 100%;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    /* Navbar - Critical for first paint */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 10px clamp(12px, 5vw, 50px);
-      height: clamp(48px, 12vw, 60px);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 100;
-      background-color: rgba(10, 10, 10, 0.7);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      opacity: 1;
-    }
-
-    /* Intro panels - critical structure */
-    .intro-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      display: flex;
-      gap: 5px;
-      z-index: 50;
-      background: #000;
-    }
-
-    .intro-panel {
-      width: 50%;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-      background: #000;
-    }
-
-    .panel-left video,
-    .panel-right video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-      background: #000;
-    }
-
-    /* ADDED: Poster image fallback */
-    .panel-left .video-poster,
-    .panel-right .video-poster {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .panel-left video.playing+.video-poster,
-    .panel-right video.playing+.video-poster {
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    /* Main content - critical for layout */
-    .main-content {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: #050505;
-      z-index: 1;
-      opacity: 0;
-      padding: clamp(12px, 3vw, 20px);
-    }
-
-    /* Aurora text - critical for hero */
-    .aurora-text {
-      display: inline-block;
-      font-size: clamp(2.2rem, 8vw, 6rem);
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      background: linear-gradient(110deg, #3a4045 0%, #768087 35%, #ffffff 45%, #ffffff 50%, #768087 55%, #3a4045 100%);
-      background-size: 300% auto;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
-      animation: glare-sweep 4s ease-in-out 2 forwards;
-    }
-
-    @keyframes glare-sweep {
-      0% {
-        background-position: -200% center;
-      }
-
-      100% {
-        background-position: 200% center;
-      }
-    }
-
-    /* Popup - critical structure */
-    .popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(24, 24, 24, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(8px);
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      z-index: 1000;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
-    }
-
-    .popup-overlay.active {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-    }
-
-    /* Hide elements until CSS loads */
-    .content-section,
-    .testimonials,
-    .site-footer {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    /* Loading state indicator */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      z-index: 9999;
-      opacity: 1;
-      transition: opacity 0.3s ease;
-    }
-
-    body.loaded::before {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    /* Images lazy load placeholder */
-    img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      background: transparent;
-    }
-
-    /* Mobile Hero Layout - Stack both panels vertically */
-    @media (max-width: 768px) {
-      .intro-overlay {
-        flex-direction: column;
-        gap: 0;
-        /* Remove gap for a seamless look on mobile */
-      }
-
-      .intro-panel {
-        width: 100% !important;
-        height: 50vh !important;
-        flex-shrink: 0;
-      }
-
-      .panel-right {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-      }
-    }
-  </style>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}h1,h2,h3,h4,h5,h6{text-transform:uppercase;font-weight:800;background:linear-gradient(110deg,#3a4045 0%,#768087 35%,#ffffff 45%,#ffffff 50%,#768087 55%,#3a4045 100%);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.4));background-position:center center;}html{scroll-behavior:smooth;max-width:100vw;overflow-x:hidden;background:#000;}body{margin:0;font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background-color:#000000;color:#ffffff;overflow-x:hidden;min-height:100vh;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}.navbar{position:fixed;top:0;left:0;width:100%;padding:10px clamp(12px,5vw,50px);height:clamp(48px,12vw,60px);display:flex;justify-content:space-between;align-items:center;z-index:100;background-color:rgba(10,10,10,0.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.1);opacity:1;}.intro-overlay{position:fixed;top:0;left:0;width:100%;height:100vh;display:flex;gap:5px;z-index:50;background:#000;}.intro-panel{width:50%;height:100%;position:relative;overflow:hidden;background:#000;}.panel-left video,.panel-right video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;background:#000;}.panel-left .video-poster,.panel-right .video-poster{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:1;pointer-events:none;}.panel-left video.playing+.video-poster,.panel-right video.playing+.video-poster{opacity:0;transition:opacity 0.3s ease;}.main-content{position:fixed;top:0;left:0;width:100%;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#050505;z-index:1;opacity:0;padding:clamp(12px,3vw,20px);}.aurora-text{display:inline-block;font-size:clamp(2.2rem,8vw,6rem);font-weight:800;line-height:1;letter-spacing:-0.02em;text-transform:uppercase;background:linear-gradient(110deg,#3a4045 0%,#768087 35%,#ffffff 45%,#ffffff 50%,#768087 55%,#3a4045 100%);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.4));animation:glare-sweep 4s ease-in-out 2 forwards;}@keyframes glare-sweep{0%{background-position:-200% center;}100%{background-position:200% center;}}.popup-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(24,24,24,0.85);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);opacity:0;visibility:hidden;pointer-events:none;z-index:1000;transition:opacity 0.4s ease,visibility 0.4s ease;}.popup-overlay.active{opacity:1;visibility:visible;pointer-events:auto;}.content-section,.testimonials,.site-footer{opacity:0;visibility:hidden;}body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;opacity:1;transition:opacity 0.3s ease;}body.loaded::before{opacity:0;pointer-events:none;}img{max-width:100%;height:auto;display:block;background:transparent;}@media (max-width:768px){.intro-overlay{flex-direction:column;gap:0;}.intro-panel{width:100% !important;height:50vh !important;flex-shrink:0;}.panel-right{display:block !important;visibility:visible !important;opacity:1 !important;}}</style>
 
   <!-- FAVICONS -->
   <link rel="icon" href="/Assets/favicon.ico" sizes="any">
@@ -334,7 +93,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap"
     rel="stylesheet">
-  <link href='https://fonts.googleapis.com/css?family=Figtree' rel='stylesheet'>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
 
 
   <!-- ========================================
@@ -408,7 +167,7 @@
   </script>
   <noscript>
     <img height="1" width="1" src="https://www.facebook.com/tr?id=2260208107777252&ev=PageView&noscript=1"
-      alt="fb pixel" />
+      alt="fb pixel" / decoding="async">
   </noscript>
 
   <!-- CRITICAL: Android performance optimization script -->
@@ -742,17 +501,17 @@
     <a href="https://www.instagram.com/soundabode" class="social-float instagram-float" target="_blank"
       rel="noopener noreferrer" title="Follow us on Instagram">
       <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram"
-        class="social-icon" loading="lazy">
+        class="social-icon" loading="lazy" decoding="async">
     </a>
     <a href="https://www.facebook.com/soundabode" class="social-float facebook-float" target="_blank"
       rel="noopener noreferrer" title="Follow us on Facebook">
       <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook"
-        class="social-icon" loading="lazy">
+        class="social-icon" loading="lazy" decoding="async">
     </a>
     <a href="https://wa.me/919975016189" class="social-float whatsapp-float" target="_blank" rel="noopener noreferrer"
       title="Chat on WhatsApp" onclick="uet_report_conversion_contact()" aria-label="Chat with Soundabode on WhatsApp">
       <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp"
-        class="social-icon" loading="lazy">
+        class="social-icon" loading="lazy" decoding="async">
     </a>
   </div>
 
@@ -801,20 +560,20 @@
           <div class="learn-images-col">
             <div class="learn-images-top-row">
               <div class="image-block-small">
-                <img src="https://ik.imagekit.io/Nex1ora2/dj-training.jpg" alt="DJ Training" loading="lazy">
+                <img src="https://ik.imagekit.io/Nex1ora2/dj-training.jpg" alt="DJ Training" loading="lazy" decoding="async">
               </div>
               <div class="image-block-small">
                 <img src="https://ik.imagekit.io/Nex1ora2/michael-benz-_NIaM1gEsfU-unsplash.jpg"
-                  alt="Synthesizer Equipment" loading="lazy">
+                  alt="Synthesizer Equipment" loading="lazy" decoding="async">
               </div>
               <div class="image-block-small">
-                <img src="https://ik.imagekit.io/Nex1ora2/dj-training.jpg" alt="DJ Deck" loading="lazy">
+                <img src="https://ik.imagekit.io/Nex1ora2/dj-training.jpg" alt="DJ Deck" loading="lazy" decoding="async">
               </div>
             </div>
             <div class="learn-images-bottom-row">
               <div class="image-block-wide">
                 <img src="https://ik.imagekit.io/Nex1ora2/dj-performance-training.jpg?updatedAt=1765352486546"
-                  alt="Professional DJ Course">
+                  alt="Professional DJ Course" decoding="async">
               </div>
             </div>
           </div>
@@ -833,21 +592,21 @@
             <div class="produce-images-top-row">
               <div class="image-block-small">
                 <img src="https://ik.imagekit.io/Nex1ora2/music-production-schooljpg.jpg" alt="Music Production 1"
-                  loading="lazy">
+                  loading="lazy" decoding="async">
               </div>
               <div class="image-block-small">
                 <img src="https://ik.imagekit.io/Nex1ora2/electronic-music-production.JPG" alt="Music Production 2"
-                  loading="lazy">
+                  loading="lazy" decoding="async">
               </div>
               <div class="image-block-small">
                 <img src="https://ik.imagekit.io/Nex1ora2/electronic-music-production.JPG" alt="Music Production 3"
-                  loading="lazy">
+                  loading="lazy" decoding="async">
               </div>
             </div>
             <div class="produce-images-bottom-row">
               <div class="image-block-wide">
                 <img src="https://ik.imagekit.io/Nex1ora2/electronic-music-production.webp"
-                  alt="Electronic Music Production Studio" loading="lazy">
+                  alt="Electronic Music Production Studio" loading="lazy" decoding="async">
               </div>
             </div>
           </div>
@@ -910,7 +669,7 @@
       <div class="carousel-track" id="carouselTrack">
         <!-- Card 1 -->
         <div class="carousel-item">
-          <img src="/Assets/Sumone.jpg" width="800" height="1000" alt="Sumone">
+          <img src="/Assets/Sumone.jpg" width="800" height="1000" alt="Sumone" decoding="async">
           <div class="card-overlay">
             <div class="card-title">Sumone</div>
             <div class="card-info"></div>
@@ -919,7 +678,7 @@
 
         <!-- Card 2 -->
         <div class="carousel-item">
-          <img src="/Assets/defpoint-belgium.jpg" width="800" height="1000" alt="Defpoint">
+          <img src="/Assets/defpoint-belgium.jpg" width="800" height="1000" alt="Defpoint" decoding="async">
           <div class="card-overlay">
             <div class="card-title">Defpoint</div>
             <div class="card-info"></div>
@@ -928,7 +687,7 @@
 
         <!-- Card 3 -->
         <div class="carousel-item">
-          <img src="/Assets/DJ_Tanisha_vdpgxy.jpg" width="800" height="1000" alt="DJ Tanisha">
+          <img src="/Assets/DJ_Tanisha_vdpgxy.jpg" width="800" height="1000" alt="DJ Tanisha" decoding="async">
           <div class="card-overlay">
             <div class="card-title">DJ Tanisha</div>
             <div class="card-info"></div>
@@ -937,7 +696,7 @@
 
         <!-- Card 4 -->
         <div class="carousel-item">
-          <img src="/Assets/SKP06352.jpg" width="800" height="1000" alt="Homeboy">
+          <img src="/Assets/SKP06352.jpg" width="800" height="1000" alt="Homeboy" decoding="async">
           <div class="card-overlay">
             <div class="card-title">Homeboy</div>
             <div class="card-info"></div>
@@ -946,7 +705,7 @@
 
         <!-- Card 5 -->
         <div class="carousel-item">
-          <img src="/Assets/third-eye-groove-dj-teg.jpg" width="800" height="1000" alt="DJ TEG">
+          <img src="/Assets/third-eye-groove-dj-teg.jpg" width="800" height="1000" alt="DJ TEG" decoding="async">
           <div class="card-overlay">
             <div class="card-title">DJ TEG</div>
             <div class="card-info"></div>
@@ -955,7 +714,7 @@
 
         <!-- Card 6 -->
         <div class="carousel-item">
-          <img src="/Assets/Problemchild.jpg" width="800" height="1000" alt="Problem Child">
+          <img src="/Assets/Problemchild.jpg" width="800" height="1000" alt="Problem Child" decoding="async">
           <div class="card-overlay">
             <div class="card-title">Problem Child</div>
             <div class="card-info"></div>
@@ -964,7 +723,7 @@
 
         <!-- Card 7 -->
         <div class="carousel-item">
-          <img src="/Assets/Yeti.jpg" width="800" height="1000" alt="Yeti">
+          <img src="/Assets/Yeti.jpg" width="800" height="1000" alt="Yeti" decoding="async">
           <div class="card-overlay">
             <div class="card-title">Yeti</div>
             <div class="card-info"></div>
@@ -973,7 +732,7 @@
 
         <!-- Card 8 -->
         <div class="carousel-item">
-          <img src="/Assets/Redeyemusic.jpeg" width="800" height="1000" alt="Redeye Music">
+          <img src="/Assets/Redeyemusic.jpeg" width="800" height="1000" alt="Redeye Music" decoding="async">
           <div class="card-overlay">
             <div class="card-title">Redeye Music</div>
             <div class="card-info"></div>
