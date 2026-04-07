@@ -365,6 +365,26 @@ body {
 
 .field input:focus, .field textarea:focus { border-color: var(--white); }
 
+.compose-actions { display: flex; gap: 12px; }
+
+.btn-primary {
+  flex: 1; padding: 14px;
+  background: var(--white); color: var(--black);
+  border: none; border-radius: 12px;
+  font-size: 0.9rem; font-weight: 800; text-transform: uppercase;
+  cursor: pointer; transition: all var(--transition);
+}
+.btn-primary:hover { background: #E0E0E0; transform: translateY(-2px); }
+
+.btn-ghost {
+  padding: 14px 20px;
+  background: var(--input-bg); color: var(--text-muted);
+  border: 1px solid var(--border-color); border-radius: 12px;
+  font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+  cursor: pointer; transition: all var(--transition);
+}
+.btn-ghost:hover { border-color: var(--white); color: var(--white); }
+
 /*  Responsive  */
 @media (max-width: 1200px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -410,8 +430,21 @@ body {
   
   .posts-grid { grid-template-columns: 1fr; gap: 24px; }
   
-  .table-row { grid-template-columns: 1fr auto; padding: 16px; }
+  .table-row { 
+    grid-template-columns: 1fr; 
+    padding: 20px; 
+    gap: 16px;
+  }
   .table-row.table-row-head { display: none; }
+
+  .table-cell-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    width: 100%;
+  }
   
   .table-row > div:nth-child(2),
   .table-row > div:nth-child(3),

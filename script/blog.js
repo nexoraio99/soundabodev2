@@ -169,6 +169,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalClose.addEventListener('click', closeModal);
     modalBackdrop.addEventListener('click', closeModal);
+    
+    // ── NEWSLETTER ──
+    const subscribeBtn = document.querySelector('.btn-subscribe');
+    const subscribeInput = document.querySelector('.subscribe-card input[type="email"]');
+    if (subscribeBtn && subscribeInput) {
+        subscribeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = subscribeInput.value.trim();
+            if(!email) return alert('Please enter your email.');
+            // Mock success
+            subscribeBtn.textContent = 'Subscribed ✓';
+            subscribeBtn.disabled = true;
+            subscribeInput.value = '';
+            setTimeout(() => {
+                subscribeBtn.textContent = 'Subscribe';
+                subscribeBtn.disabled = false;
+            }, 3000);
+        });
+    }
 
     // Initial fetch
     fetchBlogs();

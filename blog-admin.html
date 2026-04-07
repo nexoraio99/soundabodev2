@@ -211,18 +211,7 @@
 
           <!-- Compose Sidebar -->
           <div class="compose-sidebar">
-            <!-- Publish Card -->
-            <div class="compose-card">
-              <h3 class="compose-card-title">Publish</h3>
-              <div class="field">
-                <label for="publish-pass">Admin Password</label>
-                <input type="password" id="publish-pass" placeholder="Confirm password" required form="blog-form">
-              </div>
-              <div class="compose-actions">
-                <button type="submit" id="submit-btn" class="btn-primary" form="blog-form">Publish</button>
-                <button type="button" id="cancel-edit-btn" class="btn-ghost hidden">Cancel</button>
-              </div>
-            </div>
+            <!-- Moved Publish Card to the end -->
 
             <!-- Details Card -->
             <div class="compose-card">
@@ -290,6 +279,19 @@
                   <option value="AE">UAE</option>
                   <option value="SG">Singapore</option>
                 </select>
+              </div>
+            </div>
+
+            <!-- Publish Card -->
+            <div class="compose-card">
+              <h3 class="compose-card-title">Publish</h3>
+              <div class="field">
+                <label for="publish-pass">Admin Password</label>
+                <input type="password" id="publish-pass" placeholder="Confirm password" required form="blog-form">
+              </div>
+              <div class="compose-actions">
+                <button type="submit" id="submit-btn" class="btn-primary" form="blog-form">Publish</button>
+                <button type="button" id="cancel-edit-btn" class="btn-ghost hidden">Cancel</button>
               </div>
             </div>
           </div>
