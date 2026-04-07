@@ -1,4 +1,10 @@
-# Redirect .html URLs to clean URLs (SEO)
+# Domain Consistency: Redirect WWW to Non-WWW
+https://www.soundabode.com/*  https://soundabode.com/:splat  301
+
+# Global 404 Handler
+/*  /404.html  404
+
+# SEO: Redirect .html URLs to clean URLs
 /index.html                                          /                                               301
 /about.html                                          /about                                          301
 /contact.html                                        /contact                                        301
@@ -15,3 +21,4 @@
 /courses/music-production/intermediate-course.html   /courses/music-production/intermediate-course   301
 /courses/music-production/mixing-mastering-course.html /courses/music-production/mixing-mastering-course 301
 /courses/music-production/audio-engineering-diploma.html /courses/music-production/audio-engineering-diploma 301
+
