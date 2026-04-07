@@ -52,7 +52,7 @@ Studio-grade training on Kontakt instruments, Moog and Nord synthesizers, and mo
 Level 4 - Advanced Mixing & Mastering (3 + 1 months)
 The professional finish. Students master their tracks using Ozone, Waves, and RX7 - the same tools used in commercial release pipelines. Graduates leave ready to deliver release-quality audio. Fee: ₹60,000.
 
-📌 Seats are limited. Pay ₹30,000 to reserve your place. Visit soundabode.com/enroll or call 997-501-6189.
+📌 Seats are limited. Pay ₹35,000 to reserve your place. Visit soundabode.com/enroll or call 997-501-6189.
 
 What Tools Will You Learn?
 
@@ -79,7 +79,7 @@ Music Production Course Fees in Pune: What to Expect
 
 Courses in Pune range from short certificate programs (₹15,000–30,000) to comprehensive diplomas (₹60,000–2,40,000 for full multi-level paths). At Soundabode, each level is ₹60,000 - and includes internship components in three of the four levels, giving you real-world credit that is hard to put a price on.
 
-Flexible installment plans are available. You can start with as little as ₹30,000 to secure your seat.
+Flexible installment plans are available. You can start with as little as ₹35,000 to secure your seat.
 
 Frequently Asked Questions
 

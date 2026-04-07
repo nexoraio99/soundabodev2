@@ -251,7 +251,7 @@ body {
   color: #000;
   border-color: #FFF;
   transform: translateY(-2px);
-  box-shadow: 0 10px 40px rgba(255,255,255,0.1);
+  box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1);
 }
 
 /*  SIDEBAR  */
@@ -754,23 +754,22 @@ body {
   }
 }
 
-  .hero-title {
-    font-size: 1.8rem;
-  }
+.hero-title {
+  font-size: 1.8rem;
+}
 
-  .main-blog-feed {
-    gap: 10px;
-  }
+.main-blog-feed {
+  gap: 10px;
+}
 
-  .card-title {
-    font-size: 0.75rem;
-  }
+.card-title {
+  font-size: 0.75rem;
+}
 
-  .card-excerpt {
-    display: none;
-  }
+.card-excerpt {
+  display: none;
+}
 
-  .container {
-    padding: 0 20px;
-  }
+.container {
+  padding: 0 20px;
 }
