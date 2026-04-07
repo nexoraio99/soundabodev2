@@ -27,9 +27,11 @@
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="dns-prefetch" href="https://soundabodev2-server.onrender.com">
-  
-  
-  
+  <link rel="stylesheet"
+    href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-straight/css/uicons-regular-straight.css">
+  <link rel="stylesheet"
+    href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-thin-rounded/css/uicons-thin-rounded.css">
   <link rel="canonical" href="https://soundabode.com/">
 
   <title>Music Production, DJ & Audio Engineering Courses | Soundabode Pune & India</title>
@@ -67,7 +69,248 @@
   <!-- ========================================
          CRITICAL CSS - EXPANDED FOR INSTANT RENDER
          ======================================== -->
-  <style>*{margin:0;padding:0;box-sizing:border-box;}h1,h2,h3,h4,h5,h6{text-transform:uppercase;font-weight:800;background:linear-gradient(110deg,#3a4045 0%,#768087 35%,#ffffff 45%,#ffffff 50%,#768087 55%,#3a4045 100%);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.4));background-position:center center;}html{scroll-behavior:smooth;max-width:100vw;overflow-x:hidden;background:#000;}body{margin:0;font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background-color:#000000;color:#ffffff;overflow-x:hidden;min-height:100vh;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}.navbar{position:fixed;top:0;left:0;width:100%;padding:10px clamp(12px,5vw,50px);height:clamp(48px,12vw,60px);display:flex;justify-content:space-between;align-items:center;z-index:100;background-color:rgba(10,10,10,0.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.1);opacity:1;}.intro-overlay{position:fixed;top:0;left:0;width:100%;height:100vh;display:flex;gap:5px;z-index:50;background:#000;}.intro-panel{width:50%;height:100%;position:relative;overflow:hidden;background:#000;}.panel-left video,.panel-right video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;background:#000;}.panel-left .video-poster,.panel-right .video-poster{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:1;pointer-events:none;}.panel-left video.playing+.video-poster,.panel-right video.playing+.video-poster{opacity:0;transition:opacity 0.3s ease;}.main-content{position:fixed;top:0;left:0;width:100%;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#050505;z-index:1;opacity:0;padding:clamp(12px,3vw,20px);}.aurora-text{display:inline-block;font-size:clamp(2.2rem,8vw,6rem);font-weight:800;line-height:1;letter-spacing:-0.02em;text-transform:uppercase;background:linear-gradient(110deg,#3a4045 0%,#768087 35%,#ffffff 45%,#ffffff 50%,#768087 55%,#3a4045 100%);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.4));animation:glare-sweep 4s ease-in-out 2 forwards;}@keyframes glare-sweep{0%{background-position:-200% center;}100%{background-position:200% center;}}.popup-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(24,24,24,0.85);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);opacity:0;visibility:hidden;pointer-events:none;z-index:1000;transition:opacity 0.4s ease,visibility 0.4s ease;}.popup-overlay.active{opacity:1;visibility:visible;pointer-events:auto;}.content-section,.testimonials,.site-footer{opacity:0;visibility:hidden;}body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;opacity:1;transition:opacity 0.3s ease;}body.loaded::before{opacity:0;pointer-events:none;}img{max-width:100%;height:auto;display:block;background:transparent;}@media (max-width:768px){.intro-overlay{flex-direction:column;gap:0;}.intro-panel{width:100% !important;height:50vh !important;flex-shrink:0;}.panel-right{display:block !important;visibility:visible !important;opacity:1 !important;}}</style>
+  <style>
+    /* Reset & Base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      text-transform: uppercase;
+      font-weight: 800;
+      background: linear-gradient(110deg, #3a4045 0%, #768087 35%, #ffffff 45%, #ffffff 50%, #768087 55%, #3a4045 100%);
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+      background-position: center center;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      max-width: 100vw;
+      overflow-x: hidden;
+      background: #000;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-text-size-adjust: 100%;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Navbar - Critical for first paint */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px clamp(12px, 5vw, 50px);
+      height: clamp(48px, 12vw, 60px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background-color: rgba(10, 10, 10, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 1;
+    }
+
+    /* Intro panels - critical structure */
+    .intro-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      gap: 5px;
+      z-index: 50;
+      background: #000;
+    }
+
+    .intro-panel {
+      width: 50%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .panel-left video,
+    .panel-right video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      background: #000;
+    }
+
+    /* ADDED: Poster image fallback */
+    .panel-left .video-poster,
+    .panel-right .video-poster {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .panel-left video.playing+.video-poster,
+    .panel-right video.playing+.video-poster {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Main content - critical for layout */
+    .main-content {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #050505;
+      z-index: 1;
+      opacity: 0;
+      padding: clamp(12px, 3vw, 20px);
+    }
+
+    /* Aurora text - critical for hero */
+    .aurora-text {
+      display: inline-block;
+      font-size: clamp(2.2rem, 8vw, 6rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      background: linear-gradient(110deg, #3a4045 0%, #768087 35%, #ffffff 45%, #ffffff 50%, #768087 55%, #3a4045 100%);
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+      animation: glare-sweep 4s ease-in-out 2 forwards;
+    }
+
+    @keyframes glare-sweep {
+      0% {
+        background-position: -200% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    /* Popup - critical structure */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(24, 24, 24, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 1000;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    .popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* Hide elements until CSS loads */
+    .content-section,
+    .testimonials,
+    .site-footer {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Loading state indicator */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    body.loaded::before {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Images lazy load placeholder */
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      background: transparent;
+    }
+
+    /* Mobile Hero Layout - Stack both panels vertically */
+    @media (max-width: 768px) {
+      .intro-overlay {
+        flex-direction: column;
+        gap: 0;
+        /* Remove gap for a seamless look on mobile */
+      }
+
+      .intro-panel {
+        width: 100% !important;
+        height: 50vh !important;
+        flex-shrink: 0;
+      }
+
+      .panel-right {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+    }
+  </style>
 
   <!-- FAVICONS -->
   <link rel="icon" href="/Assets/favicon.ico" sizes="any">
@@ -92,7 +335,7 @@
   <!-- ========================================
          MAIN CSS - BLOCKING LOAD (FIX FOR FOUC)
          ======================================== -->
-  <link rel="stylesheet" href="/style/style.min.css">
+  <link rel="stylesheet" href="/style/style.css">
 
   <!-- ========================================
          INLINE SCRIPT TO HANDLE LOAD STATE
@@ -1158,12 +1401,7 @@
 
 
   <!-- JavaScript -->
-  <script src="/script/script.min.js" defer></script>
-<link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
-    href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-straight/css/uicons-regular-straight.css">
-<link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
-    href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
-<link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-thin-rounded/css/uicons-thin-rounded.css">
+  <script src="/script/script.js" defer></script>
 </body>
 
 </html>
