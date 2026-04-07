@@ -1,23 +1,17 @@
-# 1. Force Clean URLs for SEO (Redirects .html to the clean path)
-/index.html    /          301
-/*.html        /:splat    301
-
-# 2. Silent Rewrites: Serve the .html file when a clean URL is visited
-/about         /about.html          200
-/contact       /contact.html        200
-/courses       /courses.html        200
-/enroll        /enroll.html         200
-/privacy       /privacy.html        200
-/terms         /terms.html          200
-/blog          /blog.html           200
-/blog-admin    /blog-admin.html     200
-
-# Course subdirectories
-/courses/dj-training/basic-dj-course              /courses/dj-training/basic-dj-course.html              200
-/courses/dj-training/pro-dj-course                /courses/dj-training/pro-dj-course.html                200
-/courses/dj-training/advanced-dj-performance      /courses/dj-training/advanced-dj-performance.html      200
-
-/courses/music-production/beginner-course         /courses/music-production/beginner-course.html         200
-/courses/music-production/intermediate-course     /courses/music-production/intermediate-course.html     200
-/courses/music-production/mixing-mastering-course /courses/music-production/mixing-mastering-course.html 200
-/courses/music-production/audio-engineering-diploma /courses/music-production/audio-engineering-diploma.html 200
+# Redirect .html URLs to clean URLs (SEO)
+/index.html                                          /                                               301
+/about.html                                          /about                                          301
+/contact.html                                        /contact                                        301
+/courses.html                                        /courses                                        301
+/enroll.html                                         /enroll                                         301
+/privacy.html                                        /privacy                                        301
+/terms.html                                          /terms                                          301
+/blog.html                                           /blog                                           301
+/blog-admin.html                                     /blog-admin                                     301
+/courses/dj-training/basic-dj-course.html            /courses/dj-training/basic-dj-course            301
+/courses/dj-training/pro-dj-course.html              /courses/dj-training/pro-dj-course              301
+/courses/dj-training/advanced-dj-performance.html    /courses/dj-training/advanced-dj-performance    301
+/courses/music-production/beginner-course.html       /courses/music-production/beginner-course       301
+/courses/music-production/intermediate-course.html   /courses/music-production/intermediate-course   301
+/courses/music-production/mixing-mastering-course.html /courses/music-production/mixing-mastering-course 301
+/courses/music-production/audio-engineering-diploma.html /courses/music-production/audio-engineering-diploma 301
