@@ -7,8 +7,10 @@
 /Assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Optimized Cache Control for CSS
 /*.css
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: public, max-age=2592000, must-revalidate
 
+# Optimized Cache Control for JS
 /*.js
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: public, max-age=2592000, must-revalidate
