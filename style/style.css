@@ -2039,7 +2039,7 @@ button.next:hover {
 /* MOBILE (Max 768px) */
 @media (max-width: 768px) {
   .title-container h1 {
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     margin-top: 10px;
   }
 
