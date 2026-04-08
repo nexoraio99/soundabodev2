@@ -1,5 +1,10 @@
-# Domain Consistency: Redirect WWW to Non-WWW
-https://www.soundabode.com/*  https://soundabode.com/:splat  301
+# Domain Consistency: Redirect EVERYTHING to https://soundabode.com
+http://www.soundabode.com/*  https://soundabode.com/:splat  301!
+https://www.soundabode.com/* https://soundabode.com/:splat  301!
+http://soundabode.com/*      https://soundabode.com/:splat  301!
+
+# Force HTTPS for the main domain (Netlify handles this automatically, but being explicit helps)
+# https://soundabode.com/*    https://soundabode.com/:splat  301!
 
 # Global 404 Handler
 /*  /404.html  404
