@@ -42,6 +42,7 @@ Allow: /
 User-agent: Claude-Web
 Allow: /
 
-#  SITEMAP REFERENCE 
+User-agent: *
+Allow: /
 Sitemap: https://soundabode.com/sitemap.xml
 
