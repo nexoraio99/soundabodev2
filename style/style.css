@@ -221,7 +221,8 @@ h6 {
 .social-float {
   width: 46px;
   height: 46px;
-  border-radius: 14px; /* More modern rounded corners than 50% */
+  border-radius: 14px;
+  /* More modern rounded corners than 50% */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -269,7 +270,7 @@ h6 {
 }
 
 .instagram-float:hover {
-  background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
   border-color: transparent;
 }
 
@@ -313,15 +314,16 @@ h6 {
     right: 20px;
     gap: 8px;
   }
-  
+
   .social-float {
     width: 44px;
     height: 44px;
     border-radius: 12px;
   }
-  
+
   .social-float::after {
-    display: none; /* Hide tooltips on mobile */
+    display: none;
+    /* Hide tooltips on mobile */
   }
 }
 
@@ -2036,6 +2038,11 @@ button.next:hover {
 
 /* MOBILE (Max 768px) */
 @media (max-width: 768px) {
+  .title-container h1 {
+    letter-spacing: 2px;
+    margin-top: 10px;
+  }
+
   .navbar {
     padding: 10px 20px;
   }
@@ -2056,7 +2063,8 @@ button.next:hover {
 
   .intro-panel {
     width: 100%;
-    height: 50vh; /* Reverted to 50vh to show both panels */
+    height: 50vh;
+    /* Reverted to 50vh to show both panels */
     flex-shrink: 0;
   }
 
