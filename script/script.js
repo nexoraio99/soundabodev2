@@ -1539,7 +1539,7 @@
     initGearModal();
     initStudioModal();
     initWhyDropdown();
-    initBingUET();
+    // Bing UET and tracking now handled via Cloudflare Zaraz
 
     setTimeout(() => {
       if (!state.carouselInitialized) {
