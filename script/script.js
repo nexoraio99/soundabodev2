@@ -246,52 +246,47 @@
     const videos = qAll('.intro-panel video');
     if (!videos || videos.length === 0) return;
 
-    // Optimization: Skip videos on mobile or slow connections
+    // Optimization: Skip videos on extremely slow connections (2G/3G)
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const isSlowConnection = connection && (connection.saveData || (connection.effectiveType && ['slow-2g', '2g', '3g'].includes(connection.effectiveType)));
 
-    if (isSlowConnection || isLowEndDevice() || isMobile()) {
-      console.log('[Video] Performance protection: Staying on posters.');
+    if (isSlowConnection || isLowEndDevice()) {
+      console.log('[Video] Stay on posters due to slow connection or low performance device.');
       return;
     }
 
-    // DELAYED INJECTION: Wait for page to settle before loading local videos
-    const startVideos = () => {
+    videos.forEach((video, index) => {
+      const videoSrc = video.getAttribute('data-src');
+      if (!videoSrc || video.src) return;
+
+      // Ensure muted and playsinline for mobile autoplay
+      video.muted = true;
+      video.setAttribute('muted', '');
+      video.setAttribute('playsinline', '');
+
+      // Direct source assignment is most reliable for mobile
+      video.src = videoSrc;
+      video.load();
+
+      // Small staggered delay to prevent simultaneous decoding CPU spikes
       setTimeout(() => {
-        videos.forEach((video) => {
-          const videoSrc = video.getAttribute('data-src');
-          if (!videoSrc || video.querySelector('source')) return;
+        video.play()
+          .then(() => {
+            video.classList.add('playing');
+            const panel = video.closest('.intro-panel');
+            const poster = panel ? panel.querySelector('.video-poster') : null;
+            if (poster) {
+              poster.style.opacity = '0';
+              setTimeout(() => { poster.style.zIndex = '0'; }, 500);
+            }
+          })
+          .catch(err => {
+            console.warn(`[Video ${index}] Play failed:`, err.message);
+          });
+      }, 300 * (index + 1));
+    });
 
-          // Dynamically create and append source to avoid blocking the initial network
-          const source = document.createElement('source');
-          source.src = videoSrc;
-          source.type = 'video/mp4';
-          video.appendChild(source);
-          
-          video.load();
-
-          // Smooth fade-in play
-          video.play()
-            .then(() => {
-              video.classList.add('playing');
-              const panel = video.closest('.intro-panel');
-              const poster = panel ? panel.querySelector('.video-poster') : null;
-              if (poster) {
-                poster.style.opacity = '0';
-                setTimeout(() => { poster.style.zIndex = '0'; }, 300);
-              }
-            })
-            .catch(err => console.warn('[Video] Delayed play failed:', err.message));
-        });
-        state.videosInitialized = true;
-      }, 1500); // Reduced delay for faster perceived load
-    };
-
-    if (document.readyState === 'complete') {
-      startVideos();
-    } else {
-      window.addEventListener('load', startVideos, { once: true });
-    }
+    state.videosInitialized = true;
   }
 
   /* ==========================================================================
