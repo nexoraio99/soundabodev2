@@ -205,7 +205,7 @@
       align-items: center;
       background-color: #050505;
       z-index: 1;
-      opacity: 0;
+      opacity: 1;
       padding: clamp(12px, 3vw, 20px);
     }
 
@@ -263,26 +263,8 @@
     .content-section,
     .testimonials,
     .site-footer {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      z-index: 9999;
       opacity: 1;
-      transition: opacity 0.3s ease;
-    }
-
-    body.loaded::before {
-      opacity: 0;
-      pointer-events: none;
+      visibility: visible;
     }
 
     img {
@@ -376,37 +358,9 @@
       alt="fb pixel" / decoding="async">
   </noscript>
 
-  <!-- CRITICAL: Android performance optimization script -->
-  <script>
-    (function () {
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      const isLowEnd = navigator.hardwareConcurrency < 4 || (navigator.deviceMemory && navigator.deviceMemory < 4);
-
-      if (isAndroid || isLowEnd) {
-        document.addEventListener('DOMContentLoaded', function () {
-          const videos = document.querySelectorAll('video[autoplay]');
-          videos.forEach(function (video) {
-            const poster = video.getAttribute('poster');
-            if (poster || isLowEnd) {
-              video.removeAttribute('autoplay');
-              video.pause();
-
-              if (poster) {
-                const img = document.createElement('img');
-                img.src = poster;
-                img.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;';
-                img.loading = 'lazy';
-                video.parentNode.insertBefore(img, video);
-                video.style.display = 'none';
-              }
-            }
-          });
-
-          console.log('🤖 Android optimizations applied');
-        });
-      }
-    })();
-  </script>
+  <!-- CRITICAL: Preload LCP Images directly for the Preload Scanner -->
+  <link rel="preload" href="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-800/hero-dj-poster.jpg" as="image" fetchpriority="high">
+  <link rel="preload" href="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-800/hero-production-poster.jpg" as="image" fetchpriority="high">
 
   <!-- MERGED STRUCTURED DATA -->
   <script type="application/ld+json">
@@ -629,10 +583,15 @@
   <div class="intro-overlay">
     <!-- Left Panel - DJ Training -->
     <div class="intro-panel panel-left">
-      <video muted loop playsinline preload="metadata" poster="https://soundabode.com/Assets/hero-dj-poster.jpg"
-        fetchpriority="high" data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70/Dj-training.mp4" data-mobile-autoplay="true">
-        <source data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70/Dj-training.mp4" type="video/mp4">
+      <!-- Native Poster Image for Instant LCP -->
+      <img src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-800/hero-dj-poster.jpg" 
+           alt="DJ Training Poster" class="video-poster" fetchpriority="high">
+      
+      <video muted loop playsinline preload="metadata" 
+             data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-1200/Dj-training.mp4">
+        <source data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-1200/Dj-training.mp4" type="video/mp4">
       </video>
+      
       <div class="overlay-left">
         <h2 class="left-font">Drop Beats. Command Crowds.</h2>
         <p>Step behind the decks with Soundabode's DJ Courses where rhythm meets mastery. Learn to mix, scratch, and
@@ -645,11 +604,15 @@
 
     <!-- Right Panel - Music Production -->
     <div class="intro-panel panel-right">
-      <video muted loop playsinline preload="metadata" poster="https://soundabode.com/Assets/hero-production-poster.jpg"
-        fetchpriority="high" data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70/music-production.mp4"
-        data-mobile-autoplay="true">
-        <source data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70/music-production.mp4" type="video/mp4">
+      <!-- Native Poster Image for Instant LCP -->
+      <img src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-800/hero-production-poster.jpg" 
+           alt="Music Production Poster" class="video-poster" fetchpriority="high">
+
+      <video muted loop playsinline preload="metadata" 
+             data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-1200/music-production.mp4">
+        <source data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-1200/music-production.mp4" type="video/mp4">
       </video>
+      
       <div class="overlay-right">
         <h2 class="right-font">Create Sounds That Move The World.</h2>
         <p>Craft your own sonic identity with Soundabode's Music Production & Audio Engineering Courses in Pune, India.
