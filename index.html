@@ -38,10 +38,8 @@
   <link rel="preload"
     href="https://res.cloudinary.com/di5bqvkma/image/upload/c_scale,w_100,q_auto,f_auto/v1761233576/sa-logo_edited_vycsd0.png"
     as="image" fetchpriority="high">
-  <link rel="preload" href="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-40,w-640/hero-dj-poster.jpg" as="image"
-    fetchpriority="high">
-  <link rel="preload" href="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-40,w-640/hero-production-poster.jpg" as="image"
-    fetchpriority="high">
+  <link rel="preload" href="/Assets/dj-training.jpg" as="image" fetchpriority="high">
+  <link rel="preload" href="/Assets/audio-engineering.jpg" as="image" fetchpriority="low">
 
   <link rel="preconnect" href="https://res.cloudinary.com">
   <link rel="preconnect" href="https://ik.imagekit.io">
@@ -589,12 +587,12 @@
     <!-- Left Panel - DJ Training -->
     <div class="intro-panel panel-left">
       <!-- Native Poster Image for Instant LCP -->
-      <img src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-40,w-640/hero-dj-poster.jpg" alt="DJ Training Poster"
-        class="video-poster" fetchpriority="high" decoding="sync">
+      <img src="/Assets/dj-training.jpg" alt="DJ Training Poster" class="video-poster" fetchpriority="high"
+        decoding="sync">
 
-      <video muted loop playsinline preload="none"
-        data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-1200/Dj-training.mp4">
-        <source data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-1200/Dj-training.mp4" type="video/mp4">
+      <!-- SERVING VIDEOS FROM LOCAL ASSETS -->
+      <video muted loop playsinline preload="none" data-src="/Assets/Dj-training-small.mp4">
+        <source data-src="/Assets/Dj-training-small.mp4" type="video/mp4">
       </video>
 
       <div class="overlay-left">
@@ -609,13 +607,13 @@
 
     <!-- Right Panel - Music Production -->
     <div class="intro-panel panel-right">
-      <!-- Native Poster Image for Instant LCP -->
-      <img src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-40,w-640/hero-production-poster.jpg"
-        alt="Music Production Poster" class="video-poster" fetchpriority="low" loading="lazy">
+      <!-- Native Poster Image for High Speed LCP -->
+      <img src="/Assets/audio-engineering.jpg" alt="Music Production Poster" class="video-poster" fetchpriority="low"
+        loading="lazy">
 
-      <video muted loop playsinline preload="none"
-        data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-1200/music-production.mp4">
-        <source data-src="https://ik.imagekit.io/Nex1ora2/tr:f-auto,q-70,w-1200/music-production.mp4" type="video/mp4">
+      <!-- SERVING VIDEOS FROM LOCAL ASSETS -->
+      <video muted loop playsinline preload="none" data-src="/Assets/music-production-small.mp4">
+        <source data-src="/Assets/music-production-small.mp4" type="video/mp4">
       </video>
 
       <div class="overlay-right">
