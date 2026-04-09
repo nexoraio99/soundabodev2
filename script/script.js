@@ -250,8 +250,8 @@
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const isSlowConnection = connection && (connection.saveData || (connection.effectiveType && ['slow-2g', '2g', '3g'].includes(connection.effectiveType)));
     
-    if (isSlowConnection || isLowEndDevice()) {
-      console.log('[Video] Slow connection or low-end device detected. Staying on posters.');
+    if (isSlowConnection || isLowEndDevice() || isMobile()) {
+      console.log('[Video] Mobile, slow connection, or low-end device detected. Staying on posters for performance.');
       return;
     }
 
