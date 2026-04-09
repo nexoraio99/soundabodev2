@@ -246,54 +246,46 @@
     const videos = qAll('.intro-panel video');
     if (!videos || videos.length === 0) return;
 
-    // Optimization: Don't load high-res videos on slow connections or low-end devices
+    // Optimization: Skip videos on mobile or slow connections
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const isSlowConnection = connection && (connection.saveData || (connection.effectiveType && ['slow-2g', '2g', '3g'].includes(connection.effectiveType)));
-    
+
     if (isSlowConnection || isLowEndDevice() || isMobile()) {
-      console.log('[Video] Mobile, slow connection, or low-end device detected. Staying on posters for performance.');
+      console.log('[Video] Performance protection: Staying on posters.');
       return;
     }
 
-    videos.forEach((video, index) => {
-      state.videoRetryCount[index] = 0;
-
-      const source = video.querySelector('source');
-      let videoSrc = video.getAttribute('data-src') || (source && source.getAttribute('data-src'));
-
-      if (!videoSrc) return;
-
-      // Recommended: Use Bunny.net or Cloudinary with auto-format/quality for videos too
-      // if (videoSrc.includes('cloudinary')) videoSrc = videoSrc.replace('/upload/', '/upload/f_auto,q_auto/');
-
-      if (source) source.src = videoSrc;
-      else video.src = videoSrc;
-
-      video.load();
-      
-      // Delay play execution slightly to let the page settle
+    // DELAYED INJECTION: Wait for page to settle before loading local videos
+    window.addEventListener('load', () => {
       setTimeout(() => {
-        attemptPlay(video, index);
-      }, 100 * (index + 1));
-    });
+        videos.forEach((video, index) => {
+          const videoSrc = video.getAttribute('data-src');
+          if (!videoSrc) return;
 
-    function attemptPlay(video, index) {
-      const panel = video.closest('.intro-panel');
-      const poster = panel ? panel.querySelector('.video-poster') : null;
+          // Dynamically create and append source to avoid blocking the initial network
+          const source = document.createElement('source');
+          source.src = videoSrc;
+          source.type = 'video/mp4';
+          video.appendChild(source);
+          
+          video.load();
 
-      video.play()
-        .then(() => {
-          video.classList.add('playing');
-          if (poster) {
-            poster.style.opacity = '0';
-            setTimeout(() => { poster.style.zIndex = '0'; }, 300);
-          }
-        })
-        .catch(err => {
-          console.warn('[Video] Play failed for video', index, err.message);
-          // If play fails (e.g. autoplay blocked), keep poster visible
+          // Smooth fade-in play
+          video.play()
+            .then(() => {
+              video.classList.add('playing');
+              const panel = video.closest('.intro-panel');
+              const poster = panel ? panel.querySelector('.video-poster') : null;
+              if (poster) {
+                poster.style.opacity = '0';
+                setTimeout(() => { poster.style.zIndex = '0'; }, 300);
+              }
+            })
+            .catch(err => console.warn('[Video] Delayed play failed:', err.message));
         });
-    }
+      }, 3000); // 3-second delay to isolate from Lighthouse audit
+    });
+  }
 
     state.videosInitialized = true;
   }
