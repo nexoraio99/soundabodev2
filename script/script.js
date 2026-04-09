@@ -265,7 +265,7 @@
         video.setAttribute('muted', '');
         video.setAttribute('playsinline', '');
         
-        // Direct source assignment
+        // Direct WebM source assignment
         video.src = videoSrc;
         video.load();
 
@@ -285,18 +285,17 @@
           .then(handleTransition)
           .catch(err => {
             console.warn(`[Video ${index}] Autoplay blocked, waiting for canplay:`, err.message);
-            // Fallback for strict browsers
             video.addEventListener('canplay', handleTransition, { once: true });
           });
       });
       state.videosInitialized = true;
     };
 
-    // AGGRESSIVE TRIGGER: Start as soon as DOM is ready, don't wait for images/fonts
+    // BALANCED TRIGGER: 600ms after DOM is ready ensures LCP has a head start
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', startVideos);
+      document.addEventListener('DOMContentLoaded', () => setTimeout(startVideos, 600));
     } else {
-      setTimeout(startVideos, 200);
+      setTimeout(startVideos, 600);
     }
   }
 
