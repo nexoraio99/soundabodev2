@@ -256,11 +256,11 @@
     }
 
     // DELAYED INJECTION: Wait for page to settle before loading local videos
-    window.addEventListener('load', () => {
+    const startVideos = () => {
       setTimeout(() => {
-        videos.forEach((video, index) => {
+        videos.forEach((video) => {
           const videoSrc = video.getAttribute('data-src');
-          if (!videoSrc) return;
+          if (!videoSrc || video.querySelector('source')) return;
 
           // Dynamically create and append source to avoid blocking the initial network
           const source = document.createElement('source');
@@ -283,11 +283,15 @@
             })
             .catch(err => console.warn('[Video] Delayed play failed:', err.message));
         });
-      }, 3000); // 3-second delay to isolate from Lighthouse audit
-    });
-  }
+        state.videosInitialized = true;
+      }, 1500); // Reduced delay for faster perceived load
+    };
 
-    state.videosInitialized = true;
+    if (document.readyState === 'complete') {
+      startVideos();
+    } else {
+      window.addEventListener('load', startVideos, { once: true });
+    }
   }
 
   /* ==========================================================================
