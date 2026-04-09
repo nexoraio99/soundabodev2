@@ -240,128 +240,59 @@
   }
 
   /* ==========================================================================
-     VIDEO HANDLING - MOBILE FIX
+     VIDEO HANDLING - PERFORMANCE OPTIMIZED
      ========================================================================== */
   function initIntroVideos() {
     const videos = qAll('.intro-panel video');
     if (!videos || videos.length === 0) return;
 
-    console.log('[Video Init] Found', videos.length, 'videos');
-    console.log('[Video Init] isMobile:', isMobile(), 'isAndroid:', isAndroid(), 'isIOS:', isIOS());
+    // Optimization: Don't load high-res videos on slow connections or low-end devices
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const isSlowConnection = connection && (connection.saveData || (connection.effectiveType && ['slow-2g', '2g', '3g'].includes(connection.effectiveType)));
+    
+    if (isSlowConnection || isLowEndDevice()) {
+      console.log('[Video] Slow connection or low-end device detected. Staying on posters.');
+      return;
+    }
 
     videos.forEach((video, index) => {
       state.videoRetryCount[index] = 0;
 
       const source = video.querySelector('source');
-      const videoSrc = video.getAttribute('data-src') || (source && source.getAttribute('data-src'));
+      let videoSrc = video.getAttribute('data-src') || (source && source.getAttribute('data-src'));
 
-      if (!videoSrc) {
-        console.warn('[Video Init] No data-src found for video', index);
-        return;
-      }
+      if (!videoSrc) return;
 
-      if (source) {
-        source.src = videoSrc;
-      } else {
-        video.src = videoSrc;
-      }
+      // Recommended: Use Bunny.net or Cloudinary with auto-format/quality for videos too
+      // if (videoSrc.includes('cloudinary')) videoSrc = videoSrc.replace('/upload/', '/upload/f_auto,q_auto/');
 
-      video.setAttribute('webkit-playsinline', 'true');
-      video.setAttribute('x-webkit-airplay', 'allow');
-      video.playsInline = true;
-      video.muted = true;
-      video.loop = true;
-      video.autoplay = false;
+      if (source) source.src = videoSrc;
+      else video.src = videoSrc;
 
+      video.load();
+      
+      // Delay play execution slightly to let the page settle
+      setTimeout(() => {
+        attemptPlay(video, index);
+      }, 100 * (index + 1));
+    });
+
+    function attemptPlay(video, index) {
       const panel = video.closest('.intro-panel');
       const poster = panel ? panel.querySelector('.video-poster') : null;
 
-      function attemptPlay(retryCount = 0) {
-        if (retryCount >= CONFIG.VIDEO_RETRY_ATTEMPTS) {
-          console.warn('[Video] Max retry attempts reached for video', index);
+      video.play()
+        .then(() => {
+          video.classList.add('playing');
           if (poster) {
-            poster.style.opacity = '1';
-            poster.style.zIndex = '2';
+            poster.style.opacity = '0';
+            setTimeout(() => { poster.style.zIndex = '0'; }, 300);
           }
-          return;
-        }
-
-        video.load();
-
-        const playPromise = video.play();
-
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log('[Video] Successfully playing video', index);
-              video.classList.add('playing');
-              if (poster) {
-                setTimeout(() => {
-                  poster.style.opacity = '0';
-                  poster.style.zIndex = '0';
-                }, 300);
-              }
-            })
-            .catch(err => {
-              console.warn('[Video] Play attempt', retryCount + 1, 'failed for video', index, ':', err.message);
-              setTimeout(() => {
-                attemptPlay(retryCount + 1);
-              }, CONFIG.VIDEO_RETRY_DELAY);
-            });
-        }
-      }
-
-      video.addEventListener('loadedmetadata', () => {
-        console.log('[Video] Metadata loaded for video', index);
-      });
-
-      video.addEventListener('canplay', () => {
-        console.log('[Video] Can play video', index);
-        if (!video.classList.contains('playing')) {
-          attemptPlay(0);
-        }
-      });
-
-      video.addEventListener('playing', () => {
-        console.log('[Video] Video is playing', index);
-      });
-
-      video.addEventListener('error', (e) => {
-        console.error('[Video] Error loading video', index, ':', e);
-        if (poster) {
-          poster.style.opacity = '1';
-          poster.style.zIndex = '2';
-        }
-      });
-
-      if (isIOS()) {
-        const startOnInteraction = () => {
-          attemptPlay(0);
-          document.removeEventListener('touchstart', startOnInteraction);
-        };
-        document.addEventListener('touchstart', startOnInteraction, { once: true, passive: true });
-      }
-
-      attemptPlay(0);
-    });
-
-    if (supportsIntersectionObserver()) {
-      const videoObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          const video = entry.target;
-          if (entry.isIntersecting) {
-            if (video.paused && video.readyState >= 2) {
-              video.play().catch(e => console.log('[Video] Observer play failed:', e.message));
-            }
-          } else {
-            if (!video.paused && !isLowEndDevice()) {
-              video.pause();
-            }
-          }
+        })
+        .catch(err => {
+          console.warn('[Video] Play failed for video', index, err.message);
+          // If play fails (e.g. autoplay blocked), keep poster visible
         });
-      }, { threshold: 0.25 });
-
-      videos.forEach(video => videoObserver.observe(video));
     }
 
     state.videosInitialized = true;
