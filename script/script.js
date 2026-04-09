@@ -251,42 +251,53 @@
     const isSlowConnection = connection && (connection.saveData || (connection.effectiveType && ['slow-2g', '2g', '3g'].includes(connection.effectiveType)));
 
     if (isSlowConnection || isLowEndDevice()) {
-      console.log('[Video] Stay on posters due to slow connection or low performance device.');
+      console.log('[Video] Stay on posters due to slow connection.');
       return;
     }
 
-    videos.forEach((video, index) => {
-      const videoSrc = video.getAttribute('data-src');
-      if (!videoSrc || video.src) return;
+    const startVideos = () => {
+      videos.forEach((video, index) => {
+        const videoSrc = video.getAttribute('data-src');
+        if (!videoSrc || video.src) return;
 
-      // Ensure muted and playsinline for mobile autoplay
-      video.muted = true;
-      video.setAttribute('muted', '');
-      video.setAttribute('playsinline', '');
+        // Force muted and playsinline for mobile autoplay compatibility
+        video.muted = true;
+        video.setAttribute('muted', '');
+        video.setAttribute('playsinline', '');
+        
+        // Direct source assignment
+        video.src = videoSrc;
+        video.load();
 
-      // Direct source assignment is most reliable for mobile
-      video.src = videoSrc;
-      video.load();
+        const panel = video.closest('.intro-panel');
+        const poster = panel ? panel.querySelector('.video-poster') : null;
 
-      // Small staggered delay to prevent simultaneous decoding CPU spikes
-      setTimeout(() => {
+        const handleTransition = () => {
+          video.classList.add('playing');
+          if (poster) {
+            poster.classList.add('fade-out');
+            setTimeout(() => { poster.style.display = 'none'; }, 600);
+          }
+        };
+
+        // Attempt play
         video.play()
-          .then(() => {
-            video.classList.add('playing');
-            const panel = video.closest('.intro-panel');
-            const poster = panel ? panel.querySelector('.video-poster') : null;
-            if (poster) {
-              poster.style.opacity = '0';
-              setTimeout(() => { poster.style.zIndex = '0'; }, 500);
-            }
-          })
+          .then(handleTransition)
           .catch(err => {
-            console.warn(`[Video ${index}] Play failed:`, err.message);
+            console.warn(`[Video ${index}] Autoplay blocked, waiting for canplay:`, err.message);
+            // Fallback for strict browsers
+            video.addEventListener('canplay', handleTransition, { once: true });
           });
-      }, 300 * (index + 1));
-    });
+      });
+      state.videosInitialized = true;
+    };
 
-    state.videosInitialized = true;
+    // AGGRESSIVE TRIGGER: Start as soon as DOM is ready, don't wait for images/fonts
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startVideos);
+    } else {
+      setTimeout(startVideos, 200);
+    }
   }
 
   /* ==========================================================================
