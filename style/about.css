@@ -752,19 +752,23 @@ body {
 /* NAVBAR */
 .navbar {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 10px clamp(12px, 5vw, 50px);
+  top: 1rem;
+  left: 50%;
+  width: 95%;
+  max-width: 1400px;
+  padding: 10px clamp(12px, 5vw, 30px);
   height: clamp(48px, 12vw, 60px);
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 100;
-  background-color: rgba(10, 10, 10, 0.097);
+  background-color: rgba(10, 10, 10, 0.4);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backface-visibility: hidden;
+  transform: translateX(-50%) translateZ(0);
 }
 
 .navbar a {
