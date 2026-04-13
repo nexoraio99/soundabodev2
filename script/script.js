@@ -339,7 +339,7 @@
   function masterAnimationLoop() {
     state.scrollY = window.scrollY || window.pageYOffset || 0;
 
-    if (Math.abs(state.scrollY - state.lastScrollY) > 5 || !state.ticking) {
+    if (state.scrollY !== state.lastScrollY || !state.ticking) {
       state.lastScrollY = state.scrollY;
       state.spacerStart = window.innerHeight;
       state.spacerEnd = state.spacerStart + ((DOM.spacer && DOM.spacer.offsetHeight) || 0);

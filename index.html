@@ -123,7 +123,7 @@
       background-color: #000000;
       color: #ffffff;
       overflow-x: hidden;
-      min-height: 100vh;
+      min-height: 100dvh;
       -webkit-text-size-adjust: 100%;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -131,19 +131,23 @@
 
     .navbar {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 10px clamp(12px, 5vw, 50px);
+      top: 1rem;
+      left: 50%;
+      width: 95%;
+      max-width: 1400px;
+      padding: 10px clamp(12px, 5vw, 30px);
       height: clamp(48px, 12vw, 60px);
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 100;
-      background-color: rgba(10, 10, 10, 0.7);
+      background-color: rgba(10, 10, 10, 0.4);
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      backface-visibility: hidden;
+      transform: translateX(-50%) translateZ(0);
       opacity: 1;
     }
 
@@ -152,7 +156,7 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 100vh;
+      height: 100dvh;
       display: flex;
       gap: 5px;
       z-index: 50;
@@ -202,7 +206,7 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -286,7 +290,7 @@
 
       .intro-panel {
         width: 100% !important;
-        height: 50vh !important;
+        height: 50dvh !important;
         flex-shrink: 0;
       }
 
@@ -505,14 +509,19 @@
   <!-- POPUP FORM -->
   <div id="popup-form" class="popup-overlay">
     <div class="popup-content">
-      <button class="close-btn" id="closePopup">&times;</button>
+      <button class="close-btn" id="closePopup" aria-label="Close form">&times;</button>
       <h2>Start Your Musical Journey</h2>
       <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Fill in your details and we'll get back to you!
       </p>
 
       <form id="popup-form-element">
+        <label for="popup-name" class="sr-only">Your Name</label>
         <input type="text" id="popup-name" name="name" placeholder="Your Name" required>
+        
+        <label for="popup-email" class="sr-only">Your Email</label>
         <input type="email" id="popup-email" name="email" placeholder="Your Email" required>
+        
+        <label for="popup-phone" class="sr-only">Your Phone Number</label>
         <input type="tel" id="popup-phone" name="phone" placeholder="Your Phone" required>
 
         <button type="submit">Get Started</button>
