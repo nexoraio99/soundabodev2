@@ -73,7 +73,7 @@
   const isMobile = () => window.innerWidth < 768;
   const isAndroid = () => /Android/i.test(navigator.userAgent);
   const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const isLowEndDevice = () => (navigator.deviceMemory && navigator.deviceMemory < 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 3);
+  const isLowEndDevice = () => (navigator.deviceMemory && navigator.deviceMemory < 2);
   const supportsIntersectionObserver = () => 'IntersectionObserver' in window;
 
   /* ==========================================================================
@@ -264,6 +264,8 @@
         video.muted = true;
         video.setAttribute('muted', '');
         video.setAttribute('playsinline', '');
+        video.setAttribute('autoplay', '');
+        video.autoplay = true;
         
         // Direct WebM source assignment
         video.src = videoSrc;
@@ -281,12 +283,30 @@
         };
 
         // Attempt play
-        video.play()
-          .then(handleTransition)
-          .catch(err => {
-            console.warn(`[Video ${index}] Autoplay blocked, waiting for canplay:`, err.message);
-            video.addEventListener('canplay', handleTransition, { once: true });
-          });
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(handleTransition)
+            .catch(err => {
+              console.warn(`[Video ${index}] Autoplay blocked:`, err.message);
+              // Fallback: wait for canplay, then wait for ANY user interaction to play
+              video.addEventListener('canplay', handleTransition, { once: true });
+              
+              const playOnInteract = () => {
+                video.play().then(() => {
+                  handleTransition();
+                  document.removeEventListener('touchstart', playOnInteract);
+                  document.removeEventListener('click', playOnInteract);
+                  document.removeEventListener('scroll', playOnInteract);
+                }).catch(() => {});
+              };
+              document.addEventListener('touchstart', playOnInteract, { once: true, passive: true });
+              document.addEventListener('click', playOnInteract, { once: true, passive: true });
+              document.addEventListener('scroll', playOnInteract, { once: true, passive: true });
+            });
+        } else {
+          video.addEventListener('canplay', handleTransition, { once: true });
+        }
       });
       state.videosInitialized = true;
     };
