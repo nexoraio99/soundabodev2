@@ -52,11 +52,40 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             "default-src": ["'self'"],
-            "script-src": ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.socket.io"],
+            "script-src": [
+                "'self'", 
+                "'unsafe-inline'", 
+                "https://cdnjs.cloudflare.com", 
+                "https://cdn.socket.io",
+                "https://connect.facebook.net",
+                "https://www.googletagmanager.com",
+                "https://www.google-analytics.com"
+            ],
             "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             "font-src": ["'self'", "https://fonts.gstatic.com"],
-            "img-src": ["'self'", "data:", "https://res.cloudinary.com"],
-            "connect-src": ["'self'", "ws:", "wss:", "http://localhost:3000", "https://soundabode.com"]
+            "img-src": [
+                "'self'", 
+                "data:", 
+                "https://res.cloudinary.com",
+                "https://www.facebook.com",
+                "https://www.google-analytics.com",
+                "https://ik.imagekit.io"
+            ],
+            "connect-src": [
+                "'self'", 
+                "ws:", 
+                "wss:", 
+                "http://localhost:3000", 
+                "https://soundabode.com",
+                "https://www.facebook.com",
+                "https://www.google-analytics.com",
+                "https://connect.facebook.net"
+            ],
+            "frame-src": [
+                "'self'",
+                "https://www.facebook.com",
+                "https://www.googletagmanager.com"
+            ]
         }
     }
 }));
