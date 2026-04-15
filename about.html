@@ -183,34 +183,9 @@
       style="display:none;visibility:hidden" alt="bing-uet-noscript" / decoding="async">
   </noscript>
 
-  <!-- ========================
-       Meta / Facebook Pixel (deferred)
-       Pixel ID: 2260208107777252 (replace if needed)
-       ======================== -->
-  <script>
-    (function (pixelId) {
-      if (!pixelId) return;
-      function initPixel() {
-        if (window.fbq) return;
-        !function (f, b, e, v, n, t, s) {
-          if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments) };
-          if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
-          t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0];
-          s.parentNode.insertBefore(t, s);
-        }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', pixelId);
-        fbq('track', 'PageView');
-      }
-      if ('requestIdleCallback' in window) requestIdleCallback(initPixel);
-      else setTimeout(initPixel, 1800);
-    })('2260208107777252');
-  </script>
 
-  <!-- Meta Pixel noscript fallback -->
-  <noscript>
-    <img height="1" width="1" src="https://www.facebook.com/tr?id=2260208107777252&ev=PageView&noscript=1"
-      style="display:none;visibility:hidden" alt="fb-pixel-noscript" / decoding="async">
-  </noscript>
+
+
 
   <!-- End head -->
 </head>
@@ -530,14 +505,7 @@
           console.warn('dataLayer push failed', e);
         }
 
-        try {
-          // Facebook Pixel
-          if (window.fbq) {
-            window.fbq('track', 'Contact', { source: source || 'contact' });
-          }
-        } catch (e) {
-          // ignore
-        }
+
       };
     })();
   </script>
