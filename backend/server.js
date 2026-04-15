@@ -55,11 +55,15 @@ app.use(helmet({
             "script-src": [
                 "'self'", 
                 "'unsafe-inline'", 
+                "'unsafe-eval'",
                 "https://cdnjs.cloudflare.com", 
                 "https://cdn.socket.io",
                 "https://connect.facebook.net",
                 "https://www.googletagmanager.com",
-                "https://www.google-analytics.com"
+                "https://www.google-analytics.com",
+                "https://bat.bing.com",
+                "https://www.googleadservices.com",
+                "https://googleads.g.doubleclick.net"
             ],
             "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             "font-src": ["'self'", "https://fonts.gstatic.com"],
@@ -69,7 +73,13 @@ app.use(helmet({
                 "https://res.cloudinary.com",
                 "https://www.facebook.com",
                 "https://www.google-analytics.com",
-                "https://ik.imagekit.io"
+                "https://analytics.google.com",
+                "https://ik.imagekit.io",
+                "https://www.google.com",
+                "https://www.google.co.in",
+                "https://googleads.g.doubleclick.net",
+                "https://bat.bing.com",
+                "https://cx.atdmt.com"
             ],
             "connect-src": [
                 "'self'", 
@@ -77,14 +87,24 @@ app.use(helmet({
                 "wss:", 
                 "http://localhost:3000", 
                 "https://soundabode.com",
+                "https://soundabodev2-server.onrender.com",
+                "https://script.google.com",
+                "https://script.googleusercontent.com",
                 "https://www.facebook.com",
                 "https://www.google-analytics.com",
-                "https://connect.facebook.net"
+                "https://analytics.google.com",
+                "https://connect.facebook.net",
+                "https://bat.bing.com",
+                "https://www.google.com",
+                "https://www.google.co.in",
+                "https://googleads.g.doubleclick.net",
+                "https://www.googleadservices.com"
             ],
             "frame-src": [
                 "'self'",
                 "https://www.facebook.com",
-                "https://www.googletagmanager.com"
+                "https://www.googletagmanager.com",
+                "https://td.doubleclick.net"
             ]
         }
     }
