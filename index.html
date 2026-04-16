@@ -5,20 +5,22 @@
   <meta charset="UTF-8">
   <!-- Meta Pixel Code -->
   <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () {
+        n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+      n.queue = []; t = b.createElement(e); t.async = !0;
+      t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '976314001636856');
     fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=976314001636856&ev=PageView&noscript=1"
-  /></noscript>
+      src="https://www.facebook.com/tr?id=976314001636856&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel Code -->
 
   <!-- CRITICAL: Android viewport optimization -->
@@ -355,12 +357,12 @@
   <script>
     // Mark page as loaded and hide global loader after animation
     window.addEventListener('DOMContentLoaded', function () {
-      setTimeout(function() {
+      setTimeout(function () {
         var loader = document.getElementById('global-loader');
         if (loader) {
           loader.classList.add('hidden');
         }
-        
+
         document.body.classList.add('loaded');
         // Fade in sections
         requestAnimationFrame(function () {
@@ -377,7 +379,7 @@
       if (!document.body.classList.contains('loaded')) {
         var loader = document.getElementById('global-loader');
         if (loader) loader.classList.add('hidden');
-        
+
         document.body.classList.add('loaded');
         document.querySelectorAll('.content-section, .testimonials, .site-footer').forEach(function (el) {
           el.style.opacity = '1';
@@ -549,10 +551,10 @@
       <form id="popup-form-element">
         <label for="popup-name" class="sr-only">Your Name</label>
         <input type="text" id="popup-name" name="name" placeholder="Your Name" required>
-        
+
         <label for="popup-email" class="sr-only">Your Email</label>
         <input type="email" id="popup-email" name="email" placeholder="Your Email" required>
-        
+
         <label for="popup-phone" class="sr-only">Your Phone Number</label>
         <input type="tel" id="popup-phone" name="phone" placeholder="Your Phone" required>
 
@@ -640,8 +642,8 @@
       <div class="overlay-left">
         <h2 class="left-font">Drop Beats. Command Crowds.</h2>
         <p>Step behind the decks with Soundabode's DJ Courses where rhythm meets mastery. Learn to mix, scratch, and
-          perform like the pros with industry standard Pioneer gear and real-world club techniques.</p>
-        <p>From bedroom sets to main-stage energy your DJ journey starts here.</p>
+          perform like the pros with industry standard Pioneer gear and real-world club techniques. From bedroom sets to
+          main-stage energy your DJ journey starts here.</p>
         <a href="/courses" class="glow-border" style="display:inline-block; margin-top: 12px;">Explore
           Courses</a>
       </div>
@@ -654,7 +656,8 @@
         alt="Music Production Poster" class="video-poster" fetchpriority="low" loading="lazy">
 
       <!-- GHOST VIDEO - INJECTED VIA JS FOR 90%+ SCORE -->
-      <video autoplay muted loop playsinline preload="none" data-src="/Assets/music-production.webm" id="hero-video-right">
+      <video autoplay muted loop playsinline preload="none" data-src="/Assets/music-production.webm"
+        id="hero-video-right">
       </video>
 
       <div class="overlay-right">
@@ -688,7 +691,7 @@
 
       <div class="sa-col">
         <p>
-          We’re not just Teachers we’re Producers, DJ's, and Music lovers who’ve been exactly where you are. If you’re
+          We’re not just teachers we’re Producers, DJ's, and Music lovers who’ve been exactly where you are. If you’re
           ready to create, perform, and make your sound heard, this is where it begins.
         </p>
       </div>
@@ -773,7 +776,8 @@
               <p>Turn your passion for music into real-world DJ skills with Soundabode's pro DJ courses from beginner
                 decks to club-ready sets. Hands-on training on industry standard gear. Learn beatmatching, mixing, and
                 live performance. Mentorship from real performing DJs. Flexible batches for creators, students & night
-                owls. Master Pioneer CDJs, Rekordbox & Traktor while performing across genres Techno, Psytrance, House,
+                owls. Master Pioneer CDJs, Rekordbox & Traktor while performing across genres like Techno, Psytrance,
+                House,
                 Hip-Hop & Club music.</p>
             </div>
 
@@ -867,13 +871,13 @@
                 Learn Ableton Live from certified mentors. Craft your own sound from scratch. Mix & master like the
                 pros. Build your artist identity and release-ready tracks. From bedroom beats to festival feeds it all
                 starts here. Join Soundabode, India's next-gen music production school built for artists who want more
-                than tutorials - they want results. Learn to produce across styles Electronic, Techno, Psytrance,
+                than tutorials they want results. Learn to produce across styles like Techno, Psytrance,
                 Hip-Hop, House, Drum & Bass, Dubstep, and EDM using Ableton Live, professional hardware, and real-world
                 studio workflows.</p>
             </div>
 
             <div class="content-block secondary">
-              <p>Go beyond music production - explore game music composition, background scoring for films, web series,
+              <p>Go beyond music production, explore game music composition, background scoring for films, web series,
                 and advertisements, sound design for YouTube creators. Our courses also empower classically trained
                 musicians to start their own independent studio setups and transform their compositions into
                 professional releases. Craft, compose and produce your signature sound through expert-led programs
