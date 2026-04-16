@@ -959,6 +959,13 @@
         }
         try {
           sendConversionTracking('popup_form_submitted', { name: name, email: email });
+          // ✅ Meta Pixel custom event
+          if (typeof fbq === 'function') {
+            fbq('trackCustom', 'contact_form_submit', {
+              content_name: 'Homepage Popup',
+              status: 'success'
+            });
+          }
         } catch (e) { }
         form.reset();
         setTimeout(() => {
@@ -1070,6 +1077,13 @@
         }
         try {
           sendConversionTracking('contact_form_submitted', { name: data.fullName, email: data.email });
+          // ✅ Meta Pixel custom event
+          if (typeof fbq === 'function') {
+            fbq('trackCustom', 'contact_form_submit', {
+              content_name: data.course || 'Contact Form',
+              status: 'success'
+            });
+          }
         } catch (e) { }
         form.reset();
         if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset();

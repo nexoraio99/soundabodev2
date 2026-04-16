@@ -1338,6 +1338,14 @@
               event_category: 'enrollment',
               event_label: interest
             });
+
+            // ✅ Meta Pixel custom event
+            if (typeof fbq === 'function') {
+              fbq('trackCustom', 'contact_form_submit', {
+                content_name: interest || 'Course Enrollment',
+                status: 'success'
+              });
+            }
           } catch (tErr) {
             console.warn('Tracking error:', tErr);
           }

@@ -771,6 +771,14 @@
             if (formNote) formNote.style.display = 'none';
             if (formSuccess) formSuccess.style.display = 'block';
 
+            // ✅ Meta Pixel custom event
+            if (typeof fbq === 'function') {
+              fbq('trackCustom', 'contact_form_submit', {
+                content_name: 'Basic DJ Course',
+                status: 'success'
+              });
+            }
+
             // TODO: replace with real backend call
             setTimeout(function () { closeModal(); }, 1200);
           });

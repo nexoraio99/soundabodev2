@@ -609,6 +609,15 @@
             body: JSON.stringify(payload)
           })
           .then(res => res.json())
+          .then(data => {
+            // ✅ Meta Pixel custom event
+            if (typeof fbq === 'function') {
+              fbq('trackCustom', 'contact_form_submit', {
+                content_name: 'Mixing & Mastering Course',
+                status: 'success'
+              });
+            }
+          })
           .catch(err => console.error('Enquiry error:', err));
 
           setTimeout(() => { closeModal(); }, 1800);

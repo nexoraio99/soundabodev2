@@ -171,6 +171,14 @@
         
         form.style.display = 'none';
         success.style.display = 'block';
+
+        // ✅ Meta Pixel custom event
+        if (typeof fbq === 'function') {
+          fbq('trackCustom', 'contact_form_submit', {
+            content_name: interest,
+            status: 'success'
+          });
+        }
       } catch (error) {
         console.error('Submission error:', error);
         alert('Something went wrong. Please try again or contact us on WhatsApp.');

@@ -856,9 +856,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
               })
-              .then(res => res.json())
               .then(data => {
                 console.log('Enquiry response:', data);
+                // ✅ Meta Pixel custom event
+                if (typeof fbq === 'function') {
+                  fbq('trackCustom', 'contact_form_submit', {
+                    content_name: 'Intermediate Music Production',
+                    status: 'success'
+                  });
+                }
               })
               .catch(err => {
                 console.error('Enquiry error:', err);

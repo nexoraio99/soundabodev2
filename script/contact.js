@@ -245,6 +245,14 @@
           ec_phone: formData.phone,
           ec_course: formData.course
         });
+
+        // ✅ Meta Pixel custom event
+        if (typeof fbq === 'function') {
+          fbq('trackCustom', 'contact_form_submit', {
+            content_name: formData.course,
+            status: 'success'
+          });
+        }
   
         // ✅ Bing UET conversion tracking
         try {
